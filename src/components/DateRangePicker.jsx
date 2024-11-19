@@ -18,20 +18,41 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 const DateRangePicker = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedRange, setSelectedRange] = useState({ start: null, end: null });
-  const [baseMonth, setBaseMonth] = useState(startOfMonth(new Date()));
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [direction, setDirection] = useState(null);
   const [isSelecting, setIsSelecting] = useState(false);
-  const popoverRef = useRef(null);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date()));
+  const monthsContainerRef = useRef(null);
+  const [months, setMonths] = useState([
+    addMonths(currentMonth, -1),
+    currentMonth,
+    addMonths(currentMonth, 1)
+  ]);
 
-  const handleMonthChange = (newDirection) => {
+  const moveToMonth = (direction) => {
     if (isAnimating) return;
-    
-    setDirection(newDirection);
     setIsAnimating(true);
+
+    const container = monthsContainerRef.current;
+    const slideAmount = container.offsetWidth;
     
+    container.style.transition = 'transform 0.3s ease-in-out';
+    container.style.transform = `translateX(${direction === 'next' ? -slideAmount : slideAmount}px)`;
+
+    const newCurrentMonth = addMonths(currentMonth, direction === 'next' ? 1 : -1);
+    setCurrentMonth(newCurrentMonth);
+
     setTimeout(() => {
-      setBaseMonth(prev => newDirection === 'next' ? addMonths(prev, 1) : addMonths(prev, -1));
+      container.style.transition = 'none';
+      container.style.transform = 'translateX(0)';
+      
+      setMonths(prev => {
+        if (direction === 'next') {
+          return [prev[1], prev[2], addMonths(prev[2], 1)];
+        } else {
+          return [addMonths(prev[0], -1), prev[0], prev[1]];
+        }
+      });
+      
       setIsAnimating(false);
     }, 300);
   };
@@ -56,6 +77,36 @@ const DateRangePicker = () => {
     setIsSelecting(false);
   };
 
+  const handleMouseDown = (e) => {
+    if (isSelecting) return;
+    e.preventDefault();
+    setIsSelecting(true);
+    
+    document.body.style.userSelect = 'none';
+    document.body.style.webkitUserSelect = 'none';
+    document.body.style.mozUserSelect = 'none';
+    document.body.style.msUserSelect = 'none';
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
+
+  const handleMouseMove = (e) => {
+    e.preventDefault();
+  };
+
+  const handleMouseUp = () => {
+    setIsSelecting(false);
+    
+    document.body.style.userSelect = '';
+    document.body.style.webkitUserSelect = '';
+    document.body.style.mozUserSelect = '';
+    document.body.style.msUserSelect = '';
+    
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', handleMouseUp);
+  };
+
   const getDisplayText = () => {
     if (!selectedRange.start && !selectedRange.end) return 'Select date range';
     if (selectedRange.start && !selectedRange.end) {
@@ -64,85 +115,109 @@ const DateRangePicker = () => {
     return `${format(parseISO(selectedRange.start), 'MMM dd, yyyy')} to ${format(parseISO(selectedRange.end), 'MMM dd, yyyy')}`;
   };
 
+  const MonthPair = ({ firstMonth, secondMonth }) => (
+    <div style={{ display: 'flex', minWidth: '100%', flex: 'none' }}>
+      <div style={{ width: '50%' }}>
+        <MonthGrid
+          baseDate={firstMonth}
+          selectedRange={selectedRange}
+          onSelectionStart={handleSelectionStart}
+          onSelectionMove={handleSelectionMove}
+          isSelecting={isSelecting}
+        />
+      </div>
+      <div style={{ width: '50%' }}>
+        <MonthGrid
+          baseDate={secondMonth}
+          selectedRange={selectedRange}
+          onSelectionStart={handleSelectionStart}
+          onSelectionMove={handleSelectionMove}
+          isSelecting={isSelecting}
+        />
+      </div>
+    </div>
+  );
+
   return (
-    <div className="position-relative">
+    <div 
+      className="position-relative"
+      onMouseDown={handleMouseDown}
+      style={{ 
+        userSelect: 'none',
+        WebkitUserSelect: 'none',
+        MozUserSelect: 'none',
+        msUserSelect: 'none'
+      }}
+    >
       <Form.Control
         type="text"
         value={getDisplayText()}
         onClick={() => setIsOpen(true)}
         readOnly
-        style={{ width: '300px', cursor: 'pointer' }}
+        style={{ 
+          width: '300px', 
+          cursor: 'pointer',
+          userSelect: 'none',
+          WebkitUserSelect: 'none',
+          MozUserSelect: 'none',
+          msUserSelect: 'none'
+        }}
       />
       
       {isOpen && (
         <Card 
-          ref={popoverRef}
           className="position-absolute mt-2 shadow"
           style={{ 
             zIndex: 1000, 
             width: '700px',
             userSelect: 'none',
-            WebkitUserSelect: 'none', // For Safari
-            MozUserSelect: 'none',    // For Firefox
-            msUserSelect: 'none'      // For IE/Edge
+            WebkitUserSelect: 'none',
+            MozUserSelect: 'none',
+            msUserSelect: 'none',
+            overflow: 'hidden'
           }}
-          onMouseUp={handleSelectionEnd}
+          onMouseDown={e => {
+            e.stopPropagation();
+            handleMouseDown(e);
+          }}
+          onMouseUp={e => {
+            e.stopPropagation();
+            handleMouseUp();
+            handleSelectionEnd();
+          }}
         >
           <Card.Header className="d-flex justify-content-between align-items-center bg-white border-bottom">
             <Button
               variant="light"
-              onClick={() => handleMonthChange('prev')}
+              onClick={() => moveToMonth('prev')}
               className="px-2 py-1"
+              disabled={isAnimating}
             >
               ←
             </Button>
             <span className="fw-bold">
-              {format(baseMonth, 'MMMM yyyy')} - {format(addMonths(baseMonth, 1), 'MMMM yyyy')}
+              {format(currentMonth, 'MMMM yyyy')} - {format(addMonths(currentMonth, 1), 'MMMM yyyy')}
             </span>
             <Button
               variant="light"
-              onClick={() => handleMonthChange('next')}
+              onClick={() => moveToMonth('next')}
               className="px-2 py-1"
+              disabled={isAnimating}
             >
               →
             </Button>
           </Card.Header>
-          <Card.Body 
-            style={{ 
-              overflow: 'hidden',
-              padding: '1rem 0.5rem',
-              touchAction: 'none' // Prevents touch scrolling during selection
-            }}
-          >
-            <div
+          <Card.Body style={{ padding: '1rem 0.5rem', position: 'relative', overflow: 'hidden' }}>
+            <div 
+              ref={monthsContainerRef}
               style={{
-                transform: isAnimating 
-                  ? `translateX(${direction === 'next' ? '-100%' : '100%'})` 
-                  : 'translateX(0)',
-                transition: 'transform 0.3s ease-in-out',
                 display: 'flex',
+                width: '100%'
               }}
             >
-              <div className="d-flex" style={{ width: '100%' }}>
-                <div style={{ width: '50%' }}>
-                  <MonthGrid
-                    baseDate={baseMonth}
-                    selectedRange={selectedRange}
-                    onSelectionStart={handleSelectionStart}
-                    onSelectionMove={handleSelectionMove}
-                    isSelecting={isSelecting}
-                  />
-                </div>
-                <div style={{ width: '50%' }}>
-                  <MonthGrid
-                    baseDate={addMonths(baseMonth, 1)}
-                    selectedRange={selectedRange}
-                    onSelectionStart={handleSelectionStart}
-                    onSelectionMove={handleSelectionMove}
-                    isSelecting={isSelecting}
-                  />
-                </div>
-              </div>
+              <MonthPair firstMonth={months[0]} secondMonth={months[1]} />
+              <MonthPair firstMonth={months[1]} secondMonth={months[2]} />
+              <MonthPair firstMonth={months[2]} secondMonth={addMonths(months[2], 1)} />
             </div>
           </Card.Body>
           <Card.Footer className="d-flex justify-content-between">
