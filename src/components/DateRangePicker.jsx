@@ -1,5 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Container, Form, Button, Card, Row, Col, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { ChevronRight } from 'react-bootstrap-icons';
+import debounce from 'lodash-es/debounce';
 import { 
   format, 
   addMonths, 
@@ -14,231 +16,6 @@ import {
   isSameMonth
 } from 'date-fns';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
-const DateRangePicker = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedRange, setSelectedRange] = useState({ start: null, end: null });
-  const [isSelecting, setIsSelecting] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date()));
-  const monthsContainerRef = useRef(null);
-  const [months, setMonths] = useState([
-    addMonths(currentMonth, -1),
-    currentMonth,
-    addMonths(currentMonth, 1)
-  ]);
-
-  const moveToMonth = (direction) => {
-    if (isAnimating) return;
-    setIsAnimating(true);
-
-    const container = monthsContainerRef.current;
-    const slideAmount = container.offsetWidth;
-    
-    container.style.transition = 'transform 0.3s ease-in-out';
-    container.style.transform = `translateX(${direction === 'next' ? -slideAmount : slideAmount}px)`;
-
-    const newCurrentMonth = addMonths(currentMonth, direction === 'next' ? 1 : -1);
-    setCurrentMonth(newCurrentMonth);
-
-    setTimeout(() => {
-      container.style.transition = 'none';
-      container.style.transform = 'translateX(0)';
-      
-      setMonths(prev => {
-        if (direction === 'next') {
-          return [prev[1], prev[2], addMonths(prev[2], 1)];
-        } else {
-          return [addMonths(prev[0], -1), prev[0], prev[1]];
-        }
-      });
-      
-      setIsAnimating(false);
-    }, 300);
-  };
-
-  const handleSelectionStart = (date) => {
-    setIsSelecting(true);
-    setSelectedRange({ start: date.toISOString(), end: null });
-  };
-
-  const handleSelectionMove = (date) => {
-    if (!isSelecting || !selectedRange.start) return;
-    
-    const start = parseISO(selectedRange.start);
-    if (date < start) {
-      setSelectedRange(prev => ({ ...prev, end: prev.start, start: date.toISOString() }));
-    } else {
-      setSelectedRange(prev => ({ ...prev, end: date.toISOString() }));
-    }
-  };
-
-  const handleSelectionEnd = () => {
-    setIsSelecting(false);
-  };
-
-  const handleMouseDown = (e) => {
-    if (isSelecting) return;
-    e.preventDefault();
-    setIsSelecting(true);
-    
-    document.body.style.userSelect = 'none';
-    document.body.style.webkitUserSelect = 'none';
-    document.body.style.mozUserSelect = 'none';
-    document.body.style.msUserSelect = 'none';
-
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-  };
-
-  const handleMouseMove = (e) => {
-    e.preventDefault();
-  };
-
-  const handleMouseUp = () => {
-    setIsSelecting(false);
-    
-    document.body.style.userSelect = '';
-    document.body.style.webkitUserSelect = '';
-    document.body.style.mozUserSelect = '';
-    document.body.style.msUserSelect = '';
-    
-    document.removeEventListener('mousemove', handleMouseMove);
-    document.removeEventListener('mouseup', handleMouseUp);
-  };
-
-  const getDisplayText = () => {
-    if (!selectedRange.start && !selectedRange.end) return 'Select date range';
-    if (selectedRange.start && !selectedRange.end) {
-      return format(parseISO(selectedRange.start), 'MMM dd, yyyy');
-    }
-    return `${format(parseISO(selectedRange.start), 'MMM dd, yyyy')} to ${format(parseISO(selectedRange.end), 'MMM dd, yyyy')}`;
-  };
-
-  const MonthPair = ({ firstMonth, secondMonth }) => (
-    <div style={{ display: 'flex', minWidth: '100%', flex: 'none' }}>
-      <div style={{ width: '50%' }}>
-        <MonthGrid
-          baseDate={firstMonth}
-          selectedRange={selectedRange}
-          onSelectionStart={handleSelectionStart}
-          onSelectionMove={handleSelectionMove}
-          isSelecting={isSelecting}
-        />
-      </div>
-      <div style={{ width: '50%' }}>
-        <MonthGrid
-          baseDate={secondMonth}
-          selectedRange={selectedRange}
-          onSelectionStart={handleSelectionStart}
-          onSelectionMove={handleSelectionMove}
-          isSelecting={isSelecting}
-        />
-      </div>
-    </div>
-  );
-
-  return (
-    <div 
-      className="position-relative"
-      onMouseDown={handleMouseDown}
-      style={{ 
-        userSelect: 'none',
-        WebkitUserSelect: 'none',
-        MozUserSelect: 'none',
-        msUserSelect: 'none'
-      }}
-    >
-      <Form.Control
-        type="text"
-        value={getDisplayText()}
-        onClick={() => setIsOpen(true)}
-        readOnly
-        style={{ 
-          width: '300px', 
-          cursor: 'pointer',
-          userSelect: 'none',
-          WebkitUserSelect: 'none',
-          MozUserSelect: 'none',
-          msUserSelect: 'none'
-        }}
-      />
-      
-      {isOpen && (
-        <Card 
-          className="position-absolute mt-2 shadow"
-          style={{ 
-            zIndex: 1000, 
-            width: '700px',
-            userSelect: 'none',
-            WebkitUserSelect: 'none',
-            MozUserSelect: 'none',
-            msUserSelect: 'none',
-            overflow: 'hidden'
-          }}
-          onMouseDown={e => {
-            e.stopPropagation();
-            handleMouseDown(e);
-          }}
-          onMouseUp={e => {
-            e.stopPropagation();
-            handleMouseUp();
-            handleSelectionEnd();
-          }}
-        >
-          <Card.Header className="d-flex justify-content-between align-items-center bg-white border-bottom">
-            <Button
-              variant="light"
-              onClick={() => moveToMonth('prev')}
-              className="px-2 py-1"
-              disabled={isAnimating}
-            >
-              ←
-            </Button>
-            <span className="fw-bold">
-              {format(currentMonth, 'MMMM yyyy')} - {format(addMonths(currentMonth, 1), 'MMMM yyyy')}
-            </span>
-            <Button
-              variant="light"
-              onClick={() => moveToMonth('next')}
-              className="px-2 py-1"
-              disabled={isAnimating}
-            >
-              →
-            </Button>
-          </Card.Header>
-          <Card.Body style={{ padding: '1rem 0.5rem', position: 'relative', overflow: 'hidden' }}>
-            <div 
-              ref={monthsContainerRef}
-              style={{
-                display: 'flex',
-                width: '100%'
-              }}
-            >
-              <MonthPair firstMonth={months[0]} secondMonth={months[1]} />
-              <MonthPair firstMonth={months[1]} secondMonth={months[2]} />
-              <MonthPair firstMonth={months[2]} secondMonth={addMonths(months[2], 1)} />
-            </div>
-          </Card.Body>
-          <Card.Footer className="d-flex justify-content-between">
-            <Button
-              variant="light"
-              onClick={() => setSelectedRange({ start: null, end: null })}
-            >
-              Clear
-            </Button>
-            <Button
-              variant="primary"
-              onClick={() => setIsOpen(false)}
-            >
-              Apply
-            </Button>
-          </Card.Footer>
-        </Card>
-      )}
-    </div>
-  );
-};
 
 const DayCell = ({ 
   date, 
@@ -347,13 +124,341 @@ const MonthGrid = ({
               isInRange={isInRange}
               isCurrentMonth={isCurrentMonth}
               onMouseDown={() => onSelectionStart(date)}
-              onMouseEnter={() => isSelecting && onSelectionMove(date)}
+              onMouseEnter={() => onSelectionMove(date)}
             />
           );
         })}
       </div>
     </div>
   );
+};
+
+const MonthPair = ({ firstMonth, secondMonth, selectedRange, onSelectionStart, onSelectionMove, isSelecting }) => (
+  <div style={{ display: 'flex', minWidth: '100%', flex: 'none' }}>
+    <div style={{ width: '50%' }}>
+      <MonthGrid
+        baseDate={firstMonth}
+        selectedRange={selectedRange}
+        onSelectionStart={onSelectionStart}
+        onSelectionMove={onSelectionMove}
+        isSelecting={isSelecting}
+      />
+    </div>
+    <div style={{ width: '50%' }}>
+      <MonthGrid
+        baseDate={secondMonth}
+        selectedRange={selectedRange}
+        onSelectionStart={onSelectionStart}
+        onSelectionMove={onSelectionMove}
+        isSelecting={isSelecting}
+      />
+    </div>
+  </div>
+);
+
+const createDebouncedMoveToMonth = (moveToMonthFn) => 
+  debounce(moveToMonthFn, 1000, { leading: true, trailing: false });
+
+const DateRangePicker = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedRange, setSelectedRange] = useState({ start: null, end: null });
+  const [isSelecting, setIsSelecting] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date()));
+  const monthsContainerRef = useRef(null);
+  const containerRef = useRef(null);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isOutsideBounds, setIsOutsideBounds] = useState(false);
+  const debouncedMoveToMonthRef = useRef(null);
+  
+  const [months, setMonths] = useState([
+    addMonths(currentMonth, -1),
+    currentMonth,
+    addMonths(currentMonth, 1)
+  ]);
+
+  const moveToMonth = useCallback((direction) => {
+    if (isAnimating) return;
+    
+    setIsAnimating(true);
+    const container = monthsContainerRef.current;
+    if (!container) return;
+    
+    const slideAmount = container.offsetWidth;
+    container.style.transition = 'transform 0.3s ease-in-out';
+    container.style.transform = `translateX(${direction === 'next' ? -slideAmount : slideAmount}px)`;
+
+    const newCurrentMonth = addMonths(currentMonth, direction === 'next' ? 1 : -1);
+    setCurrentMonth(newCurrentMonth);
+
+    setTimeout(() => {
+      container.style.transition = 'none';
+      container.style.transform = 'translateX(0)';
+      
+      setMonths(prev => {
+        if (direction === 'next') {
+          return [prev[1], prev[2], addMonths(prev[2], 1)];
+        } else {
+          return [addMonths(prev[0], -1), prev[0], prev[1]];
+        }
+      });
+      
+      setIsAnimating(false);
+    }, 300);
+  }, [isAnimating, currentMonth]);
+
+  useEffect(() => {
+    debouncedMoveToMonthRef.current = createDebouncedMoveToMonth(moveToMonth);
+  }, [moveToMonth]);
+
+  const FloatingIndicator = () => {
+    if (!isOutsideBounds || !isSelecting) return null;
+    
+    if (debouncedMoveToMonthRef.current) {
+      debouncedMoveToMonthRef.current('next');
+    }
+  
+    return (
+      <div
+        style={{
+          position: 'fixed',
+          left: `${mousePosition.x + 20}px`,
+          top: `${mousePosition.y - 20}px`,
+          background: '#0d6efd',
+          color: 'white',
+          padding: '8px 12px',
+          borderRadius: '4px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+          zIndex: 1100,
+          fontSize: '14px',
+          transition: 'opacity 0.2s ease',
+          opacity: 1,
+          pointerEvents: 'none'
+        }}
+      >
+        <ChevronRight size={16} />
+        <span>Next Month</span>
+      </div>
+    );
+  };
+
+  const handleSelectionStart = (date) => {
+    setIsSelecting(true);
+    setSelectedRange({ start: date.toISOString(), end: null });
+  };
+
+  const handleSelectionMove = (date) => {
+    if (!isSelecting || !selectedRange.start) return;
+    
+    const start = parseISO(selectedRange.start);
+    if (date < start) {
+      setSelectedRange(prev => ({ ...prev, end: prev.start, start: date.toISOString() }));
+    } else {
+      setSelectedRange(prev => ({ ...prev, end: date.toISOString() }));
+    }
+  };
+  
+  const handleMouseMove = useCallback((e) => {
+    e.preventDefault();
+    
+    if (!isSelecting || !containerRef.current) return;
+
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const mouseX = e.clientX;
+    const mouseY = e.clientY;
+    
+    setMousePosition({ x: mouseX, y: mouseY });
+    
+    const isOutside = mouseX > containerRect.right;
+    setIsOutsideBounds(isOutside);
+  }, [isSelecting]);
+
+  const handleMouseUp = useCallback(() => {
+    setIsSelecting(false);
+    setIsOutsideBounds(false);
+    
+    document.body.style.userSelect = '';
+    document.body.style.webkitUserSelect = '';
+    document.body.style.mozUserSelect = '';
+    document.body.style.msUserSelect = '';
+    
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', handleMouseUp);
+  }, [handleMouseMove]);
+
+  const handleMouseDown = (e) => {
+    if (isSelecting) return;
+    e.preventDefault();
+    setIsSelecting(true);
+    
+    document.body.style.userSelect = 'none';
+    document.body.style.webkitUserSelect = 'none';
+    document.body.style.mozUserSelect = 'none';
+    document.body.style.msUserSelect = 'none';
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
+
+  const getDisplayText = () => {
+    if (!selectedRange.start && !selectedRange.end) return 'Select date range';
+    if (selectedRange.start && !selectedRange.end) {
+      return format(parseISO(selectedRange.start), 'MMM dd, yyyy');
+    }
+    return `${format(parseISO(selectedRange.start), 'MMM dd, yyyy')} to ${format(parseISO(selectedRange.end), 'MMM dd, yyyy')}`;
+  };
+
+  useEffect(() => {
+    let checkInterval;
+    
+    if (isSelecting && isOutsideBounds) {
+      checkInterval = setInterval(() => {
+        if (isSelecting && isOutsideBounds && debouncedMoveToMonthRef.current) {
+          debouncedMoveToMonthRef.current('next');
+        }
+      }, 1000);
+    }
+  
+    return () => {
+      if (checkInterval) {
+        clearInterval(checkInterval);
+      }
+    };
+  }, [isSelecting, isOutsideBounds]);
+
+  return (
+    <div 
+      className="position-relative"
+      onMouseDown={handleMouseDown}
+      style={{ 
+        userSelect: 'none',
+        WebkitUserSelect: 'none',
+        MozUserSelect: 'none',
+        msUserSelect: 'none'
+      }}
+    >
+      <Form.Control
+        type="text"
+        value={getDisplayText()}
+        onClick={() => setIsOpen(true)}
+        readOnly
+        style={{ 
+          width: '300px', 
+          cursor: 'pointer',
+          userSelect: 'none',
+          WebkitUserSelect: 'none',
+          MozUserSelect: 'none',
+          msUserSelect: 'none'
+        }}
+      />
+      
+      {isOpen && (
+        <>
+          <Card 
+            ref={containerRef}
+            className="position-absolute mt-2 shadow"
+            style={{ 
+              zIndex: 1000, 
+              width: '700px',
+              userSelect: 'none',
+              WebkitUserSelect: 'none',
+              MozUserSelect: 'none',
+              msUserSelect: 'none',
+              overflow: 'hidden'
+            }}
+            onMouseDown={e => {
+              e.stopPropagation();
+              handleMouseDown(e);
+            }}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={() => setIsOutsideBounds(true)}
+          >
+            <Card.Header className="d-flex justify-content-between align-items-center bg-white border-bottom">
+              <Button
+                variant="light"
+                onClick={() => moveToMonth('prev')}
+                className="px-2 py-1"
+                disabled={isAnimating}
+              >
+                ←
+              </Button>
+              <span className="fw-bold">
+                {format(currentMonth, 'MMMM yyyy')} - {format(addMonths(currentMonth, 1), 'MMMM yyyy')}
+              </span>
+              <Button
+                variant="light"
+                onClick={() => moveToMonth('next')}
+                className="px-2 py-1"
+                disabled={isAnimating}
+              >
+                →
+              </Button>
+            </Card.Header>
+            <Card.Body style={{ padding: '1rem 0.5rem', position: 'relative', overflow: 'hidden' }}>
+              <div 
+                ref={monthsContainerRef}
+                style={{
+                  display: 'flex',
+                  width: '100%'
+                }}
+              >
+                <MonthPair 
+                  firstMonth={months[0]} 
+                  secondMonth={months[1]}
+                  selectedRange={selectedRange}
+                  onSelectionStart={handleSelectionStart}
+                  onSelectionMove={handleSelectionMove}
+                  isSelecting={isSelecting}
+                />
+                <MonthPair 
+                  firstMonth={months[1]} 
+                  secondMonth={months[2]}
+                  selectedRange={selectedRange}
+                  onSelectionStart={handleSelectionStart}
+                  onSelectionMove={handleSelectionMove}
+                  isSelecting={isSelecting}
+                />
+                <MonthPair 
+                  firstMonth={months[2]} 
+                  secondMonth={addMonths(months[2], 1)}
+                  selectedRange={selectedRange}
+                  onSelectionStart={handleSelectionStart}
+                  onSelectionMove={handleSelectionMove}
+                  isSelecting={isSelecting}
+                />
+              </div>
+            </Card.Body>
+            <Card.Footer className="d-flex justify-content-between">
+            <Button
+               variant="light"
+               onClick={() => {
+                 setSelectedRange({ start: null, end: null });
+                 setIsSelecting(false);
+               }}
+             >
+               Clear
+             </Button>
+             <Button
+               variant="primary"
+               onClick={() => {
+                 setIsOpen(false);
+                 setIsSelecting(false);
+                 setIsOutsideBounds(false);
+               }}
+             >
+               Apply
+             </Button>
+           </Card.Footer>
+         </Card>
+         <FloatingIndicator />
+       </>
+     )}
+   </div>
+ );
 };
 
 export default DateRangePicker;
