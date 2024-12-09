@@ -170,7 +170,6 @@ const DateRangePicker = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isOutsideBounds, setIsOutsideBounds] = useState(false);
   const debouncedMoveToMonthRef = useRef(null);
-  
   const [months, setMonths] = useState([
     addMonths(currentMonth, -1),
     currentMonth,
@@ -179,14 +178,30 @@ const DateRangePicker = () => {
 
   const moveToMonth = useCallback((direction) => {
     if (isAnimating) return;
-    
+
     setIsAnimating(true);
     const container = monthsContainerRef.current;
     if (!container) return;
-    
+
     const slideAmount = container.offsetWidth;
+    
+    // Position the container before animation starts
+    container.style.transition = 'none';
+    container.style.transform = `translateX(${direction === 'next' ? 0 : -slideAmount}px)`;
+    
+    // Force a reflow
+    container.offsetHeight;
+    
+    // Update months before animation for "prev" direction
+    if (direction === 'prev') {
+      setMonths(prev => [addMonths(prev[0], -1), prev[0], prev[1]]);
+      // Force another reflow to ensure content is rendered
+      container.offsetHeight;
+    }
+
+    // Start animation
     container.style.transition = 'transform 0.3s ease-in-out';
-    container.style.transform = `translateX(${direction === 'next' ? -slideAmount : slideAmount}px)`;
+    container.style.transform = `translateX(${direction === 'next' ? -slideAmount : 0}px)`;
 
     const newCurrentMonth = addMonths(currentMonth, direction === 'next' ? 1 : -1);
     setCurrentMonth(newCurrentMonth);
@@ -195,6 +210,7 @@ const DateRangePicker = () => {
       container.style.transition = 'none';
       container.style.transform = 'translateX(0)';
       
+      // Update months array after animation
       setMonths(prev => {
         if (direction === 'next') {
           return [prev[1], prev[2], addMonths(prev[2], 1)];
@@ -202,14 +218,10 @@ const DateRangePicker = () => {
           return [addMonths(prev[0], -1), prev[0], prev[1]];
         }
       });
-      
+
       setIsAnimating(false);
     }, 300);
   }, [isAnimating, currentMonth]);
-
-  useEffect(() => {
-    debouncedMoveToMonthRef.current = createDebouncedMoveToMonth(moveToMonth);
-  }, [moveToMonth]);
 
   const FloatingIndicator = () => {
     if (!isOutsideBounds || !isSelecting) return null;

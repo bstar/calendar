@@ -31,8 +31,23 @@ export const useMonthNavigation = (initialMonth = new Date()) => {
     setIsAnimating(true);
 
     const container = monthsContainerRef.current;
-    const slideAmount = container.offsetWidth;
+    if (!container) return;
     
+    const slideAmount = container.offsetWidth;
+
+    // Prepare the new content before animation
+    setMonths(prev => {
+      if (direction === 'next') {
+        return [prev[1], prev[2], addMonths(prev[2], 1)];
+      } else {
+        return [addMonths(prev[0], -1), prev[0], prev[1]];
+      }
+    });
+
+    // Force a reflow to ensure new content is rendered
+    container.offsetHeight;
+
+    // Now start the animation
     container.style.transition = 'transform 0.3s ease-in-out';
     container.style.transform = `translateX(${direction === 'next' ? -slideAmount : slideAmount}px)`;
 
@@ -43,6 +58,7 @@ export const useMonthNavigation = (initialMonth = new Date()) => {
       container.style.transition = 'none';
       container.style.transform = 'translateX(0)';
       
+      // Update months array to prepare for next transition
       setMonths(prev => {
         if (direction === 'next') {
           return [prev[1], prev[2], addMonths(prev[2], 1)];
@@ -64,7 +80,6 @@ export const useMonthNavigation = (initialMonth = new Date()) => {
     canChangeMonth
   };
 };
-
 export const useRangeSelection = () => {
   const [selectedRange, setSelectedRange] = useState({ start: null, end: null });
   const [isSelecting, setIsSelecting] = useState(false);
