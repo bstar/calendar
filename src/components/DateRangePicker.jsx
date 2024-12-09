@@ -38,23 +38,23 @@ const DayCell = ({
   // Calculate isSelected and isInRange using more precise date comparisons
   const isSelected = useMemo(() => {
     if (!selectedRange.start) return false;
-    
+
     const startDate = parseISO(selectedRange.start);
     const endDate = selectedRange.end ? parseISO(selectedRange.end) : null;
-    
+
     return isSameDay(date, startDate) || (endDate && isSameDay(date, endDate));
   }, [date, selectedRange.start, selectedRange.end]);
 
   const isInRange = useMemo(() => {
     if (!selectedRange.start || !selectedRange.end) return false;
-    
+
     const startDate = parseISO(selectedRange.start);
     const endDate = parseISO(selectedRange.end);
-    
+
     // Ensure start is always before end
     const rangeStart = startDate < endDate ? startDate : endDate;
     const rangeEnd = startDate < endDate ? endDate : startDate;
-    
+
     // Include the boundary dates in the range check
     return date >= rangeStart && date <= rangeEnd;
   }, [date, selectedRange.start, selectedRange.end]);
@@ -149,20 +149,20 @@ const MonthGrid = ({
           </div>
         ))}
 
-{weeks.flat().map(date => {
-  const isCurrentMonth = isSameMonth(date, baseDate);
+        {weeks.flat().map(date => {
+          const isCurrentMonth = isSameMonth(date, baseDate);
 
-  return (
-    <DayCell
-      key={date.toISOString()}
-      date={date}
-      selectedRange={selectedRange}
-      isCurrentMonth={isCurrentMonth}
-      onMouseDown={() => onSelectionStart(date)}
-      onMouseEnter={() => onSelectionMove(date)}
-    />
-  );
-})}
+          return (
+            <DayCell
+              key={date.toISOString()}
+              date={date}
+              selectedRange={selectedRange}
+              isCurrentMonth={isCurrentMonth}
+              onMouseDown={() => onSelectionStart(date)}
+              onMouseEnter={() => onSelectionMove(date)}
+            />
+          );
+        })}
       </div>
     </div>
   );
@@ -223,71 +223,71 @@ const DateRangePicker = () => {
   const moveToMonthRef = useRef(null);
 
 
-// Create a stable version of moveToMonth that doesn't change on renders
-moveToMonthRef.current = useCallback((direction) => {
-  if (isAnimating) return;
+  // Create a stable version of moveToMonth that doesn't change on renders
+  moveToMonthRef.current = useCallback((direction) => {
+    if (isAnimating) return;
 
-  setIsAnimating(true);
-  const container = monthsContainerRef.current;
-  if (!container) return;
+    setIsAnimating(true);
+    const container = monthsContainerRef.current;
+    if (!container) return;
 
-  const slideAmount = container.offsetWidth / 2; // Half width since we're moving one month
+    const slideAmount = container.offsetWidth / 2; // Half width since we're moving one month
 
-  // 1. First update the months array and current month BEFORE any animation
-  const newCurrentMonth = addMonths(currentMonth, direction === 'next' ? 1 : -1);
-  setCurrentMonth(newCurrentMonth);
+    // 1. First update the months array and current month BEFORE any animation
+    const newCurrentMonth = addMonths(currentMonth, direction === 'next' ? 1 : -1);
+    setCurrentMonth(newCurrentMonth);
 
-  // 2. Force a reflow to ensure new content is rendered
-  container.style.transition = 'none';
-  container.style.transform = `translateX(${direction === 'next' ? 0 : -slideAmount}px)`;
-  container.offsetHeight; // Force reflow
+    // 2. Force a reflow to ensure new content is rendered
+    container.style.transition = 'none';
+    container.style.transform = `translateX(${direction === 'next' ? 0 : -slideAmount}px)`;
+    container.offsetHeight; // Force reflow
 
-  // Update months array before animation
-  if (direction === 'prev') {
-    setMonths(prev => [addMonths(prev[0], -1), prev[0], prev[1]]);
-  }
-
-  // 3. Start the animation
-  requestAnimationFrame(() => {
-    container.style.transition = 'transform 0.3s ease-in-out';
-    container.style.transform = `translateX(${direction === 'next' ? -slideAmount : 0}px)`;
-
-    // 4. Clean up after animation
-    setTimeout(() => {
-      container.style.transition = 'none';
-      container.style.transform = 'translateX(0)';
-
-      setMonths(prev => {
-        if (direction === 'next') {
-          return [prev[1], prev[2], addMonths(prev[2], 1)];
-        } else {
-          return [prev[0], prev[1], addMonths(prev[1], 1)];
-        }
-      });
-
-      setIsAnimating(false);
-    }, 300);
-  });
-}, [isAnimating, currentMonth]);
-
-// Setup the debounced version once
-useEffect(() => {
-  debouncedMoveToMonthRef.current = debounce((direction) => {
-    if (moveToMonthRef.current) {
-      moveToMonthRef.current(direction);
+    // Update months array before animation
+    if (direction === 'prev') {
+      setMonths(prev => [addMonths(prev[0], -1), prev[0], prev[1]]);
     }
-  }, 1000, { leading: true, trailing: false });
 
-  return () => {
-    if (debouncedMoveToMonthRef.current) {
-      debouncedMoveToMonthRef.current.cancel();
-    }
-  };
-}, []); // Empty dependency array since we're using refs
+    // 3. Start the animation
+    requestAnimationFrame(() => {
+      container.style.transition = 'transform 0.3s ease-in-out';
+      container.style.transform = `translateX(${direction === 'next' ? -slideAmount : 0}px)`;
+
+      // 4. Clean up after animation
+      setTimeout(() => {
+        container.style.transition = 'none';
+        container.style.transform = 'translateX(0)';
+
+        setMonths(prev => {
+          if (direction === 'next') {
+            return [prev[1], prev[2], addMonths(prev[2], 1)];
+          } else {
+            return [prev[0], prev[1], addMonths(prev[1], 1)];
+          }
+        });
+
+        setIsAnimating(false);
+      }, 300);
+    });
+  }, [isAnimating, currentMonth]);
+
+  // Setup the debounced version once
+  useEffect(() => {
+    debouncedMoveToMonthRef.current = debounce((direction) => {
+      if (moveToMonthRef.current) {
+        moveToMonthRef.current(direction);
+      }
+    }, 1000, { leading: true, trailing: false });
+
+    return () => {
+      if (debouncedMoveToMonthRef.current) {
+        debouncedMoveToMonthRef.current.cancel();
+      }
+    };
+  }, []); // Empty dependency array since we're using refs
 
   const FloatingIndicator = () => {
     if (!isOutsideBounds || !isSelecting) return null;
-    
+
     return (
       <div
         style={{
@@ -322,9 +322,9 @@ useEffect(() => {
 
   const handleSelectionMove = date => {
     if (!isSelecting || !selectedRange.start) return;
-  
+
     const startDate = parseISO(selectedRange.start);
-    
+
     if (date < startDate) {
       // When selecting backwards
       setSelectedRange({
@@ -342,18 +342,18 @@ useEffect(() => {
 
   const handleMouseMove = useCallback((e) => {
     e.preventDefault();
-  
+
     if (!isSelecting || !containerRef.current) return;
-  
+
     const containerRect = containerRef.current.getBoundingClientRect();
     const mouseX = e.clientX;
     const mouseY = e.clientY;
-  
+
     setMousePosition({ x: mouseX, y: mouseY });
-  
+
     const wasOutside = isOutsideBounds;
     const isOutside = mouseX > containerRect.right;
-    
+
     if (isOutside !== wasOutside) {
       setIsOutsideBounds(isOutside);
       if (isOutside && debouncedMoveToMonthRef.current) {
@@ -362,11 +362,11 @@ useEffect(() => {
       }
     }
   }, [isSelecting, isOutsideBounds]);
-  
+
   // Update the interval to have a shorter initial delay
   useEffect(() => {
     let checkInterval;
-    
+
     if (isSelecting && isOutsideBounds) {
       // Do the first check after a delay
       const timeoutId = setTimeout(() => {
@@ -374,20 +374,20 @@ useEffect(() => {
           moveToMonthRef.current('next');
         }
       }, 1000);
-  
+
       // Then set up the interval
       checkInterval = setInterval(() => {
         if (isSelecting && isOutsideBounds && moveToMonthRef.current) {
           moveToMonthRef.current('next');
         }
       }, 1000);
-  
+
       return () => {
         clearTimeout(timeoutId);
         clearInterval(checkInterval);
       };
     }
-  
+
     return () => {
       if (checkInterval) {
         clearInterval(checkInterval);
@@ -435,7 +435,7 @@ useEffect(() => {
 
   useEffect(() => {
     let checkInterval;
-    
+
     if (isSelecting && isOutsideBounds) {
       checkInterval = setInterval(() => {
         if (isSelecting && isOutsideBounds && debouncedMoveToMonthRef.current) {
@@ -443,7 +443,7 @@ useEffect(() => {
         }
       }, 1000);
     }
-  
+
     return () => {
       if (checkInterval) {
         clearInterval(checkInterval);
@@ -499,28 +499,28 @@ useEffect(() => {
             onMouseUp={handleMouseUp}
             onMouseLeave={() => setIsOutsideBounds(true)}
           >
-<Card.Header className="d-flex justify-content-between align-items-center bg-white border-bottom">
-  <Button
-    variant="light"
-    onClick={() => moveToMonthRef.current("prev")}
-    className="px-2 py-1"
-    disabled={isAnimating}
-  >
-    ←
-  </Button>
-  <span className="fw-bold">
-    {format(months[0], "MMMM yyyy")} -{" "}
-    {format(months[1], "MMMM yyyy")}
-  </span>
-  <Button
-    variant="light"
-    onClick={() => moveToMonthRef.current("next")}
-    className="px-2 py-1"
-    disabled={isAnimating}
-  >
-    →
-  </Button>
-</Card.Header>
+            <Card.Header className="d-flex justify-content-between align-items-center bg-white border-bottom">
+              <Button
+                variant="light"
+                onClick={() => moveToMonthRef.current("prev")}
+                className="px-2 py-1"
+                disabled={isAnimating}
+              >
+                ←
+              </Button>
+              <span className="fw-bold">
+                {format(months[0], "MMMM yyyy")} -{" "}
+                {format(months[1], "MMMM yyyy")}
+              </span>
+              <Button
+                variant="light"
+                onClick={() => moveToMonthRef.current("next")}
+                className="px-2 py-1"
+                disabled={isAnimating}
+              >
+                →
+              </Button>
+            </Card.Header>
             <Card.Body
               style={{
                 padding: "1rem 0.5rem",
@@ -528,34 +528,34 @@ useEffect(() => {
                 overflow: "hidden",
               }}
             >
-<div
-  ref={monthsContainerRef}
-  style={{
-    display: 'flex',
-    width: '100%',
-    position: 'relative',
-    transform: 'translateX(0)',
-    willChange: 'transform'
-  }}
->
-  {/* This should create an overlapping sequence of month pairs */}
-  <MonthPair
-    firstMonth={months[0]}    // e.g., Dec
-    secondMonth={months[1]}   // e.g., Jan
-    selectedRange={selectedRange}
-    onSelectionStart={handleSelectionStart}
-    onSelectionMove={handleSelectionMove}
-    isSelecting={isSelecting}
-  />
-  <MonthPair
-    firstMonth={months[1]}    // e.g., Jan
-    secondMonth={months[2]}   // e.g., Feb
-    selectedRange={selectedRange}
-    onSelectionStart={handleSelectionStart}
-    onSelectionMove={handleSelectionMove}
-    isSelecting={isSelecting}
-  />
-</div>
+              <div
+                ref={monthsContainerRef}
+                style={{
+                  display: 'flex',
+                  width: '100%',
+                  position: 'relative',
+                  transform: 'translateX(0)',
+                  willChange: 'transform'
+                }}
+              >
+                {/* This should create an overlapping sequence of month pairs */}
+                <MonthPair
+                  firstMonth={months[0]}    // e.g., Dec
+                  secondMonth={months[1]}   // e.g., Jan
+                  selectedRange={selectedRange}
+                  onSelectionStart={handleSelectionStart}
+                  onSelectionMove={handleSelectionMove}
+                  isSelecting={isSelecting}
+                />
+                <MonthPair
+                  firstMonth={months[1]}    // e.g., Jan
+                  secondMonth={months[2]}   // e.g., Feb
+                  selectedRange={selectedRange}
+                  onSelectionStart={handleSelectionStart}
+                  onSelectionMove={handleSelectionMove}
+                  isSelecting={isSelecting}
+                />
+              </div>
             </Card.Body>
             <Card.Footer className="d-flex justify-content-between">
               <Button
