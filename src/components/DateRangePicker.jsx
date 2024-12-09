@@ -62,13 +62,13 @@ const DayCell = ({
             backgroundColor: isSelected
               ? "#0d6efd"
               : isInRange
-              ? "#e9ecef"
-              : "transparent",
+                ? "#e9ecef"
+                : "transparent",
             color: isSelected
               ? "white"
               : isCurrentMonth
-              ? "inherit"
-              : "#adb5bd",
+                ? "inherit"
+                : "#adb5bd",
             borderRadius: "4px",
             transition: "background-color 0.15s ease, color 0.15s ease",
             fontWeight: isSelected ? "600" : "normal",
@@ -213,71 +213,74 @@ const DateRangePicker = () => {
     currentMonth,
     addMonths(currentMonth, 1),
   ]);
+  const moveToMonthRef = useRef(null);
 
-  const moveToMonth = useCallback(
-    direction => {
-      if (isAnimating) return;
 
-      setIsAnimating(true);
-      const container = monthsContainerRef.current;
-      if (!container) return;
+// Create a stable version of moveToMonth that doesn't change on renders
+moveToMonthRef.current = useCallback((direction) => {
+  if (isAnimating) return;
 
-      const slideAmount = container.offsetWidth;
+  setIsAnimating(true);
+  const container = monthsContainerRef.current;
+  if (!container) return;
 
-      // Position the container before animation starts
-      container.style.transition = "none";
-      container.style.transform = `translateX(${
-        direction === "next" ? 0 : -slideAmount
-      }px)`;
+  const slideAmount = container.offsetWidth;
 
-      // Force a reflow
-      container.offsetHeight;
+  // Position the container before animation starts
+  container.style.transition = 'none';
+  container.style.transform = `translateX(${direction === 'next' ? 0 : -slideAmount}px)`;
 
-      // Update months before animation for "prev" direction
-      if (direction === "prev") {
-        setMonths(prev => [addMonths(prev[0], -1), prev[0], prev[1]]);
-        // Force another reflow to ensure content is rendered
-        container.offsetHeight;
+  // Force a reflow
+  container.offsetHeight;
+
+  // Update months before animation for "prev" direction
+  if (direction === 'prev') {
+    setMonths(prev => [addMonths(prev[0], -1), prev[0], prev[1]]);
+    // Force another reflow to ensure content is rendered
+    container.offsetHeight;
+  }
+
+  // Start animation
+  container.style.transition = 'transform 0.3s ease-in-out';
+  container.style.transform = `translateX(${direction === 'next' ? -slideAmount : 0}px)`;
+
+  const newCurrentMonth = addMonths(currentMonth, direction === 'next' ? 1 : -1);
+  setCurrentMonth(newCurrentMonth);
+
+  setTimeout(() => {
+    container.style.transition = 'none';
+    container.style.transform = 'translateX(0)';
+
+    setMonths(prev => {
+      if (direction === 'next') {
+        return [prev[1], prev[2], addMonths(prev[2], 1)];
+      } else {
+        return [addMonths(prev[0], -1), prev[0], prev[1]];
       }
+    });
 
-      // Start animation
-      container.style.transition = "transform 0.3s ease-in-out";
-      container.style.transform = `translateX(${
-        direction === "next" ? -slideAmount : 0
-      }px)`;
+    setIsAnimating(false);
+  }, 300);
+}, [isAnimating, currentMonth]);
 
-      const newCurrentMonth = addMonths(
-        currentMonth,
-        direction === "next" ? 1 : -1
-      );
-      setCurrentMonth(newCurrentMonth);
+// Setup the debounced version once
+useEffect(() => {
+  debouncedMoveToMonthRef.current = debounce((direction) => {
+    if (moveToMonthRef.current) {
+      moveToMonthRef.current(direction);
+    }
+  }, 1000, { leading: true, trailing: false });
 
-      setTimeout(() => {
-        container.style.transition = "none";
-        container.style.transform = "translateX(0)";
-
-        // Update months array after animation
-        setMonths(prev => {
-          if (direction === "next") {
-            return [prev[1], prev[2], addMonths(prev[2], 1)];
-          } else {
-            return [addMonths(prev[0], -1), prev[0], prev[1]];
-          }
-        });
-
-        setIsAnimating(false);
-      }, 300);
-    },
-    [isAnimating, currentMonth]
-  );
+  return () => {
+    if (debouncedMoveToMonthRef.current) {
+      debouncedMoveToMonthRef.current.cancel();
+    }
+  };
+}, []); // Empty dependency array since we're using refs
 
   const FloatingIndicator = () => {
     if (!isOutsideBounds || !isSelecting) return null;
-
-    if (debouncedMoveToMonthRef.current) {
-      debouncedMoveToMonthRef.current("next");
-    }
-
+    
     return (
       <div
         style={{
@@ -325,23 +328,60 @@ const DateRangePicker = () => {
     }
   };
 
-  const handleMouseMove = useCallback(
-    e => {
-      e.preventDefault();
-
-      if (!isSelecting || !containerRef.current) return;
-
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const mouseX = e.clientX;
-      const mouseY = e.clientY;
-
-      setMousePosition({ x: mouseX, y: mouseY });
-
-      const isOutside = mouseX > containerRect.right;
+  const handleMouseMove = useCallback((e) => {
+    e.preventDefault();
+  
+    if (!isSelecting || !containerRef.current) return;
+  
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const mouseX = e.clientX;
+    const mouseY = e.clientY;
+  
+    setMousePosition({ x: mouseX, y: mouseY });
+  
+    const wasOutside = isOutsideBounds;
+    const isOutside = mouseX > containerRect.right;
+    
+    if (isOutside !== wasOutside) {
       setIsOutsideBounds(isOutside);
-    },
-    [isSelecting]
-  );
+      if (isOutside && debouncedMoveToMonthRef.current) {
+        // Trigger immediately when first going outside
+        moveToMonthRef.current('next');
+      }
+    }
+  }, [isSelecting, isOutsideBounds]);
+  
+  // Update the interval to have a shorter initial delay
+  useEffect(() => {
+    let checkInterval;
+    
+    if (isSelecting && isOutsideBounds) {
+      // Do the first check after a delay
+      const timeoutId = setTimeout(() => {
+        if (isSelecting && isOutsideBounds && moveToMonthRef.current) {
+          moveToMonthRef.current('next');
+        }
+      }, 1000);
+  
+      // Then set up the interval
+      checkInterval = setInterval(() => {
+        if (isSelecting && isOutsideBounds && moveToMonthRef.current) {
+          moveToMonthRef.current('next');
+        }
+      }, 1000);
+  
+      return () => {
+        clearTimeout(timeoutId);
+        clearInterval(checkInterval);
+      };
+    }
+  
+    return () => {
+      if (checkInterval) {
+        clearInterval(checkInterval);
+      }
+    };
+  }, [isSelecting, isOutsideBounds, moveToMonthRef]);
 
   const handleMouseUp = useCallback(() => {
     setIsSelecting(false);
@@ -383,21 +423,21 @@ const DateRangePicker = () => {
 
   useEffect(() => {
     let checkInterval;
-
+    
     if (isSelecting && isOutsideBounds) {
       checkInterval = setInterval(() => {
         if (isSelecting && isOutsideBounds && debouncedMoveToMonthRef.current) {
-          debouncedMoveToMonthRef.current("next");
+          debouncedMoveToMonthRef.current('next');
         }
       }, 1000);
     }
-
+  
     return () => {
       if (checkInterval) {
         clearInterval(checkInterval);
       }
     };
-  }, [isSelecting, isOutsideBounds]);
+  }, [isSelecting, isOutsideBounds, moveToMonthRef]);
 
   return (
     <div
@@ -450,7 +490,7 @@ const DateRangePicker = () => {
             <Card.Header className="d-flex justify-content-between align-items-center bg-white border-bottom">
               <Button
                 variant="light"
-                onClick={() => moveToMonth("prev")}
+                onClick={() => moveToMonthRef.current("prev")}
                 className="px-2 py-1"
                 disabled={isAnimating}
               >
@@ -462,7 +502,7 @@ const DateRangePicker = () => {
               </span>
               <Button
                 variant="light"
-                onClick={() => moveToMonth("next")}
+                onClick={() => moveToMonthRef.current("next")}
                 className="px-2 py-1"
                 disabled={isAnimating}
               >
@@ -479,8 +519,11 @@ const DateRangePicker = () => {
               <div
                 ref={monthsContainerRef}
                 style={{
-                  display: "flex",
-                  width: "100%",
+                  display: 'flex',
+                  width: '100%',
+                  position: 'relative',
+                  transform: 'translateX(0)',
+                  willChange: 'transform'
                 }}
               >
                 <MonthPair
