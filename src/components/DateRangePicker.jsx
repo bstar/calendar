@@ -231,43 +231,43 @@ moveToMonthRef.current = useCallback((direction) => {
   const container = monthsContainerRef.current;
   if (!container) return;
 
-  const slideAmount = container.offsetWidth;
+  const slideAmount = container.offsetWidth / 2; // Half width since we're moving one month
 
-  // Position the container before animation starts
-  container.style.transition = 'none';
-  container.style.transform = `translateX(${direction === 'next' ? 0 : -slideAmount}px)`;
-
-  // Force a reflow
-  container.offsetHeight;
-
-  // Update months before animation for "prev" direction
-  if (direction === 'prev') {
-    setMonths(prev => [addMonths(prev[0], -1), prev[0], prev[1]]);
-    // Force another reflow to ensure content is rendered
-    container.offsetHeight;
-  }
-
-  // Start animation
-  container.style.transition = 'transform 0.3s ease-in-out';
-  container.style.transform = `translateX(${direction === 'next' ? -slideAmount : 0}px)`;
-
+  // 1. First update the months array and current month BEFORE any animation
   const newCurrentMonth = addMonths(currentMonth, direction === 'next' ? 1 : -1);
   setCurrentMonth(newCurrentMonth);
 
-  setTimeout(() => {
-    container.style.transition = 'none';
-    container.style.transform = 'translateX(0)';
+  // 2. Force a reflow to ensure new content is rendered
+  container.style.transition = 'none';
+  container.style.transform = `translateX(${direction === 'next' ? 0 : -slideAmount}px)`;
+  container.offsetHeight; // Force reflow
 
-    setMonths(prev => {
-      if (direction === 'next') {
-        return [prev[1], prev[2], addMonths(prev[2], 1)];
-      } else {
-        return [addMonths(prev[0], -1), prev[0], prev[1]];
-      }
-    });
+  // Update months array before animation
+  if (direction === 'prev') {
+    setMonths(prev => [addMonths(prev[0], -1), prev[0], prev[1]]);
+  }
 
-    setIsAnimating(false);
-  }, 300);
+  // 3. Start the animation
+  requestAnimationFrame(() => {
+    container.style.transition = 'transform 0.3s ease-in-out';
+    container.style.transform = `translateX(${direction === 'next' ? -slideAmount : 0}px)`;
+
+    // 4. Clean up after animation
+    setTimeout(() => {
+      container.style.transition = 'none';
+      container.style.transform = 'translateX(0)';
+
+      setMonths(prev => {
+        if (direction === 'next') {
+          return [prev[1], prev[2], addMonths(prev[2], 1)];
+        } else {
+          return [prev[0], prev[1], addMonths(prev[1], 1)];
+        }
+      });
+
+      setIsAnimating(false);
+    }, 300);
+  });
 }, [isAnimating, currentMonth]);
 
 // Setup the debounced version once
@@ -528,41 +528,34 @@ useEffect(() => {
                 overflow: "hidden",
               }}
             >
-              <div
-                ref={monthsContainerRef}
-                style={{
-                  display: 'flex',
-                  width: '100%',
-                  position: 'relative',
-                  transform: 'translateX(0)',
-                  willChange: 'transform'
-                }}
-              >
-                <MonthPair
-                  firstMonth={months[0]}
-                  secondMonth={months[1]}
-                  selectedRange={selectedRange}
-                  onSelectionStart={handleSelectionStart}
-                  onSelectionMove={handleSelectionMove}
-                  isSelecting={isSelecting}
-                />
-                <MonthPair
-                  firstMonth={months[1]}
-                  secondMonth={months[2]}
-                  selectedRange={selectedRange}
-                  onSelectionStart={handleSelectionStart}
-                  onSelectionMove={handleSelectionMove}
-                  isSelecting={isSelecting}
-                />
-                <MonthPair
-                  firstMonth={months[2]}
-                  secondMonth={addMonths(months[2], 1)}
-                  selectedRange={selectedRange}
-                  onSelectionStart={handleSelectionStart}
-                  onSelectionMove={handleSelectionMove}
-                  isSelecting={isSelecting}
-                />
-              </div>
+<div
+  ref={monthsContainerRef}
+  style={{
+    display: 'flex',
+    width: '100%',
+    position: 'relative',
+    transform: 'translateX(0)',
+    willChange: 'transform'
+  }}
+>
+  {/* This should create an overlapping sequence of month pairs */}
+  <MonthPair
+    firstMonth={months[0]}    // e.g., Dec
+    secondMonth={months[1]}   // e.g., Jan
+    selectedRange={selectedRange}
+    onSelectionStart={handleSelectionStart}
+    onSelectionMove={handleSelectionMove}
+    isSelecting={isSelecting}
+  />
+  <MonthPair
+    firstMonth={months[1]}    // e.g., Jan
+    secondMonth={months[2]}   // e.g., Feb
+    selectedRange={selectedRange}
+    onSelectionStart={handleSelectionStart}
+    onSelectionMove={handleSelectionMove}
+    isSelecting={isSelecting}
+  />
+</div>
             </Card.Body>
             <Card.Footer className="d-flex justify-content-between">
               <Button
