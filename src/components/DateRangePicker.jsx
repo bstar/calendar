@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import React, { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import {
   Container,
   Form,
@@ -28,13 +28,36 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 const DayCell = ({
   date,
-  isSelected,
-  isInRange,
+  selectedRange,
   isCurrentMonth,
   onMouseDown,
   onMouseEnter,
 }) => {
   const tooltipContent = `Week ${getISOWeek(date)}`;
+
+  // Calculate isSelected and isInRange using more precise date comparisons
+  const isSelected = useMemo(() => {
+    if (!selectedRange.start) return false;
+    
+    const startDate = parseISO(selectedRange.start);
+    const endDate = selectedRange.end ? parseISO(selectedRange.end) : null;
+    
+    return isSameDay(date, startDate) || (endDate && isSameDay(date, endDate));
+  }, [date, selectedRange.start, selectedRange.end]);
+
+  const isInRange = useMemo(() => {
+    if (!selectedRange.start || !selectedRange.end) return false;
+    
+    const startDate = parseISO(selectedRange.start);
+    const endDate = parseISO(selectedRange.end);
+    
+    // Ensure start is always before end
+    const rangeStart = startDate < endDate ? startDate : endDate;
+    const rangeEnd = startDate < endDate ? endDate : startDate;
+    
+    // Include the boundary dates in the range check
+    return date >= rangeStart && date <= rangeEnd;
+  }, [date, selectedRange.start, selectedRange.end]);
 
   return (
     <OverlayTrigger
@@ -72,9 +95,6 @@ const DayCell = ({
             borderRadius: "4px",
             transition: "background-color 0.15s ease, color 0.15s ease",
             fontWeight: isSelected ? "600" : "normal",
-            ":hover": {
-              backgroundColor: isSelected ? "#0d6efd" : "#e9ecef",
-            },
           }}
           onMouseDown={onMouseDown}
           onMouseEnter={onMouseEnter}
@@ -129,33 +149,20 @@ const MonthGrid = ({
           </div>
         ))}
 
-        {weeks.flat().map(date => {
-          const isSelected =
-            selectedRange.start &&
-            (isSameDay(parseISO(selectedRange.start), date) ||
-              (selectedRange.end &&
-                isSameDay(parseISO(selectedRange.end), date)));
+{weeks.flat().map(date => {
+  const isCurrentMonth = isSameMonth(date, baseDate);
 
-          const isInRange =
-            selectedRange.start &&
-            selectedRange.end &&
-            date > parseISO(selectedRange.start) &&
-            date < parseISO(selectedRange.end);
-
-          const isCurrentMonth = isSameMonth(date, baseDate);
-
-          return (
-            <DayCell
-              key={date.toISOString()}
-              date={date}
-              isSelected={isSelected}
-              isInRange={isInRange}
-              isCurrentMonth={isCurrentMonth}
-              onMouseDown={() => onSelectionStart(date)}
-              onMouseEnter={() => onSelectionMove(date)}
-            />
-          );
-        })}
+  return (
+    <DayCell
+      key={date.toISOString()}
+      date={date}
+      selectedRange={selectedRange}
+      isCurrentMonth={isCurrentMonth}
+      onMouseDown={() => onSelectionStart(date)}
+      onMouseEnter={() => onSelectionMove(date)}
+    />
+  );
+})}
       </div>
     </div>
   );
@@ -209,9 +216,9 @@ const DateRangePicker = () => {
   const [isOutsideBounds, setIsOutsideBounds] = useState(false);
   const debouncedMoveToMonthRef = useRef(null);
   const [months, setMonths] = useState([
-    addMonths(currentMonth, -1),
-    currentMonth,
-    addMonths(currentMonth, 1),
+    currentMonth,                  // Current month (e.g., December)
+    addMonths(currentMonth, 1),    // Next month (e.g., January)
+    addMonths(currentMonth, 2),    // Month after next (e.g., February)
   ]);
   const moveToMonthRef = useRef(null);
 
@@ -315,16 +322,21 @@ useEffect(() => {
 
   const handleSelectionMove = date => {
     if (!isSelecting || !selectedRange.start) return;
-
-    const start = parseISO(selectedRange.start);
-    if (date < start) {
-      setSelectedRange(prev => ({
-        ...prev,
-        end: prev.start,
+  
+    const startDate = parseISO(selectedRange.start);
+    
+    if (date < startDate) {
+      // When selecting backwards
+      setSelectedRange({
         start: date.toISOString(),
-      }));
+        end: startDate.toISOString()  // Keep original start as end
+      });
     } else {
-      setSelectedRange(prev => ({ ...prev, end: date.toISOString() }));
+      // When selecting forwards
+      setSelectedRange({
+        start: startDate.toISOString(),  // Keep original start
+        end: date.toISOString()
+      });
     }
   };
 
@@ -487,28 +499,28 @@ useEffect(() => {
             onMouseUp={handleMouseUp}
             onMouseLeave={() => setIsOutsideBounds(true)}
           >
-            <Card.Header className="d-flex justify-content-between align-items-center bg-white border-bottom">
-              <Button
-                variant="light"
-                onClick={() => moveToMonthRef.current("prev")}
-                className="px-2 py-1"
-                disabled={isAnimating}
-              >
-                ←
-              </Button>
-              <span className="fw-bold">
-                {format(currentMonth, "MMMM yyyy")} -{" "}
-                {format(addMonths(currentMonth, 1), "MMMM yyyy")}
-              </span>
-              <Button
-                variant="light"
-                onClick={() => moveToMonthRef.current("next")}
-                className="px-2 py-1"
-                disabled={isAnimating}
-              >
-                →
-              </Button>
-            </Card.Header>
+<Card.Header className="d-flex justify-content-between align-items-center bg-white border-bottom">
+  <Button
+    variant="light"
+    onClick={() => moveToMonthRef.current("prev")}
+    className="px-2 py-1"
+    disabled={isAnimating}
+  >
+    ←
+  </Button>
+  <span className="fw-bold">
+    {format(months[0], "MMMM yyyy")} -{" "}
+    {format(months[1], "MMMM yyyy")}
+  </span>
+  <Button
+    variant="light"
+    onClick={() => moveToMonthRef.current("next")}
+    className="px-2 py-1"
+    disabled={isAnimating}
+  >
+    →
+  </Button>
+</Card.Header>
             <Card.Body
               style={{
                 padding: "1rem 0.5rem",
