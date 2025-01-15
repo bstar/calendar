@@ -35,28 +35,34 @@ const DayCell = ({
 }) => {
   const tooltipContent = `Week ${getISOWeek(date)}`;
 
-  // Calculate isSelected and isInRange using more precise date comparisons
-  const isSelected = useMemo(() => {
-    if (!selectedRange.start) return false;
+  // Determine if this cell is the start or end of the selection
+  const { isSelected, isInRange, isRangeStart, isRangeEnd } = useMemo(() => {
+    if (!selectedRange.start) {
+      return { isSelected: false, isInRange: false, isRangeStart: false, isRangeEnd: false };
+    }
 
     const startDate = parseISO(selectedRange.start);
     const endDate = selectedRange.end ? parseISO(selectedRange.end) : null;
 
-    return isSameDay(date, startDate) || (endDate && isSameDay(date, endDate));
-  }, [date, selectedRange.start, selectedRange.end]);
+    // Sort the dates to handle backwards selection
+    let rangeStartDate = startDate;
+    let rangeEndDate = endDate;
+    if (endDate && startDate > endDate) {
+      rangeStartDate = endDate;
+      rangeEndDate = startDate;
+    }
 
-  const isInRange = useMemo(() => {
-    if (!selectedRange.start || !selectedRange.end) return false;
-
-    const startDate = parseISO(selectedRange.start);
-    const endDate = parseISO(selectedRange.end);
-
-    // Ensure start is always before end
-    const rangeStart = startDate < endDate ? startDate : endDate;
-    const rangeEnd = startDate < endDate ? endDate : startDate;
-
-    // Include the boundary dates in the range check
-    return date >= rangeStart && date <= rangeEnd;
+    const isThisSelected = isSameDay(date, startDate) || (endDate && isSameDay(date, endDate));
+    const isThisInRange = endDate 
+      ? (date >= rangeStartDate && date <= rangeEndDate)
+      : false;
+    
+    return {
+      isSelected: isThisSelected,
+      isInRange: isThisInRange,
+      isRangeStart: isSameDay(date, rangeStartDate),
+      isRangeEnd: rangeEndDate ? isSameDay(date, rangeEndDate) : false
+    };
   }, [date, selectedRange.start, selectedRange.end]);
 
   return (
@@ -75,24 +81,27 @@ const DayCell = ({
         <div
           style={{
             position: "absolute",
-            top: "2px",
-            right: "2px",
-            bottom: "2px",
-            left: "2px",
+            top: "6px",
+            right: "1px",
+            bottom: "6px",
+            left: "1px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            borderTopLeftRadius: isRangeStart ? "15px" : "0px",
+            borderBottomLeftRadius: isRangeStart ? "15px" : "0px",
+            borderTopRightRadius: isRangeEnd ? "15px" : "0px",
+            borderBottomRightRadius: isRangeEnd ? "15px" : "0px",
             backgroundColor: isSelected
-              ? "#0d6efd"
+              ? "#7dd2d3"
               : isInRange
-                ? "#e9ecef"
+                ? "#7dd2d3"
                 : "transparent",
             color: isSelected
-              ? "white"
+              ? "black"
               : isCurrentMonth
                 ? "inherit"
                 : "#adb5bd",
-            borderRadius: "4px",
             transition: "background-color 0.15s ease, color 0.15s ease",
             fontWeight: isSelected ? "600" : "normal",
           }}
@@ -137,7 +146,7 @@ const MonthGrid = ({
     <div className="px-2">
       <div
         className="d-grid"
-        style={{ gridTemplateColumns: "repeat(7, 1fr)", gap: "1px" }}
+        style={{ gridTemplateColumns: "repeat(7, 1fr)", gap: "0px" }}
       >
         {["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"].map(day => (
           <div

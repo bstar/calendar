@@ -18,7 +18,7 @@ a {
   color: #646cff;
   text-decoration: inherit;
 }
-a:hover {
+a:hover{
   color: #535bf2;
 }
 
@@ -65,4 +65,69 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+
+/* Base range cell styling */
+.range-cell {
+  position: relative;
+  z-index: 1;
+}
+
+/* Background element for the range */
+.range-cell::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #e9ecef;
+  z-index: -1;
+}
+
+/* Range start styling */
+.range-start::before {
+  left: 50%;
+  border-radius: 4px 0 0 4px;
+}
+
+/* Range end styling */
+.range-end::before {
+  right: 50%;
+  border-radius: 0 4px 4px 0;
+}
+
+/* Middle range cells extend fully */
+.range-middle::before {
+  left: -1px;
+  right: -1px;
+}
+
+/* Selected state (start and end dates) */
+.range-selected::before {
+  background-color: #0d6efd;
+}
+
+/* Adjust text color for selected cells */
+.range-selected {
+  color: white;
+}
+
+/* Ensure the range doesn't extend into padding */
+.range-start.range-cell::before {
+  left: 2px;
+  right: -1px;
+}
+
+.range-end.range-cell::before {
+  right: 2px;
+  left: -1px;
+}
+
+/* Handle single-day selection */
+.range-start.range-end::before {
+  left: 2px;
+  right: 2px;
+  border-radius: 4px;
 }
