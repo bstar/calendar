@@ -57,24 +57,29 @@ const DayCell = ({
     const startDate = parseISO(selectedRange.start);
     const endDate = selectedRange.end ? parseISO(selectedRange.end) : null;
 
-    // Sort the dates to handle backwards selection
-    let rangeStartDate = startDate;
-    let rangeEndDate = endDate;
+    // Always determine chronological start and end dates
+    let chronologicalStart = startDate;
+    let chronologicalEnd = endDate;
+
     if (endDate && startDate > endDate) {
-      rangeStartDate = endDate;
-      rangeEndDate = startDate;
+      chronologicalStart = endDate;
+      chronologicalEnd = startDate;
     }
 
     const isThisSelected = isSameDay(date, startDate) || (endDate && isSameDay(date, endDate));
-    const isThisInRange = endDate 
-      ? (date >= rangeStartDate && date <= rangeEndDate)
+    const isThisInRange = chronologicalEnd
+      ? (date >= chronologicalStart && date <= chronologicalEnd)
       : false;
-    
+
+    // Determine if this is the chronological start or end date
+    const isThisRangeStart = chronologicalEnd ? isSameDay(date, chronologicalStart) : false;
+    const isThisRangeEnd = chronologicalEnd ? isSameDay(date, chronologicalEnd) : false;
+
     return {
       isSelected: isThisSelected,
       isInRange: isThisInRange,
-      isRangeStart: isSameDay(date, rangeStartDate),
-      isRangeEnd: rangeEndDate ? isSameDay(date, rangeEndDate) : false
+      isRangeStart: isThisRangeStart,
+      isRangeEnd: isThisRangeEnd
     };
   }, [date, selectedRange.start, selectedRange.end]);
 
@@ -221,6 +226,7 @@ const DateRangePicker = () => {
     start: null,
     end: null,
   });
+  const [initialDate, setInitialDate] = useState(null);
   const [isSelecting, setIsSelecting] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date()));
@@ -230,9 +236,9 @@ const DateRangePicker = () => {
   const [isOutsideBounds, setIsOutsideBounds] = useState(false);
   const debouncedMoveToMonthRef = useRef(null);
   const [months, setMonths] = useState([
-    currentMonth,                  // Current month (e.g., December)
-    addMonths(currentMonth, 1),    // Next month (e.g., January)
-    addMonths(currentMonth, 2),    // Month after next (e.g., February)
+    currentMonth,
+    addMonths(currentMonth, 1),
+    addMonths(currentMonth, 2),
   ]);
   const moveToMonthRef = useRef(null);
 
@@ -331,24 +337,26 @@ const DateRangePicker = () => {
 
   const handleSelectionStart = date => {
     setIsSelecting(true);
-    setSelectedRange({ start: date.toISOString(), end: null });
+    setInitialDate(date);
+    setSelectedRange({
+      start: date.toISOString(),
+      end: null
+    });
   };
 
   const handleSelectionMove = date => {
-    if (!isSelecting || !selectedRange.start) return;
+    if (!isSelecting || !initialDate) return;
 
-    const startDate = parseISO(selectedRange.start);
-
-    if (date < startDate) {
+    if (date < initialDate) {
       // When selecting backwards
       setSelectedRange({
         start: date.toISOString(),
-        end: startDate.toISOString()  // Keep original start as end
+        end: initialDate.toISOString()
       });
     } else {
       // When selecting forwards
       setSelectedRange({
-        start: startDate.toISOString(),  // Keep original start
+        start: initialDate.toISOString(),
         end: date.toISOString()
       });
     }
@@ -371,7 +379,6 @@ const DateRangePicker = () => {
     if (isOutside !== wasOutside) {
       setIsOutsideBounds(isOutside);
       if (isOutside && debouncedMoveToMonthRef.current) {
-        // Trigger immediately when first going outside
         moveToMonthRef.current('next');
       }
     }
@@ -412,6 +419,7 @@ const DateRangePicker = () => {
   const handleMouseUp = useCallback(() => {
     setIsSelecting(false);
     setIsOutsideBounds(false);
+    setInitialDate(null);  // Clear initial date
 
     document.body.style.userSelect = "";
     document.body.style.webkitUserSelect = "";
@@ -434,6 +442,13 @@ const DateRangePicker = () => {
 
     document.addEventListener("mousemove", handleMouseMove);
     document.addEventListener("mouseup", handleMouseUp);
+  };
+
+  // Update the Clear button handler
+  const handleClear = () => {
+    setSelectedRange({ start: null, end: null });
+    setIsSelecting(false);
+    setInitialDate(null);  // Clear initial date
   };
 
   const getDisplayText = () => {
@@ -552,7 +567,6 @@ const DateRangePicker = () => {
                   willChange: 'transform'
                 }}
               >
-                {/* This should create an overlapping sequence of month pairs */}
                 <MonthPair
                   firstMonth={months[0]}    // e.g., Dec
                   secondMonth={months[1]}   // e.g., Jan
@@ -574,10 +588,7 @@ const DateRangePicker = () => {
             <Card.Footer className="d-flex justify-content-between">
               <Button
                 variant="light"
-                onClick={() => {
-                  setSelectedRange({ start: null, end: null });
-                  setIsSelecting(false);
-                }}
+                onClick={handleClear}  // Use the new clear handler
               >
                 Clear
               </Button>
@@ -587,6 +598,7 @@ const DateRangePicker = () => {
                   setIsOpen(false);
                   setIsSelecting(false);
                   setIsOutsideBounds(false);
+                  setInitialDate(null);  // Clear initial date when applying
                 }}
               >
                 Apply
