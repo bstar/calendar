@@ -82,9 +82,9 @@ const DayCell = ({
           style={{
             position: "absolute",
             top: "6px",
-            right: "1px",
+            right: "0px",
             bottom: "6px",
-            left: "1px",
+            left: "0px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
