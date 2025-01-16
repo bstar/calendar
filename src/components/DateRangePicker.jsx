@@ -35,7 +35,20 @@ const DayCell = ({
 }) => {
   const tooltipContent = `Week ${getISOWeek(date)}`;
 
-  // Determine if this cell is the start or end of the selection
+  // Early return for non-current month days
+  if (!isCurrentMonth) {
+    return (
+      <div
+        style={{
+          width: "100%",
+          paddingBottom: "100%",
+          position: "relative",
+          backgroundColor: "white"
+        }}
+      />
+    );
+  }
+
   const { isSelected, isInRange, isRangeStart, isRangeEnd } = useMemo(() => {
     if (!selectedRange.start) {
       return { isSelected: false, isInRange: false, isRangeStart: false, isRangeEnd: false };
@@ -92,16 +105,8 @@ const DayCell = ({
             borderBottomLeftRadius: isRangeStart ? "15px" : "0px",
             borderTopRightRadius: isRangeEnd ? "15px" : "0px",
             borderBottomRightRadius: isRangeEnd ? "15px" : "0px",
-            backgroundColor: isSelected
-              ? "#7dd2d3"
-              : isInRange
-                ? "#7dd2d3"
-                : "transparent",
-            color: isSelected
-              ? "black"
-              : isCurrentMonth
-                ? "inherit"
-                : "#adb5bd",
+            backgroundColor: (isSelected || isInRange) ? "#7dd2d3" : "transparent",
+            color: "inherit",
             transition: "background-color 0.15s ease, color 0.15s ease",
             fontWeight: isSelected ? "600" : "normal",
           }}
