@@ -528,6 +528,44 @@ const DateRangePicker = () => {
             onMouseUp={handleMouseUp}
             onMouseLeave={() => setIsOutsideBounds(true)}
           >
+
+<div style={{ 
+  backgroundColor: '#2e334e33', 
+  padding: '16px',
+  display: 'flex',
+  justifyContent: 'space-between'
+}}>
+  <button
+    style={{
+      flex: 1,
+      padding: '8px 12px',
+      border: '1px solid #dee2e6',
+      backgroundColor: 'white',
+      marginRight: '10px',
+      textAlign: 'left',
+      color: 'inherit'  // Add this to match calendar cells
+    }}
+  >
+    {selectedRange.start 
+      ? format(parseISO(selectedRange.start), "MMMM d, yyyy")
+      : "-"}
+  </button>
+  <button
+    style={{
+      flex: 1,
+      padding: '8px 12px',
+      border: '1px solid #dee2e6',
+      backgroundColor: 'white',
+      marginLeft: '10px',
+      textAlign: 'left',
+      color: 'inherit'  // Add this to match calendar cells
+    }}
+  >
+    {selectedRange.end
+      ? format(parseISO(selectedRange.end), "MMMM d, yyyy")
+      : "-"}
+  </button>
+</div>
             <Card.Header className="d-flex justify-content-between align-items-center bg-white border-bottom">
               <Button
                 variant="light"
