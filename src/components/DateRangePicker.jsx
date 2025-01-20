@@ -95,7 +95,14 @@ const dateValidator = (() => {
         }
         return { isValid: true, error: null };
       } catch {
-        return { isValid: true, error: null };
+        return {
+          isValid: false,
+          error: {
+            message: 'Invalid date range',
+            type: 'error',
+            field: 'range'
+          }
+        };
       }
     }
   };
@@ -107,8 +114,9 @@ const dateValidator = (() => {
         rules.isValidDate(value)
       ];
 
-      if (context.currentField === 'end' && context.startDate) {
-        validations.push(rules.isValidRange(context.startDate, value));
+      // Check range validation for both start and end dates
+      if (context.startDate && context.endDate) {
+        validations.push(rules.isValidRange(context.startDate, context.endDate));
       }
 
       for (const validation of validations) {
@@ -139,14 +147,14 @@ const dateValidator = (() => {
   };
 })();
 
-const DateInput = ({ value, onChange, field, placeholder, context }) => {
+const DateInput = ({ value, onChange, field, placeholder, context, selectedRange }) => {  // Add selectedRange to props
   const [inputValue, setInputValue] = useState('');
   const [error, setError] = useState(null);
   const [isTouched, setIsTouched] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);  // Add this state
+  const [showError, setShowError] = useState(false);  // New state for error indicator
+  const [isEditing, setIsEditing] = useState(false);
 
-  // Only sync with parent value when not editing
   useEffect(() => {
     if (!isEditing && value) {
       setInputValue(dateValidator.formatValue(value));
@@ -158,22 +166,24 @@ const DateInput = ({ value, onChange, field, placeholder, context }) => {
   const handleChange = (e) => {
     const newValue = e.target.value;
     setInputValue(newValue);
-    setIsEditing(true); // Set editing mode on change
-    if (isTouched) {
+    setIsEditing(true);
+
+    if (error) {
       setError(null);
+      setShowError(false);
       onChange(null, true);
     }
   };
 
   const handleBlur = () => {
     setIsTouched(true);
-    setIsEditing(false); // Clear editing mode on blur
+    setIsEditing(false);
     validateAndUpdate();
   };
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
-      setIsEditing(false); // Clear editing mode on Enter
+      setIsEditing(false);
       validateAndUpdate();
     }
   };
@@ -182,58 +192,103 @@ const DateInput = ({ value, onChange, field, placeholder, context }) => {
     if (!inputValue) {
       onChange(null);
       setError(null);
+      setShowError(false);
       return;
     }
 
-    const validationError = dateValidator.validate(inputValue, {
-      startDate: context?.startDate,
-      endDate: context?.endDate,
-      currentField: field
-    });
-
-    if (validationError) {
-      setError(validationError);
-      onChange(null, false, validationError);
-      return;
-    }
-
+    // First validate format and date
     const parsedDate = dateValidator.parseValue(inputValue);
-    if (parsedDate) {
-      onChange(parsedDate);
-      setError(null);
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 1500);
+    if (!parsedDate) {
+      const formatError = {
+        message: `Please use format: January 15, 2024`,
+        type: 'error',
+        field: 'format'
+      };
+      showValidationError(formatError);
+      return;
     }
+
+    // Then validate range if needed
+    if (field === 'start' && selectedRange?.end) {  // Use selectedRange from props with optional chaining
+      const endDate = parseISO(selectedRange.end);
+      if (parsedDate > endDate) {
+        const rangeError = {
+          message: 'Start date must be before end date',
+          type: 'error',
+          field: 'range'
+        };
+        showValidationError(rangeError);
+        return;
+      }
+    } else if (field === 'end' && selectedRange?.start) {  // Use selectedRange from props with optional chaining
+      const startDate = parseISO(selectedRange.start);
+      if (parsedDate < startDate) {
+        const rangeError = {
+          message: 'End date must be after start date',
+          type: 'error',
+          field: 'range'
+        };
+        showValidationError(rangeError);
+        return;
+      }
+    }
+
+    // If we get here, the date is valid
+    onChange(parsedDate);
+    setError(null);
+    setShowError(false);
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 1500);
+  };
+
+  // Helper function to show validation errors
+  const showValidationError = (error) => {
+    setError(error);
+    setShowError(true);
+    onChange(null, false, error);
+
+    // Revert to last valid value
+    if (value) {
+      setInputValue(dateValidator.formatValue(value));
+    } else {
+      setInputValue('');
+    }
+
+    // Clear error after delay
+    setTimeout(() => {
+      setShowError(false);
+      setError(null);
+    }, 2000);
   };
 
   return (
-<div 
-  style={{ position: 'relative', flex: 1 }}
-  onClick={(e) => e.stopPropagation()}
-  onMouseDown={(e) => e.stopPropagation()}
->
-<input
-  type="text"
-  value={inputValue}
-  onChange={handleChange}
-  onBlur={handleBlur}
-  onKeyDown={handleKeyDown}
-  placeholder={placeholder}
-  autoComplete="off"
-  style={{
-    width: '100%',
-    padding: '8px 12px',
-    border: `1px solid ${error ? '#dc3545' : '#dee2e6'}`,
-    borderRadius: '4px',
-    backgroundColor: 'white',
-    color: 'inherit',
-    transition: 'border-color 0.15s ease',
-    cursor: 'text',
-    userSelect: 'text',   // Add this
-    WebkitUserSelect: 'text',  // Add this
-    MozUserSelect: 'text',  // Add this
-  }}
-/>
+    <div
+      style={{ position: 'relative', flex: 1 }}
+      onClick={(e) => e.stopPropagation()}
+      onMouseDown={(e) => e.stopPropagation()}
+    >
+      <input
+        type="text"
+        value={inputValue}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        onKeyDown={handleKeyDown}
+        placeholder={placeholder}
+        autoComplete="off"
+        style={{
+          width: '100%',
+          padding: '8px 12px',
+          border: `1px solid ${error ? '#dc3545' : '#dee2e6'}`,
+          borderRadius: '4px',
+          backgroundColor: 'white',
+          color: 'inherit',
+          transition: 'border-color 0.15s ease',
+          cursor: 'text',
+          userSelect: 'text',
+          WebkitUserSelect: 'text',
+          MozUserSelect: 'text',
+        }}
+      />
       {showSuccess && (
         <div
           style={{
@@ -248,7 +303,7 @@ const DateInput = ({ value, onChange, field, placeholder, context }) => {
           ✓
         </div>
       )}
-      {error && (
+      {error && showError && (
         <div
           style={{
             position: 'absolute',
@@ -257,12 +312,33 @@ const DateInput = ({ value, onChange, field, placeholder, context }) => {
             top: '100%',
             marginTop: '4px',
             fontSize: '0.875rem',
-            color: '#dc3545'
+            color: '#dc3545',
+            opacity: 1,
+            animation: 'errorMessage 2s ease forwards',
+            overflow: 'hidden'
           }}
         >
           {error.message}
         </div>
       )}
+
+      <style>
+        {`
+    @keyframes fadeInOut {
+      0% { opacity: 0; }
+      20% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    @keyframes containerPadding {
+      0% { padding-bottom: 16px; }
+      10% { padding-bottom: 40px; }
+      80% { padding-bottom: 40px; }
+      100% { padding-bottom: 16px; }
+    }
+  `}
+      </style>
     </div>
   );
 };
@@ -484,7 +560,6 @@ const DateRangePicker = () => {
 
   const handleDateChange = (field) => (date, isClearingError, validationError) => {
     if (isClearingError) {
-      // Just clear the validation error for this field
       setValidationErrors(prev => {
         const newErrors = { ...prev };
         delete newErrors[field];
@@ -492,7 +567,7 @@ const DateRangePicker = () => {
       });
       return;
     }
-  
+
     if (validationError) {
       setValidationErrors(prev => ({
         ...prev,
@@ -500,26 +575,33 @@ const DateRangePicker = () => {
       }));
       return;
     }
-  
+
     const dateStr = date?.toISOString() || null;
     const newRange = { ...selectedRange };
     const newContext = { ...dateInputContext };
-  
+
     if (field === 'start') {
       newRange.start = dateStr;
       newContext.startDate = date ? dateValidator.formatValue(date) : null;
-      if (date) {
+    } else {
+      newRange.end = dateStr;
+      newContext.endDate = date ? dateValidator.formatValue(date) : null;
+    }
+
+    setSelectedRange(newRange);
+    setDateInputContext(newContext);
+    setValidationErrors({});
+
+    // Update months if needed
+    if (date) {
+      if (field === 'start') {
         const startMonth = startOfMonth(date);
         setMonths([
           startMonth,
           addMonths(startMonth, 1),
           addMonths(startMonth, 2)
         ]);
-      }
-    } else {
-      newRange.end = dateStr;
-      newContext.endDate = date ? dateValidator.formatValue(date) : null;
-      if (date) {
+      } else {
         const endMonth = startOfMonth(date);
         setMonths([
           addMonths(endMonth, -1),
@@ -528,14 +610,6 @@ const DateRangePicker = () => {
         ]);
       }
     }
-  
-    setSelectedRange(newRange);
-    setDateInputContext(newContext);
-    setValidationErrors(prev => {
-      const newErrors = { ...prev };
-      delete newErrors[field];
-      return newErrors;
-    });
   };
 
   moveToMonthRef.current = useCallback((direction) => {
@@ -796,41 +870,42 @@ const DateRangePicker = () => {
             onMouseUp={handleMouseUp}
             onMouseLeave={() => setIsOutsideBounds(true)}
           >
-<div style={{
-  backgroundColor: '#2e334e33',
-  padding: '16px',
-  paddingBottom: Object.keys(validationErrors).length > 0 ? '32px' : '16px',
-  display: 'flex',
-  justifyContent: 'space-between',
-  gap: '20px',
-  transition: 'padding-bottom 0.2s ease',
-  userSelect: 'text',  // Add this
-  WebkitUserSelect: 'text',  // Add this
-  MozUserSelect: 'text',  // Add this
-}}>
-  <DateInput
-    value={selectedRange.start ? parseISO(selectedRange.start) : null}
-    onChange={handleDateChange('start')}
-    field="start"
-    placeholder="Start date"
-    context={{
-      startDate: dateInputContext.startDate,
-      endDate: dateInputContext.endDate,
-      currentField: 'start',
-    }}
-  />
-  <DateInput
-    value={selectedRange.end ? parseISO(selectedRange.end) : null}
-    onChange={handleDateChange('end')}
-    field="end"
-    placeholder="End date"
-    context={{
-      startDate: dateInputContext.startDate,
-      endDate: dateInputContext.endDate,
-      currentField: 'end',
-    }}
-  />
-</div>
+            <div style={{
+              backgroundColor: '#2e334e33',
+              padding: '16px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              gap: '20px',
+              userSelect: 'text',
+              WebkitUserSelect: 'text',
+              MozUserSelect: 'text',
+              animation: Object.keys(validationErrors).length > 0 ? 'containerPadding 2s ease forwards' : ''
+            }}>
+              <DateInput
+                value={selectedRange.start ? parseISO(selectedRange.start) : null}
+                onChange={handleDateChange('start')}
+                field="start"
+                placeholder="Start date"
+                context={{
+                  startDate: dateInputContext.startDate,
+                  endDate: dateInputContext.endDate,
+                  currentField: 'start',
+                }}
+                selectedRange={selectedRange}  // Make sure this is passed
+              />
+              <DateInput
+                value={selectedRange.end ? parseISO(selectedRange.end) : null}
+                onChange={handleDateChange('end')}
+                field="end"
+                placeholder="End date"
+                context={{
+                  startDate: dateInputContext.startDate,
+                  endDate: dateInputContext.endDate,
+                  currentField: 'end',
+                }}
+                selectedRange={selectedRange}  // Make sure this is passed
+              />
+            </div>
 
             <Card.Header className="d-flex justify-content-between align-items-center bg-white border-bottom">
               <Button
