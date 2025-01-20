@@ -127,18 +127,22 @@ const dateValidator = (() => {
 const DateInput = ({ value, onChange, field, placeholder, context, selectedRange }) => {
   const [inputValue, setInputValue] = useState('');
   const [error, setError] = useState(null);
-  const [showSuccess, setShowSuccess] = useState(false);
   const [showError, setShowError] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [showIndicator, setShowIndicator] = useState(null); // 'success' | 'error' | null
+  const previousValueRef = useRef(value);
 
   useEffect(() => {
-    if (!isEditing) {
-      setInputValue(value ? dateValidator.formatValue(value) : '');
+    if (!isEditing && value) {
+      setInputValue(dateValidator.formatValue(value));
+    } else if (!isEditing && !value) {
+      setInputValue('');
     }
   }, [value, isEditing]);
 
   const handleChange = (e) => {
-    setInputValue(e.target.value);
+    const newValue = e.target.value;
+    setInputValue(newValue);
     setIsEditing(true);
 
     if (error) {
@@ -167,44 +171,64 @@ const DateInput = ({ value, onChange, field, placeholder, context, selectedRange
       return;
     }
 
-    const rangeValidation = (field === 'start' && selectedRange?.end)
-      ? parsedDate > parseISO(selectedRange.end)
-        ? {
-            message: 'Start date must be before end date',
-            type: 'error',
-            field: 'range'
-          }
-        : null
-      : (field === 'end' && selectedRange?.start)
-        ? parsedDate < parseISO(selectedRange.start)
-          ? {
-              message: 'End date must be after start date',
-              type: 'error',
-              field: 'range'
-            }
-          : null
-        : null;
-
-    if (rangeValidation) {
-      showValidationError(rangeValidation);
-      return;
+    // Range validation
+    if (field === 'start' && selectedRange?.end) {
+      const endDate = parseISO(selectedRange.end);
+      if (parsedDate > endDate) {
+        const rangeError = {
+          message: 'Start date must be before end date',
+          type: 'error',
+          field: 'range'
+        };
+        showValidationError(rangeError);
+        return;
+      }
+    } else if (field === 'end' && selectedRange?.start) {
+      const startDate = parseISO(selectedRange.start);
+      if (parsedDate < startDate) {
+        const rangeError = {
+          message: 'End date must be after start date',
+          type: 'error',
+          field: 'range'
+        };
+        showValidationError(rangeError);
+        return;
+      }
     }
 
+    // Only show success indicator if the value actually changed
+    const isNewValue = !previousValueRef.current || 
+                      !isSameDay(parsedDate, previousValueRef.current);
+    
+    if (isNewValue) {
+      setShowIndicator('success');
+      setTimeout(() => setShowIndicator(null), 1500);
+    }
+
+    previousValueRef.current = parsedDate;
     onChange(parsedDate);
     setError(null);
     setShowError(false);
-    setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 1500);
   };
 
   const showValidationError = (error) => {
     setError(error);
     setShowError(true);
     onChange(null, false, error);
-    setInputValue(value ? dateValidator.formatValue(value) : '');
+
+    if (value) {
+      setInputValue(dateValidator.formatValue(value));
+    } else {
+      setInputValue('');
+    }
+
+    // Show error indicator
+    setShowIndicator('error');
+    
     setTimeout(() => {
       setShowError(false);
       setError(null);
+      setShowIndicator(null);
     }, 2000);
   };
 
@@ -249,16 +273,17 @@ const DateInput = ({ value, onChange, field, placeholder, context, selectedRange
           MozUserSelect: 'text',
         }}
       />
-      {showSuccess && (
+      {showIndicator && (
         <div
           style={{
             position: 'absolute',
             right: '8px',
             top: '8px',
-            color: '#28a745',
+            color: showIndicator === 'success' ? '#28a745' : '#dc3545',
+            fontSize: '14px',
           }}
         >
-          ✓
+          {showIndicator === 'success' ? '✓' : '×'}
         </div>
       )}
       <div
