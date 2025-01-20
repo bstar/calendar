@@ -13,6 +13,7 @@ import { ChevronRight } from "react-bootstrap-icons";
 import debounce from "lodash-es/debounce";
 import {
   format,
+  parse,
   addMonths,
   startOfMonth,
   endOfMonth,
@@ -23,8 +24,248 @@ import {
   startOfWeek,
   endOfWeek,
   isSameMonth,
+  isValid
 } from "date-fns";
 import "bootstrap/dist/css/bootstrap.min.css";
+
+const dateValidator = (() => {
+  const DATE_FORMAT = "MMMM d, yyyy";
+
+  const rules = {
+    isValidFormat: (value) => {
+      if (!value) return { isValid: true, error: null };
+      try {
+        parse(value, DATE_FORMAT, new Date());
+        return { isValid: true, error: null };
+      } catch {
+        return {
+          isValid: false,
+          error: {
+            message: `Please use format: January 15, 2024`,
+            type: 'error',
+            field: 'format'
+          }
+        };
+      }
+    },
+
+    isValidDate: (value) => {
+      if (!value) return { isValid: true, error: null };
+      try {
+        const date = parse(value, DATE_FORMAT, new Date());
+        if (isValid(date)) {
+          return { isValid: true, error: null };
+        }
+        return {
+          isValid: false,
+          error: {
+            message: 'Invalid date',
+            type: 'error',
+            field: 'date'
+          }
+        };
+      } catch {
+        return {
+          isValid: false,
+          error: {
+            message: 'Invalid date',
+            type: 'error',
+            field: 'date'
+          }
+        };
+      }
+    },
+
+    isValidRange: (start, end) => {
+      if (!start || !end) return { isValid: true, error: null };
+
+      try {
+        const startDate = parse(start, DATE_FORMAT, new Date());
+        const endDate = parse(end, DATE_FORMAT, new Date());
+
+        if (startDate > endDate) {
+          return {
+            isValid: false,
+            error: {
+              message: 'Start date must be before end date',
+              type: 'error',
+              field: 'range'
+            }
+          };
+        }
+        return { isValid: true, error: null };
+      } catch {
+        return { isValid: true, error: null };
+      }
+    }
+  };
+
+  return {
+    validate: (value, context) => {
+      const validations = [
+        rules.isValidFormat(value),
+        rules.isValidDate(value)
+      ];
+
+      if (context.currentField === 'end' && context.startDate) {
+        validations.push(rules.isValidRange(context.startDate, value));
+      }
+
+      for (const validation of validations) {
+        if (!validation.isValid) {
+          return validation.error;
+        }
+      }
+
+      return null;
+    },
+    formatValue: (date) => {
+      if (!date) return '';
+      try {
+        return format(date, DATE_FORMAT);
+      } catch {
+        return '';
+      }
+    },
+    parseValue: (value) => {
+      if (!value) return null;
+      try {
+        return parse(value, DATE_FORMAT, new Date());
+      } catch {
+        return null;
+      }
+    },
+    DATE_FORMAT
+  };
+})();
+
+const DateInput = ({ value, onChange, field, placeholder, context }) => {
+  const [inputValue, setInputValue] = useState('');
+  const [error, setError] = useState(null);
+  const [isTouched, setIsTouched] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);  // Add this state
+
+  // Only sync with parent value when not editing
+  useEffect(() => {
+    if (!isEditing && value) {
+      setInputValue(dateValidator.formatValue(value));
+    } else if (!isEditing && !value) {
+      setInputValue('');
+    }
+  }, [value, isEditing]);
+
+  const handleChange = (e) => {
+    const newValue = e.target.value;
+    setInputValue(newValue);
+    setIsEditing(true); // Set editing mode on change
+    if (isTouched) {
+      setError(null);
+      onChange(null, true);
+    }
+  };
+
+  const handleBlur = () => {
+    setIsTouched(true);
+    setIsEditing(false); // Clear editing mode on blur
+    validateAndUpdate();
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      setIsEditing(false); // Clear editing mode on Enter
+      validateAndUpdate();
+    }
+  };
+
+  const validateAndUpdate = () => {
+    if (!inputValue) {
+      onChange(null);
+      setError(null);
+      return;
+    }
+
+    const validationError = dateValidator.validate(inputValue, {
+      startDate: context?.startDate,
+      endDate: context?.endDate,
+      currentField: field
+    });
+
+    if (validationError) {
+      setError(validationError);
+      onChange(null, false, validationError);
+      return;
+    }
+
+    const parsedDate = dateValidator.parseValue(inputValue);
+    if (parsedDate) {
+      onChange(parsedDate);
+      setError(null);
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 1500);
+    }
+  };
+
+  return (
+<div 
+  style={{ position: 'relative', flex: 1 }}
+  onClick={(e) => e.stopPropagation()}
+  onMouseDown={(e) => e.stopPropagation()}
+>
+<input
+  type="text"
+  value={inputValue}
+  onChange={handleChange}
+  onBlur={handleBlur}
+  onKeyDown={handleKeyDown}
+  placeholder={placeholder}
+  autoComplete="off"
+  style={{
+    width: '100%',
+    padding: '8px 12px',
+    border: `1px solid ${error ? '#dc3545' : '#dee2e6'}`,
+    borderRadius: '4px',
+    backgroundColor: 'white',
+    color: 'inherit',
+    transition: 'border-color 0.15s ease',
+    cursor: 'text',
+    userSelect: 'text',   // Add this
+    WebkitUserSelect: 'text',  // Add this
+    MozUserSelect: 'text',  // Add this
+  }}
+/>
+      {showSuccess && (
+        <div
+          style={{
+            position: 'absolute',
+            right: '8px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            color: '#28a745',
+            animation: 'fadeInOut 1.5s ease'
+          }}
+        >
+          ✓
+        </div>
+      )}
+      {error && (
+        <div
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            top: '100%',
+            marginTop: '4px',
+            fontSize: '0.875rem',
+            color: '#dc3545'
+          }}
+        >
+          {error.message}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const DayCell = ({
   date,
@@ -35,7 +276,6 @@ const DayCell = ({
 }) => {
   const tooltipContent = `Week ${getISOWeek(date)}`;
 
-  // Early return for non-current month days
   if (!isCurrentMonth) {
     return (
       <div
@@ -57,7 +297,6 @@ const DayCell = ({
     const startDate = parseISO(selectedRange.start);
     const endDate = selectedRange.end ? parseISO(selectedRange.end) : null;
 
-    // Always determine chronological start and end dates
     let chronologicalStart = startDate;
     let chronologicalEnd = endDate;
 
@@ -71,7 +310,6 @@ const DayCell = ({
       ? (date >= chronologicalStart && date <= chronologicalEnd)
       : false;
 
-    // Determine if this is the chronological start or end date
     const isThisRangeStart = chronologicalEnd ? isSameDay(date, chronologicalStart) : false;
     const isThisRangeEnd = chronologicalEnd ? isSameDay(date, chronologicalEnd) : false;
 
@@ -217,9 +455,6 @@ const MonthPair = ({
   </div>
 );
 
-const createDebouncedMoveToMonth = moveToMonthFn =>
-  debounce(moveToMonthFn, 1000, { leading: true, trailing: false });
-
 const DateRangePicker = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedRange, setSelectedRange] = useState({
@@ -235,6 +470,11 @@ const DateRangePicker = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isOutsideBounds, setIsOutsideBounds] = useState(false);
   const debouncedMoveToMonthRef = useRef(null);
+  const [validationErrors, setValidationErrors] = useState({});
+  const [dateInputContext, setDateInputContext] = useState({
+    startDate: null,
+    endDate: null
+  });
   const [months, setMonths] = useState([
     currentMonth,
     addMonths(currentMonth, 1),
@@ -242,8 +482,62 @@ const DateRangePicker = () => {
   ]);
   const moveToMonthRef = useRef(null);
 
+  const handleDateChange = (field) => (date, isClearingError, validationError) => {
+    if (isClearingError) {
+      // Just clear the validation error for this field
+      setValidationErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+      return;
+    }
+  
+    if (validationError) {
+      setValidationErrors(prev => ({
+        ...prev,
+        [field]: validationError
+      }));
+      return;
+    }
+  
+    const dateStr = date?.toISOString() || null;
+    const newRange = { ...selectedRange };
+    const newContext = { ...dateInputContext };
+  
+    if (field === 'start') {
+      newRange.start = dateStr;
+      newContext.startDate = date ? dateValidator.formatValue(date) : null;
+      if (date) {
+        const startMonth = startOfMonth(date);
+        setMonths([
+          startMonth,
+          addMonths(startMonth, 1),
+          addMonths(startMonth, 2)
+        ]);
+      }
+    } else {
+      newRange.end = dateStr;
+      newContext.endDate = date ? dateValidator.formatValue(date) : null;
+      if (date) {
+        const endMonth = startOfMonth(date);
+        setMonths([
+          addMonths(endMonth, -1),
+          endMonth,
+          addMonths(endMonth, 1)
+        ]);
+      }
+    }
+  
+    setSelectedRange(newRange);
+    setDateInputContext(newContext);
+    setValidationErrors(prev => {
+      const newErrors = { ...prev };
+      delete newErrors[field];
+      return newErrors;
+    });
+  };
 
-  // Create a stable version of moveToMonth that doesn't change on renders
   moveToMonthRef.current = useCallback((direction) => {
     if (isAnimating) return;
 
@@ -251,28 +545,23 @@ const DateRangePicker = () => {
     const container = monthsContainerRef.current;
     if (!container) return;
 
-    const slideAmount = container.offsetWidth / 2; // Half width since we're moving one month
+    const slideAmount = container.offsetWidth / 2;
 
-    // 1. First update the months array and current month BEFORE any animation
     const newCurrentMonth = addMonths(currentMonth, direction === 'next' ? 1 : -1);
     setCurrentMonth(newCurrentMonth);
 
-    // 2. Force a reflow to ensure new content is rendered
     container.style.transition = 'none';
     container.style.transform = `translateX(${direction === 'next' ? 0 : -slideAmount}px)`;
-    container.offsetHeight; // Force reflow
+    container.offsetHeight;
 
-    // Update months array before animation
     if (direction === 'prev') {
       setMonths(prev => [addMonths(prev[0], -1), prev[0], prev[1]]);
     }
 
-    // 3. Start the animation
     requestAnimationFrame(() => {
       container.style.transition = 'transform 0.3s ease-in-out';
       container.style.transform = `translateX(${direction === 'next' ? -slideAmount : 0}px)`;
 
-      // 4. Clean up after animation
       setTimeout(() => {
         container.style.transition = 'none';
         container.style.transform = 'translateX(0)';
@@ -290,7 +579,6 @@ const DateRangePicker = () => {
     });
   }, [isAnimating, currentMonth]);
 
-  // Setup the debounced version once
   useEffect(() => {
     debouncedMoveToMonthRef.current = debounce((direction) => {
       if (moveToMonthRef.current) {
@@ -303,7 +591,7 @@ const DateRangePicker = () => {
         debouncedMoveToMonthRef.current.cancel();
       }
     };
-  }, []); // Empty dependency array since we're using refs
+  }, []);
 
   const FloatingIndicator = () => {
     if (!isOutsideBounds || !isSelecting) return null;
@@ -348,13 +636,11 @@ const DateRangePicker = () => {
     if (!isSelecting || !initialDate) return;
 
     if (date < initialDate) {
-      // When selecting backwards
       setSelectedRange({
         start: date.toISOString(),
         end: initialDate.toISOString()
       });
     } else {
-      // When selecting forwards
       setSelectedRange({
         start: initialDate.toISOString(),
         end: date.toISOString()
@@ -384,19 +670,16 @@ const DateRangePicker = () => {
     }
   }, [isSelecting, isOutsideBounds]);
 
-  // Update the interval to have a shorter initial delay
   useEffect(() => {
     let checkInterval;
 
     if (isSelecting && isOutsideBounds) {
-      // Do the first check after a delay
       const timeoutId = setTimeout(() => {
         if (isSelecting && isOutsideBounds && moveToMonthRef.current) {
           moveToMonthRef.current('next');
         }
       }, 1000);
 
-      // Then set up the interval
       checkInterval = setInterval(() => {
         if (isSelecting && isOutsideBounds && moveToMonthRef.current) {
           moveToMonthRef.current('next');
@@ -419,7 +702,7 @@ const DateRangePicker = () => {
   const handleMouseUp = useCallback(() => {
     setIsSelecting(false);
     setIsOutsideBounds(false);
-    setInitialDate(null);  // Clear initial date
+    setInitialDate(null);
 
     document.body.style.userSelect = "";
     document.body.style.webkitUserSelect = "";
@@ -444,11 +727,15 @@ const DateRangePicker = () => {
     document.addEventListener("mouseup", handleMouseUp);
   };
 
-  // Update the Clear button handler
   const handleClear = () => {
     setSelectedRange({ start: null, end: null });
     setIsSelecting(false);
-    setInitialDate(null);  // Clear initial date
+    setInitialDate(null);
+    setValidationErrors({});
+    setDateInputContext({
+      startDate: null,
+      endDate: null
+    });
   };
 
   const getDisplayText = () => {
@@ -461,24 +748,6 @@ const DateRangePicker = () => {
       "MMM dd, yyyy"
     )} to ${format(parseISO(selectedRange.end), "MMM dd, yyyy")}`;
   };
-
-  useEffect(() => {
-    let checkInterval;
-
-    if (isSelecting && isOutsideBounds) {
-      checkInterval = setInterval(() => {
-        if (isSelecting && isOutsideBounds && debouncedMoveToMonthRef.current) {
-          debouncedMoveToMonthRef.current('next');
-        }
-      }, 1000);
-    }
-
-    return () => {
-      if (checkInterval) {
-        clearInterval(checkInterval);
-      }
-    };
-  }, [isSelecting, isOutsideBounds, moveToMonthRef]);
 
   return (
     <div
@@ -495,7 +764,6 @@ const DateRangePicker = () => {
         type="text"
         value={getDisplayText()}
         onClick={() => setIsOpen(true)}
-        readOnly
         style={{
           width: "300px",
           cursor: "pointer",
@@ -528,44 +796,42 @@ const DateRangePicker = () => {
             onMouseUp={handleMouseUp}
             onMouseLeave={() => setIsOutsideBounds(true)}
           >
-
-<div style={{ 
-  backgroundColor: '#2e334e33', 
+<div style={{
+  backgroundColor: '#2e334e33',
   padding: '16px',
+  paddingBottom: Object.keys(validationErrors).length > 0 ? '32px' : '16px',
   display: 'flex',
-  justifyContent: 'space-between'
+  justifyContent: 'space-between',
+  gap: '20px',
+  transition: 'padding-bottom 0.2s ease',
+  userSelect: 'text',  // Add this
+  WebkitUserSelect: 'text',  // Add this
+  MozUserSelect: 'text',  // Add this
 }}>
-  <button
-    style={{
-      flex: 1,
-      padding: '8px 12px',
-      border: '1px solid #dee2e6',
-      backgroundColor: 'white',
-      marginRight: '10px',
-      textAlign: 'left',
-      color: 'inherit'  // Add this to match calendar cells
+  <DateInput
+    value={selectedRange.start ? parseISO(selectedRange.start) : null}
+    onChange={handleDateChange('start')}
+    field="start"
+    placeholder="Start date"
+    context={{
+      startDate: dateInputContext.startDate,
+      endDate: dateInputContext.endDate,
+      currentField: 'start',
     }}
-  >
-    {selectedRange.start 
-      ? format(parseISO(selectedRange.start), "MMMM d, yyyy")
-      : "-"}
-  </button>
-  <button
-    style={{
-      flex: 1,
-      padding: '8px 12px',
-      border: '1px solid #dee2e6',
-      backgroundColor: 'white',
-      marginLeft: '10px',
-      textAlign: 'left',
-      color: 'inherit'  // Add this to match calendar cells
+  />
+  <DateInput
+    value={selectedRange.end ? parseISO(selectedRange.end) : null}
+    onChange={handleDateChange('end')}
+    field="end"
+    placeholder="End date"
+    context={{
+      startDate: dateInputContext.startDate,
+      endDate: dateInputContext.endDate,
+      currentField: 'end',
     }}
-  >
-    {selectedRange.end
-      ? format(parseISO(selectedRange.end), "MMMM d, yyyy")
-      : "-"}
-  </button>
+  />
 </div>
+
             <Card.Header className="d-flex justify-content-between align-items-center bg-white border-bottom">
               <Button
                 variant="light"
@@ -588,6 +854,7 @@ const DateRangePicker = () => {
                 →
               </Button>
             </Card.Header>
+
             <Card.Body
               style={{
                 padding: "1rem 0.5rem",
@@ -606,16 +873,16 @@ const DateRangePicker = () => {
                 }}
               >
                 <MonthPair
-                  firstMonth={months[0]}    // e.g., Dec
-                  secondMonth={months[1]}   // e.g., Jan
+                  firstMonth={months[0]}
+                  secondMonth={months[1]}
                   selectedRange={selectedRange}
                   onSelectionStart={handleSelectionStart}
                   onSelectionMove={handleSelectionMove}
                   isSelecting={isSelecting}
                 />
                 <MonthPair
-                  firstMonth={months[1]}    // e.g., Jan
-                  secondMonth={months[2]}   // e.g., Feb
+                  firstMonth={months[1]}
+                  secondMonth={months[2]}
                   selectedRange={selectedRange}
                   onSelectionStart={handleSelectionStart}
                   onSelectionMove={handleSelectionMove}
@@ -623,10 +890,11 @@ const DateRangePicker = () => {
                 />
               </div>
             </Card.Body>
+
             <Card.Footer className="d-flex justify-content-between">
               <Button
                 variant="light"
-                onClick={handleClear}  // Use the new clear handler
+                onClick={handleClear}
               >
                 Clear
               </Button>
@@ -636,8 +904,9 @@ const DateRangePicker = () => {
                   setIsOpen(false);
                   setIsSelecting(false);
                   setIsOutsideBounds(false);
-                  setInitialDate(null);  // Clear initial date when applying
+                  setInitialDate(null);
                 }}
+                disabled={Object.keys(validationErrors).length > 0}
               >
                 Apply
               </Button>
