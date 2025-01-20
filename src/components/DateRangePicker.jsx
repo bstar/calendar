@@ -147,12 +147,13 @@ const dateValidator = (() => {
   };
 })();
 
-const DateInput = ({ value, onChange, field, placeholder, context, selectedRange }) => {  // Add selectedRange to props
+// Update the DateInput component
+const DateInput = ({ value, onChange, field, placeholder, context, selectedRange }) => {
   const [inputValue, setInputValue] = useState('');
   const [error, setError] = useState(null);
   const [isTouched, setIsTouched] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [showError, setShowError] = useState(false);  // New state for error indicator
+  const [showError, setShowError] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
@@ -196,7 +197,6 @@ const DateInput = ({ value, onChange, field, placeholder, context, selectedRange
       return;
     }
 
-    // First validate format and date
     const parsedDate = dateValidator.parseValue(inputValue);
     if (!parsedDate) {
       const formatError = {
@@ -208,8 +208,7 @@ const DateInput = ({ value, onChange, field, placeholder, context, selectedRange
       return;
     }
 
-    // Then validate range if needed
-    if (field === 'start' && selectedRange?.end) {  // Use selectedRange from props with optional chaining
+    if (field === 'start' && selectedRange?.end) {
       const endDate = parseISO(selectedRange.end);
       if (parsedDate > endDate) {
         const rangeError = {
@@ -220,7 +219,7 @@ const DateInput = ({ value, onChange, field, placeholder, context, selectedRange
         showValidationError(rangeError);
         return;
       }
-    } else if (field === 'end' && selectedRange?.start) {  // Use selectedRange from props with optional chaining
+    } else if (field === 'end' && selectedRange?.start) {
       const startDate = parseISO(selectedRange.start);
       if (parsedDate < startDate) {
         const rangeError = {
@@ -233,7 +232,6 @@ const DateInput = ({ value, onChange, field, placeholder, context, selectedRange
       }
     }
 
-    // If we get here, the date is valid
     onChange(parsedDate);
     setError(null);
     setShowError(false);
@@ -241,20 +239,17 @@ const DateInput = ({ value, onChange, field, placeholder, context, selectedRange
     setTimeout(() => setShowSuccess(false), 1500);
   };
 
-  // Helper function to show validation errors
   const showValidationError = (error) => {
     setError(error);
     setShowError(true);
     onChange(null, false, error);
 
-    // Revert to last valid value
     if (value) {
       setInputValue(dateValidator.formatValue(value));
     } else {
       setInputValue('');
     }
 
-    // Clear error after delay
     setTimeout(() => {
       setShowError(false);
       setError(null);
@@ -263,7 +258,12 @@ const DateInput = ({ value, onChange, field, placeholder, context, selectedRange
 
   return (
     <div
-      style={{ position: 'relative', flex: 1 }}
+      style={{
+        position: 'relative',
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column'
+      }}
       onClick={(e) => e.stopPropagation()}
       onMouseDown={(e) => e.stopPropagation()}
     >
@@ -294,54 +294,47 @@ const DateInput = ({ value, onChange, field, placeholder, context, selectedRange
           style={{
             position: 'absolute',
             right: '8px',
-            top: '50%',
-            transform: 'translateY(-50%)',
+            top: '8px',
             color: '#28a745',
-            animation: 'fadeInOut 1.5s ease'
           }}
         >
           ✓
         </div>
       )}
-      {error && showError && (
-        <div
-          style={{
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            top: '100%',
-            marginTop: '4px',
-            fontSize: '0.875rem',
-            color: '#dc3545',
-            opacity: 1,
-            animation: 'errorMessage 2s ease forwards',
-            overflow: 'hidden'
-          }}
-        >
-          {error.message}
-        </div>
-      )}
-
-      <style>
-        {`
-    @keyframes fadeInOut {
-      0% { opacity: 0; }
-      20% { opacity: 1; }
-      80% { opacity: 1; }
-      100% { opacity: 0; }
-    }
-
-    @keyframes containerPadding {
-      0% { padding-bottom: 16px; }
-      10% { padding-bottom: 40px; }
-      80% { padding-bottom: 40px; }
-      100% { padding-bottom: 16px; }
-    }
-  `}
-      </style>
+      <div
+        style={{
+          height: error && showError ? '24px' : '0',
+          marginTop: error && showError ? '4px' : '0',
+          fontSize: '0.875rem',
+          color: '#dc3545',
+          overflow: 'hidden',
+          transition: 'height 0.2s ease-in-out, margin-top 0.2s ease-in-out',
+        }}
+      >
+        {error?.message}
+      </div>
     </div>
   );
 };
+
+// Update the Card component's inputs container
+const InputsContainer = ({ children }) => (
+  <div
+    style={{
+      backgroundColor: '#2e334e33',
+      padding: '16px',
+      display: 'flex',
+      justifyContent: 'space-between',
+      gap: '20px',
+      userSelect: 'text',
+      WebkitUserSelect: 'text',
+      MozUserSelect: 'text',
+      transition: 'padding 0.2s ease-in-out',
+    }}
+  >
+    {children}
+  </div>
+);
 
 const DayCell = ({
   date,
