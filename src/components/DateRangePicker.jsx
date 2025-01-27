@@ -9,7 +9,7 @@ import {
   OverlayTrigger,
   Tooltip,
 } from "react-bootstrap";
-import { ChevronRight } from "react-bootstrap-icons";
+import { ChevronRight, ChevronLeft } from "react-bootstrap-icons";
 import debounce from "lodash-es/debounce";
 import {
   format,
@@ -508,12 +508,17 @@ const MonthPair = ({
   </div>
 );
 
-const FloatingIndicator = ({ isOutsideBounds, isSelecting, mousePosition }) =>
-  isOutsideBounds && isSelecting ? (
+const FloatingIndicator = ({ outOfBoundsDirection, isSelecting, mousePosition }) => {
+  if (!outOfBoundsDirection || !isSelecting) return null;
+
+  const isPrev = outOfBoundsDirection === 'prev';
+
+  return (
     <div
+      className="floating-indicator"
       style={{
         position: "fixed",
-        left: `${mousePosition.x + 20}px`,
+        left: `${mousePosition.x + (isPrev ? -100 : 20)}px`,
         top: `${mousePosition.y - 20}px`,
         background: "#0d6efd",
         color: "white",
@@ -530,10 +535,20 @@ const FloatingIndicator = ({ isOutsideBounds, isSelecting, mousePosition }) =>
         pointerEvents: "none",
       }}
     >
-      <ChevronRight size={16} />
-      <span>Next Month</span>
+      {isPrev ? (
+        <>
+          <ChevronLeft size={16} />
+          <span>Previous Month</span>
+        </>
+      ) : (
+        <>
+          <ChevronRight size={16} />
+          <span>Next Month</span>
+        </>
+      )}
     </div>
-  ) : null;
+  );
+};
 
 const DateRangePicker = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -565,6 +580,8 @@ const DateRangePicker = () => {
   const containerRef = useRef(null);
   const debouncedMoveToMonthRef = useRef(null);
   const moveToMonthRef = useRef(null);
+
+  const [outOfBoundsDirection, setOutOfBoundsDirection] = useState(null); // 'prev', 'next', or null
 
   const handleClickOutside = useCallback(() => {
     if (isOpen) {
@@ -625,33 +642,42 @@ const DateRangePicker = () => {
     if (!container) return;
 
     const slideAmount = container.offsetWidth / 2;
-    const newCurrentMonth = addMonths(currentMonth, direction === 'next' ? 1 : -1);
 
-    setCurrentMonth(newCurrentMonth);
+    // Important: Update current month first
+    setCurrentMonth(prev => addMonths(prev, direction === 'next' ? 1 : -1));
 
     const animate = async () => {
+      // Set initial position
       container.style.transition = 'none';
       container.style.transform = `translateX(${direction === 'next' ? 0 : -slideAmount}px)`;
+      container.offsetHeight; // Force reflow
 
-      // Force reflow
-      container.offsetHeight;
-
+      // Pre-animation month update
       if (direction === 'prev') {
-        setMonths(prev => [addMonths(prev[0], -1), prev[0], prev[1]]);
+        setMonths(prev => {
+          const newFirst = addMonths(prev[0], -1);
+          return [newFirst, prev[0], prev[1]];
+        });
       }
 
+      // Start animation
       requestAnimationFrame(() => {
         container.style.transition = 'transform 0.3s ease-in-out';
         container.style.transform = `translateX(${direction === 'next' ? -slideAmount : 0}px)`;
 
+        // Complete animation
         setTimeout(() => {
           container.style.transition = 'none';
           container.style.transform = 'translateX(0)';
 
-          setMonths(prev => direction === 'next'
-            ? [prev[1], prev[2], addMonths(prev[2], 1)]
-            : [prev[0], prev[1], addMonths(prev[1], 1)]
-          );
+          // Post-animation month update
+          setMonths(prev => {
+            if (direction === 'next') {
+              return [prev[1], prev[2], addMonths(prev[2], 1)];
+            } else {
+              return prev; // We already updated for prev direction
+            }
+          });
 
           setIsAnimating(false);
         }, 300);
@@ -679,25 +705,22 @@ const DateRangePicker = () => {
     let checkInterval;
     let timeoutId;
 
-    if (isSelecting && isOutsideBounds) {
-      timeoutId = setTimeout(() => {
-        if (isSelecting && isOutsideBounds && moveToMonthRef.current) {
-          moveToMonthRef.current('next');
+    if (isSelecting && outOfBoundsDirection) {
+      const advanceMonth = () => {
+        if (isSelecting && outOfBoundsDirection && moveToMonthRef.current) {
+          moveToMonthRef.current(outOfBoundsDirection);
         }
-      }, 1000);
+      };
 
-      checkInterval = setInterval(() => {
-        if (isSelecting && isOutsideBounds && moveToMonthRef.current) {
-          moveToMonthRef.current('next');
-        }
-      }, 1000);
+      timeoutId = setTimeout(advanceMonth, 1000);
+      checkInterval = setInterval(advanceMonth, 1000);
     }
 
     return () => {
       if (timeoutId) clearTimeout(timeoutId);
       if (checkInterval) clearInterval(checkInterval);
     };
-  }, [isSelecting, isOutsideBounds]);
+  }, [isSelecting, outOfBoundsDirection]);
 
   const handleSelectionStart = useCallback(date => {
     setIsSelecting(true);
@@ -727,25 +750,26 @@ const DateRangePicker = () => {
 
     const containerRect = containerRef.current.getBoundingClientRect();
     const { clientX: mouseX, clientY: mouseY } = e;
+    const BOUNDARY_THRESHOLD = 1;
 
     setMousePosition({ x: mouseX, y: mouseY });
 
-    const newIsOutside = mouseX > containerRect.right;
-    if (newIsOutside !== isOutsideBounds) {
-      setIsOutsideBounds(newIsOutside);
-      // Remove immediate call to moveToMonthRef here since the interval will handle it
+    // Check both boundaries and maintain direction
+    const newDirection = mouseX < containerRect.left + BOUNDARY_THRESHOLD ? 'prev'
+      : mouseX > containerRect.right - BOUNDARY_THRESHOLD ? 'next'
+        : null;
+
+    if (newDirection !== outOfBoundsDirection) {
+      setOutOfBoundsDirection(newDirection);
+      if (newDirection) {
+        moveToMonthRef.current(newDirection);
+      }
     }
-  }, [isSelecting, isOutsideBounds]);
+  }, [isSelecting, outOfBoundsDirection]);
 
   const handleMouseUp = useCallback(() => {
-    const resetSelectionState = () => ({
-      selecting: false,
-      outsideBounds: false,
-      initialDate: null
-    });
-
     setIsSelecting(false);
-    setIsOutsideBounds(false);
+    setOutOfBoundsDirection(null);
     setInitialDate(null);
 
     const resetUserSelect = () => {
@@ -806,179 +830,188 @@ const DateRangePicker = () => {
         : `${format(parseISO(start), "MMM dd, yyyy")} to ${format(parseISO(end), "MMM dd, yyyy")}`;
   }, [selectedRange]);
 
-  return (
-    <div
-      className="position-relative"
-      onMouseDown={handleMouseDown}
+return (
+  <div
+    className="position-relative"
+    onMouseDown={handleMouseDown}
+    style={{
+      userSelect: "none",
+      WebkitUserSelect: "none",
+      MozUserSelect: "none",
+      msUserSelect: "none",
+    }}
+  >
+    <Form.Control
+      type="text"
+      value={getDisplayText()}
+      onClick={() => setIsOpen(true)}
       style={{
+        width: "300px",
+        cursor: "pointer",
         userSelect: "none",
         WebkitUserSelect: "none",
         MozUserSelect: "none",
         msUserSelect: "none",
       }}
-    >
-      <Form.Control
-        type="text"
-        value={getDisplayText()}
-        onClick={() => setIsOpen(true)}
-        style={{
-          width: "300px",
-          cursor: "pointer",
-          userSelect: "none",
-          WebkitUserSelect: "none",
-          MozUserSelect: "none",
-          msUserSelect: "none",
-        }}
-      />
+    />
 
-      {isOpen && (
-        <>
-          <Card
-            ref={containerRef}
-            className="position-absolute mt-2 shadow"
+    {isOpen && (
+      <>
+        <Card
+          ref={containerRef}
+          className="position-absolute mt-2 shadow"
+          style={{
+            zIndex: 1000,
+            width: "700px",
+            userSelect: "none",
+            WebkitUserSelect: "none",
+            MozUserSelect: "none",
+            msUserSelect: "none",
+            overflow: "hidden",
+          }}
+          onMouseDown={e => {
+            e.stopPropagation();
+            handleMouseDown(e);
+          }}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={e => {
+            const containerRect = containerRef.current.getBoundingClientRect();
+            const { clientX: mouseX } = e;
+
+            if (mouseX < containerRect.left) {
+              setOutOfBoundsDirection('prev');
+            } else if (mouseX > containerRect.right) {
+              setOutOfBoundsDirection('next');
+            }
+          }}
+        >
+          <div style={{
+            backgroundColor: '#2e334e33',
+            padding: '16px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            gap: '20px',
+            userSelect: 'text',
+            WebkitUserSelect: 'text',
+            MozUserSelect: 'text'
+          }}>
+            <DateInput
+              value={selectedRange.start ? parseISO(selectedRange.start) : null}
+              onChange={handleDateChange('start')}
+              field="start"
+              placeholder="Start date"
+              context={{
+                startDate: dateInputContext.startDate,
+                endDate: dateInputContext.endDate,
+                currentField: 'start',
+              }}
+              selectedRange={selectedRange}
+            />
+            <DateInput
+              value={selectedRange.end ? parseISO(selectedRange.end) : null}
+              onChange={handleDateChange('end')}
+              field="end"
+              placeholder="End date"
+              context={{
+                startDate: dateInputContext.startDate,
+                endDate: dateInputContext.endDate,
+                currentField: 'end',
+              }}
+              selectedRange={selectedRange}
+            />
+          </div>
+
+          <Card.Header className="d-flex justify-content-between align-items-center bg-white border-bottom">
+            <Button
+              variant="light"
+              onClick={() => moveToMonthRef.current("prev")}
+              className="px-2 py-1"
+              disabled={isAnimating}
+            >
+              ←
+            </Button>
+            <span className="fw-bold">
+              {format(months[0], "MMMM yyyy")} -{" "}
+              {format(months[1], "MMMM yyyy")}
+            </span>
+            <Button
+              variant="light"
+              onClick={() => moveToMonthRef.current("next")}
+              className="px-2 py-1"
+              disabled={isAnimating}
+            >
+              →
+            </Button>
+          </Card.Header>
+
+          <Card.Body
             style={{
-              zIndex: 1000,
-              width: "700px",
-              userSelect: "none",
-              WebkitUserSelect: "none",
-              MozUserSelect: "none",
-              msUserSelect: "none",
+              padding: "1rem 0.5rem",
+              position: "relative",
               overflow: "hidden",
             }}
-            onMouseDown={e => {
-              e.stopPropagation();
-              handleMouseDown(e);
-            }}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={() => setIsOutsideBounds(true)}
           >
-            <div style={{
-              backgroundColor: '#2e334e33',
-              padding: '16px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              gap: '20px',
-              userSelect: 'text',
-              WebkitUserSelect: 'text',
-              MozUserSelect: 'text'
-            }}>
-              <DateInput
-                value={selectedRange.start ? parseISO(selectedRange.start) : null}
-                onChange={handleDateChange('start')}
-                field="start"
-                placeholder="Start date"
-                context={{
-                  startDate: dateInputContext.startDate,
-                  endDate: dateInputContext.endDate,
-                  currentField: 'start',
-                }}
-                selectedRange={selectedRange}
-              />
-              <DateInput
-                value={selectedRange.end ? parseISO(selectedRange.end) : null}
-                onChange={handleDateChange('end')}
-                field="end"
-                placeholder="End date"
-                context={{
-                  startDate: dateInputContext.startDate,
-                  endDate: dateInputContext.endDate,
-                  currentField: 'end',
-                }}
-                selectedRange={selectedRange}
-              />
-            </div>
-
-            <Card.Header className="d-flex justify-content-between align-items-center bg-white border-bottom">
-              <Button
-                variant="light"
-                onClick={() => moveToMonthRef.current("prev")}
-                className="px-2 py-1"
-                disabled={isAnimating}
-              >
-                ←
-              </Button>
-              <span className="fw-bold">
-                {format(months[0], "MMMM yyyy")} -{" "}
-                {format(months[1], "MMMM yyyy")}
-              </span>
-              <Button
-                variant="light"
-                onClick={() => moveToMonthRef.current("next")}
-                className="px-2 py-1"
-                disabled={isAnimating}
-              >
-                →
-              </Button>
-            </Card.Header>
-
-            <Card.Body
+            <div
+              ref={monthsContainerRef}
               style={{
-                padding: "1rem 0.5rem",
-                position: "relative",
-                overflow: "hidden",
+                display: 'flex',
+                width: '100%',
+                position: 'relative',
+                transform: 'translateX(0)',
+                willChange: 'transform'
               }}
             >
-              <div
-                ref={monthsContainerRef}
-                style={{
-                  display: 'flex',
-                  width: '100%',
-                  position: 'relative',
-                  transform: 'translateX(0)',
-                  willChange: 'transform'
-                }}
-              >
-                <MonthPair
-                  firstMonth={months[0]}
-                  secondMonth={months[1]}
-                  selectedRange={selectedRange}
-                  onSelectionStart={handleSelectionStart}
-                  onSelectionMove={handleSelectionMove}
-                  isSelecting={isSelecting}
-                />
-                <MonthPair
-                  firstMonth={months[1]}
-                  secondMonth={months[2]}
-                  selectedRange={selectedRange}
-                  onSelectionStart={handleSelectionStart}
-                  onSelectionMove={handleSelectionMove}
-                  isSelecting={isSelecting}
-                />
-              </div>
-            </Card.Body>
+              <MonthPair
+                firstMonth={months[0]}
+                secondMonth={months[1]}
+                selectedRange={selectedRange}
+                onSelectionStart={handleSelectionStart}
+                onSelectionMove={handleSelectionMove}
+                isSelecting={isSelecting}
+              />
+              <MonthPair
+                firstMonth={months[1]}
+                secondMonth={months[2]}
+                selectedRange={selectedRange}
+                onSelectionStart={handleSelectionStart}
+                onSelectionMove={handleSelectionMove}
+                isSelecting={isSelecting}
+              />
+            </div>
+          </Card.Body>
 
-            <Card.Footer className="d-flex justify-content-between">
-              <Button
-                variant="light"
-                onClick={handleClear}
-              >
-                Clear
-              </Button>
-              <Button
-                variant="primary"
-                onClick={() => {
-                  setIsOpen(false);
-                  setIsSelecting(false);
-                  setIsOutsideBounds(false);
-                  setInitialDate(null);
-                }}
-                disabled={Object.keys(validationErrors).length > 0}
-              >
-                Apply
-              </Button>
-            </Card.Footer>
-          </Card>
-          <FloatingIndicator
-            className="floating-indicator" // Add this class
-            isOutsideBounds={isOutsideBounds}
-            isSelecting={isSelecting}
-            mousePosition={mousePosition}
-          />
-        </>
-      )}
-    </div>
-  );
+          <Card.Footer className="d-flex justify-content-between">
+            <Button
+              variant="light"
+              onClick={handleClear}
+            >
+              Clear
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => {
+                setIsOpen(false);
+                setIsSelecting(false);
+                setIsOutsideBounds(false);
+                setInitialDate(null);
+              }}
+              disabled={Object.keys(validationErrors).length > 0}
+            >
+              Apply
+            </Button>
+          </Card.Footer>
+        </Card>
+        <FloatingIndicator
+          className="floating-indicator"
+          outOfBoundsDirection={outOfBoundsDirection}
+          isSelecting={isSelecting}
+          mousePosition={mousePosition}
+        />
+      </>
+    )}
+  </div>
+);
 };
 
 export default DateRangePicker;
