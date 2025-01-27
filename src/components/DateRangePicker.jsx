@@ -28,6 +28,33 @@ import {
 } from "date-fns";
 import "bootstrap/dist/css/bootstrap.min.css";
 
+
+const useClickOutside = (ref, handler) => {
+  useEffect(() => {
+    const listener = (event) => {
+      // If click is on the ref element or inside it, do nothing
+      if (!ref.current || ref.current.contains(event.target)) {
+        return;
+      }
+
+      // Also ignore clicks on the floating indicator
+      const isFloatingIndicator = event.target.closest('.floating-indicator');
+      if (isFloatingIndicator) {
+        return;
+      }
+
+      handler(event);
+    };
+
+    // Use mousedown instead of click to handle the event earlier in the cycle
+    document.addEventListener('mousedown', listener);
+    return () => {
+      document.removeEventListener('mousedown', listener);
+    };
+  }, [ref, handler]);
+};
+
+
 const dateValidator = (() => {
   const DATE_FORMAT = "MMMM d, yyyy";
 
@@ -539,6 +566,17 @@ const DateRangePicker = () => {
   const debouncedMoveToMonthRef = useRef(null);
   const moveToMonthRef = useRef(null);
 
+  const handleClickOutside = useCallback(() => {
+    if (isOpen) {
+      setIsOpen(false);
+      setIsSelecting(false);
+      setIsOutsideBounds(false);
+      setInitialDate(null);
+    }
+  }, [isOpen]);
+
+  useClickOutside(containerRef, handleClickOutside);
+
   const handleDateChange = (field) => (date, isClearingError, validationError) => {
     if (isClearingError) {
       setValidationErrors(prev =>
@@ -932,6 +970,7 @@ const DateRangePicker = () => {
             </Card.Footer>
           </Card>
           <FloatingIndicator
+            className="floating-indicator" // Add this class
             isOutsideBounds={isOutsideBounds}
             isSelecting={isSelecting}
             mousePosition={mousePosition}
