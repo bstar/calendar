@@ -129,14 +129,17 @@ const DateInput = ({ value, onChange, field, placeholder, context, selectedRange
   const [error, setError] = useState(null);
   const [showError, setShowError] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [showIndicator, setShowIndicator] = useState(null); // 'success' | 'error' | null
-  const previousValueRef = useRef(value);
+  const [showIndicator, setShowIndicator] = useState(null);
+  const previousInputRef = useRef('');
 
   useEffect(() => {
     if (!isEditing && value) {
-      setInputValue(dateValidator.formatValue(value));
+      const formattedValue = dateValidator.formatValue(value);
+      setInputValue(formattedValue);
+      previousInputRef.current = formattedValue;
     } else if (!isEditing && !value) {
       setInputValue('');
+      previousInputRef.current = '';
     }
   }, [value, isEditing]);
 
@@ -153,83 +156,91 @@ const DateInput = ({ value, onChange, field, placeholder, context, selectedRange
   };
 
   const validateAndUpdate = () => {
-    if (!inputValue) {
+    if (inputValue === previousInputRef.current) {
+      return;
+    }
+  
+    previousInputRef.current = inputValue;
+  
+    // Handle empty input
+    if (!inputValue.trim()) {
       onChange(null);
       setError(null);
       setShowError(false);
+      if (value) {
+        setShowIndicator('error');
+        setTimeout(() => setShowIndicator(null), 1500);
+      }
       return;
     }
-
-    const parsedDate = dateValidator.parseValue(inputValue);
-    if (!parsedDate) {
-      const formatError = {
+  
+    // First check if it matches the format
+    let parsedDate;
+    try {
+      parsedDate = parse(inputValue, dateValidator.DATE_FORMAT, new Date());
+      if (!isValid(parsedDate)) {
+        showValidationError({
+          message: 'Invalid date',
+          type: 'error',
+          field: 'date'
+        });
+        return;
+      }
+    } catch {
+      showValidationError({
         message: `Please use format: January 15, 2024`,
         type: 'error',
         field: 'format'
-      };
-      showValidationError(formatError);
+      });
       return;
     }
-
+  
     // Range validation
     if (field === 'start' && selectedRange?.end) {
       const endDate = parseISO(selectedRange.end);
       if (parsedDate > endDate) {
-        const rangeError = {
+        showValidationError({
           message: 'Start date must be before end date',
           type: 'error',
           field: 'range'
-        };
-        showValidationError(rangeError);
+        });
         return;
       }
     } else if (field === 'end' && selectedRange?.start) {
       const startDate = parseISO(selectedRange.start);
       if (parsedDate < startDate) {
-        const rangeError = {
+        showValidationError({
           message: 'End date must be after start date',
           type: 'error',
           field: 'range'
-        };
-        showValidationError(rangeError);
+        });
         return;
       }
     }
-
-    // Only show success indicator if the value actually changed
-    const isNewValue = !previousValueRef.current || 
-                      !isSameDay(parsedDate, previousValueRef.current);
-    
+  
+    // Only show success for valid new values
+    const isNewValue = !value || !isSameDay(parsedDate, value);
     if (isNewValue) {
       setShowIndicator('success');
       setTimeout(() => setShowIndicator(null), 1500);
     }
-
-    previousValueRef.current = parsedDate;
+  
     onChange(parsedDate);
     setError(null);
     setShowError(false);
   };
-
+  
   const showValidationError = (error) => {
     setError(error);
     setShowError(true);
-    onChange(null, false, error);
-
-    if (value) {
-      setInputValue(dateValidator.formatValue(value));
-    } else {
-      setInputValue('');
-    }
-
-    // Show error indicator
     setShowIndicator('error');
-    
+    onChange(null, false, error);
+  
     setTimeout(() => {
       setShowError(false);
       setError(null);
       setShowIndicator(null);
-    }, 2000);
+    }, 1500);
   };
 
   return (
@@ -281,6 +292,7 @@ const DateInput = ({ value, onChange, field, placeholder, context, selectedRange
             top: '8px',
             color: showIndicator === 'success' ? '#28a745' : '#dc3545',
             fontSize: '14px',
+            fontWeight: 'bold'
           }}
         >
           {showIndicator === 'success' ? '✓' : '×'}
@@ -705,20 +717,25 @@ const FloatingIndicator = ({ isOutsideBounds, isSelecting, mousePosition }) =>
     }, [isSelecting, handleMouseMove, handleMouseUp]);
   
     const handleClear = useCallback(() => {
-      const resetState = {
-        selectedRange: { start: null, end: null },
-        isSelecting: false,
-        initialDate: null,
-        validationErrors: {},
-        dateInputContext: { startDate: null, endDate: null }
-      };
-  
-      Object.entries(resetState).forEach(([key, value]) => {
-        const setterName = `set${key.charAt(0).toUpperCase()}${key.slice(1)}`;
-        if (typeof this[setterName] === 'function') {
-          this[setterName](value);
-        }
-      });
+      // Reset range and context
+      setSelectedRange({ start: null, end: null });
+      setDateInputContext({ startDate: null, endDate: null });
+      
+      // Reset selection states
+      setIsSelecting(false);
+      setInitialDate(null);
+      setIsOutsideBounds(false);
+      
+      // Reset validation
+      setValidationErrors({});
+      
+      // Reset to current month view
+      const currentDate = startOfMonth(new Date());
+      setMonths([
+        currentDate,
+        addMonths(currentDate, 1),
+        addMonths(currentDate, 2)
+      ]);
     }, []);
   
     const getDisplayText = useCallback(() => {
@@ -873,25 +890,25 @@ const FloatingIndicator = ({ isOutsideBounds, isSelecting, mousePosition }) =>
               </Card.Body>
   
               <Card.Footer className="d-flex justify-content-between">
-                <Button
-                  variant="light"
-                  onClick={handleClear}
-                >
-                  Clear
-                </Button>
-                <Button
-                  variant="primary"
-                  onClick={() => {
-                    setIsOpen(false);
-                    setIsSelecting(false);
-                    setIsOutsideBounds(false);
-                    setInitialDate(null);
-                  }}
-                  disabled={Object.keys(validationErrors).length > 0}
-                >
-                  Apply
-                </Button>
-              </Card.Footer>
+              <Button
+                variant="light"
+                onClick={handleClear}
+              >
+                Clear
+              </Button>
+              <Button
+                variant="primary"
+                onClick={() => {
+                  setIsOpen(false);
+                  setIsSelecting(false);
+                  setIsOutsideBounds(false);
+                  setInitialDate(null);
+                }}
+                disabled={Object.keys(validationErrors).length > 0}
+              >
+                Apply
+              </Button>
+            </Card.Footer>
             </Card>
             <FloatingIndicator 
               isOutsideBounds={isOutsideBounds} 
