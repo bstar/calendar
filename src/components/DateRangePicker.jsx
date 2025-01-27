@@ -637,6 +637,30 @@ const DateRangePicker = () => {
     };
   }, []);
 
+  useEffect(() => {
+    let checkInterval;
+    let timeoutId;
+
+    if (isSelecting && isOutsideBounds) {
+      timeoutId = setTimeout(() => {
+        if (isSelecting && isOutsideBounds && moveToMonthRef.current) {
+          moveToMonthRef.current('next');
+        }
+      }, 1000);
+
+      checkInterval = setInterval(() => {
+        if (isSelecting && isOutsideBounds && moveToMonthRef.current) {
+          moveToMonthRef.current('next');
+        }
+      }, 1000);
+    }
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      if (checkInterval) clearInterval(checkInterval);
+    };
+  }, [isSelecting, isOutsideBounds]);
+
   const handleSelectionStart = useCallback(date => {
     setIsSelecting(true);
     setInitialDate(date);
@@ -661,7 +685,6 @@ const DateRangePicker = () => {
 
   const handleMouseMove = useCallback((e) => {
     e.preventDefault();
-
     if (!isSelecting || !containerRef.current) return;
 
     const containerRect = containerRef.current.getBoundingClientRect();
@@ -672,9 +695,7 @@ const DateRangePicker = () => {
     const newIsOutside = mouseX > containerRect.right;
     if (newIsOutside !== isOutsideBounds) {
       setIsOutsideBounds(newIsOutside);
-      if (newIsOutside && debouncedMoveToMonthRef.current) {
-        moveToMonthRef.current('next');
-      }
+      // Remove immediate call to moveToMonthRef here since the interval will handle it
     }
   }, [isSelecting, isOutsideBounds]);
 
