@@ -303,12 +303,14 @@ const DateInput = ({ value, onChange, field, placeholder, context, selectedRange
           border: `1px solid ${error ? '#dc3545' : '#dee2e6'}`,
           borderRadius: '4px',
           backgroundColor: 'white',
-          color: 'inherit',
+          color: '#000',
           transition: 'border-color 0.15s ease',
           cursor: 'text',
           userSelect: 'text',
           WebkitUserSelect: 'text',
           MozUserSelect: 'text',
+          border: '1px solid #979797',
+          textAlign: 'center',
         }}
       />
       {showIndicator && (
@@ -375,7 +377,7 @@ const MonthGrid = ({
           <div
             key={day}
             className="text-center mb-2"
-            style={{ fontSize: "0.8rem", fontWeight: "600", color: "#6c757d" }}
+            style={{ fontSize: "0.8rem", fontWeight: "600", color: "#6c757d", height: '32px' }}
           >
             {day}
           </div>
@@ -470,7 +472,7 @@ const DayCell = ({
             borderBottomLeftRadius: isRangeStart ? "15px" : "0px",
             borderTopRightRadius: isRangeEnd ? "15px" : "0px",
             borderBottomRightRadius: isRangeEnd ? "15px" : "0px",
-            backgroundColor: (isSelected || isInRange) ? "#7dd2d3" : "transparent",
+            backgroundColor: (isSelected || isInRange) ? "#b1e4e5" : "transparent",
             color: "inherit",
             transition: "background-color 0.15s ease, color 0.15s ease",
             fontWeight: isSelected ? "600" : "normal",
@@ -520,8 +522,8 @@ const FloatingIndicator = ({ outOfBoundsDirection, isSelecting, mousePosition })
         position: "fixed",
         left: `${mousePosition.x + (isPrev ? -100 : 20)}px`,
         top: `${mousePosition.y - 20}px`,
-        background: "#0d6efd",
-        color: "white",
+        backgroundColor: 'rgba(226, 228, 238, 0.5)',
+        color: "#000",
         padding: "8px 12px",
         borderRadius: "4px",
         display: "flex",
@@ -533,6 +535,7 @@ const FloatingIndicator = ({ outOfBoundsDirection, isSelecting, mousePosition })
         transition: "opacity 0.2s ease",
         opacity: 1,
         pointerEvents: "none",
+        border: '1px solid #979797',
       }}
     >
       {isPrev ? (
@@ -887,11 +890,13 @@ return (
           }}
         >
           <div style={{
-            backgroundColor: '#2e334e33',
+            backgroundColor: 'rgba(226, 228, 238, 0.5)',
             padding: '16px',
             display: 'flex',
             justifyContent: 'space-between',
             gap: '20px',
+            height: '67px',
+            alignItems: 'center',
             userSelect: 'text',
             WebkitUserSelect: 'text',
             MozUserSelect: 'text'
@@ -928,8 +933,9 @@ return (
               onClick={() => moveToMonthRef.current("prev")}
               className="px-2 py-1"
               disabled={isAnimating}
+              style={{ backgroundColor: 'white', border: 'none' }}
             >
-              ←
+              <ChevronLeft size={16} />
             </Button>
             <span className="fw-bold">
               {format(months[0], "MMMM yyyy")} -{" "}
@@ -940,8 +946,9 @@ return (
               onClick={() => moveToMonthRef.current("next")}
               className="px-2 py-1"
               disabled={isAnimating}
+              style={{ backgroundColor: 'white', border: 'none' }}
             >
-              →
+              <ChevronRight size={16} />
             </Button>
           </Card.Header>
 
@@ -995,6 +1002,11 @@ return (
                 setIsSelecting(false);
                 setIsOutsideBounds(false);
                 setInitialDate(null);
+              }}
+              style={{
+                backgroundColor: 'rgba(226, 228, 238, 0.5)',
+                color: "#000",
+                border: '1px solid #979797',
               }}
               disabled={Object.keys(validationErrors).length > 0}
             >
