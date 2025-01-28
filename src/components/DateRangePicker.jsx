@@ -343,6 +343,7 @@ const DateInput = ({ value, onChange, field, placeholder, context, selectedRange
   );
 };
 
+// Update the MonthGrid component
 const MonthGrid = ({
   baseDate,
   selectedRange,
@@ -367,17 +368,34 @@ const MonthGrid = ({
     };
   }, {});
 
+  // Always maintain 6 rows of space regardless of actual weeks in month
+  const totalWeeks = 6;
+  const currentWeeks = Object.keys(weeks).length;
+  const emptyWeeks = totalWeeks - currentWeeks;
+
   return (
     <div className="px-2">
       <div
-        className="d-grid"
-        style={{ gridTemplateColumns: "repeat(7, 1fr)", gap: "0px" }}
+        className="d-grid calendar-grid"
+        style={{
+          gridTemplateColumns: "repeat(7, 1fr)",
+          gap: "0",
+          height: "240px", // Fixed height for 6 rows plus header
+          gridTemplateRows: `32px repeat(${totalWeeks}, 1fr)`, // Header row plus 6 week rows
+        }}
       >
         {["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"].map(day => (
           <div
             key={day}
-            className="text-center mb-2"
-            style={{ fontSize: "0.8rem", fontWeight: "600", color: "#6c757d", height: '32px' }}
+            className="text-center"
+            style={{
+              fontSize: "0.8rem",
+              fontWeight: "600",
+              color: "#6c757d",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
           >
             {day}
           </div>
@@ -398,11 +416,25 @@ const MonthGrid = ({
             );
           })
         )}
+        
+        {/* Add empty cells for consistency */}
+        {[...Array(emptyWeeks * 7)].map((_, i) => (
+          <div
+            key={`empty-${i}`}
+            style={{
+              width: "100%",
+              height: "100%",
+              position: "relative",
+              backgroundColor: "white"
+            }}
+          />
+        ))}
       </div>
     </div>
   );
 };
 
+// Update the DayCell component
 const DayCell = ({
   date,
   selectedRange,
@@ -437,7 +469,7 @@ const DayCell = ({
       <div
         style={{
           width: "100%",
-          paddingBottom: "100%",
+          height: "100%",
           position: "relative",
           backgroundColor: "white"
         }}
@@ -453,25 +485,26 @@ const DayCell = ({
       <div
         style={{
           width: "100%",
-          paddingBottom: "100%",
+          height: "100%",
           position: "relative",
           cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
         <div
           style={{
             position: "absolute",
-            top: "6px",
-            right: "0px",
-            bottom: "6px",
-            left: "0px",
+            inset: "0",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            borderTopLeftRadius: isRangeStart ? "15px" : "0px",
-            borderBottomLeftRadius: isRangeStart ? "15px" : "0px",
-            borderTopRightRadius: isRangeEnd ? "15px" : "0px",
-            borderBottomRightRadius: isRangeEnd ? "15px" : "0px",
+            borderTopLeftRadius: isRangeStart ? "15px" : "0",
+            borderBottomLeftRadius: isRangeStart ? "15px" : "0",
+            borderTopRightRadius: isRangeEnd ? "15px" : "0",
+            borderBottomRightRadius: isRangeEnd ? "15px" : "0",
+            margin: "3px 0",
             backgroundColor: (isSelected || isInRange) ? "#b1e4e5" : "transparent",
             color: "inherit",
             transition: "background-color 0.15s ease, color 0.15s ease",
