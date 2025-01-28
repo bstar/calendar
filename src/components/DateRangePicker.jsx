@@ -871,6 +871,8 @@ return (
             MozUserSelect: "none",
             msUserSelect: "none",
             overflow: "hidden",
+            border: "1px solid #B1E4E5",
+            borderRadius: '3px',
           }}
           onMouseDown={e => {
             e.stopPropagation();
