@@ -606,9 +606,10 @@ const DateRangePicker = () => {
   const [months, setMonths] = useState(() => {
     const initial = startOfMonth(new Date());
     return [
-      initial,
-      addMonths(initial, 1),
-      addMonths(initial, 2),
+      addMonths(initial, -1),  // Hidden previous
+      initial,                 // First visible
+      addMonths(initial, 1),   // Second visible
+      addMonths(initial, 2),   // Hidden next
     ];
   });
 
@@ -618,6 +619,9 @@ const DateRangePicker = () => {
   const moveToMonthRef = useRef(null);
 
   const [outOfBoundsDirection, setOutOfBoundsDirection] = useState(null); // 'prev', 'next', or null
+
+  // Add buffer state
+  const [buffer, setBuffer] = useState(null);
 
   const handleClickOutside = useCallback(() => {
     if (isOpen) {
@@ -672,56 +676,33 @@ const DateRangePicker = () => {
 
   moveToMonthRef.current = useCallback((direction) => {
     if (isAnimating) return;
-
     setIsAnimating(true);
-    const container = monthsContainerRef.current;
+
+    const container = monthsContainerRef.current?.firstChild;
     if (!container) return;
 
-    const slideAmount = container.offsetWidth / 2;
+    // Start animation
+    requestAnimationFrame(() => {
+      container.style.transition = 'transform 0.3s ease-in-out';
+      container.style.transform = `translateX(${direction === 'next' ? '-50%' : '0%'})`;
 
-    // Important: Update current month first
-    setCurrentMonth(prev => addMonths(prev, direction === 'next' ? 1 : -1));
+      // Wait for animation to complete before any React updates
+      setTimeout(() => {
+        // Update state after animation is done
+        setMonths(prev => direction === 'next'
+          ? [prev[1], prev[2], addMonths(prev[2], 1)]
+          : [addMonths(prev[0], -1), prev[0], prev[1]]
+        );
 
-    const animate = async () => {
-      // Set initial position
-      container.style.transition = 'none';
-      container.style.transform = `translateX(${direction === 'next' ? 0 : -slideAmount}px)`;
-      container.offsetHeight; // Force reflow
-
-      // Pre-animation month update
-      if (direction === 'prev') {
-        setMonths(prev => {
-          const newFirst = addMonths(prev[0], -1);
-          return [newFirst, prev[0], prev[1]];
-        });
-      }
-
-      // Start animation
-      requestAnimationFrame(() => {
-        container.style.transition = 'transform 0.3s ease-in-out';
-        container.style.transform = `translateX(${direction === 'next' ? -slideAmount : 0}px)`;
-
-        // Complete animation
-        setTimeout(() => {
-          container.style.transition = 'none';
-          container.style.transform = 'translateX(0)';
-
-          // Post-animation month update
-          setMonths(prev => {
-            if (direction === 'next') {
-              return [prev[1], prev[2], addMonths(prev[2], 1)];
-            } else {
-              return prev; // We already updated for prev direction
-            }
-          });
-
-          setIsAnimating(false);
-        }, 300);
-      });
-    };
-
-    animate();
-  }, [isAnimating, currentMonth]);
+        // Reset position instantly
+        container.style.transition = 'none';
+        container.style.transform = 'translateX(-25%)';
+        
+        setCurrentMonth(prev => addMonths(prev, direction === 'next' ? 1 : -1));
+        setIsAnimating(false);
+      }, 300);
+    });
+  }, [isAnimating]);
 
   useEffect(() => {
     debouncedMoveToMonthRef.current = debounce((direction) => {
@@ -851,9 +832,10 @@ const DateRangePicker = () => {
     // Reset to current month view
     const currentDate = startOfMonth(new Date());
     setMonths([
-      currentDate,
-      addMonths(currentDate, 1),
-      addMonths(currentDate, 2)
+      addMonths(currentDate, -1),  // Hidden previous
+      currentDate,                 // First visible
+      addMonths(currentDate, 1),   // Second visible
+      addMonths(currentDate, 2),   // Hidden next
     ]);
   }, []);
 
@@ -973,8 +955,8 @@ return (
               <ChevronLeft size={16} />
             </Button>
             <span className="fw-bold">
-              {format(months[0], "MMMM yyyy")} -{" "}
-              {format(months[1], "MMMM yyyy")}
+              {format(months[1], "MMMM yyyy")} -{" "}
+              {format(months[2], "MMMM yyyy")}
             </span>
             <Button
               variant="light"
@@ -997,29 +979,61 @@ return (
             <div
               ref={monthsContainerRef}
               style={{
-                display: 'flex',
-                width: '100%',
                 position: 'relative',
-                transform: 'translateX(0)',
-                willChange: 'transform'
+                overflow: 'hidden'
               }}
             >
-              <MonthPair
-                firstMonth={months[0]}
-                secondMonth={months[1]}
-                selectedRange={selectedRange}
-                onSelectionStart={handleSelectionStart}
-                onSelectionMove={handleSelectionMove}
-                isSelecting={isSelecting}
-              />
-              <MonthPair
-                firstMonth={months[1]}
-                secondMonth={months[2]}
-                selectedRange={selectedRange}
-                onSelectionStart={handleSelectionStart}
-                onSelectionMove={handleSelectionMove}
-                isSelecting={isSelecting}
-              />
+              <div style={{
+                display: 'flex',
+                position: 'relative',
+                width: '400%',  // Space for 4 MonthPairs
+                transform: 'translateX(-25%)'  // Show the second pair
+              }}>
+                {/* Hidden Previous */}
+                <div style={{ width: '25%' }}>
+                  <MonthPair
+                    firstMonth={addMonths(months[0], -2)}
+                    secondMonth={addMonths(months[0], -1)}
+                    selectedRange={selectedRange}
+                    onSelectionStart={handleSelectionStart}
+                    onSelectionMove={handleSelectionMove}
+                    isSelecting={isSelecting}
+                  />
+                </div>
+                {/* Current Visible */}
+                <div style={{ width: '25%' }}>
+                  <MonthPair
+                    firstMonth={months[0]}
+                    secondMonth={months[1]}
+                    selectedRange={selectedRange}
+                    onSelectionStart={handleSelectionStart}
+                    onSelectionMove={handleSelectionMove}
+                    isSelecting={isSelecting}
+                  />
+                </div>
+                {/* Next */}
+                <div style={{ width: '25%' }}>
+                  <MonthPair
+                    firstMonth={months[1]}
+                    secondMonth={months[2]}
+                    selectedRange={selectedRange}
+                    onSelectionStart={handleSelectionStart}
+                    onSelectionMove={handleSelectionMove}
+                    isSelecting={isSelecting}
+                  />
+                </div>
+                {/* Hidden Next */}
+                <div style={{ width: '25%' }}>
+                  <MonthPair
+                    firstMonth={months[2]}
+                    secondMonth={addMonths(months[2], 1)}
+                    selectedRange={selectedRange}
+                    onSelectionStart={handleSelectionStart}
+                    onSelectionMove={handleSelectionMove}
+                    isSelecting={isSelecting}
+                  />
+                </div>
+              </div>
             </div>
           </Card.Body>
 
