@@ -586,7 +586,7 @@ const FloatingIndicator = ({ outOfBoundsDirection, isSelecting, mousePosition })
   );
 };
 
-const DateRangePicker = () => {
+const DateRangePicker = ({ useAnimations = false }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedRange, setSelectedRange] = useState({
     start: null,
@@ -682,13 +682,35 @@ const DateRangePicker = () => {
     const container = monthsContainerRef.current?.firstChild;
     if (!container) return;
 
-    // Start animation
+    if (!useAnimations) {
+      // Instant update without animation
+      setMonths(prev => direction === 'next'
+        ? [
+            prev[1],
+            prev[2],
+            prev[3],
+            prev[4],
+            addMonths(prev[4], 1)
+          ]
+        : [
+            addMonths(prev[0], -1),
+            prev[0],
+            prev[1],
+            prev[2],
+            prev[3]
+          ]
+      );
+      setCurrentMonth(prev => addMonths(prev, direction === 'next' ? 1 : -1));
+      setIsAnimating(false);
+      return;
+    }
+
+    // Existing animation logic
     requestAnimationFrame(() => {
       container.style.transition = 'transform 300ms ease-out';
       container.style.transform = `translateX(${direction === 'next' ? '-60%' : '-20%'})`;
 
       setTimeout(() => {
-        // Update state after animation
         setMonths(prev => direction === 'next'
           ? [
               prev[1],
@@ -706,7 +728,6 @@ const DateRangePicker = () => {
             ]
         );
 
-        // Reset position instantly
         container.style.transition = 'none';
         container.style.transform = 'translateX(-40%)';
         
@@ -714,7 +735,7 @@ const DateRangePicker = () => {
         setIsAnimating(false);
       }, 300);
     });
-  }, [isAnimating]);
+  }, [isAnimating, useAnimations]);
 
   useEffect(() => {
     debouncedMoveToMonthRef.current = debounce((direction) => {
@@ -731,23 +752,21 @@ const DateRangePicker = () => {
   }, []);
 
   useEffect(() => {
-    let checkInterval;
-    let timeoutId;
+    const shouldAdvance = isSelecting && outOfBoundsDirection && moveToMonthRef.current;
+    if (!shouldAdvance) return () => {};
 
-    if (isSelecting && outOfBoundsDirection) {
-      const advanceMonth = () => {
-        if (isSelecting && outOfBoundsDirection && moveToMonthRef.current) {
-          moveToMonthRef.current(outOfBoundsDirection);
-        }
-      };
+    const advanceMonth = () => {
+      if (shouldAdvance) {
+        moveToMonthRef.current(outOfBoundsDirection);
+      }
+    };
 
-      timeoutId = setTimeout(advanceMonth, 1000);
-      checkInterval = setInterval(advanceMonth, 1000);
-    }
+    const initialAdvance = setTimeout(advanceMonth, 1000);
+    const continuousAdvance = setInterval(advanceMonth, 1000);
 
     return () => {
-      if (timeoutId) clearTimeout(timeoutId);
-      if (checkInterval) clearInterval(checkInterval);
+      clearTimeout(initialAdvance);
+      clearInterval(continuousAdvance);
     };
   }, [isSelecting, outOfBoundsDirection]);
 
