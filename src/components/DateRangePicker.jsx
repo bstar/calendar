@@ -58,6 +58,41 @@ const useClickOutside = (ref, handler) => {
 const dateValidator = (() => {
   const DATE_FORMAT = "MMMM d, yyyy";
 
+  const parseDotNotation = (input) => {
+    console.log('Input:', input);
+    
+    // Quick test for dot notation attempt
+    if (!/\d\./.test(input)) {
+      console.log('Not dot notation');
+      return null;
+    }
+
+    // Parse the components
+    const match = input.match(/(\d?\d)\.(\d?\d)\.(\d?\d?\d\d)/);
+    console.log('Regex match:', match);
+    
+    if (!match) {
+      console.log('No match found');
+      return null;
+    }
+
+    const [_, month, day, year] = match;
+    console.log('Parsed components:', { month, day, year });
+    
+    const fullYear = year.length === 2 ? `20${year}` : year;
+    console.log('Full year:', fullYear);
+    
+    // Create and validate date
+    const date = new Date(fullYear, parseInt(month) - 1, parseInt(day));
+    console.log('Created date:', date);
+    console.log('Month check:', date.getMonth(), parseInt(month) - 1);
+    
+    const isValid = date.getMonth() === parseInt(month) - 1;
+    console.log('Is valid?', isValid);
+    
+    return isValid ? date : null;
+  };
+
   const rules = {
     isValidFormat: (value) => {
       if (!value) return { isValid: true, error: null };
@@ -134,19 +169,41 @@ const dateValidator = (() => {
 
   return {
     validate: (value, context) => {
-      const validations = [
-        rules.isValidFormat(value),
-        rules.isValidDate(value),
-        ...(context.startDate && context.endDate ? [rules.isValidRange(context.startDate, context.endDate)] : [])
-      ];
+      if (!value) return { isValid: true, error: null };
 
-      return validations.reduce((result, validation) =>
-        !validation.isValid ? validation.error : result,
-        null
-      );
+      // Try dot notation if it looks like one
+      if (/\d\./.test(value)) {
+        const date = parseDotNotation(value);
+        return date ? { isValid: true, error: null } : {
+          isValid: false,
+          error: {
+            message: 'Invalid date',
+            type: 'error',
+            field: 'date'
+          }
+        };
+      }
+
+      // Otherwise use standard format
+      try {
+        parse(value, DATE_FORMAT, new Date());
+        return { isValid: true, error: null };
+      } catch {
+        return {
+          isValid: false,
+          error: {
+            message: `Please use format: ${DATE_FORMAT}`,
+            type: 'error',
+            field: 'format'
+          }
+        };
+      }
     },
     formatValue: (date) => !date ? '' : format(date, DATE_FORMAT),
-    parseValue: (value) => !value ? null : parse(value, DATE_FORMAT, new Date()),
+    parseValue: (value) => {
+      if (!value) return null;
+      return /\d\./.test(value) ? parseDotNotation(value) : parse(value, DATE_FORMAT, new Date());
+    },
     DATE_FORMAT
   };
 })();
@@ -183,7 +240,10 @@ const DateInput = ({ value, onChange, field, placeholder, context, selectedRange
   };
 
   const validateAndUpdate = () => {
+    console.log('Validating input:', inputValue);
+
     if (inputValue === previousInputRef.current) {
+      console.log('No change in input');
       return;
     }
 
@@ -191,6 +251,7 @@ const DateInput = ({ value, onChange, field, placeholder, context, selectedRange
 
     // Handle empty input
     if (!inputValue.trim()) {
+      console.log('Empty input');
       onChange(null);
       setError(null);
       setShowError(false);
@@ -201,21 +262,15 @@ const DateInput = ({ value, onChange, field, placeholder, context, selectedRange
       return;
     }
 
-    // First check if it matches the format
-    let parsedDate;
-    try {
-      parsedDate = parse(inputValue, dateValidator.DATE_FORMAT, new Date());
-      if (!isValid(parsedDate)) {
-        showValidationError({
-          message: 'Invalid date',
-          type: 'error',
-          field: 'date'
-        });
-        return;
-      }
-    } catch {
+    // Try to parse the input value using our flexible parser
+    console.log('Attempting to parse:', inputValue);
+    const parsedDate = dateValidator.parseValue(inputValue);
+    console.log('Parse result:', parsedDate);
+
+    if (!parsedDate) {
+      console.log('Parse failed, showing error');
       showValidationError({
-        message: `Please use format: January 15, 2024`,
+        message: `Please use format: MM/DD/YY or ${dateValidator.DATE_FORMAT}`,
         type: 'error',
         field: 'format'
       });
@@ -665,13 +720,16 @@ const DateRangePicker = ({ useAnimations = false }) => {
     setDateInputContext(newState.context);
     setValidationErrors({});
 
+    // Update months to maintain the correct sequence
     if (date) {
       const baseMonth = startOfMonth(date);
-      const monthUpdates = field === 'start'
-        ? [baseMonth, addMonths(baseMonth, 1), addMonths(baseMonth, 2)]
-        : [addMonths(baseMonth, -1), baseMonth, addMonths(baseMonth, 1)];
-
-      setMonths(monthUpdates);
+      setMonths([
+        addMonths(baseMonth, -2),
+        addMonths(baseMonth, -1),
+        baseMonth,
+        addMonths(baseMonth, 1),
+        addMonths(baseMonth, 2)
+      ]);
     }
   };
 
