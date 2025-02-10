@@ -1,15 +1,4 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from "react";
-import {
-  Container,
-  Form,
-  Button,
-  Card,
-  Row,
-  Col,
-  OverlayTrigger,
-  Tooltip,
-} from "react-bootstrap";
-import { ChevronRight, ChevronLeft } from "react-bootstrap-icons";
 import debounce from "lodash-es/debounce";
 import {
   format,
@@ -26,8 +15,62 @@ import {
   isSameMonth,
   isValid
 } from "date-fns";
-import "bootstrap/dist/css/bootstrap.min.css";
+import './DateRangePicker.css';
 
+// Custom components
+const Card = React.forwardRef(({ children, className, ...props }, ref) => (
+  <div ref={ref} className={`cla-card ${className || ''}`} {...props}>
+    {children}
+  </div>
+));
+
+Card.Header = ({ children, className, ...props }) => (
+  <div className={`cla-card-header ${className || ''}`} {...props}>
+    {children}
+  </div>
+);
+
+Card.Body = ({ children, className, ...props }) => (
+  <div className={`cla-card-body ${className || ''}`} {...props}>
+    {children}
+  </div>
+);
+
+Card.Footer = ({ children, className, ...props }) => (
+  <div className={`cla-card-footer ${className || ''}`} {...props}>
+    {children}
+  </div>
+);
+
+const Button = ({ variant, children, className, ...props }) => (
+  <button 
+    className={`cla-button cla-button-${variant} ${className || ''}`} 
+    {...props}
+  >
+    {children}
+  </button>
+);
+
+const Input = ({ className, ...props }) => (
+  <input
+    className={`cla-input ${className || ''}`}
+    {...props}
+  />
+);
+
+const ChevronLeft = ({ size = 16 }) => (
+  <span 
+    className="cla-chevron cla-chevron-left" 
+    style={{ width: size, height: size }}
+  />
+);
+
+const ChevronRight = ({ size = 16 }) => (
+  <span 
+    className="cla-chevron cla-chevron-right" 
+    style={{ width: size, height: size }}
+  />
+);
 
 const useClickOutside = (ref, handler) => {
   useEffect(() => {
@@ -53,7 +96,6 @@ const useClickOutside = (ref, handler) => {
     };
   }, [ref, handler]);
 };
-
 
 const dateValidator = (() => {
   const DATE_FORMAT = "MMMM d, yyyy";
@@ -489,7 +531,36 @@ const MonthGrid = ({
   );
 };
 
-// Update the DayCell component
+// Add custom Tooltip component
+const Tooltip = ({ children, content, show }) => {
+  if (!show) return children;
+  
+  return (
+    <div style={{ position: 'relative' }}>
+      {children}
+      <div
+        className="cla-tooltip"
+        style={{
+          position: 'absolute',
+          top: '-30px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          color: 'white',
+          padding: '4px 8px',
+          borderRadius: '4px',
+          fontSize: '12px',
+          whiteSpace: 'nowrap',
+          zIndex: 1100,
+        }}
+      >
+        {content}
+      </div>
+    </div>
+  );
+};
+
+// Update DayCell to use our custom Tooltip
 const DayCell = ({
   date,
   selectedRange,
@@ -519,6 +590,8 @@ const DayCell = ({
     };
   }, [date, selectedRange.start, selectedRange.end]);
 
+  const [showTooltip, setShowTooltip] = useState(false);
+
   if (!isCurrentMonth) {
     return (
       <div
@@ -533,11 +606,17 @@ const DayCell = ({
   }
 
   return (
-    <OverlayTrigger
-      placement="top"
-      overlay={<Tooltip>{`Week ${getISOWeek(date)}`}</Tooltip>}
+    <Tooltip
+      content={format(date, "MMMM d, yyyy")}
+      show={showTooltip}
     >
       <div
+        onMouseEnter={(e) => {
+          setShowTooltip(true);
+          onMouseEnter?.(e);
+        }}
+        onMouseLeave={() => setShowTooltip(false)}
+        onMouseDown={onMouseDown}
         style={{
           width: "100%",
           height: "100%",
@@ -565,13 +644,11 @@ const DayCell = ({
             transition: "background-color 0.15s ease, color 0.15s ease",
             fontWeight: isSelected ? "600" : "normal",
           }}
-          onMouseDown={onMouseDown}
-          onMouseEnter={onMouseEnter}
         >
           {format(date, "d")}
         </div>
       </div>
-    </OverlayTrigger>
+    </Tooltip>
   );
 };
 
@@ -938,238 +1015,236 @@ const DateRangePicker = ({ useAnimations = false }) => {
         : `${format(parseISO(start), "MMM dd, yyyy")} to ${format(parseISO(end), "MMM dd, yyyy")}`;
   }, [selectedRange]);
 
-return (
-  <div
-    className="position-relative"
-    onMouseDown={handleMouseDown}
-    style={{
-      userSelect: "none",
-      WebkitUserSelect: "none",
-      MozUserSelect: "none",
-      msUserSelect: "none",
-    }}
-  >
-    <Form.Control
-      type="text"
-      value={getDisplayText()}
-      onClick={() => setIsOpen(true)}
+  return (
+    <div
+      className="cla-container"
+      onMouseDown={handleMouseDown}
       style={{
-        width: "300px",
-        cursor: "pointer",
         userSelect: "none",
         WebkitUserSelect: "none",
         MozUserSelect: "none",
         msUserSelect: "none",
       }}
-    />
+    >
+      <Input
+        type="text"
+        value={getDisplayText()}
+        onClick={() => setIsOpen(true)}
+        style={{
+          width: "300px",
+          cursor: "pointer",
+          userSelect: "none",
+          WebkitUserSelect: "none",
+          MozUserSelect: "none",
+          msUserSelect: "none",
+        }}
+      />
 
-    {isOpen && (
-      <>
-        <Card
-          ref={containerRef}
-          className="position-absolute mt-2 shadow"
-          style={{
-            zIndex: 1000,
-            width: "700px",
-            userSelect: "none",
-            WebkitUserSelect: "none",
-            MozUserSelect: "none",
-            msUserSelect: "none",
-            overflow: "hidden",
-            border: "1px solid #B1E4E5",
-            borderRadius: '3px',
-          }}
-          onMouseDown={e => {
-            e.stopPropagation();
-            handleMouseDown(e);
-          }}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={e => {
-            const containerRect = containerRef.current.getBoundingClientRect();
-            const { clientX: mouseX } = e;
-
-            if (mouseX < containerRect.left) {
-              setOutOfBoundsDirection('prev');
-            } else if (mouseX > containerRect.right) {
-              setOutOfBoundsDirection('next');
-            }
-          }}
-        >
-          <div style={{
-            backgroundColor: 'rgba(226, 228, 238, 0.5)',
-            padding: '16px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            gap: '20px',
-            height: '67px',
-            alignItems: 'center',
-            userSelect: 'text',
-            WebkitUserSelect: 'text',
-            MozUserSelect: 'text'
-          }}>
-            <DateInput
-              value={selectedRange.start ? parseISO(selectedRange.start) : null}
-              onChange={handleDateChange('start')}
-              field="start"
-              placeholder="Start date"
-              context={{
-                startDate: dateInputContext.startDate,
-                endDate: dateInputContext.endDate,
-                currentField: 'start',
-              }}
-              selectedRange={selectedRange}
-            />
-            <DateInput
-              value={selectedRange.end ? parseISO(selectedRange.end) : null}
-              onChange={handleDateChange('end')}
-              field="end"
-              placeholder="End date"
-              context={{
-                startDate: dateInputContext.startDate,
-                endDate: dateInputContext.endDate,
-                currentField: 'end',
-              }}
-              selectedRange={selectedRange}
-            />
-          </div>
-
-          <Card.Header className="d-flex justify-content-between align-items-center bg-white border-bottom">
-            <Button
-              variant="light"
-              onClick={() => moveToMonthRef.current("prev")}
-              className="px-2 py-1"
-              disabled={isAnimating}
-              style={{ backgroundColor: 'white', border: 'none' }}
-            >
-              <ChevronLeft size={16} />
-            </Button>
-            <span className="fw-bold">
-              {format(months[2], "MMMM yyyy")} -{" "}
-              {format(months[3], "MMMM yyyy")}
-            </span>
-            <Button
-              variant="light"
-              onClick={() => moveToMonthRef.current("next")}
-              className="px-2 py-1"
-              disabled={isAnimating}
-              style={{ backgroundColor: 'white', border: 'none' }}
-            >
-              <ChevronRight size={16} />
-            </Button>
-          </Card.Header>
-
-          <Card.Body
+      {isOpen && (
+        <>
+          <Card
+            ref={containerRef}
+            className="cla-card-popup position-absolute mt-2 shadow"
             style={{
-              padding: "1rem 0.5rem",
-              position: "relative",
+              zIndex: 1000,
+              width: "700px",
+              userSelect: "none",
+              WebkitUserSelect: "none",
+              MozUserSelect: "none",
+              msUserSelect: "none",
               overflow: "hidden",
+              border: "1px solid #B1E4E5",
+              borderRadius: '3px',
+            }}
+            onMouseDown={e => {
+              e.stopPropagation();
+              handleMouseDown(e);
+            }}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={e => {
+              const containerRect = containerRef.current.getBoundingClientRect();
+              const { clientX: mouseX } = e;
+
+              if (mouseX < containerRect.left) {
+                setOutOfBoundsDirection('prev');
+              } else if (mouseX > containerRect.right) {
+                setOutOfBoundsDirection('next');
+              }
             }}
           >
-            <div
-              ref={monthsContainerRef}
+            <div style={{
+              backgroundColor: 'rgba(226, 228, 238, 0.5)',
+              padding: '16px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              gap: '20px',
+              height: '67px',
+              alignItems: 'center',
+              userSelect: 'text',
+              WebkitUserSelect: 'text',
+              MozUserSelect: 'text'
+            }}>
+              <DateInput
+                value={selectedRange.start ? parseISO(selectedRange.start) : null}
+                onChange={handleDateChange('start')}
+                field="start"
+                placeholder="Start date"
+                context={{
+                  startDate: dateInputContext.startDate,
+                  endDate: dateInputContext.endDate,
+                  currentField: 'start',
+                }}
+                selectedRange={selectedRange}
+              />
+              <DateInput
+                value={selectedRange.end ? parseISO(selectedRange.end) : null}
+                onChange={handleDateChange('end')}
+                field="end"
+                placeholder="End date"
+                context={{
+                  startDate: dateInputContext.startDate,
+                  endDate: dateInputContext.endDate,
+                  currentField: 'end',
+                }}
+                selectedRange={selectedRange}
+              />
+            </div>
+
+            <Card.Header className="cla-header">
+              <Button
+                variant="light"
+                onClick={() => moveToMonthRef.current("prev")}
+                className="cla-button-nav"
+                disabled={isAnimating}
+              >
+                <ChevronLeft size={16} />
+              </Button>
+              <span className="cla-header-title">
+                {format(months[2], "MMMM yyyy")} -{" "}
+                {format(months[3], "MMMM yyyy")}
+              </span>
+              <Button
+                variant="light"
+                onClick={() => moveToMonthRef.current("next")}
+                className="cla-button-nav"
+                disabled={isAnimating}
+              >
+                <ChevronRight size={16} />
+              </Button>
+            </Card.Header>
+
+            <Card.Body
               style={{
-                position: 'relative',
-                overflow: 'hidden'
+                padding: "1rem 0.5rem",
+                position: "relative",
+                overflow: "hidden",
               }}
             >
-              <div style={{
-                display: 'flex',
-                position: 'relative',
-                width: '500%',
-                transform: 'translateX(-40%)',
-                willChange: 'transform'
-              }}>
-                <div style={{ width: '20%' }}>
-                  <MonthPair
-                    firstMonth={months[0]}
-                    secondMonth={months[1]}
-                    selectedRange={selectedRange}
-                    onSelectionStart={handleSelectionStart}
-                    onSelectionMove={handleSelectionMove}
-                    isSelecting={isSelecting}
-                  />
-                </div>
-                <div style={{ width: '20%' }}>
-                  <MonthPair
-                    firstMonth={months[1]}
-                    secondMonth={months[2]}
-                    selectedRange={selectedRange}
-                    onSelectionStart={handleSelectionStart}
-                    onSelectionMove={handleSelectionMove}
-                    isSelecting={isSelecting}
-                  />
-                </div>
-                <div style={{ width: '20%' }}>
-                  <MonthPair
-                    firstMonth={months[2]}
-                    secondMonth={months[3]}
-                    selectedRange={selectedRange}
-                    onSelectionStart={handleSelectionStart}
-                    onSelectionMove={handleSelectionMove}
-                    isSelecting={isSelecting}
-                  />
-                </div>
-                <div style={{ width: '20%' }}>
-                  <MonthPair
-                    firstMonth={months[3]}
-                    secondMonth={months[4]}
-                    selectedRange={selectedRange}
-                    onSelectionStart={handleSelectionStart}
-                    onSelectionMove={handleSelectionMove}
-                    isSelecting={isSelecting}
-                  />
-                </div>
-                <div style={{ width: '20%' }}>
-                  <MonthPair
-                    firstMonth={months[4]}
-                    secondMonth={addMonths(months[4], 1)}
-                    selectedRange={selectedRange}
-                    onSelectionStart={handleSelectionStart}
-                    onSelectionMove={handleSelectionMove}
-                    isSelecting={isSelecting}
-                  />
+              <div
+                ref={monthsContainerRef}
+                style={{
+                  position: 'relative',
+                  overflow: 'hidden'
+                }}
+              >
+                <div style={{
+                  display: 'flex',
+                  position: 'relative',
+                  width: '500%',
+                  transform: 'translateX(-40%)',
+                  willChange: 'transform'
+                }}>
+                  <div style={{ width: '20%' }}>
+                    <MonthPair
+                      firstMonth={months[0]}
+                      secondMonth={months[1]}
+                      selectedRange={selectedRange}
+                      onSelectionStart={handleSelectionStart}
+                      onSelectionMove={handleSelectionMove}
+                      isSelecting={isSelecting}
+                    />
+                  </div>
+                  <div style={{ width: '20%' }}>
+                    <MonthPair
+                      firstMonth={months[1]}
+                      secondMonth={months[2]}
+                      selectedRange={selectedRange}
+                      onSelectionStart={handleSelectionStart}
+                      onSelectionMove={handleSelectionMove}
+                      isSelecting={isSelecting}
+                    />
+                  </div>
+                  <div style={{ width: '20%' }}>
+                    <MonthPair
+                      firstMonth={months[2]}
+                      secondMonth={months[3]}
+                      selectedRange={selectedRange}
+                      onSelectionStart={handleSelectionStart}
+                      onSelectionMove={handleSelectionMove}
+                      isSelecting={isSelecting}
+                    />
+                  </div>
+                  <div style={{ width: '20%' }}>
+                    <MonthPair
+                      firstMonth={months[3]}
+                      secondMonth={months[4]}
+                      selectedRange={selectedRange}
+                      onSelectionStart={handleSelectionStart}
+                      onSelectionMove={handleSelectionMove}
+                      isSelecting={isSelecting}
+                    />
+                  </div>
+                  <div style={{ width: '20%' }}>
+                    <MonthPair
+                      firstMonth={months[4]}
+                      secondMonth={addMonths(months[4], 1)}
+                      selectedRange={selectedRange}
+                      onSelectionStart={handleSelectionStart}
+                      onSelectionMove={handleSelectionMove}
+                      isSelecting={isSelecting}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          </Card.Body>
+            </Card.Body>
 
-          <Card.Footer className="d-flex justify-content-between">
-            <Button
-              variant="light"
-              onClick={handleClear}
-            >
-              Clear
-            </Button>
-            <Button
-              variant="primary"
-              onClick={() => {
-                setIsOpen(false);
-                setIsSelecting(false);
-                setIsOutsideBounds(false);
-                setInitialDate(null);
-              }}
-              style={{
-                backgroundColor: 'rgba(226, 228, 238, 0.5)',
-                color: "#000",
-                border: '1px solid #979797',
-              }}
-              disabled={Object.keys(validationErrors).length > 0}
-            >
-              Apply
-            </Button>
-          </Card.Footer>
-        </Card>
-        <FloatingIndicator
-          className="floating-indicator"
-          outOfBoundsDirection={outOfBoundsDirection}
-          isSelecting={isSelecting}
-          mousePosition={mousePosition}
-        />
-      </>
-    )}
-  </div>
-);
+            <Card.Footer className="cla-card-footer">
+              <Button
+                variant="primary"
+                onClick={handleClear}
+              >
+                Clear
+              </Button>
+              <Button
+                variant="primary"
+                onClick={() => {
+                  setIsOpen(false);
+                  setIsSelecting(false);
+                  setIsOutsideBounds(false);
+                  setInitialDate(null);
+                }}
+                style={{
+                  backgroundColor: 'rgba(226, 228, 238, 0.5)',
+                  color: "#000",
+                  border: '1px solid #979797',
+                }}
+                disabled={Object.keys(validationErrors).length > 0}
+              >
+                Apply
+              </Button>
+            </Card.Footer>
+          </Card>
+          <FloatingIndicator
+            className="floating-indicator"
+            outOfBoundsDirection={outOfBoundsDirection}
+            isSelecting={isSelecting}
+            mousePosition={mousePosition}
+          />
+        </>
+      )}
+    </div>
+  );
 };
 
 export default DateRangePicker;
