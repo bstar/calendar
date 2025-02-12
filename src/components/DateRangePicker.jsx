@@ -477,6 +477,7 @@ const MonthGrid = ({
     <div style={{ 
       width: '100%',
       padding: '0 8px',
+      marginTop: 0,  // Ensure no top margin
       ...style
     }}>
       {showMonthHeading && (
@@ -485,7 +486,9 @@ const MonthGrid = ({
           fontWeight: '600',
           color: '#333',
           textAlign: 'left',
+          marginTop: 0,  // Ensure no top margin
           marginBottom: '8px',
+          paddingTop: 0,  // Ensure no top padding
           paddingLeft: '2px'
         }}>
           {format(monthStart, 'MMMM')}
@@ -742,7 +745,8 @@ const FloatingIndicator = ({ outOfBoundsDirection, isSelecting, mousePosition })
 
 const DateRangePicker = ({ 
   visibleMonths = 2,
-  showMonthHeadings = false
+  showMonthHeadings = false,
+  selectionMode = 'range'  // Add new prop: 'single' | 'range'
 }) => {
   // Clamp visibleMonths between 1 and 6
   const validVisibleMonths = Math.min(6, Math.max(1, visibleMonths));
@@ -892,14 +896,26 @@ const DateRangePicker = ({
   const handleSelectionStart = useCallback(date => {
     setIsSelecting(true);
     setInitialDate(date);
-    setSelectedRange({
-      start: date.toISOString(),
-      end: null
-    });
-  }, []);
+    
+    if (selectionMode === 'single') {
+      // For single mode, set both start and end to the same date
+      setSelectedRange({
+        start: date.toISOString(),
+        end: date.toISOString()
+      });
+      setIsSelecting(false);  // End selection immediately
+    } else {
+      // For range mode, start the selection
+      setSelectedRange({
+        start: date.toISOString(),
+        end: null
+      });
+    }
+  }, [selectionMode]);
 
   const handleSelectionMove = useCallback(date => {
-    if (!isSelecting || !initialDate) return;
+    // Only handle range selection
+    if (selectionMode === 'single' || !isSelecting || !initialDate) return;
 
     const [start, end] = date < initialDate
       ? [date, initialDate]
@@ -909,7 +925,7 @@ const DateRangePicker = ({
       start: start.toISOString(),
       end: end.toISOString()
     });
-  }, [isSelecting, initialDate]);
+  }, [isSelecting, initialDate, selectionMode]);
 
   const handleMouseMove = useCallback((e) => {
     e.preventDefault();
@@ -992,12 +1008,16 @@ const DateRangePicker = ({
 
   const getDisplayText = useCallback(() => {
     const { start, end } = selectedRange;
-    return !start && !end
-      ? "Select date range"
-      : start && !end
-        ? format(parseISO(start), "MMM dd, yyyy")
-        : `${format(parseISO(start), "MMM dd, yyyy")} to ${format(parseISO(end), "MMM dd, yyyy")}`;
-  }, [selectedRange]);
+    if (!start) return "Select date";
+    
+    if (selectionMode === 'single') {
+      return format(parseISO(start), "MMM dd, yyyy");
+    }
+    
+    return !end
+      ? format(parseISO(start), "MMM dd, yyyy")
+      : `${format(parseISO(start), "MMM dd, yyyy")} - ${format(parseISO(end), "MMM dd, yyyy")}`;
+  }, [selectedRange, selectionMode]);
 
   // Fix the moveToMonth reference
   moveToMonthRef.current = moveToMonth;
@@ -1068,15 +1088,17 @@ const DateRangePicker = ({
               gap: validVisibleMonths === 1 ? '12px' : '20px',
               height: '67px',
               alignItems: 'center',
-              userSelect: 'text',
-              WebkitUserSelect: 'text',
-              MozUserSelect: 'text'
+              // Hide second input for single mode
+              ...(selectionMode === 'single' && {
+                justifyContent: 'center',
+                gap: 0
+              })
             }}>
               <DateInput
                 value={selectedRange.start ? parseISO(selectedRange.start) : null}
                 onChange={handleDateChange('start')}
                 field="start"
-                placeholder="Start date"
+                placeholder={selectionMode === 'single' ? "Select date" : "Start date"}
                 context={{
                   startDate: dateInputContext.startDate,
                   endDate: dateInputContext.endDate,
@@ -1084,18 +1106,20 @@ const DateRangePicker = ({
                 }}
                 selectedRange={selectedRange}
               />
-              <DateInput
-                value={selectedRange.end ? parseISO(selectedRange.end) : null}
-                onChange={handleDateChange('end')}
-                field="end"
-                placeholder="End date"
-                context={{
-                  startDate: dateInputContext.startDate,
-                  endDate: dateInputContext.endDate,
-                  currentField: 'end',
-                }}
-                selectedRange={selectedRange}
-              />
+              {selectionMode === 'range' && (
+                <DateInput
+                  value={selectedRange.end ? parseISO(selectedRange.end) : null}
+                  onChange={handleDateChange('end')}
+                  field="end"
+                  placeholder="End date"
+                  context={{
+                    startDate: dateInputContext.startDate,
+                    endDate: dateInputContext.endDate,
+                    currentField: 'end',
+                  }}
+                  selectedRange={selectedRange}
+                />
+              )}
             </div>
 
             <Card.Header className="cla-header">
@@ -1237,9 +1261,11 @@ const DateRangePicker = ({
 
 DateRangePicker.propTypes = {
   /** Number of months to display (1-6) */
-  visibleMonths: PropTypes.oneOf([1, 2, 3, 4, 5, 6]),  // Strict validation
+  visibleMonths: PropTypes.oneOf([1, 2, 3, 4, 5, 6]),
   /** Show month headings above each calendar */
-  showMonthHeadings: PropTypes.bool
+  showMonthHeadings: PropTypes.bool,
+  /** Selection mode: single day or range */
+  selectionMode: PropTypes.oneOf(['single', 'range'])
 };
 
 DateRangePicker.defaultProps = {

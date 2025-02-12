@@ -28,6 +28,8 @@ function App() {
         // Optional initial dates
         // defaultStartDate={new Date()}            // Date
         // defaultEndDate={new Date()}              // Date
+
+        selectionMode="single"  // or "range"
       />
     </div>
   );
