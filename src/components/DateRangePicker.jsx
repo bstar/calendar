@@ -448,7 +448,8 @@ const MonthGrid = ({
   onSelectionMove,
   isSelecting,
   style,
-  showMonthHeading = false
+  showMonthHeading = false,
+  showTooltips
 }) => {
   const monthStart = startOfMonth(baseDate);
   const monthEnd = endOfMonth(monthStart);
@@ -537,6 +538,7 @@ const MonthGrid = ({
               isCurrentMonth={isSameMonth(date, baseDate)}
               onMouseDown={() => onSelectionStart(date)}
               onMouseEnter={() => onSelectionMove(date)}
+              showTooltips={showTooltips}
             />
           ))
         )}
@@ -585,6 +587,7 @@ const DayCell = ({
   isCurrentMonth,
   onMouseDown,
   onMouseEnter,
+  showTooltips
 }) => {
   const { isSelected, isInRange, isRangeStart, isRangeEnd } = useMemo(() => {
     if (!selectedRange.start) {
@@ -621,44 +624,49 @@ const DayCell = ({
     return <div style={{ width: "100%", height: "100%", position: "relative", backgroundColor: "white" }} />;
   }
 
-  return (
-    <Tooltip content={format(date, "MMMM d, yyyy")} show={showTooltip}>
-      <div
-        onMouseEnter={(e) => {
-          setShowTooltip(true);
-          onMouseEnter?.(e);
-        }}
-        onMouseLeave={() => setShowTooltip(false)}
-        onMouseDown={onMouseDown}
-        style={{
-          width: "100%",
-          height: "100%",
-          position: "relative",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: (isSelected || isInRange) ? "#b1e4e5" : "transparent",
-          borderRadius: isSingleDay && (isSelected || isInRange) ? "50%" : (
-            isRangeStart || isRangeEnd ? 
-              `${isRangeStart ? "15px" : "0"} ${isRangeEnd ? "15px" : "0"} ${isRangeEnd ? "15px" : "0"} ${isRangeStart ? "15px" : "0"}`
-              : "0"
-          ),
-          fontWeight: isSelected ? "600" : "normal",
-          margin: 0,
-          padding: 0,
-          boxSizing: "border-box",
-          ...(isSingleDay && (isSelected || isInRange) ? {
-            width: "36px",
-            height: "36px",
-            margin: "auto"
-          } : {})
-        }}
-      >
-        {format(date, "d")}
-      </div>
-    </Tooltip>
+  // Wrap with Tooltip only if showTooltips is true
+  const dayCell = (
+    <div
+      onMouseEnter={(e) => {
+        if (showTooltips) setShowTooltip(true);
+        onMouseEnter?.(e);
+      }}
+      onMouseLeave={() => showTooltips && setShowTooltip(false)}
+      onMouseDown={onMouseDown}
+      style={{
+        width: "100%",
+        height: "100%",
+        position: "relative",
+        cursor: "pointer",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: (isSelected || isInRange) ? "#b1e4e5" : "transparent",
+        borderRadius: isSingleDay && (isSelected || isInRange) ? "50%" : (
+          isRangeStart || isRangeEnd ? 
+            `${isRangeStart ? "15px" : "0"} ${isRangeEnd ? "15px" : "0"} ${isRangeEnd ? "15px" : "0"} ${isRangeStart ? "15px" : "0"}`
+            : "0"
+        ),
+        fontWeight: isSelected ? "600" : "normal",
+        margin: 0,
+        padding: 0,
+        boxSizing: "border-box",
+        ...(isSingleDay && (isSelected || isInRange) ? {
+          width: "36px",
+          height: "36px",
+          margin: "auto"
+        } : {})
+      }}
+    >
+      {format(date, "d")}
+    </div>
   );
+
+  return showTooltips ? (
+    <Tooltip content={format(date, "MMMM d, yyyy")} show={showTooltip}>
+      {dayCell}
+    </Tooltip>
+  ) : dayCell;
 };
 
 const MonthPair = ({
@@ -669,7 +677,8 @@ const MonthPair = ({
   onSelectionMove,
   isSelecting,
   visibleMonths,
-  showMonthHeadings
+  showMonthHeadings,
+  showTooltips
 }) => {
   // Create array of months to display
   const monthsToShow = [];
@@ -693,6 +702,7 @@ const MonthPair = ({
           isSelecting={isSelecting}
           style={{ width: `${100 / visibleMonths}%` }}
           showMonthHeading={showMonthHeadings}
+          showTooltips={showTooltips}
         />
       ))}
     </div>
@@ -745,7 +755,8 @@ const FloatingIndicator = ({ outOfBoundsDirection, isSelecting, mousePosition })
 const DateRangePicker = ({ 
   visibleMonths = 2,
   showMonthHeadings = false,
-  selectionMode = 'range'  // Add new prop: 'single' | 'range'
+  selectionMode = 'range',  // Add new prop: 'single' | 'range'
+  showTooltips = true
 }) => {
   // Clamp visibleMonths between 1 and 6
   const validVisibleMonths = Math.min(6, Math.max(1, visibleMonths));
@@ -1167,6 +1178,7 @@ const DateRangePicker = ({
                     isSelecting={isSelecting}
                     visibleMonths={validVisibleMonths}
                     showMonthHeadings={showMonthHeadings}
+                    showTooltips={showTooltips}
                   />
                 </div>
                 <div style={{ width: '20%' }}>
@@ -1179,6 +1191,7 @@ const DateRangePicker = ({
                     isSelecting={isSelecting}
                     visibleMonths={validVisibleMonths}
                     showMonthHeadings={showMonthHeadings}
+                    showTooltips={showTooltips}
                   />
                 </div>
                 <div style={{ width: '20%' }}>
@@ -1191,6 +1204,7 @@ const DateRangePicker = ({
                     isSelecting={isSelecting}
                     visibleMonths={validVisibleMonths}
                     showMonthHeadings={showMonthHeadings}
+                    showTooltips={showTooltips}
                   />
                 </div>
                 <div style={{ width: '20%' }}>
@@ -1203,6 +1217,7 @@ const DateRangePicker = ({
                     isSelecting={isSelecting}
                     visibleMonths={validVisibleMonths}
                     showMonthHeadings={showMonthHeadings}
+                    showTooltips={showTooltips}
                   />
                 </div>
                 <div style={{ width: '20%' }}>
@@ -1215,6 +1230,7 @@ const DateRangePicker = ({
                     isSelecting={isSelecting}
                     visibleMonths={validVisibleMonths}
                     showMonthHeadings={showMonthHeadings}
+                    showTooltips={showTooltips}
                   />
                 </div>
               </div>
@@ -1264,12 +1280,15 @@ DateRangePicker.propTypes = {
   /** Show month headings above each calendar */
   showMonthHeadings: PropTypes.bool,
   /** Selection mode: single day or range */
-  selectionMode: PropTypes.oneOf(['single', 'range'])
+  selectionMode: PropTypes.oneOf(['single', 'range']),
+  /** Show tooltips for day cells */
+  showTooltips: PropTypes.bool
 };
 
 DateRangePicker.defaultProps = {
   visibleMonths: 2,
-  showMonthHeadings: false
+  showMonthHeadings: false,
+  showTooltips: true
 };
 
 export default DateRangePicker;
