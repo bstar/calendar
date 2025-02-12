@@ -665,7 +665,7 @@ const MonthPair = ({
         isSelecting={isSelecting}
         style={{ width: viewMode === 'single' ? '100%' : '50%' }}
       />
-      {viewMode === 'double' && (
+      {viewMode === 'dual' && (
         <MonthGrid
           baseDate={secondMonth}
           selectedRange={selectedRange}
@@ -724,7 +724,7 @@ const FloatingIndicator = ({ outOfBoundsDirection, isSelecting, mousePosition })
 
 const DateRangePicker = ({ 
   useAnimations = false, 
-  viewMode = 'double'
+  viewMode = 'dual'
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedRange, setSelectedRange] = useState({
