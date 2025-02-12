@@ -755,7 +755,7 @@ const FloatingIndicator = ({ outOfBoundsDirection, isSelecting, mousePosition })
 const DateRangePicker = ({ 
   visibleMonths = 2,
   showMonthHeadings = false,
-  selectionMode = 'range',  // Add new prop: 'single' | 'range'
+  selectionMode = 'range',
   showTooltips = true
 }) => {
   // Clamp visibleMonths between 1 and 6
@@ -1272,23 +1272,6 @@ const DateRangePicker = ({
       )}
     </div>
   );
-};
-
-DateRangePicker.propTypes = {
-  /** Number of months to display (1-6) */
-  visibleMonths: PropTypes.oneOf([1, 2, 3, 4, 5, 6]),
-  /** Show month headings above each calendar */
-  showMonthHeadings: PropTypes.bool,
-  /** Selection mode: single day or range */
-  selectionMode: PropTypes.oneOf(['single', 'range']),
-  /** Show tooltips for day cells */
-  showTooltips: PropTypes.bool
-};
-
-DateRangePicker.defaultProps = {
-  visibleMonths: 2,
-  showMonthHeadings: false,
-  showTooltips: true
 };
 
 export default DateRangePicker;
