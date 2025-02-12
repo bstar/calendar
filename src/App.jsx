@@ -9,6 +9,9 @@ function App() {
         // Number of months to display (1-5)
         visibleMonths={3}
 
+        // Show month headings
+        showMonthHeadings={true}
+
         // Animation settings
         useAnimations={false}
 

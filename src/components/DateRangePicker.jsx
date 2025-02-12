@@ -16,6 +16,7 @@ import {
   isValid
 } from "date-fns";
 import './DateRangePicker.css';
+import PropTypes from "prop-types";
 
 // Custom components
 const Card = React.forwardRef(({ children, className, ...props }, ref) => (
@@ -447,7 +448,8 @@ const MonthGrid = ({
   onSelectionStart,
   onSelectionMove,
   isSelecting,
-  style
+  style,
+  showMonthHeading = false
 }) => {
   const monthStart = startOfMonth(baseDate);
   const monthEnd = endOfMonth(monthStart);
@@ -477,11 +479,25 @@ const MonthGrid = ({
       padding: '0 8px',
       ...style
     }}>
-      {/* Header row */}
+      {/* Month heading */}
+      {showMonthHeading && (
+        <div style={{
+          fontSize: '1rem',
+          fontWeight: '600',
+          color: '#333',
+          textAlign: 'left',
+          marginBottom: '8px',
+          paddingLeft: '4px'
+        }}>
+          {format(monthStart, 'MMMM')}
+        </div>
+      )}
+
+      {/* Weekday header row */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(7, 1fr)',
-        marginBottom: '12px',  // Space only between header and days
+        marginBottom: '8px',
       }}>
         {["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"].map(day => (
           <div
@@ -508,6 +524,7 @@ const MonthGrid = ({
         gridAutoRows: '36px',
         rowGap: '4px',  // Add gap between rows only
         columnGap: 0,   // Keep horizontal cells connected
+        paddingBottom: '4px'  // Add small padding at bottom
       }}>
         {Object.values(weeks).flatMap(week =>
           week.map(date => (
@@ -649,7 +666,8 @@ const MonthPair = ({
   onSelectionStart,
   onSelectionMove,
   isSelecting,
-  visibleMonths
+  visibleMonths,
+  showMonthHeadings
 }) => {
   // Create array of months to display
   const monthsToShow = [];
@@ -672,6 +690,7 @@ const MonthPair = ({
           onSelectionMove={onSelectionMove}
           isSelecting={isSelecting}
           style={{ width: `${100 / visibleMonths}%` }}
+          showMonthHeading={showMonthHeadings}
         />
       ))}
     </div>
@@ -723,7 +742,8 @@ const FloatingIndicator = ({ outOfBoundsDirection, isSelecting, mousePosition })
 
 const DateRangePicker = ({ 
   useAnimations = false, 
-  visibleMonths = 2  // Number of months to show (1-5)
+  visibleMonths = 2,  // Number of months to show (1-6)
+  showMonthHeadings = false  // New prop
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedRange, setSelectedRange] = useState({
@@ -1141,7 +1161,7 @@ const DateRangePicker = ({
 
             <Card.Body
               style={{
-                padding: "1rem 0.5rem",
+                padding: "0.5rem 0.5rem",
                 position: "relative",
                 overflow: "hidden",
               }}
@@ -1169,6 +1189,7 @@ const DateRangePicker = ({
                       onSelectionMove={handleSelectionMove}
                       isSelecting={isSelecting}
                       visibleMonths={visibleMonths}
+                      showMonthHeadings={showMonthHeadings}
                     />
                   </div>
                   <div style={{ width: '20%' }}>
@@ -1180,6 +1201,7 @@ const DateRangePicker = ({
                       onSelectionMove={handleSelectionMove}
                       isSelecting={isSelecting}
                       visibleMonths={visibleMonths}
+                      showMonthHeadings={showMonthHeadings}
                     />
                   </div>
                   <div style={{ width: '20%' }}>
@@ -1191,6 +1213,7 @@ const DateRangePicker = ({
                       onSelectionMove={handleSelectionMove}
                       isSelecting={isSelecting}
                       visibleMonths={visibleMonths}
+                      showMonthHeadings={showMonthHeadings}
                     />
                   </div>
                   <div style={{ width: '20%' }}>
@@ -1202,6 +1225,7 @@ const DateRangePicker = ({
                       onSelectionMove={handleSelectionMove}
                       isSelecting={isSelecting}
                       visibleMonths={visibleMonths}
+                      showMonthHeadings={showMonthHeadings}
                     />
                   </div>
                   <div style={{ width: '20%' }}>
@@ -1213,6 +1237,7 @@ const DateRangePicker = ({
                       onSelectionMove={handleSelectionMove}
                       isSelecting={isSelecting}
                       visibleMonths={visibleMonths}
+                      showMonthHeadings={showMonthHeadings}
                     />
                   </div>
                 </div>
@@ -1255,6 +1280,23 @@ const DateRangePicker = ({
       )}
     </div>
   );
+};
+
+DateRangePicker.propTypes = {
+  /** Number of months to display (1-6) */
+  visibleMonths: PropTypes.number,
+  
+  /** Show month headings above each calendar */
+  showMonthHeadings: PropTypes.bool,
+  
+  /** Enable/disable animations */
+  useAnimations: PropTypes.bool
+};
+
+DateRangePicker.defaultProps = {
+  visibleMonths: 2,
+  showMonthHeadings: false,
+  useAnimations: false
 };
 
 export default DateRangePicker;
