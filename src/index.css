@@ -1,71 +1,14 @@
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --primary-color: #0d6efd;
+  --border-color: #dee2e6;
+  --text-color: #212529;
+  --bg-hover: #f8f9fa;
+  --error-color: #dc3545;
+  --calendar-bg: #fff;
+  --calendar-selected: #b1e4e5;
+  --calendar-hover: rgba(177, 228, 229, 0.3);
+  --calendar-active: rgba(177, 228, 229, 0.5);
 }
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover{
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
-}
-
 
 /* Base range cell styling */
 .range-cell {
@@ -129,4 +72,264 @@ button:focus-visible {
   left: 2px;
   right: 2px;
   border-radius: 4px;
+}
+
+/* Card styles */
+.cla-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--calendar-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.cla-card-body {
+  padding: 0.25rem 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.cla-card-header {
+  padding: 0.5rem 1rem;
+  margin-bottom: 0;
+  background-color: #fff;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Button styles */
+.cla-btn {
+  display: inline-block;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  border-radius: 0.375rem;
+  transition: color 0.15s ease-in-out, 
+              background-color 0.15s ease-in-out,
+              border-color 0.15s ease-in-out;
+}
+
+.cla-btn-light {
+  color: var(--text-color);
+  background-color: #fff;
+  border: 1px solid var(--border-color);
+}
+
+.cla-btn-light:hover {
+  background-color: var(--bg-hover);
+}
+
+/* Form control styles */
+.cla-form-control {
+  display: block;
+  width: 100%;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-color);
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid var(--border-color);
+  border-radius: 0.375rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.cla-form-control:focus {
+  border-color: #86b7fe;
+  outline: 0;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Utility classes */
+.cla-d-flex {
+  display: flex !important;
+}
+
+.cla-justify-content-between {
+  justify-content: space-between !important;
+}
+
+.cla-align-items-center {
+  align-items: center !important;
+}
+
+.cla-position-relative {
+  position: relative !important;
+}
+
+.cla-position-absolute {
+  position: absolute !important;
+}
+
+/* Additional calendar-specific styles */
+.cla-calendar-container {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: var(--text-color);
+}
+
+/* Calendar specific styles */
+.cla-calendar {
+  position: relative;
+  width: fit-content;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.cla-card-popup {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 0.5rem;
+  z-index: 1000;
+}
+
+.cla-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.cla-header-title {
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.cla-button-nav {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.cla-button-nav:hover {
+  background-color: var(--calendar-hover);
+}
+
+/* Day cell styles */
+.cla-day-cell {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.cla-day-selected {
+  background-color: var(--calendar-selected);
+  font-weight: 600;
+}
+
+.cla-day-in-range {
+  background-color: var(--calendar-selected);
+}
+
+.cla-day-single {
+  border-radius: 50%;
+}
+
+/* Add these calendar styles */
+.cla-weekday-header {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #6c757d;
+  text-align: center;
+  padding: 4px 0;
+}
+
+.cla-month-container {
+  width: 100%;
+  padding: 0 8px;
+}
+
+/* Month grid layout */
+.cla-month-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-auto-rows: 36px;
+  gap: 4px 0;
+  margin-bottom: 8px;
+}
+
+.cla-month-heading {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 8px;
+  padding-left: 2px;
+}
+
+.cla-day-other-month {
+  color: #6c757d;
+}
+
+/* Input container styles */
+.cla-input-container {
+  display: flex;
+  gap: 20px;
+  padding: 16px;
+  background-color: rgba(226, 228, 238, 0.5);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.cla-input-wrapper {
+  position: relative;
+  flex: 1;
+}
+
+.cla-input {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-color);
+  background-color: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  transition: border-color 0.15s ease-in-out;
+}
+
+.cla-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.25);
+}
+
+.cla-input.error {
+  border-color: var(--error-color);
+}
+
+.cla-input::placeholder {
+  color: #6c757d;
+}
+
+/* Single mode adjustments */
+.cla-input-container.single {
+  justify-content: center;
+}
+
+.cla-input-container.single .cla-input-wrapper {
+  max-width: 200px;
 }

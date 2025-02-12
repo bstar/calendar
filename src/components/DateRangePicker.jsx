@@ -776,16 +776,13 @@ const DateRangePicker = ({
     startDate: null,
     endDate: null
   });
-  const [months, setMonths] = useState(() => {
-    const initial = startOfMonth(new Date());
-    return [
-      addMonths(initial, -2),
-      addMonths(initial, -1),
-      initial,
-      addMonths(initial, 1),
-      addMonths(initial, 2)
-    ];
-  });
+  const months = useMemo(() => {
+    const result = [];
+    for (let i = 0; i < 5; i++) {  // Keep 5 months for consistent rendering
+      result.push(addMonths(currentMonth, i - 2));  // Start 2 months before
+    }
+    return result;
+  }, [currentMonth]);
 
   const containerRef = useRef(null);
   const debouncedMoveToMonthRef = useRef(null);
@@ -840,33 +837,11 @@ const DateRangePicker = ({
     // Update months to maintain the correct sequence
     if (date) {
       const baseMonth = startOfMonth(date);
-      setMonths([
-        addMonths(baseMonth, -2),
-        addMonths(baseMonth, -1),
-        baseMonth,
-        addMonths(baseMonth, 1),
-        addMonths(baseMonth, 2)
-      ]);
+      setCurrentMonth(baseMonth);
     }
   };
 
   const moveToMonth = useCallback((direction) => {
-    setMonths(prev => direction === 'next'
-      ? [
-          prev[1],
-          prev[2],
-          prev[3],
-          prev[4],
-          addMonths(prev[4], 1)
-        ]
-      : [
-          addMonths(prev[0], -1),
-          prev[0],
-          prev[1],
-          prev[2],
-          prev[3]
-        ]
-    );
     setCurrentMonth(prev => addMonths(prev, direction === 'next' ? 1 : -1));
   }, []);
 
@@ -1007,13 +982,7 @@ const DateRangePicker = ({
 
     // Reset to current month view
     const currentDate = startOfMonth(new Date());
-    setMonths([
-      addMonths(currentDate, -2),
-      addMonths(currentDate, -1),
-      currentDate,
-      addMonths(currentDate, 1),
-      addMonths(currentDate, 2)
-    ]);
+    setCurrentMonth(currentDate);
   }, []);
 
   const getDisplayText = useCallback(() => {
@@ -1211,19 +1180,6 @@ const DateRangePicker = ({
                   <MonthPair
                     firstMonth={months[3]}
                     secondMonth={months[4]}
-                    selectedRange={selectedRange}
-                    onSelectionStart={handleSelectionStart}
-                    onSelectionMove={handleSelectionMove}
-                    isSelecting={isSelecting}
-                    visibleMonths={validVisibleMonths}
-                    showMonthHeadings={showMonthHeadings}
-                    showTooltips={showTooltips}
-                  />
-                </div>
-                <div style={{ width: '20%' }}>
-                  <MonthPair
-                    firstMonth={months[4]}
-                    secondMonth={addMonths(months[4], 1)}
                     selectedRange={selectedRange}
                     onSelectionStart={handleSelectionStart}
                     onSelectionMove={handleSelectionMove}
