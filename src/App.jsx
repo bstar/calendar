@@ -1,4 +1,4 @@
-import 'bootstrap/dist/css/bootstrap.min.css'
+import './bootstrap.min.css'
 
 import DateRangePicker from './components/DateRangePicker';
 
@@ -10,7 +10,7 @@ function App() {
         visibleMonths={2}
         // Show month headings
         showMonthHeadings={true}
-        // Single or range selection
+        // Single vs range selection
         selectionMode="single"  // or "range"
       />
     </div>

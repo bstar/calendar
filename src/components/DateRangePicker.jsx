@@ -398,7 +398,6 @@ const DateInput = ({ value, onChange, field, placeholder, context, selectedRange
         style={{
           width: '100%',
           padding: '8px 12px',
-          border: `1px solid ${error ? '#dc3545' : '#dee2e6'}`,
           borderRadius: '4px',
           backgroundColor: 'white',
           color: '#000',
