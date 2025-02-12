@@ -447,6 +447,7 @@ const MonthGrid = ({
   onSelectionStart,
   onSelectionMove,
   isSelecting,
+  style
 }) => {
   const monthStart = startOfMonth(baseDate);
   const monthEnd = endOfMonth(monthStart);
@@ -471,60 +472,58 @@ const MonthGrid = ({
   const emptyWeeks = totalWeeks - currentWeeks;
 
   return (
-    <div className="px-2">
-      <div
-        className="d-grid calendar-grid"
-        style={{
-          gridTemplateColumns: "repeat(7, 1fr)",
-          gap: "0",
-          height: "240px", // Fixed height for 6 rows plus header
-          gridTemplateRows: `32px repeat(${totalWeeks}, 1fr)`, // Header row plus 6 week rows
-        }}
-      >
+    <div style={{ 
+      width: '100%',
+      padding: '0 8px',
+      ...style
+    }}>
+      {/* Header row */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(7, 1fr)',
+        marginBottom: '12px',  // Space only between header and days
+      }}>
         {["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"].map(day => (
           <div
             key={day}
-            className="text-center"
             style={{
               fontSize: "0.8rem",
               fontWeight: "600",
               color: "#6c757d",
               display: "flex",
               alignItems: "center",
-              justifyContent: "center"
+              justifyContent: "center",
+              height: "24px"  // Reduced header height
             }}
           >
             {day}
           </div>
         ))}
+      </div>
 
+      {/* Days grid - no gaps */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(7, 1fr)',
+        gridAutoRows: '36px',
+        rowGap: '4px',  // Add gap between rows only
+        columnGap: 0,   // Keep horizontal cells connected
+      }}>
         {Object.values(weeks).flatMap(week =>
-          week.map(date => {
-            const isCurrentMonth = isSameMonth(date, baseDate);
-            return (
-              <DayCell
-                key={date.toISOString()}
-                date={date}
-                selectedRange={selectedRange}
-                isCurrentMonth={isCurrentMonth}
-                onMouseDown={() => onSelectionStart(date)}
-                onMouseEnter={() => onSelectionMove(date)}
-              />
-            );
-          })
+          week.map(date => (
+            <DayCell
+              key={date.toISOString()}
+              date={date}
+              selectedRange={selectedRange}
+              isCurrentMonth={isSameMonth(date, baseDate)}
+              onMouseDown={() => onSelectionStart(date)}
+              onMouseEnter={() => onSelectionMove(date)}
+            />
+          ))
         )}
         
-        {/* Add empty cells for consistency */}
         {[...Array(emptyWeeks * 7)].map((_, i) => (
-          <div
-            key={`empty-${i}`}
-            style={{
-              width: "100%",
-              height: "100%",
-              position: "relative",
-              backgroundColor: "white"
-            }}
-          />
+          <div key={`empty-${i}`} style={{ backgroundColor: "white" }} />
         ))}
       </div>
     </div>
@@ -560,7 +559,7 @@ const Tooltip = ({ children, content, show }) => {
   );
 };
 
-// Update DayCell to use our custom Tooltip
+// Update DayCell to handle circular selection without gaps
 const DayCell = ({
   date,
   selectedRange,
@@ -592,24 +591,19 @@ const DayCell = ({
 
   const [showTooltip, setShowTooltip] = useState(false);
 
+  // Update single day check to handle both cases
+  const isSingleDay = useMemo(() => {
+    if (!selectedRange.start) return false;
+    if (!selectedRange.end) return true;
+    return isSameDay(parseISO(selectedRange.start), parseISO(selectedRange.end));
+  }, [selectedRange.start, selectedRange.end]);
+
   if (!isCurrentMonth) {
-    return (
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          position: "relative",
-          backgroundColor: "white"
-        }}
-      />
-    );
+    return <div style={{ width: "100%", height: "100%", position: "relative", backgroundColor: "white" }} />;
   }
 
   return (
-    <Tooltip
-      content={format(date, "MMMM d, yyyy")}
-      show={showTooltip}
-    >
+    <Tooltip content={format(date, "MMMM d, yyyy")} show={showTooltip}>
       <div
         onMouseEnter={(e) => {
           setShowTooltip(true);
@@ -625,28 +619,24 @@ const DayCell = ({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          backgroundColor: (isSelected || isInRange) ? "#b1e4e5" : "transparent",
+          borderRadius: isSingleDay && (isSelected || isInRange) ? "50%" : (
+            isRangeStart || isRangeEnd ? 
+              `${isRangeStart ? "15px" : "0"} ${isRangeEnd ? "15px" : "0"} ${isRangeEnd ? "15px" : "0"} ${isRangeStart ? "15px" : "0"}`
+              : "0"
+          ),
+          fontWeight: isSelected ? "600" : "normal",
+          margin: 0,
+          padding: 0,
+          boxSizing: "border-box",
+          ...(isSingleDay && (isSelected || isInRange) ? {
+            width: "36px",
+            height: "36px",
+            margin: "auto"
+          } : {})
         }}
       >
-        <div
-          style={{
-            position: "absolute",
-            inset: "0",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            borderTopLeftRadius: isRangeStart ? "15px" : "0",
-            borderBottomLeftRadius: isRangeStart ? "15px" : "0",
-            borderTopRightRadius: isRangeEnd ? "15px" : "0",
-            borderBottomRightRadius: isRangeEnd ? "15px" : "0",
-            margin: "3px 0",
-            backgroundColor: (isSelected || isInRange) ? "#b1e4e5" : "transparent",
-            color: "inherit",
-            transition: "background-color 0.15s ease, color 0.15s ease",
-            fontWeight: isSelected ? "600" : "normal",
-          }}
-        >
-          {format(date, "d")}
-        </div>
+        {format(date, "d")}
       </div>
     </Tooltip>
   );
@@ -659,21 +649,35 @@ const MonthPair = ({
   onSelectionStart,
   onSelectionMove,
   isSelecting,
-}) => (
-  <div style={{ display: "flex", minWidth: "100%", flex: "none" }}>
-    {[firstMonth, secondMonth].map((month, index) => (
-      <div key={month.toString()} style={{ width: "50%" }}>
+  viewMode
+}) => {
+  return (
+    <div style={{ 
+      display: 'flex', 
+      width: '100%',
+      gap: viewMode === 'single' ? '0' : '1rem'
+    }}>
+      <MonthGrid
+        baseDate={firstMonth}
+        selectedRange={selectedRange}
+        onSelectionStart={onSelectionStart}
+        onSelectionMove={onSelectionMove}
+        isSelecting={isSelecting}
+        style={{ width: viewMode === 'single' ? '100%' : '50%' }}
+      />
+      {viewMode === 'double' && (
         <MonthGrid
-          baseDate={month}
+          baseDate={secondMonth}
           selectedRange={selectedRange}
           onSelectionStart={onSelectionStart}
           onSelectionMove={onSelectionMove}
           isSelecting={isSelecting}
+          style={{ width: '50%' }}
         />
-      </div>
-    ))}
-  </div>
-);
+      )}
+    </div>
+  );
+};
 
 const FloatingIndicator = ({ outOfBoundsDirection, isSelecting, mousePosition }) => {
   if (!outOfBoundsDirection || !isSelecting) return null;
@@ -718,7 +722,10 @@ const FloatingIndicator = ({ outOfBoundsDirection, isSelecting, mousePosition })
   );
 };
 
-const DateRangePicker = ({ useAnimations = false }) => {
+const DateRangePicker = ({ 
+  useAnimations = false, 
+  viewMode = 'double'
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedRange, setSelectedRange] = useState({
     start: null,
@@ -810,25 +817,22 @@ const DateRangePicker = ({ useAnimations = false }) => {
     }
   };
 
-  moveToMonthRef.current = useCallback((direction) => {
+  const moveToMonth = useCallback((direction) => {
     if (isAnimating) return;
     setIsAnimating(true);
 
-    const container = monthsContainerRef.current?.firstChild;
-    if (!container) return;
-
+    const container = monthsContainerRef.current;
     if (!useAnimations) {
-      // Instant update without animation
       setMonths(prev => direction === 'next'
         ? [
             prev[1],
             prev[2],
             prev[3],
             prev[4],
-            addMonths(prev[4], 1)
+            addMonths(prev[4], viewMode === 'single' ? 1 : 2)
           ]
         : [
-            addMonths(prev[0], -1),
+            addMonths(prev[0], viewMode === 'single' ? -1 : -2),
             prev[0],
             prev[1],
             prev[2],
@@ -852,10 +856,10 @@ const DateRangePicker = ({ useAnimations = false }) => {
               prev[2],
               prev[3],
               prev[4],
-              addMonths(prev[4], 1)
+              addMonths(prev[4], viewMode === 'single' ? 1 : 2)
             ]
           : [
-              addMonths(prev[0], -1),
+              addMonths(prev[0], viewMode === 'single' ? -1 : -2),
               prev[0],
               prev[1],
               prev[2],
@@ -870,7 +874,7 @@ const DateRangePicker = ({ useAnimations = false }) => {
         setIsAnimating(false);
       }, 300);
     });
-  }, [isAnimating, useAnimations]);
+  }, [isAnimating, useAnimations, viewMode]);
 
   useEffect(() => {
     debouncedMoveToMonthRef.current = debounce((direction) => {
@@ -1015,6 +1019,9 @@ const DateRangePicker = ({ useAnimations = false }) => {
         : `${format(parseISO(start), "MMM dd, yyyy")} to ${format(parseISO(end), "MMM dd, yyyy")}`;
   }, [selectedRange]);
 
+  // Fix the moveToMonth reference
+  moveToMonthRef.current = moveToMonth;
+
   return (
     <div
       className="cla-container"
@@ -1044,10 +1051,10 @@ const DateRangePicker = ({ useAnimations = false }) => {
         <>
           <Card
             ref={containerRef}
-            className="cla-card-popup position-absolute mt-2 shadow"
+            className="cla-card-popup"
             style={{
               zIndex: 1000,
-              width: "700px",
+              width: viewMode === 'single' ? '400px' : '700px',
               userSelect: "none",
               WebkitUserSelect: "none",
               MozUserSelect: "none",
@@ -1078,7 +1085,7 @@ const DateRangePicker = ({ useAnimations = false }) => {
               padding: '16px',
               display: 'flex',
               justifyContent: 'space-between',
-              gap: '20px',
+              gap: viewMode === 'single' ? '12px' : '20px',
               height: '67px',
               alignItems: 'center',
               userSelect: 'text',
@@ -1114,19 +1121,21 @@ const DateRangePicker = ({ useAnimations = false }) => {
             <Card.Header className="cla-header">
               <Button
                 variant="light"
-                onClick={() => moveToMonthRef.current("prev")}
+                onClick={() => moveToMonth("prev")}
                 className="cla-button-nav"
                 disabled={isAnimating}
               >
                 <ChevronLeft size={16} />
               </Button>
               <span className="cla-header-title">
-                {format(months[2], "MMMM yyyy")} -{" "}
-                {format(months[3], "MMMM yyyy")}
+                {viewMode === 'single' 
+                  ? format(months[2], "MMMM yyyy")
+                  : `${format(months[2], "MMMM yyyy")} - ${format(months[3], "MMMM yyyy")}`
+                }
               </span>
               <Button
                 variant="light"
-                onClick={() => moveToMonthRef.current("next")}
+                onClick={() => moveToMonth("next")}
                 className="cla-button-nav"
                 disabled={isAnimating}
               >
@@ -1163,6 +1172,7 @@ const DateRangePicker = ({ useAnimations = false }) => {
                       onSelectionStart={handleSelectionStart}
                       onSelectionMove={handleSelectionMove}
                       isSelecting={isSelecting}
+                      viewMode={viewMode}
                     />
                   </div>
                   <div style={{ width: '20%' }}>
@@ -1173,6 +1183,7 @@ const DateRangePicker = ({ useAnimations = false }) => {
                       onSelectionStart={handleSelectionStart}
                       onSelectionMove={handleSelectionMove}
                       isSelecting={isSelecting}
+                      viewMode={viewMode}
                     />
                   </div>
                   <div style={{ width: '20%' }}>
@@ -1183,6 +1194,7 @@ const DateRangePicker = ({ useAnimations = false }) => {
                       onSelectionStart={handleSelectionStart}
                       onSelectionMove={handleSelectionMove}
                       isSelecting={isSelecting}
+                      viewMode={viewMode}
                     />
                   </div>
                   <div style={{ width: '20%' }}>
@@ -1193,6 +1205,7 @@ const DateRangePicker = ({ useAnimations = false }) => {
                       onSelectionStart={handleSelectionStart}
                       onSelectionMove={handleSelectionMove}
                       isSelecting={isSelecting}
+                      viewMode={viewMode}
                     />
                   </div>
                   <div style={{ width: '20%' }}>
@@ -1203,6 +1216,7 @@ const DateRangePicker = ({ useAnimations = false }) => {
                       onSelectionStart={handleSelectionStart}
                       onSelectionMove={handleSelectionMove}
                       isSelecting={isSelecting}
+                      viewMode={viewMode}
                     />
                   </div>
                 </div>
