@@ -479,7 +479,6 @@ const MonthGrid = ({
       padding: '0 8px',
       ...style
     }}>
-      {/* Month heading */}
       {showMonthHeading && (
         <div style={{
           fontSize: '1rem',
@@ -487,7 +486,7 @@ const MonthGrid = ({
           color: '#333',
           textAlign: 'left',
           marginBottom: '8px',
-          paddingLeft: '4px'
+          paddingLeft: '2px'
         }}>
           {format(monthStart, 'MMMM')}
         </div>
@@ -498,6 +497,7 @@ const MonthGrid = ({
         display: 'grid',
         gridTemplateColumns: 'repeat(7, 1fr)',
         marginBottom: '8px',
+        paddingLeft: '2px'  // Match month heading alignment
       }}>
         {["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"].map(day => (
           <div
@@ -517,14 +517,14 @@ const MonthGrid = ({
         ))}
       </div>
 
-      {/* Days grid - no gaps */}
+      {/* Days grid */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(7, 1fr)',
         gridAutoRows: '36px',
-        rowGap: '4px',  // Add gap between rows only
-        columnGap: 0,   // Keep horizontal cells connected
-        paddingBottom: '4px'  // Add small padding at bottom
+        rowGap: '4px',
+        columnGap: 0,
+        paddingLeft: '2px'  // Match month heading alignment
       }}>
         {Object.values(weeks).flatMap(week =>
           week.map(date => (
@@ -741,10 +741,12 @@ const FloatingIndicator = ({ outOfBoundsDirection, isSelecting, mousePosition })
 };
 
 const DateRangePicker = ({ 
-  useAnimations = false, 
-  visibleMonths = 2,  // Number of months to show (1-6)
-  showMonthHeadings = false  // New prop
+  visibleMonths = 2,
+  showMonthHeadings = false
 }) => {
+  // Clamp visibleMonths between 1 and 6
+  const validVisibleMonths = Math.min(6, Math.max(1, visibleMonths));
+
   const [isOpen, setIsOpen] = useState(false);
   const [selectedRange, setSelectedRange] = useState({
     start: null,
@@ -752,7 +754,6 @@ const DateRangePicker = ({
   });
   const [initialDate, setInitialDate] = useState(null);
   const [isSelecting, setIsSelecting] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date()));
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isOutsideBounds, setIsOutsideBounds] = useState(false);
@@ -764,15 +765,14 @@ const DateRangePicker = ({
   const [months, setMonths] = useState(() => {
     const initial = startOfMonth(new Date());
     return [
-      addMonths(initial, -2),  // First month
-      addMonths(initial, -1),  // Second month
-      initial,                 // Third month (current)
-      addMonths(initial, 1),   // Fourth month
-      addMonths(initial, 2)    // Fifth month
+      addMonths(initial, -2),
+      addMonths(initial, -1),
+      initial,
+      addMonths(initial, 1),
+      addMonths(initial, 2)
     ];
   });
 
-  const monthsContainerRef = useRef(null);
   const containerRef = useRef(null);
   const debouncedMoveToMonthRef = useRef(null);
   const moveToMonthRef = useRef(null);
@@ -837,63 +837,24 @@ const DateRangePicker = ({
   };
 
   const moveToMonth = useCallback((direction) => {
-    if (isAnimating) return;
-    setIsAnimating(true);
-
-    const container = monthsContainerRef.current;
-    if (!useAnimations) {
-      setMonths(prev => direction === 'next'
-        ? [
-            prev[1],
-            prev[2],
-            prev[3],
-            prev[4],
-            addMonths(prev[4], visibleMonths === 1 ? 1 : 2)
-          ]
-        : [
-            addMonths(prev[0], visibleMonths === 1 ? -1 : -2),
-            prev[0],
-            prev[1],
-            prev[2],
-            prev[3]
-          ]
-      );
-      setCurrentMonth(prev => addMonths(prev, direction === 'next' ? 1 : -1));
-      setIsAnimating(false);
-      return;
-    }
-
-    // Existing animation logic
-    requestAnimationFrame(() => {
-      container.style.transition = 'transform 300ms ease-out';
-      container.style.transform = `translateX(${direction === 'next' ? '-60%' : '-20%'})`;
-
-      setTimeout(() => {
-        setMonths(prev => direction === 'next'
-          ? [
-              prev[1],
-              prev[2],
-              prev[3],
-              prev[4],
-              addMonths(prev[4], visibleMonths === 1 ? 1 : 2)
-            ]
-          : [
-              addMonths(prev[0], visibleMonths === 1 ? -1 : -2),
-              prev[0],
-              prev[1],
-              prev[2],
-              prev[3]
-            ]
-        );
-
-        container.style.transition = 'none';
-        container.style.transform = 'translateX(-40%)';
-        
-        setCurrentMonth(prev => addMonths(prev, direction === 'next' ? 1 : -1));
-        setIsAnimating(false);
-      }, 300);
-    });
-  }, [isAnimating, useAnimations, visibleMonths]);
+    setMonths(prev => direction === 'next'
+      ? [
+          prev[1],
+          prev[2],
+          prev[3],
+          prev[4],
+          addMonths(prev[4], 1)
+        ]
+      : [
+          addMonths(prev[0], -1),
+          prev[0],
+          prev[1],
+          prev[2],
+          prev[3]
+        ]
+    );
+    setCurrentMonth(prev => addMonths(prev, direction === 'next' ? 1 : -1));
+  }, []);
 
   useEffect(() => {
     debouncedMoveToMonthRef.current = debounce((direction) => {
@@ -1073,14 +1034,14 @@ const DateRangePicker = ({
             className="cla-card-popup"
             style={{
               zIndex: 1000,
-              width: `${350 * visibleMonths}px`,  // Dynamic width based on number of months
+              width: `${(validVisibleMonths === 1 ? 400 : 400) * validVisibleMonths}px`,
               userSelect: "none",
               WebkitUserSelect: "none",
               MozUserSelect: "none",
               msUserSelect: "none",
               overflow: "hidden",
               border: "1px solid #B1E4E5",
-              borderRadius: '3px',
+              borderRadius: '3px'
             }}
             onMouseDown={e => {
               e.stopPropagation();
@@ -1104,7 +1065,7 @@ const DateRangePicker = ({
               padding: '16px',
               display: 'flex',
               justifyContent: 'space-between',
-              gap: visibleMonths === 1 ? '12px' : '20px',
+              gap: validVisibleMonths === 1 ? '12px' : '20px',
               height: '67px',
               alignItems: 'center',
               userSelect: 'text',
@@ -1142,18 +1103,16 @@ const DateRangePicker = ({
                 variant="light"
                 onClick={() => moveToMonth("prev")}
                 className="cla-button-nav"
-                disabled={isAnimating}
               >
                 <ChevronLeft size={16} />
               </Button>
               <span className="cla-header-title">
-                {`${format(months[2], "MMMM yyyy")} - ${format(addMonths(months[2], visibleMonths - 1), "MMMM yyyy")}`}
+                {`${format(months[2], "MMMM yyyy")} - ${format(addMonths(months[2], validVisibleMonths - 1), "MMMM yyyy")}`}
               </span>
               <Button
                 variant="light"
                 onClick={() => moveToMonth("next")}
                 className="cla-button-nav"
-                disabled={isAnimating}
               >
                 <ChevronRight size={16} />
               </Button>
@@ -1161,85 +1120,79 @@ const DateRangePicker = ({
 
             <Card.Body
               style={{
-                padding: "0.5rem 0.5rem",
+                padding: "0.25rem 0.5rem",  // Reduced top/bottom padding even more
                 position: "relative",
                 overflow: "hidden",
               }}
             >
               <div
-                ref={monthsContainerRef}
                 style={{
-                  position: 'relative',
-                  overflow: 'hidden'
-                }}
-              >
-                <div style={{
                   display: 'flex',
                   position: 'relative',
                   width: '500%',
                   transform: 'translateX(-40%)',
                   willChange: 'transform'
-                }}>
-                  <div style={{ width: '20%' }}>
-                    <MonthPair
-                      firstMonth={months[0]}
-                      secondMonth={months[1]}
-                      selectedRange={selectedRange}
-                      onSelectionStart={handleSelectionStart}
-                      onSelectionMove={handleSelectionMove}
-                      isSelecting={isSelecting}
-                      visibleMonths={visibleMonths}
-                      showMonthHeadings={showMonthHeadings}
-                    />
-                  </div>
-                  <div style={{ width: '20%' }}>
-                    <MonthPair
-                      firstMonth={months[1]}
-                      secondMonth={months[2]}
-                      selectedRange={selectedRange}
-                      onSelectionStart={handleSelectionStart}
-                      onSelectionMove={handleSelectionMove}
-                      isSelecting={isSelecting}
-                      visibleMonths={visibleMonths}
-                      showMonthHeadings={showMonthHeadings}
-                    />
-                  </div>
-                  <div style={{ width: '20%' }}>
-                    <MonthPair
-                      firstMonth={months[2]}
-                      secondMonth={months[3]}
-                      selectedRange={selectedRange}
-                      onSelectionStart={handleSelectionStart}
-                      onSelectionMove={handleSelectionMove}
-                      isSelecting={isSelecting}
-                      visibleMonths={visibleMonths}
-                      showMonthHeadings={showMonthHeadings}
-                    />
-                  </div>
-                  <div style={{ width: '20%' }}>
-                    <MonthPair
-                      firstMonth={months[3]}
-                      secondMonth={months[4]}
-                      selectedRange={selectedRange}
-                      onSelectionStart={handleSelectionStart}
-                      onSelectionMove={handleSelectionMove}
-                      isSelecting={isSelecting}
-                      visibleMonths={visibleMonths}
-                      showMonthHeadings={showMonthHeadings}
-                    />
-                  </div>
-                  <div style={{ width: '20%' }}>
-                    <MonthPair
-                      firstMonth={months[4]}
-                      secondMonth={addMonths(months[4], 1)}
-                      selectedRange={selectedRange}
-                      onSelectionStart={handleSelectionStart}
-                      onSelectionMove={handleSelectionMove}
-                      isSelecting={isSelecting}
-                      visibleMonths={visibleMonths}
-                      showMonthHeadings={showMonthHeadings}
-                    />
-                  </div>
+                }}
+              >
+                <div style={{ width: '20%' }}>
+                  <MonthPair
+                    firstMonth={months[0]}
+                    secondMonth={months[1]}
+                    selectedRange={selectedRange}
+                    onSelectionStart={handleSelectionStart}
+                    onSelectionMove={handleSelectionMove}
+                    isSelecting={isSelecting}
+                    visibleMonths={validVisibleMonths}
+                    showMonthHeadings={showMonthHeadings}
+                  />
+                </div>
+                <div style={{ width: '20%' }}>
+                  <MonthPair
+                    firstMonth={months[1]}
+                    secondMonth={months[2]}
+                    selectedRange={selectedRange}
+                    onSelectionStart={handleSelectionStart}
+                    onSelectionMove={handleSelectionMove}
+                    isSelecting={isSelecting}
+                    visibleMonths={validVisibleMonths}
+                    showMonthHeadings={showMonthHeadings}
+                  />
+                </div>
+                <div style={{ width: '20%' }}>
+                  <MonthPair
+                    firstMonth={months[2]}
+                    secondMonth={months[3]}
+                    selectedRange={selectedRange}
+                    onSelectionStart={handleSelectionStart}
+                    onSelectionMove={handleSelectionMove}
+                    isSelecting={isSelecting}
+                    visibleMonths={validVisibleMonths}
+                    showMonthHeadings={showMonthHeadings}
+                  />
+                </div>
+                <div style={{ width: '20%' }}>
+                  <MonthPair
+                    firstMonth={months[3]}
+                    secondMonth={months[4]}
+                    selectedRange={selectedRange}
+                    onSelectionStart={handleSelectionStart}
+                    onSelectionMove={handleSelectionMove}
+                    isSelecting={isSelecting}
+                    visibleMonths={validVisibleMonths}
+                    showMonthHeadings={showMonthHeadings}
+                  />
+                </div>
+                <div style={{ width: '20%' }}>
+                  <MonthPair
+                    firstMonth={months[4]}
+                    secondMonth={addMonths(months[4], 1)}
+                    selectedRange={selectedRange}
+                    onSelectionStart={handleSelectionStart}
+                    onSelectionMove={handleSelectionMove}
+                    isSelecting={isSelecting}
+                    visibleMonths={validVisibleMonths}
+                    showMonthHeadings={showMonthHeadings}
+                  />
                 </div>
               </div>
             </Card.Body>
@@ -1284,19 +1237,14 @@ const DateRangePicker = ({
 
 DateRangePicker.propTypes = {
   /** Number of months to display (1-6) */
-  visibleMonths: PropTypes.number,
-  
+  visibleMonths: PropTypes.oneOf([1, 2, 3, 4, 5, 6]),  // Strict validation
   /** Show month headings above each calendar */
-  showMonthHeadings: PropTypes.bool,
-  
-  /** Enable/disable animations */
-  useAnimations: PropTypes.bool
+  showMonthHeadings: PropTypes.bool
 };
 
 DateRangePicker.defaultProps = {
   visibleMonths: 2,
-  showMonthHeadings: false,
-  useAnimations: false
+  showMonthHeadings: false
 };
 
 export default DateRangePicker;

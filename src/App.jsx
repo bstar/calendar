@@ -6,14 +6,11 @@ function App() {
   return (
     <div style={{ padding: '20px' }}>
       <DateRangePicker 
-        // Number of months to display (1-5)
-        visibleMonths={3}
+        // Number of months to display (1-6)
+        visibleMonths={2}
 
         // Show month headings
         showMonthHeadings={true}
-
-        // Animation settings
-        useAnimations={false}
 
         // Optional callbacks
         // onChange={(dates) => console.log(dates)}  // {start: Date, end: Date}
