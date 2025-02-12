@@ -6,14 +6,11 @@ function App() {
   return (
     <div style={{ padding: '20px' }}>
       <DateRangePicker 
-        // Display mode for calendar
-        viewMode="dual"      // 'single' | 'dual'
-
-        // Selection behavior
-        selectionMode="range" // 'single' | 'range'
+        // Number of months to display (1-5)
+        visibleMonths={3}
 
         // Animation settings
-        useAnimations={true} // true | false
+        useAnimations={false}
 
         // Optional callbacks
         // onChange={(dates) => console.log(dates)}  // {start: Date, end: Date}

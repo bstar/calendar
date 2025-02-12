@@ -649,32 +649,31 @@ const MonthPair = ({
   onSelectionStart,
   onSelectionMove,
   isSelecting,
-  viewMode
+  visibleMonths
 }) => {
+  // Create array of months to display
+  const monthsToShow = [];
+  for (let i = 0; i < visibleMonths && i < 6; i++) {
+    monthsToShow.push(addMonths(firstMonth, i));
+  }
+
   return (
     <div style={{ 
       display: 'flex', 
       width: '100%',
-      gap: viewMode === 'single' ? '0' : '1rem'
+      gap: '1rem'
     }}>
-      <MonthGrid
-        baseDate={firstMonth}
-        selectedRange={selectedRange}
-        onSelectionStart={onSelectionStart}
-        onSelectionMove={onSelectionMove}
-        isSelecting={isSelecting}
-        style={{ width: viewMode === 'single' ? '100%' : '50%' }}
-      />
-      {viewMode === 'dual' && (
+      {monthsToShow.map((month, index) => (
         <MonthGrid
-          baseDate={secondMonth}
+          key={month.toISOString()}
+          baseDate={month}
           selectedRange={selectedRange}
           onSelectionStart={onSelectionStart}
           onSelectionMove={onSelectionMove}
           isSelecting={isSelecting}
-          style={{ width: '50%' }}
+          style={{ width: `${100 / visibleMonths}%` }}
         />
-      )}
+      ))}
     </div>
   );
 };
@@ -724,7 +723,7 @@ const FloatingIndicator = ({ outOfBoundsDirection, isSelecting, mousePosition })
 
 const DateRangePicker = ({ 
   useAnimations = false, 
-  viewMode = 'dual'
+  visibleMonths = 2  // Number of months to show (1-5)
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedRange, setSelectedRange] = useState({
@@ -829,10 +828,10 @@ const DateRangePicker = ({
             prev[2],
             prev[3],
             prev[4],
-            addMonths(prev[4], viewMode === 'single' ? 1 : 2)
+            addMonths(prev[4], visibleMonths === 1 ? 1 : 2)
           ]
         : [
-            addMonths(prev[0], viewMode === 'single' ? -1 : -2),
+            addMonths(prev[0], visibleMonths === 1 ? -1 : -2),
             prev[0],
             prev[1],
             prev[2],
@@ -856,10 +855,10 @@ const DateRangePicker = ({
               prev[2],
               prev[3],
               prev[4],
-              addMonths(prev[4], viewMode === 'single' ? 1 : 2)
+              addMonths(prev[4], visibleMonths === 1 ? 1 : 2)
             ]
           : [
-              addMonths(prev[0], viewMode === 'single' ? -1 : -2),
+              addMonths(prev[0], visibleMonths === 1 ? -1 : -2),
               prev[0],
               prev[1],
               prev[2],
@@ -874,7 +873,7 @@ const DateRangePicker = ({
         setIsAnimating(false);
       }, 300);
     });
-  }, [isAnimating, useAnimations, viewMode]);
+  }, [isAnimating, useAnimations, visibleMonths]);
 
   useEffect(() => {
     debouncedMoveToMonthRef.current = debounce((direction) => {
@@ -1054,7 +1053,7 @@ const DateRangePicker = ({
             className="cla-card-popup"
             style={{
               zIndex: 1000,
-              width: viewMode === 'single' ? '400px' : '700px',
+              width: `${350 * visibleMonths}px`,  // Dynamic width based on number of months
               userSelect: "none",
               WebkitUserSelect: "none",
               MozUserSelect: "none",
@@ -1085,7 +1084,7 @@ const DateRangePicker = ({
               padding: '16px',
               display: 'flex',
               justifyContent: 'space-between',
-              gap: viewMode === 'single' ? '12px' : '20px',
+              gap: visibleMonths === 1 ? '12px' : '20px',
               height: '67px',
               alignItems: 'center',
               userSelect: 'text',
@@ -1128,10 +1127,7 @@ const DateRangePicker = ({
                 <ChevronLeft size={16} />
               </Button>
               <span className="cla-header-title">
-                {viewMode === 'single' 
-                  ? format(months[2], "MMMM yyyy")
-                  : `${format(months[2], "MMMM yyyy")} - ${format(months[3], "MMMM yyyy")}`
-                }
+                {`${format(months[2], "MMMM yyyy")} - ${format(addMonths(months[2], visibleMonths - 1), "MMMM yyyy")}`}
               </span>
               <Button
                 variant="light"
@@ -1172,7 +1168,7 @@ const DateRangePicker = ({
                       onSelectionStart={handleSelectionStart}
                       onSelectionMove={handleSelectionMove}
                       isSelecting={isSelecting}
-                      viewMode={viewMode}
+                      visibleMonths={visibleMonths}
                     />
                   </div>
                   <div style={{ width: '20%' }}>
@@ -1183,7 +1179,7 @@ const DateRangePicker = ({
                       onSelectionStart={handleSelectionStart}
                       onSelectionMove={handleSelectionMove}
                       isSelecting={isSelecting}
-                      viewMode={viewMode}
+                      visibleMonths={visibleMonths}
                     />
                   </div>
                   <div style={{ width: '20%' }}>
@@ -1194,7 +1190,7 @@ const DateRangePicker = ({
                       onSelectionStart={handleSelectionStart}
                       onSelectionMove={handleSelectionMove}
                       isSelecting={isSelecting}
-                      viewMode={viewMode}
+                      visibleMonths={visibleMonths}
                     />
                   </div>
                   <div style={{ width: '20%' }}>
@@ -1205,7 +1201,7 @@ const DateRangePicker = ({
                       onSelectionStart={handleSelectionStart}
                       onSelectionMove={handleSelectionMove}
                       isSelecting={isSelecting}
-                      viewMode={viewMode}
+                      visibleMonths={visibleMonths}
                     />
                   </div>
                   <div style={{ width: '20%' }}>
@@ -1216,7 +1212,7 @@ const DateRangePicker = ({
                       onSelectionStart={handleSelectionStart}
                       onSelectionMove={handleSelectionMove}
                       isSelecting={isSelecting}
-                      viewMode={viewMode}
+                      visibleMonths={visibleMonths}
                     />
                   </div>
                 </div>
