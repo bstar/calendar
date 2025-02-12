@@ -8,6 +8,7 @@
     "dist"
   ],
   "scripts": {
+    "dev": "vite",
     "build": "rollup -c",
     "test": "jest",
     "prepare": "npm run build"
@@ -19,6 +20,8 @@
     "lodash-es": "^4.17.0"
   },
   "devDependencies": {
+    "vite": "^4.0.0", 
+
     "@rollup/plugin-commonjs": "^21.0.0",
     "@rollup/plugin-node-resolve": "^13.0.0",
     "rollup": "^2.60.0",
