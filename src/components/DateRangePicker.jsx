@@ -721,12 +721,11 @@ const SideChevronIndicator = ({ outOfBoundsDirection, isSelecting }) => {
         position: "absolute",
         top: "50%",
         transform: "translateY(-50%)",
-        [isPrev ? 'left' : 'right']: "-16px",
+        [isPrev ? 'left' : 'right']: "-24px",
         backgroundColor: '#fff',
         color: "#000",
-        padding: "16px 8px",
-        height: "80px",
-        // Flip the rounded corners - more rounded on the inside edge
+        padding: "12px 6px",
+        height: "60px",
         borderRadius: isPrev ? "20px 0 0 20px" : "0 20px 20px 0",
         display: "flex",
         alignItems: "center",
@@ -743,7 +742,7 @@ const SideChevronIndicator = ({ outOfBoundsDirection, isSelecting }) => {
         }
       }}
     >
-      {isPrev ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+      {isPrev ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
     </div>
   );
 };
