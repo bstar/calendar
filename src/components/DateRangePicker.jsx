@@ -834,10 +834,20 @@ const DateRangePicker = ({
     setDateInputContext(newState.context);
     setValidationErrors({});
 
-    // Update months to maintain the correct sequence
+    // Only update calendar position if we have a valid date
     if (date) {
-      const baseMonth = startOfMonth(date);
-      setCurrentMonth(baseMonth);
+      if (field === 'start') {
+        // For start date, we want it in the leftmost month
+        // If we want March to show on the left, we need March to be our currentMonth
+        const newBaseMonth = startOfMonth(date);
+        setCurrentMonth(newBaseMonth);
+      } else {
+        // For end date, we want it in the rightmost month
+        // If we want April to show on the right, and we're showing 2 months,
+        // we need March to be our currentMonth (since we show currentMonth + 1)
+        const newBaseMonth = addMonths(startOfMonth(date), -1);
+        setCurrentMonth(newBaseMonth);
+      }
     }
   };
 
