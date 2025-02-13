@@ -923,7 +923,7 @@ const DateRangePicker = ({
 
     const containerRect = containerRef.current.getBoundingClientRect();
     const { clientX: mouseX, clientY: mouseY } = e;
-    const BOUNDARY_THRESHOLD = 20; // Increased threshold for better detection
+    const BOUNDARY_THRESHOLD = 20;
 
     setMousePosition({ x: mouseX, y: mouseY });
 
@@ -934,8 +934,11 @@ const DateRangePicker = ({
 
     if (newDirection !== outOfBoundsDirection) {
       setOutOfBoundsDirection(newDirection);
-      if (newDirection) {
-        moveToMonthRef.current(newDirection);
+      // Only start the month changes after a delay when first entering the boundary
+      if (newDirection && !outOfBoundsDirection) {
+        setTimeout(() => {
+          moveToMonthRef.current(newDirection);
+        }, 1000);
       }
     }
   }, [isSelecting, outOfBoundsDirection]);
@@ -1003,13 +1006,19 @@ const DateRangePicker = ({
   }, [selectedRange, selectionMode]);
 
   return (
-    <div className="cla-calendar">
+    <div className="cla-calendar" style={{ width: 'fit-content' }}>
       <input
         type="text"
         value={getDisplayText()}
         onClick={() => setIsOpen(true)}
         className="cla-form-control"
         readOnly
+        style={{
+          width: '300px',  // Fixed width to accommodate full date range
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis'
+        }}
       />
 
       {isOpen && (
