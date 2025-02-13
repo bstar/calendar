@@ -867,16 +867,19 @@ const DateRangePicker = ({
 
     // Only update calendar position if we have a valid date
     if (date) {
+      const validVisibleMonths = Math.min(6, Math.max(1, visibleMonths));
+      
       if (field === 'start') {
         // For start date, we want it in the leftmost month
-        // If we want March to show on the left, we need March to be our currentMonth
+        // If we want March to show on the left, and we're showing 3 months,
+        // we need March to be our currentMonth (since we show currentMonth to currentMonth + 2)
         const newBaseMonth = startOfMonth(date);
         setCurrentMonth(newBaseMonth);
       } else {
         // For end date, we want it in the rightmost month
-        // If we want April to show on the right, and we're showing 2 months,
-        // we need March to be our currentMonth (since we show currentMonth + 1)
-        const newBaseMonth = addMonths(startOfMonth(date), -1);
+        // If we want April to show on the right, and we're showing 3 months,
+        // we need February to be our currentMonth (since we show currentMonth + 2)
+        const newBaseMonth = addMonths(startOfMonth(date), -(validVisibleMonths - 1));
         setCurrentMonth(newBaseMonth);
       }
     }
