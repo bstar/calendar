@@ -709,45 +709,41 @@ const MonthPair = ({
   );
 };
 
-const FloatingIndicator = ({ outOfBoundsDirection, isSelecting, mousePosition }) => {
+const SideChevronIndicator = ({ outOfBoundsDirection, isSelecting }) => {
   if (!outOfBoundsDirection || !isSelecting) return null;
 
   const isPrev = outOfBoundsDirection === 'prev';
-
+  
   return (
     <div
-      className="floating-indicator"
+      className="side-chevron-indicator"
       style={{
-        position: "fixed",
-        left: `${mousePosition.x + (isPrev ? -100 : 20)}px`,
-        top: `${mousePosition.y - 20}px`,
-        backgroundColor: 'rgba(226, 228, 238, 0.5)',
+        position: "absolute",
+        top: "50%",
+        transform: "translateY(-50%)",
+        [isPrev ? 'left' : 'right']: "-16px",
+        backgroundColor: '#fff',
         color: "#000",
-        padding: "8px 12px",
-        borderRadius: "4px",
+        padding: "16px 8px",
+        height: "80px",
+        // Flip the rounded corners - more rounded on the inside edge
+        borderRadius: isPrev ? "20px 0 0 20px" : "0 20px 20px 0",
         display: "flex",
         alignItems: "center",
-        gap: "6px",
-        boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+        justifyContent: "center",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
         zIndex: 1100,
-        fontSize: "14px",
-        transition: "opacity 0.2s ease",
-        opacity: 1,
-        pointerEvents: "none",
-        border: '1px solid #979797',
+        transition: "all 0.2s ease",
+        opacity: 0.95,
+        border: '1px solid var(--border-color)',
+        cursor: "pointer",
+        '&:hover': {
+          opacity: 1,
+          backgroundColor: 'var(--bg-hover)'
+        }
       }}
     >
-      {isPrev ? (
-        <>
-          <ChevronLeft size={16} />
-          <span>Previous Month</span>
-        </>
-      ) : (
-        <>
-          <ChevronRight size={16} />
-          <span>Next Month</span>
-        </>
-      )}
+      {isPrev ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
     </div>
   );
 };
@@ -758,46 +754,82 @@ const DateRangePicker = ({
   selectionMode = 'range',
   showTooltips = true
 }) => {
-  // Clamp visibleMonths between 1 and 6
-  const validVisibleMonths = Math.min(6, Math.max(1, visibleMonths));
-
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedRange, setSelectedRange] = useState({
-    start: null,
-    end: null,
-  });
-  const [initialDate, setInitialDate] = useState(null);
-  const [isSelecting, setIsSelecting] = useState(false);
+  const [selectedRange, setSelectedRange] = useState({ start: null, end: null });
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date()));
+  const [isSelecting, setIsSelecting] = useState(false);
+  const [initialDate, setInitialDate] = useState(null);
+  const [outOfBoundsDirection, setOutOfBoundsDirection] = useState(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isOutsideBounds, setIsOutsideBounds] = useState(false);
-  const [validationErrors, setValidationErrors] = useState({});
   const [dateInputContext, setDateInputContext] = useState({
     startDate: null,
-    endDate: null
+    endDate: null,
+    currentField: null
   });
-  const months = useMemo(() => {
-    const result = [];
-    for (let i = 0; i < 5; i++) {  // Keep 5 months for consistent rendering
-      result.push(addMonths(currentMonth, i - 2));  // Start 2 months before
-    }
-    return result;
-  }, [currentMonth]);
+  const [validationErrors, setValidationErrors] = useState({});
 
   const containerRef = useRef(null);
-  const debouncedMoveToMonthRef = useRef(null);
   const moveToMonthRef = useRef(null);
+  const debouncedMoveToMonthRef = useRef(null);
 
-  const [outOfBoundsDirection, setOutOfBoundsDirection] = useState(null); // 'prev', 'next', or null
+  // Simplified month generation
+  const months = useMemo(() => {
+    const validVisibleMonths = Math.min(6, Math.max(1, visibleMonths));
+    const result = [];
+    for (let i = 0; i < validVisibleMonths; i++) {
+      result.push(addMonths(currentMonth, i));
+    }
+    return result;
+  }, [currentMonth, visibleMonths]);
 
-  // Add buffer state
-  const [buffer, setBuffer] = useState(null);
+  // Keep debounced month change for out-of-bounds scrolling
+  useEffect(() => {
+    debouncedMoveToMonthRef.current = debounce((direction) => {
+      if (moveToMonthRef.current) {
+        moveToMonthRef.current(direction);
+      }
+    }, 1000, { leading: true, trailing: false });
+
+    return () => {
+      if (debouncedMoveToMonthRef.current) {
+        debouncedMoveToMonthRef.current.cancel();
+      }
+    };
+  }, []);
+
+  // Add back the continuous month advancement effect
+  useEffect(() => {
+    const shouldAdvance = isSelecting && outOfBoundsDirection && moveToMonthRef.current;
+    if (!shouldAdvance) return () => {};
+
+    const advanceMonth = () => {
+      if (shouldAdvance) {
+        moveToMonthRef.current(outOfBoundsDirection);
+      }
+    };
+
+    // Initial delay then continuous advancement every second
+    const initialAdvance = setTimeout(advanceMonth, 1000);
+    const continuousAdvance = setInterval(advanceMonth, 1000);
+
+    return () => {
+      clearTimeout(initialAdvance);
+      clearInterval(continuousAdvance);
+    };
+  }, [isSelecting, outOfBoundsDirection]);
+
+  // Simple month navigation
+  const moveToMonth = useCallback((direction) => {
+    setCurrentMonth(prev => addMonths(prev, direction === 'next' ? 1 : -1));
+  }, []);
+
+  // Set the ref for out-of-bounds scrolling
+  moveToMonthRef.current = moveToMonth;
 
   const handleClickOutside = useCallback(() => {
     if (isOpen) {
       setIsOpen(false);
       setIsSelecting(false);
-      setIsOutsideBounds(false);
       setInitialDate(null);
     }
   }, [isOpen]);
@@ -851,43 +883,6 @@ const DateRangePicker = ({
     }
   };
 
-  const moveToMonth = useCallback((direction) => {
-    setCurrentMonth(prev => addMonths(prev, direction === 'next' ? 1 : -1));
-  }, []);
-
-  useEffect(() => {
-    debouncedMoveToMonthRef.current = debounce((direction) => {
-      if (moveToMonthRef.current) {
-        moveToMonthRef.current(direction);
-      }
-    }, 1000, { leading: true, trailing: false });
-
-    return () => {
-      if (debouncedMoveToMonthRef.current) {
-        debouncedMoveToMonthRef.current.cancel();
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    const shouldAdvance = isSelecting && outOfBoundsDirection && moveToMonthRef.current;
-    if (!shouldAdvance) return () => {};
-
-    const advanceMonth = () => {
-      if (shouldAdvance) {
-        moveToMonthRef.current(outOfBoundsDirection);
-      }
-    };
-
-    const initialAdvance = setTimeout(advanceMonth, 1000);
-    const continuousAdvance = setInterval(advanceMonth, 1000);
-
-    return () => {
-      clearTimeout(initialAdvance);
-      clearInterval(continuousAdvance);
-    };
-  }, [isSelecting, outOfBoundsDirection]);
-
   const handleSelectionStart = useCallback(date => {
     setIsSelecting(true);
     setInitialDate(date);
@@ -928,11 +923,11 @@ const DateRangePicker = ({
 
     const containerRect = containerRef.current.getBoundingClientRect();
     const { clientX: mouseX, clientY: mouseY } = e;
-    const BOUNDARY_THRESHOLD = 1;
+    const BOUNDARY_THRESHOLD = 20; // Increased threshold for better detection
 
     setMousePosition({ x: mouseX, y: mouseY });
 
-    // Check both boundaries and maintain direction
+    // Check both boundaries with equal thresholds
     const newDirection = mouseX < containerRect.left + BOUNDARY_THRESHOLD ? 'prev'
       : mouseX > containerRect.right - BOUNDARY_THRESHOLD ? 'next'
         : null;
@@ -980,12 +975,11 @@ const DateRangePicker = ({
   const handleClear = useCallback(() => {
     // Reset range and context
     setSelectedRange({ start: null, end: null });
-    setDateInputContext({ startDate: null, endDate: null });
+    setDateInputContext({ startDate: null, endDate: null, currentField: null });
 
     // Reset selection states
     setIsSelecting(false);
     setInitialDate(null);
-    setIsOutsideBounds(false);
 
     // Reset validation
     setValidationErrors({});
@@ -1008,233 +1002,105 @@ const DateRangePicker = ({
       : `${format(parseISO(start), "MMM dd, yyyy")} - ${format(parseISO(end), "MMM dd, yyyy")}`;
   }, [selectedRange, selectionMode]);
 
-  // Fix the moveToMonth reference
-  moveToMonthRef.current = moveToMonth;
-
   return (
-    <div
-      className="cla-container"
-      onMouseDown={handleMouseDown}
-      style={{
-        userSelect: "none",
-        WebkitUserSelect: "none",
-        MozUserSelect: "none",
-        msUserSelect: "none",
-      }}
-    >
-      <Input
+    <div className="cla-calendar">
+      <input
         type="text"
         value={getDisplayText()}
         onClick={() => setIsOpen(true)}
-        style={{
-          width: "300px",
-          cursor: "pointer",
-          userSelect: "none",
-          WebkitUserSelect: "none",
-          MozUserSelect: "none",
-          msUserSelect: "none",
-        }}
+        className="cla-form-control"
+        readOnly
       />
 
       {isOpen && (
-        <>
-          <Card
-            ref={containerRef}
-            className="cla-card-popup"
-            style={{
-              zIndex: 1000,
-              width: `${(validVisibleMonths === 1 ? 400 : 400) * validVisibleMonths}px`,
-              userSelect: "none",
-              WebkitUserSelect: "none",
-              MozUserSelect: "none",
-              msUserSelect: "none",
-              overflow: "hidden",
-              border: "1px solid #B1E4E5",
-              borderRadius: '3px'
-            }}
-            onMouseDown={e => {
-              e.stopPropagation();
-              handleMouseDown(e);
-            }}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={e => {
-              const containerRect = containerRef.current.getBoundingClientRect();
-              const { clientX: mouseX } = e;
+        <div 
+          ref={containerRef}
+          className="cla-card cla-card-popup"
+          style={{
+            width: `${400 * Math.min(6, Math.max(1, visibleMonths))}px`,
+            position: 'relative'
+          }}
+          onMouseDown={e => {
+            e.stopPropagation();
+            handleMouseDown(e);
+          }}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={e => {
+            const containerRect = containerRef.current.getBoundingClientRect();
+            const { clientX: mouseX } = e;
 
-              if (mouseX < containerRect.left) {
-                setOutOfBoundsDirection('prev');
-              } else if (mouseX > containerRect.right) {
-                setOutOfBoundsDirection('next');
-              }
-            }}
-          >
-            <div style={{
-              backgroundColor: 'rgba(226, 228, 238, 0.5)',
-              padding: '16px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              gap: validVisibleMonths === 1 ? '12px' : '20px',
-              height: '67px',
-              alignItems: 'center',
-              // Hide second input for single mode
-              ...(selectionMode === 'single' && {
-                justifyContent: 'center',
-                gap: 0
-              })
-            }}>
+            if (mouseX < containerRect.left) {
+              setOutOfBoundsDirection('prev');
+            } else if (mouseX > containerRect.right) {
+              setOutOfBoundsDirection('next');
+            }
+          }}
+        >
+          <div className="cla-input-container">
+            <div className="cla-input-wrapper">
               <DateInput
                 value={selectedRange.start ? parseISO(selectedRange.start) : null}
                 onChange={handleDateChange('start')}
                 field="start"
                 placeholder={selectionMode === 'single' ? "Select date" : "Start date"}
-                context={{
-                  startDate: dateInputContext.startDate,
-                  endDate: dateInputContext.endDate,
-                  currentField: 'start',
-                }}
+                context={dateInputContext}
                 selectedRange={selectedRange}
               />
-              {selectionMode === 'range' && (
+            </div>
+            {selectionMode === 'range' && (
+              <div className="cla-input-wrapper">
                 <DateInput
                   value={selectedRange.end ? parseISO(selectedRange.end) : null}
                   onChange={handleDateChange('end')}
                   field="end"
                   placeholder="End date"
-                  context={{
-                    startDate: dateInputContext.startDate,
-                    endDate: dateInputContext.endDate,
-                    currentField: 'end',
-                  }}
+                  context={dateInputContext}
                   selectedRange={selectedRange}
                 />
-              )}
-            </div>
-
-            <Card.Header className="cla-header">
-              <Button
-                variant="light"
-                onClick={() => moveToMonth("prev")}
-                className="cla-button-nav"
-              >
-                <ChevronLeft size={16} />
-              </Button>
-              <span className="cla-header-title">
-                {`${format(months[2], "MMMM yyyy")} - ${format(addMonths(months[2], validVisibleMonths - 1), "MMMM yyyy")}`}
-              </span>
-              <Button
-                variant="light"
-                onClick={() => moveToMonth("next")}
-                className="cla-button-nav"
-              >
-                <ChevronRight size={16} />
-              </Button>
-            </Card.Header>
-
-            <Card.Body
-              style={{
-                padding: "0.25rem 0.5rem",  // Reduced top/bottom padding even more
-                position: "relative",
-                overflow: "hidden",
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  position: 'relative',
-                  width: '500%',
-                  transform: 'translateX(-40%)',
-                  willChange: 'transform'
-                }}
-              >
-                <div style={{ width: '20%' }}>
-                  <MonthPair
-                    firstMonth={months[0]}
-                    secondMonth={months[1]}
-                    selectedRange={selectedRange}
-                    onSelectionStart={handleSelectionStart}
-                    onSelectionMove={handleSelectionMove}
-                    isSelecting={isSelecting}
-                    visibleMonths={validVisibleMonths}
-                    showMonthHeadings={showMonthHeadings}
-                    showTooltips={showTooltips}
-                  />
-                </div>
-                <div style={{ width: '20%' }}>
-                  <MonthPair
-                    firstMonth={months[1]}
-                    secondMonth={months[2]}
-                    selectedRange={selectedRange}
-                    onSelectionStart={handleSelectionStart}
-                    onSelectionMove={handleSelectionMove}
-                    isSelecting={isSelecting}
-                    visibleMonths={validVisibleMonths}
-                    showMonthHeadings={showMonthHeadings}
-                    showTooltips={showTooltips}
-                  />
-                </div>
-                <div style={{ width: '20%' }}>
-                  <MonthPair
-                    firstMonth={months[2]}
-                    secondMonth={months[3]}
-                    selectedRange={selectedRange}
-                    onSelectionStart={handleSelectionStart}
-                    onSelectionMove={handleSelectionMove}
-                    isSelecting={isSelecting}
-                    visibleMonths={validVisibleMonths}
-                    showMonthHeadings={showMonthHeadings}
-                    showTooltips={showTooltips}
-                  />
-                </div>
-                <div style={{ width: '20%' }}>
-                  <MonthPair
-                    firstMonth={months[3]}
-                    secondMonth={months[4]}
-                    selectedRange={selectedRange}
-                    onSelectionStart={handleSelectionStart}
-                    onSelectionMove={handleSelectionMove}
-                    isSelecting={isSelecting}
-                    visibleMonths={validVisibleMonths}
-                    showMonthHeadings={showMonthHeadings}
-                    showTooltips={showTooltips}
-                  />
-                </div>
               </div>
-            </Card.Body>
+            )}
+          </div>
 
-            <Card.Footer className="cla-card-footer">
-              <Button
-                variant="primary"
-                onClick={handleClear}
-              >
-                Clear
-              </Button>
-              <Button
-                variant="primary"
-                onClick={() => {
-                  setIsOpen(false);
-                  setIsSelecting(false);
-                  setIsOutsideBounds(false);
-                  setInitialDate(null);
-                }}
-                style={{
-                  backgroundColor: 'rgba(226, 228, 238, 0.5)',
-                  color: "#000",
-                  border: '1px solid #979797',
-                }}
-                disabled={Object.keys(validationErrors).length > 0}
-              >
-                Apply
-              </Button>
-            </Card.Footer>
-          </Card>
-          <FloatingIndicator
-            className="floating-indicator"
+          <div className="cla-header">
+            <button className="cla-button-nav" onClick={() => moveToMonth('prev')}>
+              <ChevronLeft size={16} />
+            </button>
+            <span className="cla-header-title">
+              {`${format(months[0], "MMMM yyyy")} - ${format(months[months.length - 1], "MMMM yyyy")}`}
+            </span>
+            <button className="cla-button-nav" onClick={() => moveToMonth('next')}>
+              <ChevronRight size={16} />
+            </button>
+          </div>
+
+          <div className="cla-card-body">
+            <div style={{ display: 'flex' }}>
+              <MonthPair
+                firstMonth={months[0]}
+                secondMonth={months[1]}
+                selectedRange={selectedRange}
+                onSelectionStart={handleSelectionStart}
+                onSelectionMove={handleSelectionMove}
+                isSelecting={isSelecting}
+                visibleMonths={visibleMonths}
+                showMonthHeadings={showMonthHeadings}
+                showTooltips={showTooltips}
+              />
+            </div>
+          </div>
+
+          <div className="cla-card-footer">
+            <Button variant="primary" onClick={handleClear}>
+              Clear
+            </Button>
+          </div>
+
+          <SideChevronIndicator
             outOfBoundsDirection={outOfBoundsDirection}
             isSelecting={isSelecting}
-            mousePosition={mousePosition}
           />
-        </>
+        </div>
       )}
     </div>
   );
