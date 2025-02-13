@@ -7,7 +7,7 @@ function App() {
     <div style={{ padding: '20px' }}>
       <DateRangePicker 
         // Number of months to display (1-6)
-        visibleMonths={2}
+        visibleMonths={3}
         // Show month headings
         showMonthHeadings={true}
         // Single vs range selection

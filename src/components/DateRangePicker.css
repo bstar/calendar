@@ -203,4 +203,28 @@
 .cla-button-primary:disabled {
   opacity: 0.65;
   cursor: not-allowed;
+}
+
+.side-chevron-indicator {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #fff;
+  color: #000;
+  padding: 12px 6px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  z-index: 1100;
+  transition: all 0.2s ease;
+  opacity: 0.95;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+}
+
+.side-chevron-indicator:hover {
+  opacity: 1;
+  background-color: var(--bg-hover);
 } 

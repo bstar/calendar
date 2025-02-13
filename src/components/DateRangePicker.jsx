@@ -1013,7 +1013,7 @@ const DateRangePicker = ({
         className="cla-form-control"
         readOnly
         style={{
-          width: '300px',  // Fixed width to accommodate full date range
+          width: '300px',  // Keep input width independent
           whiteSpace: 'nowrap',
           overflow: 'hidden',
           textOverflow: 'ellipsis'
@@ -1025,7 +1025,7 @@ const DateRangePicker = ({
           ref={containerRef}
           className="cla-card cla-card-popup"
           style={{
-            width: `${400 * Math.min(6, Math.max(1, visibleMonths))}px`,
+            width: visibleMonths === 1 ? '500px' : `${400 * Math.min(6, Math.max(1, visibleMonths))}px`,
             position: 'relative'
           }}
           onMouseDown={e => {
@@ -1075,7 +1075,10 @@ const DateRangePicker = ({
               <ChevronLeft size={16} />
             </button>
             <span className="cla-header-title">
-              {`${format(months[0], "MMMM yyyy")} - ${format(months[months.length - 1], "MMMM yyyy")}`}
+              {visibleMonths === 1 
+                ? format(months[0], "MMMM yyyy")  // Single month display
+                : `${format(months[0], "MMMM yyyy")} - ${format(months[months.length - 1], "MMMM yyyy")}`
+              }
             </span>
             <button className="cla-button-nav" onClick={() => moveToMonth('next')}>
               <ChevronRight size={16} />
@@ -1086,7 +1089,7 @@ const DateRangePicker = ({
             <div style={{ display: 'flex' }}>
               <MonthPair
                 firstMonth={months[0]}
-                secondMonth={months[1]}
+                secondMonth={visibleMonths === 1 ? null : months[1]}
                 selectedRange={selectedRange}
                 onSelectionStart={handleSelectionStart}
                 onSelectionMove={handleSelectionMove}
