@@ -53,19 +53,19 @@ export const SETTINGS = {
       presets: {
         'Default': null,
         'No Border': {
-          border: 'none',
+          border: 'none'
+        },
+        'No Shadow': {
           boxShadow: 'none'
         },
-        'Flat': {
-          border: '1px solid #eee',
-          borderRadius: '0',
-          boxShadow: 'none'
-        },
-        'Heavy Shadow': {
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+        'Shadow': {
+          boxShadow: '0 2px 4px rgba(0,0,0,0.08)'
         },
         'Rounded Corners': {
           borderRadius: '12px'
+        },
+        'Rigid Corners': {
+          borderRadius: '0'
         }
       }
     }

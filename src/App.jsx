@@ -51,12 +51,23 @@ function App() {
       if (presetName === 'Default') {
         newPresets = ['Default'];
       } else {
+        // Remove Default from selection
         newPresets = selectedPresets.filter(p => p !== 'Default');
+        
+        // Handle mutually exclusive presets
+        if (presetName === 'No Shadow' || presetName === 'Shadow') {
+          newPresets = newPresets.filter(p => p !== 'No Shadow' && p !== 'Shadow');
+        }
+        if (presetName === 'Rounded Corners' || presetName === 'Rigid Corners') {
+          newPresets = newPresets.filter(p => p !== 'Rounded Corners' && p !== 'Rigid Corners');
+        }
+        
         if (newPresets.includes(presetName)) {
           newPresets = newPresets.filter(p => p !== presetName);
         } else {
           newPresets.push(presetName);
         }
+        
         if (newPresets.length === 0) newPresets = ['Default'];
       }
 
@@ -93,7 +104,10 @@ function App() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '4px',
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
+                width: '120px',
+                height: '40px',
+                justifyContent: 'center'
               }}
             >
               {selectedPresets.includes(preset) && (
