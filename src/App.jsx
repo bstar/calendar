@@ -364,6 +364,15 @@ function App() {
     }
   };
 
+  const handleExport = () => {
+    const configString = JSON.stringify(settings, null, 2);
+    navigator.clipboard.writeText(configString).then(() => {
+      alert('Configuration copied to clipboard!');
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+    });
+  };
+
   return (
     <div style={{ padding: '20px', maxWidth: '1800px', margin: '0 auto' }}>
       {/* Header */}
@@ -447,6 +456,26 @@ function App() {
 
           {/* Tab Content */}
           {renderTabContent()}
+
+          {/* Export Button */}
+          <button
+            onClick={handleExport}
+            style={{
+              marginTop: '20px',
+              padding: '10px 20px',
+              backgroundColor: '#0366d6',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontSize: '16px',
+              fontWeight: 'bold',
+              transition: 'background-color 0.2s ease',
+              width: '100%'
+            }}
+          >
+            Export Configuration
+          </button>
         </div>
 
         {/* Preview and Documentation Column */}
