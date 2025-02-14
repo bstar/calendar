@@ -229,7 +229,8 @@ function App() {
                   cursor: 'pointer',
                   color: '#666',
                   fontSize: '12px',
-                  opacity: showMeta ? 1 : 0.6
+                  opacity: showMeta ? 1 : 0.6,
+                  outline: 'none'
                 }}
               >
                 ⓘ
