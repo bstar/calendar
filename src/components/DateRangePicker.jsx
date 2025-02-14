@@ -1076,6 +1076,7 @@ const DateRangePicker = ({
           style={{
             width: visibleMonths === 1 ? `${singleMonthWidth}px` : `${400 * Math.min(6, Math.max(1, visibleMonths))}px`,
             position: displayMode === 'popup' ? 'relative' : 'static',
+            padding: 0,
             ...DEFAULT_CONTAINER_STYLES,
             ...containerStyle
           }}
@@ -1088,7 +1089,7 @@ const DateRangePicker = ({
         >
           {showHeader && (
             <>
-              <div className="cla-input-container">
+              <div className="cla-input-container" style={{ padding: '16px' }}>
                 <div className="cla-input-wrapper">
                   <DateInput
                     value={selectedRange.start ? parseISO(selectedRange.start) : null}
@@ -1113,7 +1114,7 @@ const DateRangePicker = ({
                 )}
               </div>
 
-              <div className="cla-header">
+              <div className="cla-header" style={{ padding: '12px 16px' }}>
                 <button className="cla-button-nav" onClick={() => moveToMonth('prev')}>
                   <ChevronLeft size={16} />
                 </button>
@@ -1130,7 +1131,7 @@ const DateRangePicker = ({
             </>
           )}
 
-          <div className="cla-card-body">
+          <div className="cla-card-body" style={{ padding: '16px' }}>
             <div style={{ display: 'flex' }}>
               <MonthPair
                 firstMonth={months[0]}
@@ -1147,7 +1148,7 @@ const DateRangePicker = ({
           </div>
 
           {showFooter && (
-            <div className="cla-card-footer">
+            <div className="cla-card-footer" style={{ padding: '16px' }}>
               <Button
                 variant="primary"
                 onClick={handleClear}

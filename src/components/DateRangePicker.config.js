@@ -83,7 +83,7 @@ export const SETTINGS = {
       type: 'boolean',
       label: 'Show Tooltips',
       description: 'Show helpful tooltips on hover',
-      default: true
+      default: false
     },
     header: {
       id: 'showHeader',
