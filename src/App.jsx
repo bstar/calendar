@@ -10,6 +10,8 @@ function App() {
     isOpen: true  // Force calendar to be open on initial load
   });
 
+  const [activeTab, setActiveTab] = useState('core');
+
   const handleChange = (prop) => (event) => {
     const value = event.target.type === 'checkbox' 
       ? event.target.checked 
@@ -334,16 +336,39 @@ function App() {
     );
   };
 
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'core':
+        return (
+          <div style={{ display: 'grid', gap: '12px' }}>
+            {Object.entries(SETTINGS.core).map(([key, config]) => (
+              <SettingControl key={key} config={config} />
+            ))}
+          </div>
+        );
+      case 'features':
+        return (
+          <div style={{ display: 'grid', gap: '12px' }}>
+            {Object.entries(SETTINGS.features).map(([key, config]) => (
+              <SettingControl key={key} config={config} />
+            ))}
+          </div>
+        );
+      case 'data':
+        return <div>Data content will be added here later.</div>;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div style={{ padding: '20px', maxWidth: '1800px', margin: '0 auto' }}>
-      {/* Split into two columns */}
       <div style={{ 
         display: 'grid',
         gridTemplateColumns: '400px 1fr',
         gap: '24px',
         alignItems: 'start'
       }}>
-        {/* Controls Column */}
         <div style={{ 
           padding: '20px',
           border: '1px solid #dee2e6',
@@ -352,25 +377,33 @@ function App() {
           position: 'sticky',
           top: '20px'
         }}>
-          {/* Core Settings */}
-          <div style={{ marginBottom: '24px' }}>
-            <h5 style={{ marginBottom: '16px', color: '#666' }}>Core Settings</h5>
-            <div style={{ display: 'grid', gap: '12px' }}>
-              {Object.entries(SETTINGS.core).map(([key, config]) => (
-                <SettingControl key={key} config={config} />
-              ))}
-            </div>
+          {/* Tabs */}
+          <div style={{ display: 'flex', marginBottom: '16px', borderBottom: '1px solid #dee2e6' }}>
+            {['core', 'features', 'data'].map(tab => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                style={{
+                  padding: '10px 20px',
+                  border: 'none',
+                  borderBottom: activeTab === tab ? '2px solid #0366d6' : '2px solid transparent',
+                  backgroundColor: 'transparent',
+                  color: activeTab === tab ? '#0366d6' : '#666',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: activeTab === tab ? 'bold' : 'normal',
+                  transition: 'color 0.2s ease',
+                  marginRight: '8px',
+                  outline: 'none'  // Remove default focus outline
+                }}
+              >
+                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </button>
+            ))}
           </div>
 
-          {/* Features */}
-          <div>
-            <h5 style={{ marginBottom: '16px', color: '#666' }}>Features</h5>
-            <div style={{ display: 'grid', gap: '12px' }}>
-              {Object.entries(SETTINGS.features).map(([key, config]) => (
-                <SettingControl key={key} config={config} />
-              ))}
-            </div>
-          </div>
+          {/* Tab Content */}
+          {renderTabContent()}
         </div>
 
         {/* Preview and Documentation Column */}
@@ -395,7 +428,6 @@ function App() {
             backgroundColor: '#fff'
           }}>
             <h2 style={{ marginBottom: '24px', color: '#333', fontSize: '20px' }}>Documentation</h2>
-
             {/* Documentation sections in a horizontal layout */}
             <div style={{ display: 'grid', gap: '24px' }}>
               {/* Core Props */}
