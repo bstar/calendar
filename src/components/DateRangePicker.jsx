@@ -748,10 +748,16 @@ const SideChevronIndicator = ({ outOfBoundsDirection, isSelecting }) => {
 };
 
 const DateRangePicker = ({ 
-  visibleMonths = 2,
-  showMonthHeadings = false,
-  selectionMode = 'range',
-  showTooltips = true
+  visibleMonths = 2,            // ✓ default: 2
+  showMonthHeadings = false,    // ✗ App shows true, actual default is false
+  selectionMode = 'range',      // ✓ default: 'range'
+  showTooltips = true,         // ✗ App shows false, actual default is true
+  showHeader = true,            // ✓ default: true
+  closeOnClickAway = true,      // ✓ default: true
+  showSubmitButton = false,     // ✓ default: false
+  showFooter = true,            // ✓ default: true
+  singleMonthWidth = 500,       // ✓ default: 500
+  enableOutOfBoundsScroll = true // ✓ default: true
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedRange, setSelectedRange] = useState({ start: null, end: null });
@@ -796,8 +802,10 @@ const DateRangePicker = ({
     };
   }, []);
 
-  // Add back the continuous month advancement effect
+  // Add back the continuous month advancement effect with enableOutOfBoundsScroll check
   useEffect(() => {
+    if (!enableOutOfBoundsScroll) return () => {};
+
     const shouldAdvance = isSelecting && outOfBoundsDirection && moveToMonthRef.current;
     if (!shouldAdvance) return () => {};
 
@@ -815,7 +823,7 @@ const DateRangePicker = ({
       clearTimeout(initialAdvance);
       clearInterval(continuousAdvance);
     };
-  }, [isSelecting, outOfBoundsDirection]);
+  }, [isSelecting, outOfBoundsDirection, enableOutOfBoundsScroll]);
 
   // Simple month navigation
   const moveToMonth = useCallback((direction) => {
@@ -826,12 +834,12 @@ const DateRangePicker = ({
   moveToMonthRef.current = moveToMonth;
 
   const handleClickOutside = useCallback(() => {
-    if (isOpen) {
+    if (isOpen && closeOnClickAway) {
       setIsOpen(false);
       setIsSelecting(false);
       setInitialDate(null);
     }
-  }, [isOpen]);
+  }, [isOpen, closeOnClickAway]);
 
   useClickOutside(containerRef, handleClickOutside);
 
@@ -994,6 +1002,12 @@ const DateRangePicker = ({
     setCurrentMonth(currentDate);
   }, []);
 
+  const handleSubmit = useCallback(() => {
+    setIsOpen(false);
+    setIsSelecting(false);
+    setInitialDate(null);
+  }, []);
+
   const getDisplayText = useCallback(() => {
     const { start, end } = selectedRange;
     if (!start) return "Select date";
@@ -1016,7 +1030,7 @@ const DateRangePicker = ({
         className="cla-form-control"
         readOnly
         style={{
-          width: '300px',  // Keep input width independent
+          width: '300px',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
           textOverflow: 'ellipsis'
@@ -1028,65 +1042,71 @@ const DateRangePicker = ({
           ref={containerRef}
           className="cla-card cla-card-popup"
           style={{
-            width: visibleMonths === 1 ? '500px' : `${400 * Math.min(6, Math.max(1, visibleMonths))}px`,
+            width: visibleMonths === 1 ? `${singleMonthWidth}px` : `${400 * Math.min(6, Math.max(1, visibleMonths))}px`,
             position: 'relative'
           }}
-          onMouseDown={e => {
-            e.stopPropagation();
-            handleMouseDown(e);
-          }}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={e => {
-            const containerRect = containerRef.current.getBoundingClientRect();
-            const { clientX: mouseX } = e;
+          {...(enableOutOfBoundsScroll ? {
+            onMouseDown: e => {
+              e.stopPropagation();
+              handleMouseDown(e);
+            },
+            onMouseMove: handleMouseMove,
+            onMouseUp: handleMouseUp,
+            onMouseLeave: e => {
+              const containerRect = containerRef.current.getBoundingClientRect();
+              const { clientX: mouseX } = e;
 
-            if (mouseX < containerRect.left) {
-              setOutOfBoundsDirection('prev');
-            } else if (mouseX > containerRect.right) {
-              setOutOfBoundsDirection('next');
-            }
-          }}
-        >
-          <div className="cla-input-container">
-            <div className="cla-input-wrapper">
-              <DateInput
-                value={selectedRange.start ? parseISO(selectedRange.start) : null}
-                onChange={handleDateChange('start')}
-                field="start"
-                placeholder={selectionMode === 'single' ? "Select date" : "Start date"}
-                context={dateInputContext}
-                selectedRange={selectedRange}
-              />
-            </div>
-            {selectionMode === 'range' && (
-              <div className="cla-input-wrapper">
-                <DateInput
-                  value={selectedRange.end ? parseISO(selectedRange.end) : null}
-                  onChange={handleDateChange('end')}
-                  field="end"
-                  placeholder="End date"
-                  context={dateInputContext}
-                  selectedRange={selectedRange}
-                />
-              </div>
-            )}
-          </div>
-
-          <div className="cla-header">
-            <button className="cla-button-nav" onClick={() => moveToMonth('prev')}>
-              <ChevronLeft size={16} />
-            </button>
-            <span className="cla-header-title">
-              {visibleMonths === 1 
-                ? format(months[0], "MMMM yyyy")  // Single month display
-                : `${format(months[0], "MMMM yyyy")} - ${format(months[months.length - 1], "MMMM yyyy")}`
+              if (mouseX < containerRect.left) {
+                setOutOfBoundsDirection('prev');
+              } else if (mouseX > containerRect.right) {
+                setOutOfBoundsDirection('next');
               }
-            </span>
-            <button className="cla-button-nav" onClick={() => moveToMonth('next')}>
-              <ChevronRight size={16} />
-            </button>
-          </div>
+            }
+          } : {})}
+        >
+          {showHeader && (
+            <>
+              <div className="cla-input-container">
+                <div className="cla-input-wrapper">
+                  <DateInput
+                    value={selectedRange.start ? parseISO(selectedRange.start) : null}
+                    onChange={handleDateChange('start')}
+                    field="start"
+                    placeholder={selectionMode === 'single' ? "Select date" : "Start date"}
+                    context={dateInputContext}
+                    selectedRange={selectedRange}
+                  />
+                </div>
+                {selectionMode === 'range' && (
+                  <div className="cla-input-wrapper">
+                    <DateInput
+                      value={selectedRange.end ? parseISO(selectedRange.end) : null}
+                      onChange={handleDateChange('end')}
+                      field="end"
+                      placeholder="End date"
+                      context={dateInputContext}
+                      selectedRange={selectedRange}
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="cla-header">
+                <button className="cla-button-nav" onClick={() => moveToMonth('prev')}>
+                  <ChevronLeft size={16} />
+                </button>
+                <span className="cla-header-title">
+                  {visibleMonths === 1 
+                    ? format(months[0], "MMMM yyyy")
+                    : `${format(months[0], "MMMM yyyy")} - ${format(months[months.length - 1], "MMMM yyyy")}`
+                  }
+                </span>
+                <button className="cla-button-nav" onClick={() => moveToMonth('next')}>
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+            </>
+          )}
 
           <div className="cla-card-body">
             <div style={{ display: 'flex' }}>
@@ -1104,16 +1124,32 @@ const DateRangePicker = ({
             </div>
           </div>
 
-          <div className="cla-card-footer">
-            <Button variant="primary" onClick={handleClear}>
-              Clear
-            </Button>
-          </div>
+          {showFooter && (
+            <div className="cla-card-footer">
+              <Button
+                variant="primary"
+                onClick={handleClear}
+              >
+                Clear
+              </Button>
+              {showSubmitButton && (
+                <Button
+                  variant="primary"
+                  onClick={handleSubmit}
+                  style={{ marginLeft: '8px' }}
+                >
+                  Submit
+                </Button>
+              )}
+            </div>
+          )}
 
-          <SideChevronIndicator
-            outOfBoundsDirection={outOfBoundsDirection}
-            isSelecting={isSelecting}
-          />
+          {enableOutOfBoundsScroll && (
+            <SideChevronIndicator
+              outOfBoundsDirection={outOfBoundsDirection}
+              isSelecting={isSelecting}
+            />
+          )}
         </div>
       )}
     </div>

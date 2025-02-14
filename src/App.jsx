@@ -5,10 +5,16 @@ import DateRangePicker from './components/DateRangePicker';
 
 function App() {
   const [settings, setSettings] = useState({
-    visibleMonths: 2,
-    showMonthHeadings: true,
-    selectionMode: 'range',
-    showTooltips: false
+    visibleMonths: 2,            // default: 2
+    showMonthHeadings: true,     // overridden from default: false
+    selectionMode: 'range',      // default: 'range'
+    showTooltips: false,         // overridden from default: true
+    showHeader: true,            // default: true
+    closeOnClickAway: false,      // default: true
+    showSubmitButton: false,     // default: false
+    showFooter: true,            // default: true
+    singleMonthWidth: 500,       // default: 500
+    enableOutOfBoundsScroll: true // default: true
   });
 
   const handleChange = (prop) => (event) => {
@@ -91,6 +97,80 @@ function App() {
               Show Tooltips
             </label>
           </div>
+
+          <div>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <input
+                type="checkbox"
+                checked={settings.showHeader}
+                onChange={handleChange('showHeader')}
+              />
+              Show Header
+            </label>
+          </div>
+
+          <div>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <input
+                type="checkbox"
+                checked={settings.closeOnClickAway}
+                onChange={handleChange('closeOnClickAway')}
+              />
+              Close on Click Away
+            </label>
+          </div>
+
+          <div>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <input
+                type="checkbox"
+                checked={settings.showSubmitButton}
+                onChange={handleChange('showSubmitButton')}
+              />
+              Show Submit Button
+            </label>
+          </div>
+
+          <div>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <input
+                type="checkbox"
+                checked={settings.showFooter}
+                onChange={handleChange('showFooter')}
+              />
+              Show Footer
+            </label>
+          </div>
+
+          <div>
+            <label style={{ display: 'block', marginBottom: '8px' }}>
+              Single Month Width:
+              <input
+                type="number"
+                min="300"
+                max="800"
+                value={settings.singleMonthWidth}
+                onChange={handleChange('singleMonthWidth')}
+                style={{ 
+                  marginLeft: '8px',
+                  padding: '4px 8px',
+                  borderRadius: '4px',
+                  border: '1px solid #dee2e6'
+                }}
+              />
+            </label>
+          </div>
+
+          <div>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <input
+                type="checkbox"
+                checked={settings.enableOutOfBoundsScroll}
+                onChange={handleChange('enableOutOfBoundsScroll')}
+              />
+              Enable Out of Bounds Scroll
+            </label>
+          </div>
         </div>
       </div>
 
@@ -99,6 +179,12 @@ function App() {
         showMonthHeadings={settings.showMonthHeadings}
         selectionMode={settings.selectionMode}
         showTooltips={settings.showTooltips}
+        showHeader={settings.showHeader}
+        closeOnClickAway={settings.closeOnClickAway}
+        showSubmitButton={settings.showSubmitButton}
+        showFooter={settings.showFooter}
+        singleMonthWidth={settings.singleMonthWidth}
+        enableOutOfBoundsScroll={settings.enableOutOfBoundsScroll}
       />
     </div>
   );
