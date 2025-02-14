@@ -747,6 +747,52 @@ const SideChevronIndicator = ({ outOfBoundsDirection, isSelecting }) => {
   );
 };
 
+// Define feature configuration with defaults and descriptions
+const FEATURES = {
+  monthHeadings: {
+    id: 'showMonthHeadings',
+    default: false,
+    label: 'Show Month Headings',
+    description: 'Display month names above each calendar grid'
+  },
+  tooltips: {
+    id: 'showTooltips',
+    default: true,
+    label: 'Show Tooltips',
+    description: 'Show helpful tooltips on hover'
+  },
+  header: {
+    id: 'showHeader',
+    default: true,
+    label: 'Show Header',
+    description: 'Display the header with month navigation'
+  },
+  clickAway: {
+    id: 'closeOnClickAway',
+    default: true,
+    label: 'Close on Click Away',
+    description: 'Close calendar when clicking outside'
+  },
+  submitButton: {
+    id: 'showSubmitButton',
+    default: false,
+    label: 'Show Submit Button',
+    description: 'Display a submit button in footer'
+  },
+  footer: {
+    id: 'showFooter',
+    default: true,
+    label: 'Show Footer',
+    description: 'Display the footer with actions'
+  },
+  outOfBoundsScroll: {
+    id: 'enableOutOfBoundsScroll',
+    default: true,
+    label: 'Enable Out of Bounds Scroll',
+    description: 'Allow month scrolling when dragging outside calendar'
+  }
+};
+
 const DateRangePicker = ({ 
   visibleMonths = 2,            // ✓ default: 2
   showMonthHeadings = false,    // ✗ App shows true, actual default is false
