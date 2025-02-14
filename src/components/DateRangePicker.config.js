@@ -1,5 +1,17 @@
 export const SETTINGS = {
   core: {
+    displayMode: {
+      id: 'displayMode',
+      type: 'select',
+      label: 'Display Mode',
+      description: 'Show calendar as embedded or popup',
+      default: 'popup',
+      options: [
+        { value: 'popup', label: 'Popup' },
+        { value: 'embedded', label: 'Embedded' }
+      ],
+      width: '120px'
+    },
     visibleMonths: {
       id: 'visibleMonths',
       type: 'number',
@@ -31,6 +43,41 @@ export const SETTINGS = {
       min: 300,
       max: 800,
       width: '100px'
+    },
+    containerStyle: {
+      id: 'containerStyle',
+      type: 'style-editor',
+      label: 'Container Styles',
+      description: 'Override container styles (border, shadow, etc)',
+      default: null,
+      presets: {
+        'Default': null,
+        'No Border': {
+          border: 'none',
+          boxShadow: 'none'
+        },
+        'Flat': {
+          border: '1px solid #eee',
+          borderRadius: '0',
+          boxShadow: 'none'
+        },
+        'Heavy Shadow': {
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+        },
+        'Rounded Corners': {
+          borderRadius: '12px'
+        },
+        'Dark Mode': {
+          backgroundColor: '#1a1a1a',
+          border: '1px solid #333',
+          color: '#fff'
+        },
+        'Glass Effect': {
+          backgroundColor: 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(8px)',
+          border: '1px solid rgba(255, 255, 255, 0.3)'
+        }
+      }
     }
   },
   features: {
@@ -86,14 +133,42 @@ export const SETTINGS = {
   }
 };
 
-// Helper to get default settings
-export const getDefaultSettings = () => {
+// Add display mode constraints
+export const DISPLAY_MODE_CONSTRAINTS = {
+  embedded: {
+    // Features that should be forced to specific values in embedded mode
+    closeOnClickAway: false,
+    enableOutOfBoundsScroll: false,
+    showHeader: true, // Always show header in embedded mode
+  }
+};
+
+// Update getDefaultSettings to handle mode-specific defaults
+export const getDefaultSettings = (displayMode = 'popup') => {
   const defaults = {};
+  
+  // Set base defaults
   Object.values(SETTINGS.core).forEach(setting => {
     defaults[setting.id] = setting.default;
   });
   Object.values(SETTINGS.features).forEach(feature => {
     defaults[feature.id] = feature.default;
   });
+
+  // Apply mode-specific constraints
+  if (displayMode === 'embedded') {
+    Object.entries(DISPLAY_MODE_CONSTRAINTS.embedded).forEach(([key, value]) => {
+      defaults[key] = value;
+    });
+  }
+
   return defaults;
+};
+
+// Default container styles that can be overridden
+export const DEFAULT_CONTAINER_STYLES = {
+  border: '1px solid #dee2e6',
+  borderRadius: '8px',
+  backgroundColor: '#fff',
+  boxShadow: '0 2px 4px rgba(0,0,0,0.08)'
 }; 

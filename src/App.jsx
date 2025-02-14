@@ -2,7 +2,7 @@ import { useState } from 'react';
 import './bootstrap.min.css'
 
 import DateRangePicker from './components/DateRangePicker';
-import { SETTINGS, getDefaultSettings } from './components/DateRangePicker.config';
+import { SETTINGS, getDefaultSettings, DISPLAY_MODE_CONSTRAINTS } from './components/DateRangePicker.config';
 
 function App() {
   const [settings, setSettings] = useState(getDefaultSettings());
@@ -17,17 +17,146 @@ function App() {
     setSettings(prev => ({ ...prev, [prop]: value }));
   };
 
+  const StyleEditor = ({ config, value, onChange }) => {
+    const [isEditing, setIsEditing] = useState(false);
+    const [styleText, setStyleText] = useState(
+      value ? JSON.stringify(value, null, 2) : ''
+    );
+
+    const handlePresetChange = (e) => {
+      const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+      
+      // Combine all selected presets
+      const combinedStyles = selectedOptions.reduce((styles, presetName) => {
+        if (presetName === 'Default') return null;
+        return {
+          ...styles,
+          ...config.presets[presetName]
+        };
+      }, {});
+
+      onChange({ target: { value: combinedStyles } });
+      setStyleText(combinedStyles ? JSON.stringify(combinedStyles, null, 2) : '');
+    };
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <select
+            multiple
+            size={4}
+            onChange={handlePresetChange}
+            style={{ 
+              padding: '4px 8px',
+              borderRadius: '4px',
+              border: '1px solid #dee2e6',
+              width: '100%'
+            }}
+          >
+            {Object.keys(config.presets).map(preset => (
+              <option 
+                key={preset} 
+                value={preset}
+                style={{
+                  padding: '4px 8px',
+                  cursor: 'pointer'
+                }}
+              >
+                {preset}
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={() => setIsEditing(!isEditing)}
+            style={{
+              padding: '4px 8px',
+              borderRadius: '4px',
+              border: '1px solid #dee2e6',
+              backgroundColor: '#fff',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            {isEditing ? 'Cancel' : 'Edit JSON'}
+          </button>
+        </div>
+
+        {isEditing && (
+          <>
+            <textarea
+              value={styleText}
+              onChange={(e) => setStyleText(e.target.value)}
+              placeholder="Enter styles in JSON format..."
+              style={{
+                width: '100%',
+                height: '100px',
+                padding: '8px',
+                borderRadius: '4px',
+                border: '1px solid #dee2e6',
+                fontFamily: 'monospace',
+                fontSize: '12px'
+              }}
+            />
+            <button
+              onClick={() => {
+                try {
+                  const styleObj = styleText ? JSON.parse(styleText) : null;
+                  onChange({ target: { value: styleObj } });
+                  setIsEditing(false);
+                } catch (e) {
+                  alert('Invalid style format. Please use valid JSON.');
+                }
+              }}
+              style={{
+                padding: '4px 8px',
+                borderRadius: '4px',
+                border: '1px solid #dee2e6',
+                backgroundColor: '#fff',
+                cursor: 'pointer'
+              }}
+            >
+              Apply Styles
+            </button>
+          </>
+        )}
+
+        {value && !isEditing && (
+          <div style={{ 
+            fontSize: '12px', 
+            fontFamily: 'monospace',
+            padding: '8px',
+            backgroundColor: '#f8f9fa',
+            borderRadius: '4px',
+            border: '1px solid #eee'
+          }}>
+            {JSON.stringify(value, null, 2)}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const SettingControl = ({ config }) => {
     const isOverridden = settings[config.id] !== config.default;
     const [showMeta, setShowMeta] = useState(false);
+
+    // Check if control should be disabled based on display mode
+    const isDisabled = settings.displayMode === 'embedded' && 
+      DISPLAY_MODE_CONSTRAINTS.embedded.hasOwnProperty(config.id);
+
+    // Get constraint message if applicable
+    const constraintMessage = isDisabled ? 
+      `This feature is ${DISPLAY_MODE_CONSTRAINTS.embedded[config.id] ? 'enabled' : 'disabled'} in embedded mode` : 
+      null;
 
     return (
       <div style={{ 
         padding: '12px',
         border: '1px solid #eee',
         borderRadius: '6px',
-        backgroundColor: isOverridden ? '#fff' : '#fafafa',
-        width: '100%'
+        backgroundColor: isDisabled ? '#f5f5f5' : isOverridden ? '#fff' : '#fafafa',
+        width: '100%',
+        opacity: isDisabled ? 0.7 : 1
       }}>
         {/* Control Header */}
         <div style={{ marginBottom: '8px' }}>
@@ -90,9 +219,26 @@ function App() {
           </div>
         )}
 
+        {constraintMessage && (
+          <div style={{ 
+            fontSize: '12px', 
+            color: '#666', 
+            fontStyle: 'italic',
+            marginTop: '4px' 
+          }}>
+            {constraintMessage}
+          </div>
+        )}
+
         {/* Control Input */}
-        <div>
-          {config.type === 'boolean' && (
+        <div style={{ pointerEvents: isDisabled ? 'none' : 'auto' }}>
+          {config.type === 'style-editor' ? (
+            <StyleEditor
+              config={config}
+              value={settings[config.id]}
+              onChange={handleChange(config.id)}
+            />
+          ) : config.type === 'boolean' ? (
             <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
               <input
                 type="checkbox"
@@ -101,8 +247,7 @@ function App() {
               />
               <span style={{ fontSize: '14px' }}>Enable</span>
             </label>
-          )}
-          {config.type === 'number' && (
+          ) : config.type === 'number' ? (
             <input
               type="number"
               min={config.min}
@@ -116,8 +261,7 @@ function App() {
                 border: '1px solid #dee2e6'
               }}
             />
-          )}
-          {config.type === 'select' && (
+          ) : config.type === 'select' ? (
             <select
               value={settings[config.id]}
               onChange={handleChange(config.id)}
@@ -132,7 +276,7 @@ function App() {
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
               ))}
             </select>
-          )}
+          ) : null}
         </div>
       </div>
     );

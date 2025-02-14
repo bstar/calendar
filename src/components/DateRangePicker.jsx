@@ -17,6 +17,7 @@ import {
 } from "date-fns";
 import './DateRangePicker.css';
 import PropTypes from "prop-types";
+import { DEFAULT_CONTAINER_STYLES } from './DateRangePicker.config';
 
 // Custom components
 const Card = React.forwardRef(({ children, className, ...props }, ref) => (
@@ -747,65 +748,21 @@ const SideChevronIndicator = ({ outOfBoundsDirection, isSelecting }) => {
   );
 };
 
-// Define feature configuration with defaults and descriptions
-const FEATURES = {
-  monthHeadings: {
-    id: 'showMonthHeadings',
-    default: false,
-    label: 'Show Month Headings',
-    description: 'Display month names above each calendar grid'
-  },
-  tooltips: {
-    id: 'showTooltips',
-    default: true,
-    label: 'Show Tooltips',
-    description: 'Show helpful tooltips on hover'
-  },
-  header: {
-    id: 'showHeader',
-    default: true,
-    label: 'Show Header',
-    description: 'Display the header with month navigation'
-  },
-  clickAway: {
-    id: 'closeOnClickAway',
-    default: true,
-    label: 'Close on Click Away',
-    description: 'Close calendar when clicking outside'
-  },
-  submitButton: {
-    id: 'showSubmitButton',
-    default: false,
-    label: 'Show Submit Button',
-    description: 'Display a submit button in footer'
-  },
-  footer: {
-    id: 'showFooter',
-    default: true,
-    label: 'Show Footer',
-    description: 'Display the footer with actions'
-  },
-  outOfBoundsScroll: {
-    id: 'enableOutOfBoundsScroll',
-    default: true,
-    label: 'Enable Out of Bounds Scroll',
-    description: 'Allow month scrolling when dragging outside calendar'
-  }
-};
-
 const DateRangePicker = ({ 
-  visibleMonths = 2,            // ✓ default: 2
-  showMonthHeadings = false,    // ✗ App shows true, actual default is false
-  selectionMode = 'range',      // ✓ default: 'range'
-  showTooltips = true,         // ✗ App shows false, actual default is true
-  showHeader = true,            // ✓ default: true
-  closeOnClickAway = true,      // ✓ default: true
-  showSubmitButton = false,     // ✓ default: false
-  showFooter = true,            // ✓ default: true
-  singleMonthWidth = 500,       // ✓ default: 500
-  enableOutOfBoundsScroll = true // ✓ default: true
+  displayMode = 'popup',
+  containerStyle = null,
+  visibleMonths = 2,
+  showMonthHeadings = false,
+  selectionMode = 'range',
+  showTooltips = true,
+  showHeader = true,
+  closeOnClickAway = true,
+  showSubmitButton = false,
+  showFooter = true,
+  singleMonthWidth = 500,
+  enableOutOfBoundsScroll = true
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(displayMode === 'embedded');
   const [selectedRange, setSelectedRange] = useState({ start: null, end: null });
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date()));
   const [isSelecting, setIsSelecting] = useState(false);
@@ -1067,47 +1024,65 @@ const DateRangePicker = ({
       : `${format(parseISO(start), "MMM dd, yyyy")} - ${format(parseISO(end), "MMM dd, yyyy")}`;
   }, [selectedRange, selectionMode]);
 
+  // Fix the props reference in settings
+  const settings = {
+    displayMode,
+    visibleMonths,
+    showMonthHeadings,
+    selectionMode,
+    showTooltips,
+    showHeader,
+    closeOnClickAway,
+    showSubmitButton,
+    showFooter,
+    singleMonthWidth,
+    enableOutOfBoundsScroll
+  };
+
+  const handleMouseLeave = useCallback((e) => {
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const { clientX: mouseX } = e;
+
+    if (mouseX < containerRect.left) {
+      setOutOfBoundsDirection('prev');
+    } else if (mouseX > containerRect.right) {
+      setOutOfBoundsDirection('next');
+    }
+  }, []);
+
   return (
     <div className="cla-calendar" style={{ width: 'fit-content' }}>
-      <input
-        type="text"
-        value={getDisplayText()}
-        onClick={() => setIsOpen(true)}
-        className="cla-form-control"
-        readOnly
-        style={{
-          width: '300px',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis'
-        }}
-      />
+      {displayMode === 'popup' && (
+        <input
+          type="text"
+          value={getDisplayText()}
+          onClick={() => setIsOpen(true)}
+          className="cla-form-control"
+          readOnly
+          style={{
+            width: '300px',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
+          }}
+        />
+      )}
 
-      {isOpen && (
+      {(isOpen || displayMode === 'embedded') && (
         <div 
           ref={containerRef}
-          className="cla-card cla-card-popup"
+          className={`cla-card ${displayMode === 'popup' ? 'cla-card-popup' : ''}`}
           style={{
             width: visibleMonths === 1 ? `${singleMonthWidth}px` : `${400 * Math.min(6, Math.max(1, visibleMonths))}px`,
-            position: 'relative'
+            position: displayMode === 'popup' ? 'relative' : 'static',
+            ...DEFAULT_CONTAINER_STYLES,
+            ...containerStyle
           }}
-          {...(enableOutOfBoundsScroll ? {
-            onMouseDown: e => {
-              e.stopPropagation();
-              handleMouseDown(e);
-            },
+          {...(settings.enableOutOfBoundsScroll ? {
+            onMouseDown: handleMouseDown,
             onMouseMove: handleMouseMove,
             onMouseUp: handleMouseUp,
-            onMouseLeave: e => {
-              const containerRect = containerRef.current.getBoundingClientRect();
-              const { clientX: mouseX } = e;
-
-              if (mouseX < containerRect.left) {
-                setOutOfBoundsDirection('prev');
-              } else if (mouseX > containerRect.right) {
-                setOutOfBoundsDirection('next');
-              }
-            }
+            onMouseLeave: handleMouseLeave
           } : {})}
         >
           {showHeader && (
