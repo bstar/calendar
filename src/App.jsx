@@ -23,6 +23,23 @@ function App() {
       value ? JSON.stringify(value, null, 2) : ''
     );
 
+    // Determine which presets are currently active by comparing their styles
+    const getActivePresets = () => {
+      if (!value) return ['Default'];
+      
+      return Object.entries(config.presets)
+        .filter(([name, presetStyles]) => {
+          if (name === 'Default') return false;
+          if (!presetStyles) return false;
+          
+          // Check if all styles from this preset are present in current value
+          return Object.entries(presetStyles).every(([key, val]) => 
+            value[key] === val
+          );
+        })
+        .map(([name]) => name);
+    };
+
     const handlePresetChange = (e) => {
       const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
       
@@ -39,12 +56,15 @@ function App() {
       setStyleText(combinedStyles ? JSON.stringify(combinedStyles, null, 2) : '');
     };
 
+    const activePresets = getActivePresets();
+
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
           <select
             multiple
             size={4}
+            value={activePresets}
             onChange={handlePresetChange}
             style={{ 
               padding: '4px 8px',
@@ -59,10 +79,12 @@ function App() {
                 value={preset}
                 style={{
                   padding: '4px 8px',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  backgroundColor: activePresets.includes(preset) ? '#f0f7ff' : undefined
                 }}
               >
                 {preset}
+                {activePresets.includes(preset) && ' ✓'}
               </option>
             ))}
           </select>
@@ -74,7 +96,8 @@ function App() {
               border: '1px solid #dee2e6',
               backgroundColor: '#fff',
               cursor: 'pointer',
-              whiteSpace: 'nowrap'
+              whiteSpace: 'nowrap',
+              height: 'fit-content'
             }}
           >
             {isEditing ? 'Cancel' : 'Edit JSON'}
@@ -322,6 +345,165 @@ function App() {
       </div>
 
       <DateRangePicker {...settings} />
+
+      {/* Documentation */}
+      <div style={{ marginTop: '40px', padding: '20px' }}>
+        <h2 style={{ marginBottom: '24px', color: '#333' }}>Documentation</h2>
+
+        {/* Core Props */}
+        <div style={{ marginBottom: '32px' }}>
+          <h3 style={{ 
+            marginBottom: '16px', 
+            color: '#444',
+            paddingBottom: '8px',
+            borderBottom: '1px solid #eee'
+          }}>
+            Core Properties
+          </h3>
+          <table style={{ 
+            width: '100%', 
+            borderCollapse: 'collapse',
+            fontSize: '14px'
+          }}>
+            <thead>
+              <tr style={{ backgroundColor: '#f8f9fa' }}>
+                <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #dee2e6' }}>Property</th>
+                <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #dee2e6' }}>Type</th>
+                <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #dee2e6' }}>Default</th>
+                <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #dee2e6' }}>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(SETTINGS.core).map(([key, config]) => (
+                <tr key={key} style={{ borderBottom: '1px solid #eee' }}>
+                  <td style={{ padding: '12px', color: '#0366d6' }}>{config.id}</td>
+                  <td style={{ padding: '12px', fontFamily: 'monospace', color: '#666' }}>
+                    {config.type === 'style-editor' ? 'object' : config.type}
+                  </td>
+                  <td style={{ padding: '12px', fontFamily: 'monospace', color: '#666' }}>
+                    {config.type === 'select' 
+                      ? config.default
+                      : String(config.default)}
+                  </td>
+                  <td style={{ padding: '12px' }}>
+                    {config.description}
+                    {config.type === 'select' && (
+                      <div style={{ marginTop: '4px', color: '#666' }}>
+                        Options: {config.options?.map(opt => opt.value).join(' | ')}
+                      </div>
+                    )}
+                    {config.type === 'number' && (
+                      <div style={{ marginTop: '4px', color: '#666' }}>
+                        Range: {config.min} - {config.max}
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Features */}
+        <div style={{ marginBottom: '32px' }}>
+          <h3 style={{ 
+            marginBottom: '16px', 
+            color: '#444',
+            paddingBottom: '8px',
+            borderBottom: '1px solid #eee'
+          }}>
+            Features
+          </h3>
+          <table style={{ 
+            width: '100%', 
+            borderCollapse: 'collapse',
+            fontSize: '14px'
+          }}>
+            <thead>
+              <tr style={{ backgroundColor: '#f8f9fa' }}>
+                <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #dee2e6' }}>Feature</th>
+                <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #dee2e6' }}>Type</th>
+                <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #dee2e6' }}>Default</th>
+                <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #dee2e6' }}>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(SETTINGS.features).map(([key, config]) => (
+                <tr key={key} style={{ borderBottom: '1px solid #eee' }}>
+                  <td style={{ padding: '12px', color: '#0366d6' }}>{config.id}</td>
+                  <td style={{ padding: '12px', fontFamily: 'monospace', color: '#666' }}>
+                    {config.type}
+                  </td>
+                  <td style={{ padding: '12px', fontFamily: 'monospace', color: '#666' }}>
+                    {String(config.default)}
+                  </td>
+                  <td style={{ padding: '12px' }}>
+                    {config.description}
+                    {config.id in DISPLAY_MODE_CONSTRAINTS.embedded && (
+                      <div style={{ 
+                        marginTop: '4px', 
+                        color: '#664d03',
+                        backgroundColor: '#fff3cd',
+                        padding: '4px 8px',
+                        borderRadius: '4px',
+                        fontSize: '12px'
+                      }}>
+                        Note: Behavior is constrained in embedded mode
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Style Presets */}
+        <div>
+          <h3 style={{ 
+            marginBottom: '16px', 
+            color: '#444',
+            paddingBottom: '8px',
+            borderBottom: '1px solid #eee'
+          }}>
+            Style Presets
+          </h3>
+          <table style={{ 
+            width: '100%', 
+            borderCollapse: 'collapse',
+            fontSize: '14px'
+          }}>
+            <thead>
+              <tr style={{ backgroundColor: '#f8f9fa' }}>
+                <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #dee2e6' }}>Preset</th>
+                <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #dee2e6' }}>Styles</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(SETTINGS.core.containerStyle.presets).map(([name, styles]) => (
+                <tr key={name} style={{ borderBottom: '1px solid #eee' }}>
+                  <td style={{ padding: '12px', color: '#0366d6' }}>{name}</td>
+                  <td style={{ padding: '12px' }}>
+                    {styles ? (
+                      <pre style={{ 
+                        margin: 0,
+                        padding: '8px',
+                        backgroundColor: '#f8f9fa',
+                        borderRadius: '4px',
+                        fontSize: '12px'
+                      }}>
+                        {JSON.stringify(styles, null, 2)}
+                      </pre>
+                    ) : (
+                      <span style={{ color: '#666', fontStyle: 'italic' }}>Default styles</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }
