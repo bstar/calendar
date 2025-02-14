@@ -4,6 +4,9 @@ import './bootstrap.min.css'
 import DateRangePicker from './components/DateRangePicker';
 import { SETTINGS, getDefaultSettings, DISPLAY_MODE_CONSTRAINTS } from './components/DateRangePicker.config';
 
+// Import package.json to access version, description, and name
+import packageInfo from '../package.json';
+
 function App() {
   const [settings, setSettings] = useState({
     ...getDefaultSettings(),
@@ -363,6 +366,46 @@ function App() {
 
   return (
     <div style={{ padding: '20px', maxWidth: '1800px', margin: '0 auto' }}>
+      {/* Header */}
+      <header style={{ 
+        padding: '20px', 
+        borderBottom: '1px solid #dee2e6', 
+        marginBottom: '24px',
+        textAlign: 'center',
+        backgroundColor: '#f8f9fa',
+        borderRadius: '8px'
+      }}>
+        <h1 style={{ 
+          margin: '0 0 8px', 
+          color: '#0366d6', 
+          fontSize: '36px',  // Larger font size
+          fontWeight: 'bold',  // Bold font weight
+          fontFamily: 'Arial, sans-serif',  // Change font family
+          letterSpacing: '1.5px',  // Add letter spacing
+          display: 'flex',  // Use flexbox for alignment
+          justifyContent: 'center',  // Center content
+          alignItems: 'flex-end',  // Align items to the bottom
+          gap: '12px'  // Space between name and version
+        }}>
+          {packageInfo.name}
+          <span style={{ 
+            backgroundColor: '#e1e4e8',  // Light gray background
+            color: '#0366d6',  // Blue text color
+            padding: '4px 8px',  // Padding for pill effect
+            borderRadius: '12px',  // Rounded corners
+            fontSize: '14px',  // Font size for version
+            fontWeight: 'normal',  // Normal font weight
+            paddingBottom: '4px',
+            marginBottom: '6px',
+          }}>
+            v{packageInfo.version}
+          </span>
+        </h1>
+        <p style={{ margin: '0', color: '#666', fontSize: '16px' }}>
+          {packageInfo.description}
+        </p>
+      </header>
+
       <div style={{ 
         display: 'grid',
         gridTemplateColumns: '400px 1fr',
