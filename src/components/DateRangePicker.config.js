@@ -66,16 +66,6 @@ export const SETTINGS = {
         },
         'Rounded Corners': {
           borderRadius: '12px'
-        },
-        'Dark Mode': {
-          backgroundColor: '#1a1a1a',
-          border: '1px solid #333',
-          color: '#fff'
-        },
-        'Glass Effect': {
-          backgroundColor: 'rgba(255, 255, 255, 0.8)',
-          backdropFilter: 'blur(8px)',
-          border: '1px solid rgba(255, 255, 255, 0.3)'
         }
       }
     }
