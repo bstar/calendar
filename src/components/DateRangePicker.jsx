@@ -751,6 +751,7 @@ const SideChevronIndicator = ({ outOfBoundsDirection, isSelecting }) => {
 const DateRangePicker = ({ 
   displayMode = 'popup',
   containerStyle = null,
+  isOpen: initialIsOpen = false,
   visibleMonths = 2,
   showMonthHeadings = false,
   selectionMode = 'range',
@@ -762,7 +763,7 @@ const DateRangePicker = ({
   singleMonthWidth = 500,
   enableOutOfBoundsScroll = true
 }) => {
-  const [isOpen, setIsOpen] = useState(displayMode === 'embedded');
+  const [isOpen, setIsOpen] = useState(displayMode === 'embedded' || initialIsOpen);
   const [selectedRange, setSelectedRange] = useState({ start: null, end: null });
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date()));
   const [isSelecting, setIsSelecting] = useState(false);
@@ -1178,3 +1179,19 @@ const DateRangePicker = ({
 };
 
 export default DateRangePicker;
+
+DateRangePicker.propTypes = {
+  displayMode: PropTypes.string,
+  containerStyle: PropTypes.object,
+  isOpen: PropTypes.bool,
+  visibleMonths: PropTypes.number,
+  showMonthHeadings: PropTypes.bool,
+  selectionMode: PropTypes.string,
+  showTooltips: PropTypes.bool,
+  showHeader: PropTypes.bool,
+  closeOnClickAway: PropTypes.bool,
+  showSubmitButton: PropTypes.bool,
+  showFooter: PropTypes.bool,
+  singleMonthWidth: PropTypes.number,
+  enableOutOfBoundsScroll: PropTypes.bool
+};

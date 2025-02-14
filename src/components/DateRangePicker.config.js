@@ -97,7 +97,7 @@ export const SETTINGS = {
       type: 'boolean',
       label: 'Close on Click Away',
       description: 'Close calendar when clicking outside',
-      default: true
+      default: false
     },
     submitButton: {
       id: 'showSubmitButton',

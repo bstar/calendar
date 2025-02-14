@@ -5,7 +5,10 @@ import DateRangePicker from './components/DateRangePicker';
 import { SETTINGS, getDefaultSettings, DISPLAY_MODE_CONSTRAINTS } from './components/DateRangePicker.config';
 
 function App() {
-  const [settings, setSettings] = useState(getDefaultSettings());
+  const [settings, setSettings] = useState({
+    ...getDefaultSettings(),
+    isOpen: true  // Force calendar to be open on initial load
+  });
 
   const handleChange = (prop) => (event) => {
     const value = event.target.type === 'checkbox' 
