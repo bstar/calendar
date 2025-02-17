@@ -1,151 +1,302 @@
-development_plan:
+project:
+  name: "DateRangePicker Component"
+  version: "pre-1.0.0"
+  description: "A flexible date range picker with layer-based visualization and validation"
+
+architecture:
+  overview: "Layer-based calendar system with validation and alerts"
+  core_principles:
+    - "Single layer visibility at a time"
+    - "Base layer always present"
+    - "Independent layer configurations"
+    - "Centralized alert management"
+    - "Typescript-first development"
+    - "Maintainable and extensible design"
+
+layer_system:
+  base_layer:
+    required: true
+    features:
+      - "Core calendar functionality"
+      - "Selection restrictions"
+      - "Base validation rules"
+    responsibilities:
+      - "Handle user selections"
+      - "Enforce global restrictions"
+      - "Maintain calendar state"
+
+  additional_layers:
+    features:
+      - "Independent data visualization"
+      - "Layer-specific validation"
+      - "Custom styling"
+    constraints:
+      - "Must respect base layer restrictions"
+      - "Cannot interfere with other layers"
+      - "Single layer visible at a time"
+
+  layer_configuration:
+    structure:
+      id: string
+      name: string
+      type: 
+        - single
+        - range
+      data:
+        items: object
+        validations: object
+        restrictions: object
+      timezone:
+        override: string
+        convert: boolean
+      style:
+        default: object
+        overlap:
+          pattern: string
+          backgroundColor: string
+      alerts:
+        template: ReactComponent
+        position: string
+
+alert_system:
+  types:
+    error:
+      priority: 1
+      icon: "triangle-exclamation"
+      color: "#dc3545"
+    warning:
+      priority: 2
+      icon: "triangle-warning"
+      color: "#ffc107"
+    content:
+      priority: 3
+      icon: "info-circle"
+      color: "#0dcaf0"
+  
+  stacked_alerts:
+    icon: "layers"
+    badge:
+      position: "top-right"
+      style:
+        backgroundColor: "#dc3545"
+        color: "#fff"
+  
+  display:
+    cell:
+      position: "top-right"
+      stacking: "single-icon-with-count"
+    popout:
+      ordering: "by-priority"
+      grouping: "by-type"
+
+validation_system:
+  rules:
+    date_range:
+      type: "dateRange"
+      properties:
+        start: string
+        end: string
+        message: string
+    weekday:
+      type: "weekday"
+      properties:
+        allowed: string[]
+        message: string
+    custom:
+      type: "custom"
+      properties:
+        validate: "(date) => boolean"
+        message: string
+
+restrictor_system:
+  types:
+    - "dateRange"
+    - "weekday"
+    - "custom"
+  structure:
+    type: string
+    range:
+      start: string
+      end: string
+    direction:
+      - "before"
+      - "after"
+      - "within"
+    message: string
+  behavior:
+    - "Prevents selection in restricted areas"
+    - "Shows alert message on attempt"
+    - "Can aggregate multiple restriction messages"
+
+component_structure:
+  root: src/components/DateRangePicker/
+  directories:
+    LayerManager:
+      files:
+        - index.tsx
+        - Layer.tsx
+        - LayerToggle.tsx
+      responsibilities:
+        - "Layer state management"
+        - "Layer switching"
+        - "Data coordination"
+    
+    Calendar:
+      files:
+        - index.tsx
+        - MonthGrid.tsx
+        - DayCell.tsx
+      responsibilities:
+        - "Calendar rendering"
+        - "Date calculations"
+        - "Cell management"
+    
+    Interactions:
+      files:
+        - SelectionHandler.tsx
+        - PopoutMenu.tsx
+        - Modal.tsx
+      responsibilities:
+        - "User selection handling"
+        - "Conflict resolution"
+        - "Information display"
+    
+    utils:
+      files:
+        - validators.ts
+        - restrictors.ts
+        - timezone.ts
+      responsibilities:
+        - "Validation logic"
+        - "Restriction checking"
+        - "Timezone handling"
+    
+    icons:
+      files:
+        - index.tsx
+        - AlertError.tsx
+        - AlertWarning.tsx
+        - AlertContent.tsx
+        - AlertStacked.tsx
+      responsibilities:
+        - "Default SVG icons"
+        - "Icon management"
+        - "Custom icon support"
+    
+    types:
+      files:
+        - index.ts
+        - layers.ts
+        - alerts.ts
+        - config.ts
+      responsibilities:
+        - "Type definitions"
+        - "Interfaces"
+        - "Enums"
+
+typescript_migration:
+  config:
+    initial_settings:
+      strict: false
+      allowJs: true
+      jsx: "react"
+      moduleResolution: "node"
+    
+  strategy:
+    - "Incremental conversion"
+    - "Co-existence of .js and .tsx during transition"
+    - "Type definitions alongside components"
+    - "Permissive initial configuration"
+  
+  priorities:
+    - "New component structure"
+    - "Core interfaces"
+    - "Utility functions"
+    - "Existing components"
+
+development_phases:
   phase1_restructure:
     description: "Initial restructuring and TypeScript setup"
-    steps:
-      - create_directory_structure:
-          path: src/components/DateRangePicker/
-          structure:
-            - index.tsx  # Main export
-            - LayerManager/
-                - index.tsx
-                - Layer.tsx
-                - LayerToggle.tsx
-            - Calendar/
-                - index.tsx
-                - MonthGrid.tsx
-                - DayCell.tsx
-            - Interactions/
-                - SelectionHandler.tsx
-                - PopoutMenu.tsx
-                - Modal.tsx
-            - utils/
-                - validators.ts
-                - restrictors.ts
-                - timezone.ts
-            - icons/
-                - index.tsx
-                - AlertError.tsx
-                - AlertWarning.tsx
-                - AlertContent.tsx
-                - AlertStacked.tsx
-            - types/
-                - index.ts  # All shared interfaces
-                - layers.ts
-                - alerts.ts
-                - config.ts
-            
-      - setup_typescript:
-          files:
-            - tsconfig.json:
-                compilerOptions:
-                  strict: false
-                  allowJs: true
-                  jsx: "react"
-            - .eslintrc:
-                extends: 
-                  - "eslint:recommended"
-                  - "plugin:@typescript-eslint/recommended"
-                  - "plugin:react/recommended"
-
-      - create_base_interfaces:
-          files:
-            - types/config.ts:
-                interfaces:
-                  - LayerConfig
-                  - AlertConfig
-                  - RestrictorConfig
-                  - ValidationConfig
-            - types/layers.ts:
-                interfaces:
-                  - Layer
-                  - LayerData
-                  - LayerItem
-            - types/alerts.ts:
-                enums:
-                  - AlertType
-                  - AlertPriority
-                interfaces:
-                  - Alert
-                  - AlertDisplay
+    tasks:
+      - "Create directory structure"
+      - "Setup TypeScript configuration"
+      - "Create base interfaces"
+      - "Setup ESLint"
+    deliverables:
+      - "Project structure"
+      - "Basic TypeScript setup"
+      - "Core type definitions"
 
   phase2_layer_system:
     description: "Implement core layer functionality"
-    steps:
-      - implement_layer_manager:
-          components:
-            - LayerManager
-            - Layer
-            - LayerToggle
-          features:
-            - Layer switching
-            - Base layer handling
-            - Data management
-            - Timezone support
-
-      - implement_calendar_core:
-          components:
-            - Calendar
-            - MonthGrid
-            - DayCell
-          features:
-            - Layer-aware rendering
-            - Selection handling
-            - Day item display
+    tasks:
+      - "Implement LayerManager"
+      - "Create base layer functionality"
+      - "Add layer switching"
+      - "Implement timezone support"
+    deliverables:
+      - "Working layer system"
+      - "Layer toggle UI"
+      - "Basic data management"
 
   phase3_validation_restriction:
     description: "Add validation and restriction systems"
-    steps:
-      - implement_validators:
-          features:
-            - Date range validation
-            - Conflict detection
-            - Custom validation rules
-      
-      - implement_restrictors:
-          features:
-            - Date range restrictions
-            - Selection constraints
-            - Restriction messaging
-
-      - implement_alerts:
-          features:
-            - Alert icons
-            - Stacked alerts
-            - Alert priority
+    tasks:
+      - "Implement validators"
+      - "Add restriction system"
+      - "Create alert system"
+    deliverables:
+      - "Working validation"
+      - "Selection restrictions"
+      - "Alert display"
 
   phase4_interaction:
     description: "Enhance user interactions"
-    steps:
-      - implement_selection:
-          features:
-            - Layer-aware selection
-            - Conflict resolution
-            - Selection modals
-      
-      - implement_popouts:
-          features:
-            - Day item details
-            - Alert details
-            - Stacked content
+    tasks:
+      - "Improve selection handling"
+      - "Add conflict resolution"
+      - "Implement popouts"
+    deliverables:
+      - "Smooth user interactions"
+      - "Conflict handling"
+      - "Information display"
 
   phase5_documentation:
     description: "Update documentation and tooling"
-    steps:
-      - update_app_tsx:
-          features:
-            - Layer configuration UI
-            - Alert configuration
-            - Restrictor settings
-      
-      - create_tests:
-          coverage:
-            - Component tests
-            - Utility tests
-            - Integration tests
+    tasks:
+      - "Update App.tsx"
+      - "Create tests"
+      - "Update documentation"
+    deliverables:
+      - "Updated demo app"
+      - "Test coverage"
+      - "Complete documentation"
 
-  maintenance:
-    ongoing:
-      - Type safety improvements
-      - Performance optimization
-      - Bug fixes
-      - Feature requests
+testing:
+  strategy:
+    - "Tests alongside components"
+    - "No snapshot testing initially"
+    - "Mock data for complex scenarios"
+  
+  coverage:
+    components:
+      - "LayerManager"
+      - "Calendar"
+      - "DayCell"
+      - "SelectionHandler"
+    utils:
+      - "timezone"
+      - "restrictors"
+      - "validators"
+      - "alerts"
+
+maintenance:
+  ongoing:
+    - "Type safety improvements"
+    - "Performance optimization"
+    - "Bug fixes"
+    - "Feature requests"
+  
+  versioning:
+    strategy: "Minor version updates per phase"
+    target: "1.0.0 release"
