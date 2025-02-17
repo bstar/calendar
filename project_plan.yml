@@ -1,422 +1,151 @@
-project_name: CLACalendar Enhancement
-description: Add event interface and selection constraints to existing calendar component
+development_plan:
+  phase1_restructure:
+    description: "Initial restructuring and TypeScript setup"
+    steps:
+      - create_directory_structure:
+          path: src/components/DateRangePicker/
+          structure:
+            - index.tsx  # Main export
+            - LayerManager/
+                - index.tsx
+                - Layer.tsx
+                - LayerToggle.tsx
+            - Calendar/
+                - index.tsx
+                - MonthGrid.tsx
+                - DayCell.tsx
+            - Interactions/
+                - SelectionHandler.tsx
+                - PopoutMenu.tsx
+                - Modal.tsx
+            - utils/
+                - validators.ts
+                - restrictors.ts
+                - timezone.ts
+            - icons/
+                - index.tsx
+                - AlertError.tsx
+                - AlertWarning.tsx
+                - AlertContent.tsx
+                - AlertStacked.tsx
+            - types/
+                - index.ts  # All shared interfaces
+                - layers.ts
+                - alerts.ts
+                - config.ts
+            
+      - setup_typescript:
+          files:
+            - tsconfig.json:
+                compilerOptions:
+                  strict: false
+                  allowJs: true
+                  jsx: "react"
+            - .eslintrc:
+                extends: 
+                  - "eslint:recommended"
+                  - "plugin:@typescript-eslint/recommended"
+                  - "plugin:react/recommended"
 
-interfaces:
-  calendar_config:
-    dayConfigs:
-      type: object
-      key_format: ISO date string
-      properties:
-        tooltips:
-          - content: string
-            type: string # optional, for styling
-        cell:
-          # Function that returns cell configuration
-          renderer: |
-            (date: Date) => {
-              content?: React.ReactNode;  # Additional content rendered alongside the day number
-              contentPosition?: 'above' | 'below' | 'left' | 'right' | 'overlay';  # Position relative to day number
-              className?: string;         # Additional styling
-              onClick?: (date: Date, e: React.MouseEvent) => void;
-              onMouseEnter?: (date: Date, e: React.MouseEvent) => void;
-              onMouseLeave?: (date: Date, e: React.MouseEvent) => void;
-              style?: React.CSSProperties;
-              disabled?: boolean;         # Disable cell interactions
-              highlightType?: string;     # For different highlight states
-              hideDay?: boolean;          # Optional: hide the default day number if needed
-            }
-          options:
-            propagateEvents: boolean # Whether to bubble events to parent
-            preventDefaultSelection: boolean # Whether to prevent default range selection
+      - create_base_interfaces:
+          files:
+            - types/config.ts:
+                interfaces:
+                  - LayerConfig
+                  - AlertConfig
+                  - RestrictorConfig
+                  - ValidationConfig
+            - types/layers.ts:
+                interfaces:
+                  - Layer
+                  - LayerData
+                  - LayerItem
+            - types/alerts.ts:
+                enums:
+                  - AlertType
+                  - AlertPriority
+                interfaces:
+                  - Alert
+                  - AlertDisplay
 
-    ranges:
-      type: object
-      properties:
-        rangeId:
-          start: ISO date string
-          end: ISO date string
-          style:
-            # CSS properties for start/end date visualization
-            backgroundColor: string
-            borderRadius: string
-            border: string
-            # additional CSS properties as needed
+  phase2_layer_system:
+    description: "Implement core layer functionality"
+    steps:
+      - implement_layer_manager:
+          components:
+            - LayerManager
+            - Layer
+            - LayerToggle
+          features:
+            - Layer switching
+            - Base layer handling
+            - Data management
+            - Timezone support
 
-    selectionRules:
-      boundaryRanges:
-        - type: string # e.g., 'isoWeek', 'period', 'season'
-          snapBehavior: enum[start, end, both]
-          enforceStrict: boolean
-      events:
-        onBoundaryViolation:
-          data:
-            originalSelection:
-              start: ISO date string
-              end: ISO date string
-            violatedBoundary:
-              type: string
-              start: ISO date string
-              end: ISO date string
-            suggestedAdjustment:
-              start: ISO date string
-              end: ISO date string
+      - implement_calendar_core:
+          components:
+            - Calendar
+            - MonthGrid
+            - DayCell
+          features:
+            - Layer-aware rendering
+            - Selection handling
+            - Day item display
 
-configuration_examples:
-  basic_event_indicator:
-    description: Simple event indicator with right-aligned icon
-    example: |
-      {
-        dayConfigs: {
-          '2024-12-25': {
-            cell: {
-              renderer: (date) => ({
-                content: <EventIcon size={12} />,
-                contentPosition: 'right',
-                className: 'event-day'
-              })
-            }
-          }
-        }
-      }
+  phase3_validation_restriction:
+    description: "Add validation and restriction systems"
+    steps:
+      - implement_validators:
+          features:
+            - Date range validation
+            - Conflict detection
+            - Custom validation rules
+      
+      - implement_restrictors:
+          features:
+            - Date range restrictions
+            - Selection constraints
+            - Restriction messaging
 
-  multiple_events_with_count:
-    description: Show event count with tooltip
-    example: |
-      {
-        dayConfigs: {
-          '2024-12-26': {
-            cell: {
-              renderer: (date) => ({
-                content: <EventCount count={3} />,
-                contentPosition: 'below',
-                onClick: (date, e) => showEventDetails(date)
-              }),
-              options: {
-                preventDefaultSelection: true
-              }
-            },
-            tooltips: [
-              { content: '3 events scheduled', type: 'info' }
-            ]
-          }
-        }
-      }
+      - implement_alerts:
+          features:
+            - Alert icons
+            - Stacked alerts
+            - Alert priority
 
-  custom_styling:
-    description: Custom cell styling for special days
-    example: |
-      {
-        dayConfigs: {
-          '2024-12-31': {
-            cell: {
-              renderer: (date) => ({
-                style: {
-                  backgroundColor: '#f8f9fa',
-                  border: '2px solid #dee2e6'
-                },
-                className: 'special-day'
-              })
-            }
-          }
-        }
-      }
+  phase4_interaction:
+    description: "Enhance user interactions"
+    steps:
+      - implement_selection:
+          features:
+            - Layer-aware selection
+            - Conflict resolution
+            - Selection modals
+      
+      - implement_popouts:
+          features:
+            - Day item details
+            - Alert details
+            - Stacked content
 
-  interactive_cell:
-    description: Cell with hover effects and click handling
-    example: |
-      {
-        dayConfigs: {
-          '2024-12-24': {
-            cell: {
-              renderer: (date) => ({
-                content: <HolidayIcon />,
-                contentPosition: 'overlay',
-                onMouseEnter: (date, e) => showHolidayPreview(date),
-                onMouseLeave: (date, e) => hideHolidayPreview(),
-                onClick: (date, e) => openHolidayDetails(date),
-                className: 'holiday-cell'
-              }),
-              options: {
-                propagateEvents: false
-              }
-            }
-          }
-        }
-      }
+  phase5_documentation:
+    description: "Update documentation and tooling"
+    steps:
+      - update_app_tsx:
+          features:
+            - Layer configuration UI
+            - Alert configuration
+            - Restrictor settings
+      
+      - create_tests:
+          coverage:
+            - Component tests
+            - Utility tests
+            - Integration tests
 
-  range_with_boundary:
-    description: Range configuration with selection rules
-    example: |
-      {
-        ranges: {
-          'winter-season': {
-            start: '2024-12-21',
-            end: '2025-03-20',
-            style: {
-              backgroundColor: '#e9ecef',
-              borderRadius: '4px'
-            }
-          }
-        },
-        selectionRules: {
-          boundaryRanges: [{
-            type: 'season',
-            snapBehavior: 'both',
-            enforceStrict: true
-          }]
-        }
-      }
-
-  complex_day_config:
-    description: Complex configuration with multiple features
-    example: |
-      {
-        dayConfigs: {
-          '2024-12-25': {
-            cell: {
-              renderer: (date) => ({
-                content: (
-                  <div className="flex flex-col items-center">
-                    <HolidayBadge />
-                    <EventCount count={2} />
-                  </div>
-                ),
-                contentPosition: 'below',
-                style: { backgroundColor: '#f8f9fa' },
-                onClick: (date, e) => handleDayClick(date),
-                highlightType: 'holiday'
-              })
-            },
-            tooltips: [
-              { content: 'Christmas Day', type: 'holiday' },
-              { content: '2 events scheduled', type: 'events' }
-            ]
-          }
-        }
-      }
-
-phases:
-  phase0:
-    name: Initial Prototype
-    status: in_progress
-    tasks:
-      - name: Development Environment Setup
-        description: Set up external app for rapid calendar development
-        subtasks:
-          - Install dependencies (vite, date-fns, react-bootstrap)
-          - Create component namespace
-          - Configure development environment
-        status: completed
-
-      - name: Basic Calendar Implementation
-        description: Implement core calendar visualization
-        subtasks:
-          - Create dual month view layout
-          - Implement basic styling to match Figma designs
-          - Add text input integration
-          - Test basic rendering
-        status: completed
-
-      - name: Month Navigation System
-        description: Implement dynamic month rendering and navigation
-        subtasks:
-          - Create month generation using date-fns
-          - Implement month switching controls
-          - Add month title synchronization
-          - Test month navigation
-        status: completed
-
-      - name: Month Carousel Enhancement
-        description: Improve month navigation with carousel functionality
-        subtasks:
-          - Implement smooth slide animations
-          - Add month preloading
-          - Configure directional animations
-          - Optimize animation performance
-        status: completed
-
-      - name: Range Selection Implementation
-        description: Add date range selection capabilities
-        subtasks:
-          - Implement basic range selection
-          - Add click and drag functionality
-          - Create selection styling
-          - Test selection behavior
-        status: completed
-
-      - name: Extended Range Selection
-        description: Enable cross-month range selection
-        subtasks:
-          - Add out-of-bounds selection handling
-          - Implement automatic month sliding
-          - Configure debounce behavior
-          - Test extended selection scenarios
-        status: completed
-
-  phase1:
-    name: Core Functionality and UI Improvements
-    status: not_started
-    tasks:
-      - name: UI Enhancement
-        description: Implement Figma designs and animation improvements
-        subtasks:
-          - Update component styling to match Figma designs
-          - Refactor CSS to ensure design consistency
-          - Improve month transition animation
-          - Fix pop in/out effect during month changes
-          - Test animations across different browsers
-          - Validate design implementation against Figma specs
-        status: not_started
-
-      - name: Date Handling Improvements
-        description: Implement UTC conversion and single day selection
-        subtasks:
-          - Add UTC conversion logic
-          - Update date handling throughout component
-          - Implement single day selection mode
-          - Add toggle between range and single day selection
-          - Test UTC edge cases
-          - Document UTC handling approach
-        status: not_started
-
-      - name: Boundary Configuration
-        description: Implement selection boundaries
-        subtasks:
-          - Add boundary range parsing
-          - Implement boundary validation
-          - Create boundary visualization
-          - Test boundary configurations
-        status: not_started
-
-      - name: Snap Behavior
-        description: Add snap-to-bounds functionality
-        subtasks:
-          - Implement snap logic
-          - Add snap animation
-          - Create snap configuration options
-          - Test snap behavior
-        status: not_started
-
-      - name: Selection Validation and Event System
-        description: Implement validation and event emission for boundary violations
-        subtasks:
-          - Create validation system for checking boundary rules
-          - Implement event emission system for boundary violations
-          - Add boundary violation detection during selection
-          - Create suggested adjustment calculation
-          - Implement event payload construction with all required data
-          - Add event subscription mechanism for consumers
-          - Test validation and event scenarios
-          - Document event system and payload structure
-        status: not_started
-
-      - name: Adjustment Notifications
-        description: Add user feedback for adjustments
-        subtasks:
-          - Create notification component
-          - Implement notification triggers
-          - Add notification styling
-          - Test notification system
-        status: not_started
-
-  phase2:
-    name: Range Start/End Visualization
-    status: not_started
-    tasks:
-      - name: Range Endpoint Display
-        description: Implement visualization for range start and end dates
-        subtasks:
-          - Create start/end date styling system
-          - Implement CSS property application
-          - Add visual treatment for range endpoints
-          - Test endpoint display
-        status: not_started
-
-      - name: Style Configuration
-        description: Add configurable styling for range endpoints
-        subtasks:
-          - Implement style application system
-          - Add support for custom CSS properties
-          - Test style configurations
-          - Document supported CSS properties
-        status: not_started
-
-  phase3:
-    name: Basic Event Display
-    status: not_started
-    tasks:
-      - name: Tooltip Infrastructure
-        description: Implement base tooltip system
-        subtasks:
-          - Add tooltip container component
-          - Implement tooltip positioning logic
-          - Add basic tooltip content rendering
-          - Test tooltip display/hide behavior
-        status: not_started
-
-      - name: Cell Display System
-        description: Add support for custom day cell content
-        subtasks:
-          - Create cell renderer component
-          - Implement content positioning system
-          - Add basic cell styles
-          - Test cell rendering
-        status: not_started
-
-      - name: Multiple Events State
-        description: Handle multiple events per day
-        subtasks:
-          - Add multiple events handling
-          - Implement event counting logic
-          - Update tooltip for multiple events
-          - Test multiple events behavior
-        status: not_started
-
-  phase4:
-    name: Enhanced Features
-    status: not_started
-    tasks:
-      - name: Stacked Tooltips
-        description: Implement tooltip stacking
-        subtasks:
-          - Create stacked tooltip component
-          - Add tooltip aggregation logic
-          - Implement tooltip styling
-          - Test stacked tooltips
-        status: not_started
-
-future_considerations:
-  range_highlight:
-    description: Add click-to-highlight functionality for ranges
-    considerations:
-      - Click handling for range start/end dates
-      - Highlight entire range on click
-      - Clear highlight when clicking elsewhere
-      - Single highlight at a time enforcement
-      - Visual treatment for highlighted range
-      - Performance optimization for large ranges
-
-  day_of_week_restrictions:
-    description: Add support for day-of-week selection rules
-    considerations:
-      - Rule configuration format
-      - Visual indication of restricted days
-      - Selection validation logic
-      - User feedback mechanism
-
-  selection_length_limits:
-    description: Add min/max selection length constraints
-    considerations:
-      - Length validation system
-      - User feedback for invalid selections
-      - Visual indication of valid ranges
-      - Selection adjustment logic
-
-  dynamic_updates:
-    description: Support for dynamic configuration updates
-    considerations:
-      - Memoization strategy for config object
-      - Efficient update mechanism
-      - Version/timestamp tracking
-      - Performance optimization for large updates
-      - Component lifecycle management
+  maintenance:
+    ongoing:
+      - Type safety improvements
+      - Performance optimization
+      - Bug fixes
+      - Feature requests
