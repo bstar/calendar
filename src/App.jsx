@@ -3,6 +3,7 @@ import './bootstrap.min.css'
 
 import DateRangePicker from './components/DateRangePicker';
 import { SETTINGS, getDefaultSettings, DISPLAY_MODE_CONSTRAINTS } from './components/DateRangePicker.config';
+import DateRangePickerNew from './components/DateRangePickerNew';
 
 // Import package.json to access version, description, and name
 import packageInfo from '../package.json';
@@ -376,6 +377,32 @@ function App() {
 
   return (
     <div style={{ padding: '20px', maxWidth: '1800px', margin: '0 auto' }}>
+      {/* New Version Preview */}
+      <div style={{ 
+        padding: '20px',
+        border: '1px solid #dee2e6',
+        borderRadius: '8px',
+        backgroundColor: '#fff',
+        marginBottom: '24px'
+      }}>
+        <h5 style={{ marginBottom: '16px', color: '#666' }}>New Version Preview</h5>
+        <DateRangePickerNew 
+          displayMode="popup"
+          visibleMonths={2}
+          selectionMode="range"
+          singleMonthWidth={500}
+          containerStyle={null}
+          showMonthHeadings={false}
+          showTooltips={false}
+          showHeader={true}
+          closeOnClickAway={false}
+          showSubmitButton={false}
+          showFooter={true}
+          enableOutOfBoundsScroll={true}
+          isOpen={true}
+        />
+      </div>
+
       {/* Header */}
       <header style={{ 
         padding: '20px', 
