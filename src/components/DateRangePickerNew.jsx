@@ -1418,6 +1418,17 @@ const DateRangePickerNew = ({
                     : `${format(months[0], "MMMM yyyy")} - ${format(months[months.length - 1], "MMMM yyyy")}`
                   }
                 </span>
+                <button 
+                  className="cla-button-nav"
+                  onClick={() => setForceShowTooltips(prev => !prev)}
+                  style={{
+                    marginLeft: '8px',
+                    padding: '4px 8px',
+                    backgroundColor: forceShowTooltips ? '#e7f3ff' : 'transparent'
+                  }}
+                >
+                  Show All
+                </button>
                 <button className="cla-button-nav" onClick={() => moveToMonth('next')}>
                   <ChevronRight size={16} />
                 </button>
