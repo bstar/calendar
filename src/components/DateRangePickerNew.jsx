@@ -554,35 +554,44 @@ const MonthGrid = ({
   );
 };
 
-// Update the Tooltip component for better positioning
+// Update the Tooltip component to handle both positioning and visibility
 const Tooltip = ({ content, show, children }) => {
   const [position, setPosition] = useState({ top: 0, left: 0 });
+  const [isHovered, setIsHovered] = useState(false);
   const tooltipRef = useRef(null);
   const targetRef = useRef(null);
 
   useEffect(() => {
-    if (show && targetRef.current && tooltipRef.current) {
+    if (show && isHovered && targetRef.current && tooltipRef.current) {
+      console.log('Calculating tooltip position'); // Debug log
       const targetRect = targetRef.current.getBoundingClientRect();
       const tooltipRect = tooltipRef.current.getBoundingClientRect();
       
-      // Calculate position to show above the target
-      const top = targetRect.top - tooltipRect.height - 8;
-      const left = targetRect.left + (targetRect.width - tooltipRect.width) / 2;
+      const newPosition = {
+        top: targetRect.top - tooltipRect.height - 8,
+        left: targetRect.left + (targetRect.width - tooltipRect.width) / 2
+      };
 
-      // Ensure tooltip stays within viewport
-      const adjustedLeft = Math.max(8, Math.min(left, window.innerWidth - tooltipRect.width - 8));
-      
-      setPosition({
-        top,
-        left: adjustedLeft
-      });
+      console.log('Tooltip position:', newPosition); // Debug log
+      setPosition(newPosition);
     }
-  }, [show, content]);
+  }, [show, isHovered, content]);
 
   return (
-    <div ref={targetRef} style={{ position: 'relative', width: '100%', height: '100%' }}>
+    <div 
+      ref={targetRef} 
+      style={{ position: 'relative', width: '100%', height: '100%' }}
+      onMouseEnter={() => {
+        console.log('Tooltip target mouse enter'); // Debug log
+        setIsHovered(true);
+      }}
+      onMouseLeave={() => {
+        console.log('Tooltip target mouse leave'); // Debug log
+        setIsHovered(false);
+      }}
+    >
       {children}
-      {show && (
+      {show && isHovered && (
         <div
           ref={tooltipRef}
           style={{
@@ -592,11 +601,11 @@ const Tooltip = ({ content, show, children }) => {
             backgroundColor: 'white',
             boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
             borderRadius: '4px',
-            zIndex: 1000,
+            zIndex: 9999,
             fontSize: '14px',
             maxWidth: '300px',
             padding: '8px',
-            pointerEvents: 'none' // Prevent tooltip from interfering with interactions
+            pointerEvents: 'none'
           }}
         >
           {content}
@@ -606,7 +615,7 @@ const Tooltip = ({ content, show, children }) => {
   );
 };
 
-// Update DayCell to handle circular selection without gaps
+// Update the DayCell component to add debug logging and ensure hover events
 const DayCell = ({
   date,
   selectedRange,
@@ -638,7 +647,7 @@ const DayCell = ({
     };
   }, [date, selectedRange.start, selectedRange.end]);
 
-  const [showTooltip, setShowTooltip] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   // Update single day check to handle both cases
   const isSingleDay = useMemo(() => {
@@ -648,18 +657,29 @@ const DayCell = ({
   }, [selectedRange.start, selectedRange.end]);
 
   const handleMouseEnter = (e) => {
-    if (showTooltips) setShowTooltip(true);
+    const content = renderContent?.(date);
+    if (content) {
+      console.log('Mouse enter event cell:', date, content);
+      console.log('Tooltip content:', content.tooltipContent); // Debug log
+    }
+    setIsHovered(true);
     onMouseEnter?.(e);
   };
 
   const handleMouseLeave = () => {
-    setShowTooltip(false);
+    const content = renderContent?.(date);
+    if (content) {
+      console.log('Mouse leave event cell:', date);
+    }
+    setIsHovered(false);
   };
 
   if (!isCurrentMonth) {
     return <div style={{ width: "100%", height: "100%", position: "relative", backgroundColor: "white" }} />;
   }
 
+  const eventContent = renderContent?.(date);
+  
   const dayCell = (
     <div
       onMouseEnter={handleMouseEnter}
@@ -695,7 +715,8 @@ const DayCell = ({
         inset: 0,
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        pointerEvents: 'none'
       }}>
         <span style={{ 
           position: 'relative', 
@@ -705,12 +726,26 @@ const DayCell = ({
           {format(date, "d")}
         </span>
       </div>
-      {renderContent && renderContent(date)}
+      {eventContent?.element && (
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          pointerEvents: 'none'
+        }}>
+          {eventContent.element}
+        </div>
+      )}
     </div>
   );
 
   return showTooltips ? (
-    <Tooltip content={format(date, "MMMM d, yyyy")} show={showTooltip}>
+    <Tooltip 
+      content={eventContent?.tooltipContent}
+      show={isHovered && showTooltips && eventContent?.tooltipContent}
+    >
       {dayCell}
     </Tooltip>
   ) : dayCell;
@@ -880,45 +915,14 @@ const EventsLayer = ({
     
     if (dayEvents.length === 0) return null;
 
-    const mainEvent = dayEvents[0];
-    const tooltipContent = (
-      <div style={{ 
-        padding: '8px',
-        backgroundColor: 'white',
-        borderRadius: '4px'
-      }}>
-        {dayEvents.map((event, index) => (
-          <div key={index} style={{ 
-            marginBottom: index < dayEvents.length - 1 ? '8px' : 0,
-            whiteSpace: 'nowrap'
-          }}>
-            <div style={{ 
-              fontWeight: 'bold',
-              color: event.type === 'work' ? '#0366d6' : '#28a745'
-            }}>
-              {event.title}
-            </div>
-            <div style={{ fontSize: '0.9em', color: '#666' }}>{event.time}</div>
-            <div style={{ fontSize: '0.9em' }}>{event.description}</div>
-          </div>
-        ))}
-      </div>
-    );
+    console.log('Rendering event cell for date:', date, 'with events:', dayEvents);
 
-    return (
-      <Tooltip 
-        content={tooltipContent} 
-        show={showTooltips && !isSelecting}
-      >
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 0
-        }}>
-          <div style={{
+    const mainEvent = dayEvents[0];
+    
+    return {
+      element: (
+        <div 
+          style={{
             width: '36px',
             height: '36px',
             borderRadius: '50%',
@@ -927,23 +931,47 @@ const EventsLayer = ({
               : 'rgba(40, 167, 69, 0.2)',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            {dayEvents.length > 1 && (
-              <span style={{ 
-                fontSize: '12px', 
-                fontWeight: 'bold',
-                color: mainEvent.type === 'work' ? '#0366d6' : '#28a745',
-                lineHeight: 1,
-                pointerEvents: 'none'
-              }}>
-                {dayEvents.length}
-              </span>
-            )}
-          </div>
+            justifyContent: 'center',
+            pointerEvents: 'none'
+          }}
+        >
+          {dayEvents.length > 1 && (
+            <span style={{ 
+              fontSize: '12px', 
+              fontWeight: 'bold',
+              color: mainEvent.type === 'work' ? '#0366d6' : '#28a745',
+              lineHeight: 1,
+              pointerEvents: 'none'
+            }}>
+              {dayEvents.length}
+            </span>
+          )}
         </div>
-      </Tooltip>
-    );
+      ),
+      tooltipContent: (
+        <div style={{ 
+          padding: '8px',
+          backgroundColor: 'white',
+          borderRadius: '4px'
+        }}>
+          {dayEvents.map((event, index) => (
+            <div key={index} style={{ 
+              marginBottom: index < dayEvents.length - 1 ? '8px' : 0,
+              whiteSpace: 'nowrap'
+            }}>
+              <div style={{ 
+                fontWeight: 'bold',
+                color: event.type === 'work' ? '#0366d6' : '#28a745'
+              }}>
+                {event.title}
+              </div>
+              <div style={{ fontSize: '0.9em', color: '#666' }}>{event.time}</div>
+              <div style={{ fontSize: '0.9em' }}>{event.description}</div>
+            </div>
+          ))}
+        </div>
+      )
+    };
   };
 
   return (
@@ -994,6 +1022,7 @@ const DateRangePickerNew = ({
   const [validationErrors, setValidationErrors] = useState({});
   const [layers] = useState(INITIAL_LAYERS);
   const [activeLayer, setActiveLayer] = useState('base');
+  const [forceShowTooltips, setForceShowTooltips] = useState(false);
 
   const containerRef = useRef(null);
   const moveToMonthRef = useRef(null);
@@ -1298,6 +1327,24 @@ const DateRangePickerNew = ({
     setActiveLayer(layerId);
   };
 
+  // Add keyboard listener for tooltip toggle
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (e.key === 't' && e.ctrlKey) {  // Ctrl + T to toggle
+        setForceShowTooltips(prev => !prev);
+        console.log('Tooltips forced:', !forceShowTooltips);  // Debug log
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [forceShowTooltips]);
+
+  // Update the Tooltip component usage to include forced state
+  const tooltipProps = {
+    showTooltips: showTooltips || forceShowTooltips
+  };
+
   return (
     <div className="cla-calendar" style={{ width: 'fit-content' }}>
       {displayMode === 'popup' && (
@@ -1395,7 +1442,7 @@ const DateRangePickerNew = ({
                   isSelecting={isSelecting}
                   visibleMonths={visibleMonths}
                   showMonthHeadings={showMonthHeadings}
-                  showTooltips={showTooltips}
+                  showTooltips={tooltipProps.showTooltips}
                 />
               )}
               {activeLayer === 'events' && (
@@ -1407,7 +1454,7 @@ const DateRangePickerNew = ({
                   isSelecting={isSelecting}
                   visibleMonths={visibleMonths}
                   showMonthHeadings={showMonthHeadings}
-                  showTooltips={showTooltips}
+                  showTooltips={tooltipProps.showTooltips}
                 />
               )}
               {activeLayer === 'restrictions' && (
