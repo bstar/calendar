@@ -450,7 +450,8 @@ const MonthGrid = ({
   isSelecting,
   style,
   showMonthHeading = false,
-  showTooltips
+  showTooltips,
+  renderDay
 }) => {
   const monthStart = startOfMonth(baseDate);
   const monthEnd = endOfMonth(monthStart);
@@ -537,9 +538,10 @@ const MonthGrid = ({
               date={date}
               selectedRange={selectedRange}
               isCurrentMonth={isSameMonth(date, baseDate)}
-              onMouseDown={() => onSelectionStart(date)}
-              onMouseEnter={() => onSelectionMove(date)}
+              onMouseDown={() => onSelectionStart?.(date)}
+              onMouseEnter={() => onSelectionMove?.(date)}
               showTooltips={showTooltips}
+              renderContent={renderDay}
             />
           ))
         )}
@@ -588,7 +590,8 @@ const DayCell = ({
   isCurrentMonth,
   onMouseDown,
   onMouseEnter,
-  showTooltips
+  showTooltips,
+  renderContent
 }) => {
   const { isSelected, isInRange, isRangeStart, isRangeEnd } = useMemo(() => {
     if (!selectedRange.start) {
@@ -660,6 +663,7 @@ const DayCell = ({
       }}
     >
       {format(date, "d")}
+      {renderContent && renderContent(date)}
     </div>
   );
 
@@ -679,7 +683,8 @@ const MonthPair = ({
   isSelecting,
   visibleMonths,
   showMonthHeadings,
-  showTooltips
+  showTooltips,
+  renderDay
 }) => {
   // Create array of months to display
   const monthsToShow = [];
@@ -704,6 +709,7 @@ const MonthPair = ({
           style={{ width: `${100 / visibleMonths}%` }}
           showMonthHeading={showMonthHeadings}
           showTooltips={showTooltips}
+          renderDay={renderDay}
         />
       ))}
     </div>
@@ -756,6 +762,12 @@ const INITIAL_LAYERS = [
     required: true,
   },
   {
+    id: 'events',
+    name: 'Events',
+    type: 'overlay',
+    required: false,
+  },
+  {
     id: 'restrictions',
     name: 'Restrictions',
     type: 'overlay',
@@ -768,6 +780,98 @@ const INITIAL_LAYERS = [
     required: false,
   }
 ];
+
+const LayerControl = ({ layers, activeLayer, onLayerChange }) => {
+  return (
+    <div className="cla-layer-control" style={{
+      padding: '12px 16px',
+      borderTop: '1px solid #dee2e6',
+      display: 'flex',
+      gap: '8px'
+    }}>
+      {layers.map(layer => (
+        <button
+          key={layer.id}
+          onClick={() => onLayerChange(layer.id)}
+          className={`cla-layer-button ${activeLayer === layer.id ? 'active' : ''}`}
+          style={{
+            padding: '6px 12px',
+            borderRadius: '4px',
+            border: '1px solid #dee2e6',
+            backgroundColor: activeLayer === layer.id ? '#e7f3ff' : '#fff',
+            color: activeLayer === layer.id ? '#0366d6' : '#666',
+            cursor: 'pointer'
+          }}
+        >
+          {layer.name}
+        </button>
+      ))}
+    </div>
+  );
+};
+
+const EventsLayer = ({
+  months,
+  selectedRange,
+  visibleMonths,
+  showMonthHeadings,
+  showTooltips
+}) => {
+  // Updated events data for Feb-March 2025
+  const events = [
+    { date: '2025-02-15', title: 'Team Meeting', type: 'work' },
+    { date: '2025-02-20', title: 'Lunch with Client', type: 'work' },
+    { date: '2025-02-25', title: 'Birthday Party', type: 'personal' },
+    { date: '2025-03-05', title: 'Conference', type: 'work' },
+    { date: '2025-03-12', title: 'Dentist', type: 'personal' },
+    { date: '2025-03-18', title: 'Project Deadline', type: 'work' },
+    { date: '2025-03-22', title: 'Weekend Trip', type: 'personal' }
+  ];
+
+  return (
+    <div style={{ width: '100%' }}>
+      <MonthPair
+        firstMonth={months[0]}
+        secondMonth={visibleMonths === 1 ? null : months[1]}
+        selectedRange={selectedRange}
+        visibleMonths={visibleMonths}
+        showMonthHeadings={showMonthHeadings}
+        showTooltips={showTooltips}
+        renderDay={(date) => {
+          const dayEvents = events.filter(event => 
+            event.date === format(date, 'yyyy-MM-dd')
+          );
+          
+          if (dayEvents.length === 0) return null;
+
+          return (
+            <div style={{
+              position: 'absolute',
+              bottom: '2px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              display: 'flex',
+              gap: '2px'
+            }}>
+              {dayEvents.map((event, index) => (
+                <div
+                  key={index}
+                  style={{
+                    width: '6px',
+                    height: '6px',
+                    borderRadius: '50%',
+                    backgroundColor: event.type === 'work' ? '#0366d6' : '#28a745'
+                  }}
+                  title={event.title}
+                />
+              ))}
+            </div>
+          );
+        }}
+      />
+    </div>
+  );
+};
 
 const DateRangePickerNew = ({ 
   displayMode = 'popup',
@@ -786,7 +890,7 @@ const DateRangePickerNew = ({
 }) => {
   const [isOpen, setIsOpen] = useState(displayMode === 'embedded' || initialIsOpen);
   const [selectedRange, setSelectedRange] = useState({ start: null, end: null });
-  const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date()));
+  const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date(2025, 1, 1)));
   const [isSelecting, setIsSelecting] = useState(false);
   const [initialDate, setInitialDate] = useState(null);
   const [outOfBoundsDirection, setOutOfBoundsDirection] = useState(null);
@@ -1074,35 +1178,6 @@ const DateRangePickerNew = ({
     }
   }, []);
 
-  const LayerControl = ({ layers, activeLayer, onLayerChange }) => {
-    return (
-      <div className="cla-layer-control" style={{
-        padding: '12px 16px',
-        borderTop: '1px solid #dee2e6',
-        display: 'flex',
-        gap: '8px'
-      }}>
-        {layers.map(layer => (
-          <button
-            key={layer.id}
-            onClick={() => onLayerChange(layer.id)}
-            className={`cla-layer-button ${activeLayer === layer.id ? 'active' : ''}`}
-            style={{
-              padding: '6px 12px',
-              borderRadius: '4px',
-              border: '1px solid #dee2e6',
-              backgroundColor: activeLayer === layer.id ? '#e7f3ff' : '#fff',
-              color: activeLayer === layer.id ? '#0366d6' : '#666',
-              cursor: 'pointer'
-            }}
-          >
-            {layer.name}
-          </button>
-        ))}
-      </div>
-    );
-  };
-
   const BaseLayer = ({
     months,
     selectedRange,
@@ -1212,6 +1287,12 @@ const DateRangePickerNew = ({
             </>
           )}
 
+          <LayerControl
+            layers={layers}
+            activeLayer={activeLayer}
+            onLayerChange={handleLayerChange}
+          />
+
           <div className="cla-card-body" style={{ padding: '16px' }}>
             <div style={{ display: 'flex' }}>
               {activeLayer === 'base' && (
@@ -1221,6 +1302,15 @@ const DateRangePickerNew = ({
                   onSelectionStart={handleSelectionStart}
                   onSelectionMove={handleSelectionMove}
                   isSelecting={isSelecting}
+                  visibleMonths={visibleMonths}
+                  showMonthHeadings={showMonthHeadings}
+                  showTooltips={showTooltips}
+                />
+              )}
+              {activeLayer === 'events' && (
+                <EventsLayer
+                  months={months}
+                  selectedRange={selectedRange}
                   visibleMonths={visibleMonths}
                   showMonthHeadings={showMonthHeadings}
                   showTooltips={showTooltips}
@@ -1236,12 +1326,6 @@ const DateRangePickerNew = ({
               )}
             </div>
           </div>
-
-          <LayerControl
-            layers={layers}
-            activeLayer={activeLayer}
-            onLayerChange={handleLayerChange}
-          />
 
           {showFooter && (
             <div className="cla-card-footer" style={{ padding: '16px' }}>
