@@ -554,31 +554,54 @@ const MonthGrid = ({
   );
 };
 
-// Add custom Tooltip component
-const Tooltip = ({ children, content, show }) => {
-  if (!show) return children;
-  
+// Update the Tooltip component for better positioning
+const Tooltip = ({ content, show, children }) => {
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+  const tooltipRef = useRef(null);
+  const targetRef = useRef(null);
+
+  useEffect(() => {
+    if (show && targetRef.current && tooltipRef.current) {
+      const targetRect = targetRef.current.getBoundingClientRect();
+      const tooltipRect = tooltipRef.current.getBoundingClientRect();
+      
+      // Calculate position to show above the target
+      const top = targetRect.top - tooltipRect.height - 8;
+      const left = targetRect.left + (targetRect.width - tooltipRect.width) / 2;
+
+      // Ensure tooltip stays within viewport
+      const adjustedLeft = Math.max(8, Math.min(left, window.innerWidth - tooltipRect.width - 8));
+      
+      setPosition({
+        top,
+        left: adjustedLeft
+      });
+    }
+  }, [show, content]);
+
   return (
-    <div style={{ position: 'relative' }}>
+    <div ref={targetRef} style={{ position: 'relative', width: '100%', height: '100%' }}>
       {children}
-      <div
-        className="cla-tooltip"
-        style={{
-          position: 'absolute',
-          top: '-30px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          color: 'white',
-          padding: '4px 8px',
-          borderRadius: '4px',
-          fontSize: '12px',
-          whiteSpace: 'nowrap',
-          zIndex: 1100,
-        }}
-      >
-        {content}
-      </div>
+      {show && (
+        <div
+          ref={tooltipRef}
+          style={{
+            position: 'fixed',
+            top: position.top,
+            left: position.left,
+            backgroundColor: 'white',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+            borderRadius: '4px',
+            zIndex: 1000,
+            fontSize: '14px',
+            maxWidth: '300px',
+            padding: '8px',
+            pointerEvents: 'none' // Prevent tooltip from interfering with interactions
+          }}
+        >
+          {content}
+        </div>
+      )}
     </div>
   );
 };
@@ -624,18 +647,23 @@ const DayCell = ({
     return isSameDay(parseISO(selectedRange.start), parseISO(selectedRange.end));
   }, [selectedRange.start, selectedRange.end]);
 
+  const handleMouseEnter = (e) => {
+    if (showTooltips) setShowTooltip(true);
+    onMouseEnter?.(e);
+  };
+
+  const handleMouseLeave = () => {
+    setShowTooltip(false);
+  };
+
   if (!isCurrentMonth) {
     return <div style={{ width: "100%", height: "100%", position: "relative", backgroundColor: "white" }} />;
   }
 
-  // Wrap with Tooltip only if showTooltips is true
   const dayCell = (
     <div
-      onMouseEnter={(e) => {
-        if (showTooltips) setShowTooltip(true);
-        onMouseEnter?.(e);
-      }}
-      onMouseLeave={() => showTooltips && setShowTooltip(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       onMouseDown={onMouseDown}
       style={{
         width: "100%",
@@ -662,7 +690,21 @@ const DayCell = ({
         } : {})
       }}
     >
-      {format(date, "d")}
+      <div style={{ 
+        position: 'absolute',
+        inset: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <span style={{ 
+          position: 'relative', 
+          zIndex: 1,
+          pointerEvents: 'none' 
+        }}>
+          {format(date, "d")}
+        </span>
+      </div>
       {renderContent && renderContent(date)}
     </div>
   );
@@ -815,18 +857,94 @@ const EventsLayer = ({
   selectedRange,
   visibleMonths,
   showMonthHeadings,
-  showTooltips
+  showTooltips,
+  onSelectionStart,
+  onSelectionMove,
+  isSelecting
 }) => {
-  // Updated events data for Feb-March 2025
+  // Sample events data
   const events = [
-    { date: '2025-02-15', title: 'Team Meeting', type: 'work' },
-    { date: '2025-02-20', title: 'Lunch with Client', type: 'work' },
-    { date: '2025-02-25', title: 'Birthday Party', type: 'personal' },
-    { date: '2025-03-05', title: 'Conference', type: 'work' },
-    { date: '2025-03-12', title: 'Dentist', type: 'personal' },
-    { date: '2025-03-18', title: 'Project Deadline', type: 'work' },
-    { date: '2025-03-22', title: 'Weekend Trip', type: 'personal' }
+    { date: '2025-02-15', title: 'Team Meeting', type: 'work', time: '10:00 AM', description: 'Weekly sync' },
+    { date: '2025-02-20', title: 'Lunch with Client', type: 'work', time: '12:30 PM', description: 'Project discussion' },
+    { date: '2025-02-25', title: 'Birthday Party', type: 'personal', time: '7:00 PM', description: 'Cake and presents!' },
+    { date: '2025-03-05', title: 'Conference', type: 'work', time: '9:00 AM', description: 'Annual tech summit' },
+    { date: '2025-03-12', title: 'Dentist', type: 'personal', time: '2:00 PM', description: 'Regular checkup' },
+    { date: '2025-03-18', title: 'Project Deadline', type: 'work', time: '5:00 PM', description: 'Final deliverables due' },
+    { date: '2025-03-22', title: 'Weekend Trip', type: 'personal', time: 'All day', description: 'Beach getaway' }
   ];
+
+  const renderDay = (date) => {
+    const dayEvents = events.filter(event => 
+      event.date === format(date, 'yyyy-MM-dd')
+    );
+    
+    if (dayEvents.length === 0) return null;
+
+    const mainEvent = dayEvents[0];
+    const tooltipContent = (
+      <div style={{ 
+        padding: '8px',
+        backgroundColor: 'white',
+        borderRadius: '4px'
+      }}>
+        {dayEvents.map((event, index) => (
+          <div key={index} style={{ 
+            marginBottom: index < dayEvents.length - 1 ? '8px' : 0,
+            whiteSpace: 'nowrap'
+          }}>
+            <div style={{ 
+              fontWeight: 'bold',
+              color: event.type === 'work' ? '#0366d6' : '#28a745'
+            }}>
+              {event.title}
+            </div>
+            <div style={{ fontSize: '0.9em', color: '#666' }}>{event.time}</div>
+            <div style={{ fontSize: '0.9em' }}>{event.description}</div>
+          </div>
+        ))}
+      </div>
+    );
+
+    return (
+      <Tooltip 
+        content={tooltipContent} 
+        show={showTooltips && !isSelecting}
+      >
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 0
+        }}>
+          <div style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '50%',
+            backgroundColor: mainEvent.type === 'work' 
+              ? 'rgba(3, 102, 214, 0.2)' 
+              : 'rgba(40, 167, 69, 0.2)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            {dayEvents.length > 1 && (
+              <span style={{ 
+                fontSize: '12px', 
+                fontWeight: 'bold',
+                color: mainEvent.type === 'work' ? '#0366d6' : '#28a745',
+                lineHeight: 1,
+                pointerEvents: 'none'
+              }}>
+                {dayEvents.length}
+              </span>
+            )}
+          </div>
+        </div>
+      </Tooltip>
+    );
+  };
 
   return (
     <div style={{ width: '100%' }}>
@@ -834,40 +952,13 @@ const EventsLayer = ({
         firstMonth={months[0]}
         secondMonth={visibleMonths === 1 ? null : months[1]}
         selectedRange={selectedRange}
+        onSelectionStart={onSelectionStart}
+        onSelectionMove={onSelectionMove}
+        isSelecting={isSelecting}
         visibleMonths={visibleMonths}
         showMonthHeadings={showMonthHeadings}
         showTooltips={showTooltips}
-        renderDay={(date) => {
-          const dayEvents = events.filter(event => 
-            event.date === format(date, 'yyyy-MM-dd')
-          );
-          
-          if (dayEvents.length === 0) return null;
-
-          return (
-            <div style={{
-              position: 'absolute',
-              bottom: '2px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              display: 'flex',
-              gap: '2px'
-            }}>
-              {dayEvents.map((event, index) => (
-                <div
-                  key={index}
-                  style={{
-                    width: '6px',
-                    height: '6px',
-                    borderRadius: '50%',
-                    backgroundColor: event.type === 'work' ? '#0366d6' : '#28a745'
-                  }}
-                  title={event.title}
-                />
-              ))}
-            </div>
-          );
-        }}
+        renderDay={renderDay}
       />
     </div>
   );
@@ -1311,6 +1402,9 @@ const DateRangePickerNew = ({
                 <EventsLayer
                   months={months}
                   selectedRange={selectedRange}
+                  onSelectionStart={handleSelectionStart}
+                  onSelectionMove={handleSelectionMove}
+                  isSelecting={isSelecting}
                   visibleMonths={visibleMonths}
                   showMonthHeadings={showMonthHeadings}
                   showTooltips={showTooltips}
