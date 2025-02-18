@@ -748,6 +748,27 @@ const SideChevronIndicator = ({ outOfBoundsDirection, isSelecting }) => {
   );
 };
 
+const INITIAL_LAYERS = [
+  {
+    id: 'base',
+    name: 'Calendar',
+    type: 'base',
+    required: true,
+  },
+  {
+    id: 'restrictions',
+    name: 'Restrictions',
+    type: 'overlay',
+    required: false,
+  },
+  {
+    id: 'alerts',
+    name: 'Alerts',
+    type: 'overlay',
+    required: false,
+  }
+];
+
 const DateRangePickerNew = ({ 
   displayMode = 'popup',
   containerStyle = null,
@@ -776,6 +797,8 @@ const DateRangePickerNew = ({
     currentField: null
   });
   const [validationErrors, setValidationErrors] = useState({});
+  const [layers] = useState(INITIAL_LAYERS);
+  const [activeLayer, setActiveLayer] = useState('base');
 
   const containerRef = useRef(null);
   const moveToMonthRef = useRef(null);
@@ -1051,6 +1074,64 @@ const DateRangePickerNew = ({
     }
   }, []);
 
+  const LayerControl = ({ layers, activeLayer, onLayerChange }) => {
+    return (
+      <div className="cla-layer-control" style={{
+        padding: '12px 16px',
+        borderTop: '1px solid #dee2e6',
+        display: 'flex',
+        gap: '8px'
+      }}>
+        {layers.map(layer => (
+          <button
+            key={layer.id}
+            onClick={() => onLayerChange(layer.id)}
+            className={`cla-layer-button ${activeLayer === layer.id ? 'active' : ''}`}
+            style={{
+              padding: '6px 12px',
+              borderRadius: '4px',
+              border: '1px solid #dee2e6',
+              backgroundColor: activeLayer === layer.id ? '#e7f3ff' : '#fff',
+              color: activeLayer === layer.id ? '#0366d6' : '#666',
+              cursor: 'pointer'
+            }}
+          >
+            {layer.name}
+          </button>
+        ))}
+      </div>
+    );
+  };
+
+  const BaseLayer = ({
+    months,
+    selectedRange,
+    onSelectionStart,
+    onSelectionMove,
+    isSelecting,
+    visibleMonths,
+    showMonthHeadings,
+    showTooltips
+  }) => {
+    return (
+      <MonthPair
+        firstMonth={months[0]}
+        secondMonth={visibleMonths === 1 ? null : months[1]}
+        selectedRange={selectedRange}
+        onSelectionStart={onSelectionStart}
+        onSelectionMove={onSelectionMove}
+        isSelecting={isSelecting}
+        visibleMonths={visibleMonths}
+        showMonthHeadings={showMonthHeadings}
+        showTooltips={showTooltips}
+      />
+    );
+  };
+
+  const handleLayerChange = (layerId) => {
+    setActiveLayer(layerId);
+  };
+
   return (
     <div className="cla-calendar" style={{ width: 'fit-content' }}>
       {displayMode === 'popup' && (
@@ -1133,19 +1214,34 @@ const DateRangePickerNew = ({
 
           <div className="cla-card-body" style={{ padding: '16px' }}>
             <div style={{ display: 'flex' }}>
-              <MonthPair
-                firstMonth={months[0]}
-                secondMonth={visibleMonths === 1 ? null : months[1]}
-                selectedRange={selectedRange}
-                onSelectionStart={handleSelectionStart}
-                onSelectionMove={handleSelectionMove}
-                isSelecting={isSelecting}
-                visibleMonths={visibleMonths}
-                showMonthHeadings={showMonthHeadings}
-                showTooltips={showTooltips}
-              />
+              {activeLayer === 'base' && (
+                <BaseLayer
+                  months={months}
+                  selectedRange={selectedRange}
+                  onSelectionStart={handleSelectionStart}
+                  onSelectionMove={handleSelectionMove}
+                  isSelecting={isSelecting}
+                  visibleMonths={visibleMonths}
+                  showMonthHeadings={showMonthHeadings}
+                  showTooltips={showTooltips}
+                />
+              )}
+              {activeLayer === 'restrictions' && (
+                // Placeholder for restrictions layer
+                <div>Restrictions Layer (Coming Soon)</div>
+              )}
+              {activeLayer === 'alerts' && (
+                // Placeholder for alerts layer
+                <div>Alerts Layer (Coming Soon)</div>
+              )}
             </div>
           </div>
+
+          <LayerControl
+            layers={layers}
+            activeLayer={activeLayer}
+            onLayerChange={handleLayerChange}
+          />
 
           {showFooter && (
             <div className="cla-card-footer" style={{ padding: '16px' }}>
