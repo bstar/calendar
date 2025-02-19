@@ -19,7 +19,7 @@ import {
 import './DateRangePicker.css';
 import PropTypes from "prop-types";
 import { DEFAULT_CONTAINER_STYLES, DEFAULT_LAYERS } from './DateRangePicker.config';
-import { LayerRenderer } from './DateRangePickerNew/layers/LayerRenderer';
+import { LayerRenderer } from './DateRangePickerNew/layers/LayerRenderer.jsx';
 import { LAYER_TYPES } from './DateRangePickerNew/layers/types';
 
 // Custom components
@@ -674,10 +674,12 @@ const DayCell = ({
   const eventContent = renderContent?.(date);
   
   const getBackgroundColor = () => {
-    const renderer = LayerRenderer.getRenderer(layer);
-    return renderer.getBackgroundColor ? 
-      renderer.getBackgroundColor(date) : 
-      'transparent';
+    if (layer.data?.background) {
+      const renderer = LayerRenderer.createBackgroundRenderer(layer.data.background);
+      const result = renderer(date);
+      return result?.backgroundColor || 'transparent';
+    }
+    return 'transparent';
   };
 
   const events = layer.data?.events?.filter(event => 
@@ -864,7 +866,7 @@ const LayerControl = ({ layers, activeLayer, onLayerChange }) => {
   );
 };
 
-const EventsLayer = ({
+const CalendarGrid = ({
   months,
   selectedRange,
   onSelectionStart,
@@ -873,171 +875,48 @@ const EventsLayer = ({
   visibleMonths,
   showMonthHeadings,
   showTooltips,
-  data = [],
-  layer
-}) => {
-  // Use useMemo to memoize the renderDay function based on data changes
-  const renderDay = useMemo(() => (date) => {
-    const dayEvents = (layer.data?.events || []).filter(event => {
-      const eventDate = parseISO(event.date);
-      return isSameDay(eventDate, date);
-    });
-    
-    if (dayEvents.length === 0) return null;
-
-    const mainEvent = dayEvents[0];
-    
-    return {
-      element: (
-        <div 
-          style={{
-            width: '36px',
-            height: '36px',
-            borderRadius: '50%',
-            backgroundColor: mainEvent.type === 'work' 
-              ? 'rgba(3, 102, 214, 0.2)' 
-              : 'rgba(40, 167, 69, 0.2)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            pointerEvents: 'none'
-          }}
-        >
-          {dayEvents.length > 1 && (
-            <span style={{ 
-              fontSize: '12px', 
-              fontWeight: 'bold',
-              color: mainEvent.type === 'work' ? '#0366d6' : '#28a745',
-              lineHeight: 1,
-              pointerEvents: 'none'
-            }}>
-              {dayEvents.length}
-            </span>
-          )}
-        </div>
-      ),
-      tooltipContent: (
-        <div style={{ 
-          padding: '8px',
-          backgroundColor: 'white',
-          borderRadius: '4px'
-        }}>
-          {dayEvents.map((event, index) => (
-            <div key={index} style={{ 
-              marginBottom: index < dayEvents.length - 1 ? '8px' : 0,
-              whiteSpace: 'nowrap'
-            }}>
-              <div style={{ 
-                fontWeight: 'bold',
-                color: event.type === 'work' ? '#0366d6' : '#28a745'
-              }}>
-                {event.title}
-              </div>
-              <div style={{ fontSize: '0.9em', color: '#666' }}>{event.time}</div>
-              <div style={{ fontSize: '0.9em' }}>{event.description}</div>
-            </div>
-          ))}
-        </div>
-      )
-    };
-  }, [layer.data]); // Update dependency to layer.data
-
-  return (
-    <div style={{ width: '100%' }}>
-      <MonthPair
-        key={JSON.stringify(data)} // Force re-render when data changes
-        firstMonth={months[0]}
-        secondMonth={visibleMonths === 1 ? null : months[1]}
-        selectedRange={selectedRange}
-        onSelectionStart={onSelectionStart}
-        onSelectionMove={onSelectionMove}
-        isSelecting={isSelecting}
-        visibleMonths={visibleMonths}
-        showMonthHeadings={showMonthHeadings}
-        showTooltips={showTooltips}
-        renderDay={renderDay}
-        layer={layer}
-      />
-    </div>
-  );
-};
-
-const BaseLayer = ({
-  months,
-  selectedRange,
-  onSelectionStart,
-  onSelectionMove,
-  isSelecting,
-  visibleMonths,
-  showMonthHeadings,
-  showTooltips,
-  data = [],
   layer,
   activeLayer
 }) => {
-  // Use useMemo to memoize the renderDay function based on data changes
-  const renderDay = useMemo(() => (date) => {
-    const featureData = layer.data?.[layer.type] || [];
-    const dayData = featureData.filter(item => {
-      const itemDate = parseISO(item.date);
-      return isSameDay(itemDate, date);
-    });
+  // Create renderers based on available data types
+  const renderers = [];
+  
+  if (layer.data?.background) {
+    renderers.push(LayerRenderer.createBackgroundRenderer(layer.data.background));
+  }
+  
+  if (layer.data?.events) {
+    renderers.push(LayerRenderer.createEventRenderer(layer.data.events));
+  }
+  
+  const renderDay = (date) => {
+    // Combine all renderer results for this date
+    const results = renderers
+      .map(renderer => renderer(date))
+      .filter(Boolean);
+      
+    if (results.length === 0) return null;
     
-    if (dayData.length === 0) return null;
-
-    const mainItem = dayData[0];
-    
-    return {
-      element: (
-        <div 
-          style={{
-            width: '36px',
-            height: '36px',
-            borderRadius: '50%',
-            backgroundColor: 'rgba(0, 0, 0, 0.1)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            pointerEvents: 'none'
-          }}
-        >
-          {dayData.length > 1 && (
-            <span style={{ 
-              fontSize: '12px', 
-              fontWeight: 'bold',
-              color: '#666',
-              lineHeight: 1,
-              pointerEvents: 'none'
-            }}>
-              {dayData.length}
-            </span>
-          )}
+    // Merge the results
+    return results.reduce((combined, result) => ({
+      backgroundColor: result.backgroundColor || combined.backgroundColor,
+      element: result.element ? (
+        <div style={{ position: 'relative' }}>
+          {combined.element}
+          {result.element}
         </div>
-      ),
-      tooltipContent: (
-        <div style={{ 
-          padding: '8px',
-          backgroundColor: 'white',
-          borderRadius: '4px'
-        }}>
-          {dayData.map((item, index) => (
-            <div key={index} style={{ 
-              marginBottom: index < dayData.length - 1 ? '8px' : 0,
-              whiteSpace: 'nowrap'
-            }}>
-              <div style={{ fontWeight: 'bold' }}>{item.title}</div>
-              <div style={{ fontSize: '0.9em', color: '#666' }}>{item.time}</div>
-              <div style={{ fontSize: '0.9em' }}>{item.description}</div>
-            </div>
-          ))}
+      ) : combined.element,
+      tooltipContent: result.tooltipContent ? (
+        <div>
+          {combined.tooltipContent}
+          {result.tooltipContent}
         </div>
-      )
-    };
-  }, [layer.data, layer.type]);
-
+      ) : combined.tooltipContent
+    }));
+  };
+  
   return (
     <MonthPair
-      key={JSON.stringify(data)} // Force re-render when data changes
       firstMonth={months[0]}
       secondMonth={visibleMonths === 1 ? null : months[1]}
       selectedRange={selectedRange}
@@ -1404,42 +1283,19 @@ const DateRangePickerNew = ({
     console.log('Layer:', layer.name);
     console.log('Layer data:', layer.data);
     
-    // Create a composite view that can show multiple features
     return (
-      <div style={{ width: '100%', position: 'relative' }}>
-        {/* Render background if background data exists */}
-        {layer.data?.background && (
-          <BaseLayer
-            months={months}
-            selectedRange={selectedRange}
-            onSelectionStart={handleSelectionStart}
-            onSelectionMove={handleSelectionMove}
-            isSelecting={isSelecting}
-            visibleMonths={visibleMonths}
-            showMonthHeadings={showMonthHeadings}
-            showTooltips={tooltipProps.showTooltips}
-            data={layer.data}
-            layer={layer}
-            activeLayer={activeLayer}
-          />
-        )}
-      
-        {/* Render events if events data exists */}
-        {layer.data?.events && (
-          <EventsLayer
-            months={months}
-            selectedRange={selectedRange}
-            onSelectionStart={handleSelectionStart}
-            onSelectionMove={handleSelectionMove}
-            isSelecting={isSelecting}
-            visibleMonths={visibleMonths}
-            showMonthHeadings={showMonthHeadings}
-            showTooltips={tooltipProps.showTooltips}
-            data={layer.data}
-            layer={layer}
-          />
-        )}
-      </div>
+      <CalendarGrid
+        months={months}
+        selectedRange={selectedRange}
+        onSelectionStart={handleSelectionStart}
+        onSelectionMove={handleSelectionMove}
+        isSelecting={isSelecting}
+        visibleMonths={visibleMonths}
+        showMonthHeadings={showMonthHeadings}
+        showTooltips={tooltipProps.showTooltips}
+        layer={layer}
+        activeLayer={activeLayer}
+      />
     );
   };
 
