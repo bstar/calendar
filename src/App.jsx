@@ -54,6 +54,48 @@ const styles = {
     fontSize: '12px',
     color: '#666',
     fontWeight: '600'
+  },
+  button: {
+    padding: '6px 12px',
+    fontSize: '12px',
+    border: '1px solid #cfd4d9',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+    transition: 'all 0.2s ease',
+    backgroundColor: '#fff',
+    color: '#666'
+  },
+  // Button variants
+  buttonVariants: {
+    primary: {
+      backgroundColor: '#0366d6',
+      color: '#fff',
+      border: 'none',
+      '&:hover': {
+        backgroundColor: '#0256b9'
+      }
+    },
+    secondary: {
+      backgroundColor: '#f8f9fa',
+      '&:hover': {
+        backgroundColor: '#e9ecef'
+      }
+    },
+    import: {
+      backgroundColor: '#e3f2fd',
+      '&:hover': {
+        backgroundColor: '#bbdefb',
+        color: '#1565c0'
+      }
+    },
+    export: {
+      backgroundColor: '#e6f4ea',
+      '&:hover': {
+        backgroundColor: '#d4eede',
+        color: '#1a7f37'
+      }
+    }
   }
 };
 
@@ -930,15 +972,16 @@ function App() {
             <button
               onClick={() => setShowImportModal(true)}
               style={{
-                padding: '4px 8px',
-                backgroundColor: '#e3f2fd',  // Pastel blue
+                padding: '6px 12px',
+                backgroundColor: '#e3f2fd',
                 color: '#666',
-                borderWidth: '0 1px 1px 0',
+                borderWidth: '0 1px 1px 1px',
                 borderStyle: 'solid',
                 borderColor: '#cfd4d9',
-                borderRadius: '0 0 0 8px',  // Only round bottom-left
+                borderRadius: '0 0 0 4px',
                 cursor: 'pointer',
                 fontSize: '12px',
+                whiteSpace: 'nowrap',
                 transition: 'all 0.2s ease',
                 '&:hover': {
                   backgroundColor: '#bbdefb',
@@ -951,15 +994,16 @@ function App() {
             <button
               onClick={handleExport}
               style={{
-                padding: '4px 8px',
-                backgroundColor: '#e6f4ea',  // Pastel green
+                padding: '6px 12px',
+                backgroundColor: '#e6f4ea',
                 color: '#666',
                 borderWidth: '0 1px 1px 0',
                 borderStyle: 'solid',
                 borderColor: '#cfd4d9',
-                borderRadius: '0 8px 0 0',  // Only round top-right (part of container)
+                borderRadius: '0 8px 0 0',
                 cursor: 'pointer',
                 fontSize: '12px',
+                whiteSpace: 'nowrap',
                 transition: 'all 0.2s ease',
                 '&:hover': {
                   backgroundColor: '#d4eede',
