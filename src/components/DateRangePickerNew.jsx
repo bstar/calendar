@@ -1345,7 +1345,6 @@ const DateRangePickerNew = ({
           {...(settings.enableOutOfBoundsScroll ? {
             onMouseDown: handleMouseDown,
             onMouseMove: handleMouseMove,
-            onMouseUp: handleMouseUp,
             onMouseLeave: handleMouseLeave
           } : {})}
         >
