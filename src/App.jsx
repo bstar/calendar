@@ -348,11 +348,11 @@ function App() {
               style={{
                 ...styles.containerStyleButton,
                 marginLeft: 0,
-                backgroundColor: '#f8f9fa',
-                color: '#444',
+                backgroundColor: '#f3e8fd',
+                color: '#6f42c1',
                 '&:hover': {
-                  backgroundColor: '#e9ecef',
-                  color: '#0366d6'
+                  backgroundColor: '#e9d5fc',
+                  color: '#6f42c1'
                 }
               }}
             >
