@@ -377,7 +377,6 @@ function App() {
   };
 
   const LayerDataEditor = ({ layer, onUpdate }) => {
-    const [isEditing, setIsEditing] = useState(false);
     const [dataText, setDataText] = useState(
       JSON.stringify(layer.data || [], null, 2)
     );
@@ -386,7 +385,6 @@ function App() {
       try {
         const newData = JSON.parse(dataText);
         onUpdate(layer.name, newData);
-        setIsEditing(false);
       } catch (e) {
         alert('Invalid JSON format');
       }
@@ -408,64 +406,35 @@ function App() {
             Layer Data
           </h4>
           <button
-            onClick={() => setIsEditing(!isEditing)}
+            onClick={handleApply}
             style={{
-              padding: '4px 8px',
-              fontSize: '12px',
-              border: '1px solid #dee2e6',
+              padding: '4px 12px',
+              background: '#0366d6',
+              color: '#fff',
+              border: 'none',
               borderRadius: '4px',
-              background: isEditing ? '#fff3cd' : '#fff',
               cursor: 'pointer'
             }}
           >
-            {isEditing ? 'Cancel' : 'Edit Data'}
+            Apply Changes
           </button>
         </div>
 
-        {isEditing ? (
-          <>
-            <textarea
-              value={dataText}
-              onChange={(e) => setDataText(e.target.value)}
-              style={{
-                width: '100%',
-                height: '200px',
-                padding: '8px',
-                fontFamily: 'monospace',
-                fontSize: '12px',
-                border: '1px solid #dee2e6',
-                borderRadius: '4px',
-                resize: 'vertical'
-              }}
-            />
-            <button
-              onClick={handleApply}
-              style={{
-                marginTop: '8px',
-                padding: '4px 12px',
-                background: '#0366d6',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              Apply Changes
-            </button>
-          </>
-        ) : (
-          <pre style={{ 
-            margin: 0,
+        <textarea
+          value={dataText}
+          onChange={(e) => setDataText(e.target.value)}
+          style={{
+            width: '100%',
+            height: '200px',
             padding: '12px',
-            backgroundColor: '#f6f8fa',
-            borderRadius: '6px',
+            fontFamily: 'monospace',
             fontSize: '12px',
-            overflow: 'auto',
-            maxHeight: '200px'
-          }}>
-            {JSON.stringify(layer.data, null, 2)}
-          </pre>
-        )}
+            border: '1px solid #dee2e6',
+            borderRadius: '4px',
+            resize: 'vertical',
+            backgroundColor: '#f6f8fa'
+          }}
+        />
       </div>
     );
   };
