@@ -7,6 +7,29 @@ export const DEFAULT_LAYERS = [
     description: 'Basic calendar functionality with date selection'
   },
   {
+    name: 'Background',
+    type: 'overlay',
+    title: 'Background Colors',
+    description: 'Apply background colors to date ranges',
+    data: [
+      {
+        startDate: '2025-01-05',
+        endDate: '2025-01-15',
+        color: '#cce5ff'  // Darker pastel blue
+      },
+      {
+        startDate: '2025-02-10',
+        endDate: '2025-02-20',
+        color: '#ffe6e6'  // Darker pastel red
+      },
+      {
+        startDate: '2025-03-01',
+        endDate: '2025-03-10',
+        color: '#e6ffe6'  // Darker pastel green
+      }
+    ]
+  },
+  {
     name: 'Events',
     type: 'overlay',
     title: 'Event Management',
