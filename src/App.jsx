@@ -148,6 +148,9 @@ function App() {
 
   const [activeTab, setActiveTab] = useState('core');
 
+  // Add new state for import modal
+  const [showImportModal, setShowImportModal] = useState(false);
+
   // Initialize layers with data
   useEffect(() => {
     console.log('=== Initial Settings ===');
@@ -760,6 +763,89 @@ function App() {
     });
   };
 
+  // Add import handler
+  const handleImport = (configText) => {
+    try {
+      const newConfig = JSON.parse(configText);
+      setSettings(newConfig);
+      setShowImportModal(false);
+    } catch (e) {
+      alert('Invalid configuration format');
+    }
+  };
+
+  // Add Import Modal component
+  const ImportModal = ({ onClose, onImport }) => {
+    const [configText, setConfigText] = useState('');
+    
+    return (
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 1000
+      }}>
+        <div style={{
+          backgroundColor: 'white',
+          padding: '24px',
+          borderRadius: '8px',
+          width: '500px',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+        }}>
+          <h3 style={docStyles.sectionHeading}>Import Configuration</h3>
+          <textarea
+            value={configText}
+            onChange={(e) => setConfigText(e.target.value)}
+            placeholder="Paste configuration JSON here..."
+            style={{
+              width: '100%',
+              height: '200px',
+              padding: '12px',
+              marginBottom: '16px',
+              border: '1px solid #dee2e6',
+              borderRadius: '4px',
+              fontSize: '13px',
+              fontFamily: 'monospace'
+            }}
+          />
+          <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+            <button
+              onClick={onClose}
+              style={{
+                padding: '8px 16px',
+                border: '1px solid #dee2e6',
+                borderRadius: '4px',
+                background: 'white',
+                cursor: 'pointer'
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => onImport(configText)}
+              style={{
+                padding: '8px 16px',
+                border: 'none',
+                borderRadius: '4px',
+                background: '#0366d6',
+                color: 'white',
+                cursor: 'pointer'
+              }}
+            >
+              Import
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div style={{ padding: '20px', maxWidth: '1800px', margin: '0 auto' }}>
       {/* Header */}
@@ -816,31 +902,51 @@ function App() {
           position: 'sticky',
           top: '20px'
         }}>
-          {/* Export Button - Moved outside the relative container */}
-          <button
-            onClick={handleExport}
-            style={{
-              position: 'absolute',
-              top: 0,
-              right: 0,
-              padding: '4px 8px',
-              backgroundColor: '#e6f4ea',  // Pastel green
-              color: '#666',
-              borderWidth: '0 1px 1px 0',
-              borderStyle: 'solid',
-              borderColor: '#cfd4d9',
-              borderRadius: '0 8px 0 8px',  // Only round bottom-right and top-right
-              cursor: 'pointer',
-              fontSize: '12px',
-              transition: 'all 0.2s ease',
-              '&:hover': {
-                backgroundColor: '#d4eede',
-                color: '#1a7f37'
-              }
-            }}
-          >
-            Export
-          </button>
+          {/* Export/Import Buttons */}
+          <div style={{ position: 'absolute', top: 0, right: 0, display: 'flex' }}>
+            <button
+              onClick={() => setShowImportModal(true)}
+              style={{
+                padding: '4px 8px',
+                backgroundColor: '#e3f2fd',  // Pastel blue
+                color: '#666',
+                borderWidth: '0 1px 1px 0',
+                borderStyle: 'solid',
+                borderColor: '#cfd4d9',
+                borderRadius: '0 0 0 8px',  // Only round bottom-left
+                cursor: 'pointer',
+                fontSize: '12px',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  backgroundColor: '#bbdefb',
+                  color: '#1565c0'
+                }
+              }}
+            >
+              Import
+            </button>
+            <button
+              onClick={handleExport}
+              style={{
+                padding: '4px 8px',
+                backgroundColor: '#e6f4ea',  // Pastel green
+                color: '#666',
+                borderWidth: '0 1px 1px 0',
+                borderStyle: 'solid',
+                borderColor: '#cfd4d9',
+                borderRadius: '0 8px 0 0',  // Only round top-right (part of container)
+                cursor: 'pointer',
+                fontSize: '12px',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  backgroundColor: '#d4eede',
+                  color: '#1a7f37'
+                }
+              }}
+            >
+              Export
+            </button>
+          </div>
 
           <div style={{ 
             position: 'relative', 
@@ -1302,6 +1408,14 @@ function App() {
           </div>
         </div>
       </div>
+
+      {/* Import Modal */}
+      {showImportModal && (
+        <ImportModal
+          onClose={() => setShowImportModal(false)}
+          onImport={handleImport}
+        />
+      )}
     </div>
   );
 }
