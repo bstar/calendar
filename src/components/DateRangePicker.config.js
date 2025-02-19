@@ -1,39 +1,24 @@
+import { LAYER_TYPES } from './DateRangePickerNew/layers/types';
+
 export const DEFAULT_LAYERS = [
   {
-    name: 'Calendar',
-    type: 'base',
+    name: 'calendar',
+    type: LAYER_TYPES.BASE,
     required: true,
-    title: 'Base Calendar Layer',
-    description: 'Basic calendar functionality with date selection'
+    title: 'Calendar',
+    description: 'Basic calendar functionality'
   },
   {
-    name: 'Background',
-    type: 'overlay',
-    title: 'Background Colors',
-    description: 'Apply background colors to date ranges',
-    data: [
-      {
-        startDate: '2025-01-05',
-        endDate: '2025-01-15',
-        color: '#cce5ff'  // Darker pastel blue
-      },
-      {
-        startDate: '2025-02-10',
-        endDate: '2025-02-20',
-        color: '#ffe6e6'  // Darker pastel red
-      },
-      {
-        startDate: '2025-03-01',
-        endDate: '2025-03-10',
-        color: '#e6ffe6'  // Darker pastel green
-      }
-    ]
+    name: 'sample-background',
+    type: LAYER_TYPES.BACKGROUND,
+    title: 'Sample Background',
+    description: 'Example background colors',
   },
   {
-    name: 'Events',
-    type: 'overlay',
-    title: 'Event Management',
-    description: 'Display and manage calendar events'
+    name: 'sample-events',
+    type: LAYER_TYPES.EVENTS,
+    title: 'Sample Events',
+    description: 'Example events',
   }
 ];
 

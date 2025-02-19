@@ -19,6 +19,8 @@ import {
 import './DateRangePicker.css';
 import PropTypes from "prop-types";
 import { DEFAULT_CONTAINER_STYLES, DEFAULT_LAYERS } from './DateRangePicker.config';
+import { LayerRenderer } from './DateRangePickerNew/layers/LayerRenderer';
+import { LAYER_TYPES } from './DateRangePickerNew/layers/types';
 
 // Custom components
 const Card = React.forwardRef(({ children, className, ...props }, ref) => (
@@ -453,7 +455,7 @@ const MonthGrid = ({
   showMonthHeading = false,
   showTooltips,
   renderDay,
-  layerData
+  layer
 }) => {
   const monthStart = startOfMonth(baseDate);
   const monthEnd = endOfMonth(monthStart);
@@ -544,7 +546,8 @@ const MonthGrid = ({
               onMouseEnter={() => onSelectionMove(date)}
               showTooltips={showTooltips}
               renderContent={renderDay}
-              layerData={layerData}
+              layer={layer}
+              activeLayer={layer.name}
             />
           ))
         )}
@@ -620,7 +623,8 @@ const DayCell = ({
   onMouseEnter,
   showTooltips,
   renderContent,
-  layerData
+  layer,
+  activeLayer
 }) => {
   const { isSelected, isInRange, isRangeStart, isRangeEnd } = useMemo(() => {
     if (!selectedRange.start) {
@@ -670,19 +674,10 @@ const DayCell = ({
   const eventContent = renderContent?.(date);
   
   const getBackgroundColor = () => {
-    if (!layerData) return 'transparent';
-    
-    for (const range of layerData) {
-      const start = parseISO(range.startDate);
-      const end = parseISO(range.endDate);
-      
-      if (isWithinInterval(date, { start, end }) || 
-          isSameDay(date, start) || 
-          isSameDay(date, end)) {
-        return range.color;
-      }
-    }
-    return 'transparent';
+    const renderer = LayerRenderer.getRenderer(layer);
+    return renderer.getBackgroundColor ? 
+      renderer.getBackgroundColor(date) : 
+      'transparent';
   };
 
   const dayCell = (
@@ -767,7 +762,7 @@ const MonthPair = ({
   showMonthHeadings,
   showTooltips,
   renderDay,
-  layerData
+  layer
 }) => {
   // Create array of months to display
   const monthsToShow = [];
@@ -793,7 +788,7 @@ const MonthPair = ({
           showMonthHeading={showMonthHeadings}
           showTooltips={showTooltips}
           renderDay={renderDay}
-          layerData={layerData}
+          layer={layer}
         />
       ))}
     </div>
@@ -875,7 +870,7 @@ const EventsLayer = ({
   showMonthHeadings,
   showTooltips,
   data = [],
-  layerData
+  layer
 }) => {
   // Use useMemo to memoize the renderDay function based on data changes
   const renderDay = useMemo(() => (date) => {
@@ -957,7 +952,7 @@ const EventsLayer = ({
         showMonthHeadings={showMonthHeadings}
         showTooltips={showTooltips}
         renderDay={renderDay}
-        layerData={layerData}
+        layer={layer}
       />
     </div>
   );
@@ -973,7 +968,8 @@ const BaseLayer = ({
   showMonthHeadings,
   showTooltips,
   data = [],
-  layerData
+  layer,
+  activeLayer
 }) => {
   // Use useMemo to memoize the renderDay function based on data changes
   const renderDay = useMemo(() => (date) => {
@@ -1047,7 +1043,7 @@ const BaseLayer = ({
       showMonthHeadings={showMonthHeadings}
       showTooltips={showTooltips}
       renderDay={renderDay}
-      layerData={layerData}
+      layer={layer}
     />
   );
 };
@@ -1403,7 +1399,7 @@ const DateRangePickerNew = ({
     console.log('Layer data:', layer.data);
     
     switch (layer.type) {
-      case 'base':
+      case LAYER_TYPES.BASE:
         return (
           <BaseLayer
             months={months}
@@ -1415,10 +1411,27 @@ const DateRangePickerNew = ({
             showMonthHeadings={showMonthHeadings}
             showTooltips={tooltipProps.showTooltips}
             data={layer.data}
-            layerData={activeLayers.find(l => l.name === 'Background')?.data}
+            layer={layer}
+            activeLayer={activeLayer}
           />
         );
-      case 'overlay':
+      case LAYER_TYPES.BACKGROUND:
+        return (
+          <BaseLayer
+            months={months}
+            selectedRange={selectedRange}
+            onSelectionStart={handleSelectionStart}
+            onSelectionMove={handleSelectionMove}
+            isSelecting={isSelecting}
+            visibleMonths={visibleMonths}
+            showMonthHeadings={showMonthHeadings}
+            showTooltips={tooltipProps.showTooltips}
+            data={layer.data}
+            layer={layer}
+            activeLayer={activeLayer}
+          />
+        );
+      case LAYER_TYPES.EVENTS:
         return (
           <EventsLayer
             months={months}
@@ -1430,7 +1443,7 @@ const DateRangePickerNew = ({
             showMonthHeadings={showMonthHeadings}
             showTooltips={tooltipProps.showTooltips}
             data={layer.data}
-            layerData={activeLayers.find(l => l.name === 'Background')?.data}
+            layer={layer}
           />
         );
       default:

@@ -7,6 +7,25 @@ import DateRangePickerNew from './components/DateRangePickerNew';
 // Import package.json to access version, description, and name
 import packageInfo from '../package.json';
 
+// Sample data for different layers
+const SAMPLE_BACKGROUND_DATA = [
+  {
+    startDate: '2025-01-05',
+    endDate: '2025-01-15',
+    color: '#cce5ff'  // Darker pastel blue
+  },
+  {
+    startDate: '2025-02-10',
+    endDate: '2025-02-20',
+    color: '#ffe6e6'  // Darker pastel red
+  },
+  {
+    startDate: '2025-03-01',
+    endDate: '2025-03-10',
+    color: '#e6ffe6'  // Darker pastel green
+  }
+];
+
 const SAMPLE_EVENTS_DATA = [
   { date: '2025-02-15', title: 'Team Meeting', type: 'work', time: '10:00 AM', description: 'Weekly sync' },
   { date: '2025-02-20', title: 'Lunch with Client', type: 'work', time: '12:30 PM', description: 'Project discussion' },
@@ -231,9 +250,11 @@ function App() {
       const updatedSettings = {
         ...prev,
         layers: prev.layers.map(layer => {
-          if (layer.name === 'Events') {
-            console.log('Adding events data to Events layer');
+          if (layer.name === 'sample-events') {
             return { ...layer, data: SAMPLE_EVENTS_DATA };
+          }
+          if (layer.name === 'sample-background') {
+            return { ...layer, data: SAMPLE_BACKGROUND_DATA };
           }
           return layer;
         })
