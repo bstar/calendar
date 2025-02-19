@@ -1065,7 +1065,7 @@ const DateRangePickerNew = ({
   suppressTooltipsOnSelection = false,
   layers: initialLayers = DEFAULT_LAYERS,
   showLayerControls = true,
-  defaultLayer = 'Calendar'
+  defaultLayer = 'calendar'
 }) => {
   const [isOpen, setIsOpen] = useState(displayMode === 'embedded' || initialIsOpen);
   const [selectedRange, setSelectedRange] = useState({ start: null, end: null });
@@ -1103,12 +1103,13 @@ const DateRangePickerNew = ({
   // Add this effect to update activeLayers when initialLayers changes
   useEffect(() => {
     setActiveLayers(initialLayers);
-  }, [initialLayers]);
-
-  // Update active layer when defaultLayer prop changes
-  useEffect(() => {
-    setActiveLayer(defaultLayer);
-  }, [defaultLayer]);
+    // Ensure we have a valid active layer
+    if (!activeLayer || !initialLayers.find(l => l.name === activeLayer)) {
+      const defaultLayerExists = initialLayers.find(l => l.name === defaultLayer);
+      const firstLayer = initialLayers[0];
+      setActiveLayer(defaultLayerExists ? defaultLayer : firstLayer?.name);
+    }
+  }, [initialLayers, defaultLayer, activeLayer]);
 
   // Simplified month generation
   const months = useMemo(() => {
