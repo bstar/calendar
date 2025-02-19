@@ -941,6 +941,93 @@ const EventsLayer = ({
   );
 };
 
+const BaseLayer = ({
+  months,
+  selectedRange,
+  onSelectionStart,
+  onSelectionMove,
+  isSelecting,
+  visibleMonths,
+  showMonthHeadings,
+  showTooltips,
+  data = []
+}) => {
+  // Use useMemo to memoize the renderDay function based on data changes
+  const renderDay = useMemo(() => (date) => {
+    const dayData = data.filter(item => {
+      const itemDate = parseISO(item.date);
+      return isSameDay(itemDate, date);
+    });
+    
+    if (dayData.length === 0) return null;
+
+    const mainItem = dayData[0];
+    
+    return {
+      element: (
+        <div 
+          style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '50%',
+            backgroundColor: 'rgba(0, 0, 0, 0.1)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            pointerEvents: 'none'
+          }}
+        >
+          {dayData.length > 1 && (
+            <span style={{ 
+              fontSize: '12px', 
+              fontWeight: 'bold',
+              color: '#666',
+              lineHeight: 1,
+              pointerEvents: 'none'
+            }}>
+              {dayData.length}
+            </span>
+          )}
+        </div>
+      ),
+      tooltipContent: (
+        <div style={{ 
+          padding: '8px',
+          backgroundColor: 'white',
+          borderRadius: '4px'
+        }}>
+          {dayData.map((item, index) => (
+            <div key={index} style={{ 
+              marginBottom: index < dayData.length - 1 ? '8px' : 0,
+              whiteSpace: 'nowrap'
+            }}>
+              <div style={{ fontWeight: 'bold' }}>{item.title}</div>
+              <div style={{ fontSize: '0.9em', color: '#666' }}>{item.time}</div>
+              <div style={{ fontSize: '0.9em' }}>{item.description}</div>
+            </div>
+          ))}
+        </div>
+      )
+    };
+  }, [data]);
+
+  return (
+    <MonthPair
+      key={JSON.stringify(data)} // Force re-render when data changes
+      firstMonth={months[0]}
+      secondMonth={visibleMonths === 1 ? null : months[1]}
+      selectedRange={selectedRange}
+      onSelectionStart={onSelectionStart}
+      onSelectionMove={onSelectionMove}
+      isSelecting={isSelecting}
+      visibleMonths={visibleMonths}
+      showMonthHeadings={showMonthHeadings}
+      showTooltips={showTooltips}
+      renderDay={renderDay}
+    />
+  );
+};
+
 const DateRangePickerNew = ({ 
   displayMode = 'popup',
   containerStyle = null,
@@ -1269,32 +1356,6 @@ const DateRangePickerNew = ({
       setOutOfBoundsDirection('next');
     }
   }, []);
-
-  const BaseLayer = ({
-    months,
-    selectedRange,
-    onSelectionStart,
-    onSelectionMove,
-    isSelecting,
-    visibleMonths,
-    showMonthHeadings,
-    showTooltips,
-    data = []
-  }) => {
-    return (
-      <MonthPair
-        firstMonth={months[0]}
-        secondMonth={visibleMonths === 1 ? null : months[1]}
-        selectedRange={selectedRange}
-        onSelectionStart={onSelectionStart}
-        onSelectionMove={onSelectionMove}
-        isSelecting={isSelecting}
-        visibleMonths={visibleMonths}
-        showMonthHeadings={showMonthHeadings}
-        showTooltips={showTooltips}
-      />
-    );
-  };
 
   const handleLayerChange = (layerId) => {
     setActiveLayer(layerId);
