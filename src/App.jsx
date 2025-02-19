@@ -27,15 +27,29 @@ function App() {
 
   // Initialize layers with data
   useEffect(() => {
-    setSettings(prev => ({
-      ...prev,
-      layers: prev.layers.map(layer => 
-        layer.name === 'Events' 
-          ? { ...layer, data: SAMPLE_EVENTS_DATA }
-          : layer
-      )
-    }));
+    console.log('=== Initial Settings ===');
+    console.log('Before update:', settings.layers);
+    
+    setSettings(prev => {
+      const updatedSettings = {
+        ...prev,
+        layers: prev.layers.map(layer => {
+          if (layer.name === 'Events') {
+            console.log('Adding events data to Events layer');
+            return { ...layer, data: SAMPLE_EVENTS_DATA };
+          }
+          return layer;
+        })
+      };
+      console.log('After update:', updatedSettings.layers);
+      return updatedSettings;
+    });
   }, []);
+
+  // Also log when settings change
+  useEffect(() => {
+    console.log('Settings changed:', settings);
+  }, [settings]);
 
   const handleChange = (prop) => (event) => {
     const value = event.target.type === 'checkbox' 
@@ -580,22 +594,10 @@ function App() {
             marginBottom: '24px'
           }}>
             <h5 style={{ marginBottom: '16px', color: '#666' }}>Preview</h5>
+            <pre style={{ fontSize: '12px', color: '#666' }}>
+              {JSON.stringify(settings.layers, null, 2)}
+            </pre>
             <DateRangePickerNew {...settings} />
-            {/* <DateRangePickerNew 
-              displayMode="popup"
-              visibleMonths={2}
-              selectionMode="range"
-              singleMonthWidth={500}
-              containerStyle={null}
-              showMonthHeadings={false}
-              showTooltips={false}
-              showHeader={true}
-              closeOnClickAway={false}
-              showSubmitButton={false}
-              showFooter={true}
-              enableOutOfBoundsScroll={true}
-              isOpen={true}
-            /> */}
           </div>
 
           {/* Documentation */}

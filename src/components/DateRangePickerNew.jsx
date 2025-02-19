@@ -857,9 +857,16 @@ const EventsLayer = ({
   data = []
 }) => {
   const renderDay = (date) => {
-    const dayEvents = data.filter(event => 
-      event.date === format(date, 'yyyy-MM-dd')
-    );
+    // Debug logging
+    console.log('Checking date:', format(date, 'yyyy-MM-dd'));
+    console.log('Available events:', data);
+    
+    const dayEvents = data.filter(event => {
+      const eventDate = parseISO(event.date);
+      return isSameDay(eventDate, date);
+    });
+    
+    console.log('Found events:', dayEvents);
     
     if (dayEvents.length === 0) return null;
 
@@ -968,13 +975,25 @@ const DateRangePickerNew = ({
     currentField: null
   });
   const [validationErrors, setValidationErrors] = useState({});
-  const [activeLayers, setActiveLayers] = useState(initialLayers);  // Rename state variable
+  const [activeLayers, setActiveLayers] = useState(initialLayers);
   const [activeLayer, setActiveLayer] = useState('Calendar');
   const [forceShowTooltips, setForceShowTooltips] = useState(true);
 
   const containerRef = useRef(null);
   const moveToMonthRef = useRef(null);
   const debouncedMoveToMonthRef = useRef(null);
+
+  // Add logging when initialLayers prop changes
+  useEffect(() => {
+    console.log('=== DateRangePickerNew Layers ===');
+    console.log('initialLayers:', initialLayers);
+  }, [initialLayers]);
+
+  // Add logging when activeLayers state changes
+  useEffect(() => {
+    console.log('=== Active Layers Updated ===');
+    console.log('activeLayers:', activeLayers);
+  }, [activeLayers]);
 
   // Simplified month generation
   const months = useMemo(() => {
@@ -1286,6 +1305,10 @@ const DateRangePickerNew = ({
   };
 
   const renderLayer = (layer) => {
+    console.log('=== Rendering Layer ===');
+    console.log('Layer:', layer.name);
+    console.log('Layer data:', layer.data);
+    
     switch (layer.name) {
       case 'Calendar':
         return (
