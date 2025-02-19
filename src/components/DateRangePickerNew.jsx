@@ -582,11 +582,11 @@ const Tooltip = ({ content, show, children }) => {
       ref={targetRef} 
       style={{ position: 'relative', width: '100%', height: '100%' }}
       onMouseEnter={() => {
-        console.log('Tooltip target mouse enter'); // Debug log
+        console.log('Tooltip target mouse enter');
         setIsHovered(true);
       }}
       onMouseLeave={() => {
-        console.log('Tooltip target mouse leave'); // Debug log
+        console.log('Tooltip target mouse leave');
         setIsHovered(false);
       }}
     >
@@ -599,13 +599,14 @@ const Tooltip = ({ content, show, children }) => {
             top: position.top,
             left: position.left,
             backgroundColor: 'white',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.25)',  // Darker shadow
             borderRadius: '4px',
             zIndex: 9999,
             fontSize: '14px',
             maxWidth: '300px',
             padding: '8px',
-            pointerEvents: 'none'
+            pointerEvents: 'none',
+            border: '1px solid rgba(0,0,0,0.2)'  // Darker border
           }}
         >
           {content}
