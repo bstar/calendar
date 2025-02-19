@@ -13,7 +13,7 @@ export class LayerRenderer {
         
         switch (layer.type) {
           case LAYER_TYPES.EVENTS:
-            return this.renderEventDay(date, layer.data, props);
+            return this.renderEventDay(date, layer.data?.events || [], props);
           case LAYER_TYPES.BASE:
             return this.renderBaseDay(date, layer.data, props);
           default:
@@ -22,13 +22,13 @@ export class LayerRenderer {
       },
       
       getBackgroundColor: capabilities.applyBackground ? 
-        (date) => this.getBackgroundColor(date, layer.data) : 
+        (date) => this.getBackgroundColor(date, layer.data?.background || []) : 
         null
     };
   }
 
   static getBackgroundColor(date, data) {
-    if (!data) return 'transparent';
+    if (!Array.isArray(data)) return 'transparent';
     
     for (const range of data) {
       const start = parseISO(range.startDate);
@@ -45,8 +45,21 @@ export class LayerRenderer {
 
   static renderBackgroundDay(date, data, props) {
     return {
-      backgroundColor: this.getBackgroundColor(date, data)
+      backgroundColor: this.getBackgroundColor(date, data?.background || [])
     };
+  }
+
+  static renderEventDay(date, data, props) {
+    if (!Array.isArray(data)) return null;
+    
+    const events = data.filter(event => 
+      isSameDay(date, parseISO(event.date))
+    );
+    
+    return events.length > 0 ? {
+      content: events.map(event => event.title).join(', '),
+      events
+    } : null;
   }
 
   // Other render methods as needed...

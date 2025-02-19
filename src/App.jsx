@@ -251,10 +251,21 @@ function App() {
         ...prev,
         layers: prev.layers.map(layer => {
           if (layer.name === 'sample-events') {
-            return { ...layer, data: SAMPLE_EVENTS_DATA };
+            return { 
+              ...layer, 
+              data: {
+                events: SAMPLE_EVENTS_DATA,
+                background: []  // Empty background data by default
+              }
+            };
           }
           if (layer.name === 'sample-background') {
-            return { ...layer, data: SAMPLE_BACKGROUND_DATA };
+            return { 
+              ...layer, 
+              data: {
+                background: SAMPLE_BACKGROUND_DATA
+              }
+            };
           }
           return layer;
         })

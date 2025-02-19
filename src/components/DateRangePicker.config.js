@@ -6,21 +6,65 @@ export const DEFAULT_LAYERS = [
     type: LAYER_TYPES.BASE,
     required: true,
     title: 'Calendar',
-    description: 'Basic calendar functionality'
+    description: 'Basic calendar functionality',
+    features: ['base']
   },
   {
     name: 'sample-background',
     type: LAYER_TYPES.BACKGROUND,
     title: 'Sample Background',
     description: 'Example background colors',
+    features: ['background'],
+    data: {
+      background: []  // Will be populated with sample data in App.jsx
+    }
   },
   {
     name: 'sample-events',
     type: LAYER_TYPES.EVENTS,
     title: 'Sample Events',
     description: 'Example events',
+    features: ['events', 'background'],  // This layer can have both events and background colors
+    data: {
+      events: [],     // Will be populated with sample data in App.jsx
+      background: []  // Optional background data for this layer
+    }
   }
 ];
+
+export const LAYER_FEATURES = {
+  base: {
+    name: 'Base Calendar',
+    description: 'Basic calendar functionality',
+    dataSchema: null  // Base layer doesn't need data
+  },
+  background: {
+    name: 'Background Colors',
+    description: 'Apply background colors to date ranges',
+    dataSchema: {
+      type: 'array',
+      items: {
+        startDate: 'string',  // ISO date
+        endDate: 'string',    // ISO date
+        color: 'string'       // CSS color
+      }
+    }
+  },
+  events: {
+    name: 'Events',
+    description: 'Display and manage calendar events',
+    dataSchema: {
+      type: 'array',
+      items: {
+        date: 'string',       // ISO date
+        title: 'string',
+        type: 'string',
+        time: 'string',
+        description: 'string'
+      }
+    }
+  }
+};
 
 export const SETTINGS = {
   core: {
@@ -168,17 +212,16 @@ export const SETTINGS = {
       }
     },
     controls: {
-      type: {
-        id: 'type',
-        type: 'select',
-        label: 'Layer Type',
+      features: {
+        id: 'features',
+        type: 'multi-select',
+        label: 'Layer Features',
         description: 'The type of functionality for this layer',
-        options: [
-          { value: LAYER_TYPES.BASE, label: 'Base' },
-          { value: LAYER_TYPES.BACKGROUND, label: 'Background' },
-          { value: LAYER_TYPES.EVENTS, label: 'Events' }
-        ],
-        width: '150px'
+        options: Object.entries(LAYER_FEATURES).map(([key, feature]) => ({
+          value: key,
+          label: feature.name
+        })),
+        width: '250px'
       },
       title: {
         id: 'title',

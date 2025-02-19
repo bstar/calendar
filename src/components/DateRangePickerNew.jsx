@@ -680,6 +680,10 @@ const DayCell = ({
       'transparent';
   };
 
+  const events = layer.data?.events?.filter(event => 
+    isSameDay(date, parseISO(event.date))
+  ) || [];
+
   const dayCell = (
     <div
       onMouseEnter={handleMouseEnter}
@@ -874,7 +878,7 @@ const EventsLayer = ({
 }) => {
   // Use useMemo to memoize the renderDay function based on data changes
   const renderDay = useMemo(() => (date) => {
-    const dayEvents = data.filter(event => {
+    const dayEvents = (layer.data?.events || []).filter(event => {
       const eventDate = parseISO(event.date);
       return isSameDay(eventDate, date);
     });
@@ -936,7 +940,7 @@ const EventsLayer = ({
         </div>
       )
     };
-  }, [data]); // Dependency on data ensures renderDay updates when data changes
+  }, [layer.data]); // Update dependency to layer.data
 
   return (
     <div style={{ width: '100%' }}>
@@ -973,7 +977,8 @@ const BaseLayer = ({
 }) => {
   // Use useMemo to memoize the renderDay function based on data changes
   const renderDay = useMemo(() => (date) => {
-    const dayData = data.filter(item => {
+    const featureData = layer.data?.[layer.type] || [];
+    const dayData = featureData.filter(item => {
       const itemDate = parseISO(item.date);
       return isSameDay(itemDate, date);
     });
@@ -1028,7 +1033,7 @@ const BaseLayer = ({
         </div>
       )
     };
-  }, [data]);
+  }, [layer.data, layer.type]);
 
   return (
     <MonthPair
@@ -1399,9 +1404,11 @@ const DateRangePickerNew = ({
     console.log('Layer:', layer.name);
     console.log('Layer data:', layer.data);
     
-    switch (layer.type) {
-      case LAYER_TYPES.BASE:
-        return (
+    // Create a composite view that can show multiple features
+    return (
+      <div style={{ width: '100%', position: 'relative' }}>
+        {/* Render background if background data exists */}
+        {layer.data?.background && (
           <BaseLayer
             months={months}
             selectedRange={selectedRange}
@@ -1415,25 +1422,10 @@ const DateRangePickerNew = ({
             layer={layer}
             activeLayer={activeLayer}
           />
-        );
-      case LAYER_TYPES.BACKGROUND:
-        return (
-          <BaseLayer
-            months={months}
-            selectedRange={selectedRange}
-            onSelectionStart={handleSelectionStart}
-            onSelectionMove={handleSelectionMove}
-            isSelecting={isSelecting}
-            visibleMonths={visibleMonths}
-            showMonthHeadings={showMonthHeadings}
-            showTooltips={tooltipProps.showTooltips}
-            data={layer.data}
-            layer={layer}
-            activeLayer={activeLayer}
-          />
-        );
-      case LAYER_TYPES.EVENTS:
-        return (
+        )}
+      
+        {/* Render events if events data exists */}
+        {layer.data?.events && (
           <EventsLayer
             months={months}
             selectedRange={selectedRange}
@@ -1446,11 +1438,9 @@ const DateRangePickerNew = ({
             data={layer.data}
             layer={layer}
           />
-        );
-      default:
-        console.warn(`Unknown layer type: ${layer.type}`);
-        return null;
-    }
+        )}
+      </div>
+    );
   };
 
   return (
