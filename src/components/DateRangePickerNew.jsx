@@ -1371,8 +1371,8 @@ const DateRangePickerNew = ({
     console.log('Layer:', layer.name);
     console.log('Layer data:', layer.data);
     
-    switch (layer.name) {
-      case 'Calendar':
+    switch (layer.type) {
+      case 'base':
         return (
           <BaseLayer
             months={months}
@@ -1386,7 +1386,7 @@ const DateRangePickerNew = ({
             data={layer.data}
           />
         );
-      case 'Events':
+      case 'overlay':
         return (
           <EventsLayer
             months={months}
@@ -1401,7 +1401,7 @@ const DateRangePickerNew = ({
           />
         );
       default:
-        console.warn(`Unknown layer type: ${layer.name}`);
+        console.warn(`Unknown layer type: ${layer.type}`);
         return null;
     }
   };

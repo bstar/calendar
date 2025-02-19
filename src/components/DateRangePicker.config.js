@@ -178,6 +178,18 @@ export const SETTINGS = {
         description: 'Whether this layer is required for calendar operation',
         default: false
       }
+    },
+    actions: {
+      canAdd: true,
+      canRemove: true,
+      newLayerTemplate: {
+        name: 'New Layer',
+        type: 'overlay',
+        title: 'New Layer',
+        description: 'A new calendar layer',
+        required: false,
+        data: []
+      }
     }
   }
 };

@@ -520,6 +520,105 @@ function App() {
     );
   };
 
+  const LayerManager = ({ layers, onUpdate }) => {
+    const handleAddLayer = () => {
+      const newLayer = {
+        ...SETTINGS.layers.actions.newLayerTemplate,
+        name: `Layer_${Date.now()}`, // Ensure unique name
+        title: `New Layer ${layers.length + 1}`
+      };
+      onUpdate([...layers, newLayer]);
+    };
+
+    const handleRemoveLayer = (layerName) => {
+      onUpdate(layers.filter(l => l.name !== layerName));
+    };
+
+    return (
+      <div style={{ marginBottom: '24px' }}>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '16px'
+        }}>
+          <h3 style={{ 
+            margin: 0,
+            fontSize: '16px',
+            color: '#666'
+          }}>
+            Layers
+          </h3>
+          <button
+            onClick={handleAddLayer}
+            style={{
+              padding: '4px 8px',
+              background: 'transparent',
+              color: '#0366d6',
+              border: '1px solid #0366d6',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '12px'
+            }}
+          >
+            Add Layer
+          </button>
+        </div>
+
+        <div style={{ display: 'grid', gap: '16px' }}>
+          {layers.map((layer) => (
+            <div key={layer.name} style={{ 
+              padding: '16px',
+              border: '1px solid #dee2e6',
+              borderRadius: '8px',
+              backgroundColor: '#fff',
+              position: 'relative'
+            }}>
+              {!layer.required && (
+                <button
+                  onClick={() => handleRemoveLayer(layer.name)}
+                  style={{
+                    position: 'absolute',
+                    top: '8px',
+                    right: '8px',
+                    padding: '4px 8px',
+                    background: 'transparent',
+                    color: '#dc3545',
+                    border: '1px solid #dc3545',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '12px'
+                  }}
+                >
+                  Remove
+                </button>
+              )}
+              
+              <LayerMetadataEditor 
+                layer={layer}
+                onUpdate={(layerName, updatedLayer) => {
+                  onUpdate(layers.map(l => 
+                    l.name === layerName ? updatedLayer : l
+                  ));
+                }}
+              />
+              <LayerDataEditor 
+                layer={layer} 
+                onUpdate={(layerName, newData) => {
+                  onUpdate(layers.map(l => 
+                    l.name === layerName 
+                      ? { ...l, data: newData }
+                      : l
+                  ));
+                }}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'core':
@@ -540,41 +639,15 @@ function App() {
         );
       case 'layers':
         return (
-          <div style={{ display: 'grid', gap: '24px' }}>
-            {settings.layers.map((layer) => (
-              <div key={layer.name} style={{ 
-                padding: '16px',
-                border: '1px solid #dee2e6',
-                borderRadius: '8px',
-                backgroundColor: '#fff'
-              }}>
-                <LayerMetadataEditor 
-                  layer={layer}
-                  onUpdate={(layerName, updatedLayer) => {
-                    setSettings(prev => ({
-                      ...prev,
-                      layers: prev.layers.map(l => 
-                        l.name === layerName ? updatedLayer : l
-                      )
-                    }));
-                  }}
-                />
-                <LayerDataEditor 
-                  layer={layer} 
-                  onUpdate={(layerName, newData) => {
-                    setSettings(prev => ({
-                      ...prev,
-                      layers: prev.layers.map(l => 
-                        l.name === layerName 
-                          ? { ...l, data: newData }
-                          : l
-                      )
-                    }));
-                  }}
-                />
-              </div>
-            ))}
-          </div>
+          <LayerManager 
+            layers={settings.layers}
+            onUpdate={(updatedLayers) => {
+              setSettings(prev => ({
+                ...prev,
+                layers: updatedLayers
+              }));
+            }}
+          />
         );
       default:
         return null;
