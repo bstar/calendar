@@ -376,6 +376,100 @@ function App() {
     );
   };
 
+  const LayerDataEditor = ({ layer, onUpdate }) => {
+    const [isEditing, setIsEditing] = useState(false);
+    const [dataText, setDataText] = useState(
+      JSON.stringify(layer.data || [], null, 2)
+    );
+
+    const handleApply = () => {
+      try {
+        const newData = JSON.parse(dataText);
+        onUpdate(layer.name, newData);
+        setIsEditing(false);
+      } catch (e) {
+        alert('Invalid JSON format');
+      }
+    };
+
+    return (
+      <div style={{ marginTop: '12px' }}>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          marginBottom: '8px' 
+        }}>
+          <h4 style={{ 
+            margin: 0,
+            fontSize: '14px',
+            color: '#666'
+          }}>
+            Layer Data
+          </h4>
+          <button
+            onClick={() => setIsEditing(!isEditing)}
+            style={{
+              padding: '4px 8px',
+              fontSize: '12px',
+              border: '1px solid #dee2e6',
+              borderRadius: '4px',
+              background: isEditing ? '#fff3cd' : '#fff',
+              cursor: 'pointer'
+            }}
+          >
+            {isEditing ? 'Cancel' : 'Edit Data'}
+          </button>
+        </div>
+
+        {isEditing ? (
+          <>
+            <textarea
+              value={dataText}
+              onChange={(e) => setDataText(e.target.value)}
+              style={{
+                width: '100%',
+                height: '200px',
+                padding: '8px',
+                fontFamily: 'monospace',
+                fontSize: '12px',
+                border: '1px solid #dee2e6',
+                borderRadius: '4px',
+                resize: 'vertical'
+              }}
+            />
+            <button
+              onClick={handleApply}
+              style={{
+                marginTop: '8px',
+                padding: '4px 12px',
+                background: '#0366d6',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              Apply Changes
+            </button>
+          </>
+        ) : (
+          <pre style={{ 
+            margin: 0,
+            padding: '12px',
+            backgroundColor: '#f6f8fa',
+            borderRadius: '6px',
+            fontSize: '12px',
+            overflow: 'auto',
+            maxHeight: '200px'
+          }}>
+            {JSON.stringify(layer.data, null, 2)}
+          </pre>
+        )}
+      </div>
+    );
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'core':
@@ -397,7 +491,7 @@ function App() {
       case 'layers':
         return (
           <div style={{ display: 'grid', gap: '24px' }}>
-            {settings.layers.map((layer, index) => (
+            {settings.layers.map((layer) => (
               <div key={layer.name} style={{ 
                 padding: '16px',
                 border: '1px solid #dee2e6',
@@ -437,29 +531,20 @@ function App() {
                   </div>
                 </div>
 
-                {/* Show data if it exists */}
-                {layer.data && layer.data.length > 0 && (
-                  <div style={{ marginTop: '12px' }}>
-                    <h4 style={{ 
-                      margin: '0 0 8px',
-                      fontSize: '14px',
-                      color: '#666'
-                    }}>
-                      Layer Data
-                    </h4>
-                    <pre style={{ 
-                      margin: 0,
-                      padding: '12px',
-                      backgroundColor: '#f6f8fa',
-                      borderRadius: '6px',
-                      fontSize: '12px',
-                      overflow: 'auto',
-                      maxHeight: '200px'
-                    }}>
-                      {JSON.stringify(layer.data, null, 2)}
-                    </pre>
-                  </div>
-                )}
+                {/* Replace the old data display with the new editor */}
+                <LayerDataEditor 
+                  layer={layer} 
+                  onUpdate={(layerName, newData) => {
+                    setSettings(prev => ({
+                      ...prev,
+                      layers: prev.layers.map(l => 
+                        l.name === layerName 
+                          ? { ...l, data: newData }
+                          : l
+                      )
+                    }));
+                  }}
+                />
               </div>
             ))}
           </div>
@@ -594,9 +679,6 @@ function App() {
             marginBottom: '24px'
           }}>
             <h5 style={{ marginBottom: '16px', color: '#666' }}>Preview</h5>
-            <pre style={{ fontSize: '12px', color: '#666' }}>
-              {JSON.stringify(settings.layers, null, 2)}
-            </pre>
             <DateRangePickerNew {...settings} />
           </div>
 
