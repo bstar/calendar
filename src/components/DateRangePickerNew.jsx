@@ -838,7 +838,7 @@ const LayerControl = ({ layers, activeLayer, onLayerChange }) => {
             cursor: 'pointer'
           }}
         >
-          {layer.name}
+          {layer.title}
         </button>
       ))}
     </div>
