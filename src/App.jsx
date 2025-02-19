@@ -506,7 +506,7 @@ function App() {
           padding: '16px',
           backgroundColor: '#f8f9fa',
           borderRadius: '8px',
-          border: '1px solid #dee2e6'
+          border: '1px solid #cfd4d9'
         }}>
           <h3 style={styles.sectionHeading}>Layer Settings</h3>
           
@@ -583,7 +583,7 @@ function App() {
           {layers.map((layer) => (
             <div key={layer.name} style={{ 
               padding: '16px',
-              border: '1px solid #dee2e6',
+              border: '1px solid #cfd4d9',
               borderRadius: '8px',
               backgroundColor: '#fff',
               position: 'relative'
@@ -682,7 +682,7 @@ function App() {
       {/* Header */}
       <header style={{ 
         padding: '20px', 
-        borderBottom: '1px solid #dee2e6', 
+        borderBottom: '1px solid #cfd4d9',
         marginBottom: '24px',
         textAlign: 'center',
         backgroundColor: '#f8f9fa',
@@ -727,7 +727,7 @@ function App() {
       }}>
         <div style={{ 
           padding: '20px',
-          border: '1px solid #dee2e6',
+          border: '1px solid #cfd4d9',
           borderRadius: '8px',
           backgroundColor: '#f8f9fa',
           position: 'sticky',
@@ -745,7 +745,7 @@ function App() {
               color: '#666',
               borderWidth: '0 1px 1px 0',
               borderStyle: 'solid',
-              borderColor: '#dee2e6',
+              borderColor: '#cfd4d9',
               borderRadius: '0 8px 0 8px',  // Only round bottom-right and top-right
               cursor: 'pointer',
               fontSize: '12px',
@@ -774,17 +774,19 @@ function App() {
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   style={{
-                    padding: '10px 20px',
+                    padding: '10px 0',  // Remove horizontal padding
+                    width: '100px',     // Fixed width for all tabs
                     border: 'none',
                     borderBottom: activeTab === tab ? '2px solid #0366d6' : '2px solid transparent',
                     backgroundColor: 'transparent',
                     color: activeTab === tab ? '#0366d6' : '#666',
                     cursor: 'pointer',
                     fontSize: '14px',
-                    fontWeight: activeTab === tab ? 'bold' : 'normal',
+                    fontWeight: '600',  // Keep consistent font weight
                     transition: 'color 0.2s ease',
                     marginRight: '8px',
-                    outline: 'none'
+                    outline: 'none',
+                    textAlign: 'center'  // Center the text
                   }}
                 >
                   {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -802,7 +804,7 @@ function App() {
           {/* Calendar Preview */}
           <div style={{ 
             padding: '20px',
-            border: '1px solid #dee2e6',
+            border: '1px solid #cfd4d9',
             borderRadius: '8px',
             backgroundColor: '#fff',
             marginBottom: '24px'
@@ -818,7 +820,7 @@ function App() {
           {/* Documentation */}
           <div style={{ 
             padding: '20px',
-            border: '1px solid #eee',
+            border: '1px solid #cfd4d9',
             borderRadius: '8px',
             backgroundColor: '#fff'
           }}>
