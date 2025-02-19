@@ -755,22 +755,45 @@ function App() {
   };
 
   const handleExport = () => {
-    const configString = JSON.stringify(settings, null, 2);
+    const exportConfig = {
+      ...settings,
+      // Remove any internal or unnecessary fields
+      isOpen: undefined
+    };
+    
+    const configString = JSON.stringify(exportConfig, null, 2);
     navigator.clipboard.writeText(configString).then(() => {
       alert('Configuration copied to clipboard!');
     }).catch(err => {
-      console.error('Failed to copy: ', err);
+      console.error('Export error:', err);
+      alert('Failed to copy configuration. Please try again.');
     });
   };
 
-  // Add import handler
+  // Update the import handler to properly process the configuration
   const handleImport = (configText) => {
     try {
       const newConfig = JSON.parse(configText);
-      setSettings(newConfig);
+      
+      // Ensure we maintain any required layers (like Calendar)
+      const requiredLayers = settings.layers.filter(l => l.name === 'Calendar');
+      const importedLayers = newConfig.layers || [];
+      
+      // Merge the configurations, keeping required layers
+      const mergedConfig = {
+        ...getDefaultSettings(), // Start with defaults
+        ...newConfig, // Apply imported settings
+        layers: [
+          ...requiredLayers, // Keep required layers
+          ...importedLayers.filter(l => l.name !== 'Calendar') // Add new layers
+        ]
+      };
+
+      setSettings(mergedConfig);
       setShowImportModal(false);
     } catch (e) {
-      alert('Invalid configuration format');
+      console.error('Import error:', e);
+      alert('Invalid configuration format. Please check the JSON structure.');
     }
   };
 
