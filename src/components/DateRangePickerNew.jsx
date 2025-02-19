@@ -819,13 +819,9 @@ const SideChevronIndicator = ({ outOfBoundsDirection, isSelecting }) => {
 const LayerControl = ({ layers, activeLayer, onLayerChange }) => {
   return (
     <div className="cla-layer-control" style={{
-      padding: '12px 16px',
-      borderTop: '1px solid #dee2e6',
-      display: 'flex',
-      gap: '8px'
     }}>
       {layers
-        .filter(layer => layer.visible !== false) // Only show visible layers
+        .filter(layer => layer.visible !== false)
         .map(layer => (
           <button
             key={layer.name}
