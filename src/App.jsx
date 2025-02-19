@@ -408,15 +408,17 @@ function App() {
           <button
             onClick={handleApply}
             style={{
-              padding: '4px 12px',
-              background: '#0366d6',
-              color: '#fff',
-              border: 'none',
+              padding: '4px 8px',
+              background: 'transparent',
+              color: '#0366d6',
+              border: '1px solid #0366d6',
               borderRadius: '4px',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              fontSize: '12px',
+              transition: 'all 0.2s ease'
             }}
           >
-            Apply Changes
+            Apply
           </button>
         </div>
 
@@ -588,53 +590,68 @@ function App() {
           position: 'sticky',
           top: '20px'
         }}>
-          {/* Tabs */}
-          <div style={{ display: 'flex', marginBottom: '16px', borderBottom: '1px solid #dee2e6' }}>
-            {['core', 'features', 'layers'].map(tab => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                style={{
-                  padding: '10px 20px',
-                  border: 'none',
-                  borderBottom: activeTab === tab ? '2px solid #0366d6' : '2px solid transparent',
-                  backgroundColor: 'transparent',
-                  color: activeTab === tab ? '#0366d6' : '#666',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: activeTab === tab ? 'bold' : 'normal',
-                  transition: 'color 0.2s ease',
-                  marginRight: '8px',
-                  outline: 'none'  // Remove default focus outline
-                }}
-              >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
-              </button>
-            ))}
+          {/* Export Button - Moved outside the relative container */}
+          <button
+            onClick={handleExport}
+            style={{
+              position: 'absolute',
+              top: 0,
+              right: 0,
+              padding: '4px 8px',
+              backgroundColor: '#e6f4ea',  // Pastel green
+              color: '#666',
+              borderWidth: '0 1px 1px 0',
+              borderStyle: 'solid',
+              borderColor: '#dee2e6',
+              borderRadius: '0 8px 0 8px',  // Only round bottom-right and top-right
+              cursor: 'pointer',
+              fontSize: '12px',
+              transition: 'all 0.2s ease',
+              '&:hover': {
+                backgroundColor: '#d4eede',
+                color: '#1a7f37'
+              }
+            }}
+          >
+            Export
+          </button>
+
+          <div style={{ 
+            position: 'relative', 
+            marginBottom: '16px' 
+          }}>
+            {/* Tabs */}
+            <div style={{ 
+              display: 'flex', 
+              marginBottom: '16px', 
+              borderBottom: '1px solid #dee2e6' 
+            }}>
+              {['core', 'features', 'layers'].map(tab => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  style={{
+                    padding: '10px 20px',
+                    border: 'none',
+                    borderBottom: activeTab === tab ? '2px solid #0366d6' : '2px solid transparent',
+                    backgroundColor: 'transparent',
+                    color: activeTab === tab ? '#0366d6' : '#666',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: activeTab === tab ? 'bold' : 'normal',
+                    transition: 'color 0.2s ease',
+                    marginRight: '8px',
+                    outline: 'none'
+                  }}
+                >
+                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Tab Content */}
           {renderTabContent()}
-
-          {/* Export Button */}
-          <button
-            onClick={handleExport}
-            style={{
-              marginTop: '20px',
-              padding: '10px 20px',
-              backgroundColor: '#0366d6',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontSize: '16px',
-              fontWeight: 'bold',
-              transition: 'background-color 0.2s ease',
-              width: '100%'
-            }}
-          >
-            Export Configuration
-          </button>
         </div>
 
         {/* Preview and Documentation Column */}
