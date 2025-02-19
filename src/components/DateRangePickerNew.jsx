@@ -988,7 +988,8 @@ const DateRangePickerNew = ({
   showSubmitButton = false,
   showFooter = true,
   singleMonthWidth = 500,
-  enableOutOfBoundsScroll = true
+  enableOutOfBoundsScroll = true,
+  suppressTooltipsOnSelection = false
 }) => {
   const [isOpen, setIsOpen] = useState(displayMode === 'embedded' || initialIsOpen);
   const [selectedRange, setSelectedRange] = useState({ start: null, end: null });
@@ -1189,7 +1190,9 @@ const DateRangePickerNew = ({
 
   const handleMouseUp = useCallback(() => {
     setIsSelecting(false);
-    setForceShowTooltips(true);  // Re-enable tooltips after selection
+    if (suppressTooltipsOnSelection) {
+      setForceShowTooltips(true);  // Only re-enable tooltips if suppression was enabled
+    }
     console.log('ending selection');
     setOutOfBoundsDirection(null);
     setInitialDate(null);
@@ -1199,7 +1202,7 @@ const DateRangePickerNew = ({
 
     document.removeEventListener("mousemove", handleMouseMove);
     document.removeEventListener("mouseup", handleMouseUp);
-  }, [handleMouseMove]);
+  }, [handleMouseMove, suppressTooltipsOnSelection]);
 
   const handleMouseDown = useCallback(e => {
     if (isSelecting) return;
@@ -1211,13 +1214,15 @@ const DateRangePickerNew = ({
     };
 
     setIsSelecting(true);
-    setForceShowTooltips(false);  // Disable tooltips during selection
+    if (suppressTooltipsOnSelection) {
+      setForceShowTooltips(false);  // Only disable tooltips if suppression is enabled
+    }
     console.log('starting selection');
     setUserSelectNone();
 
     document.addEventListener("mousemove", handleMouseMove);
     document.addEventListener("mouseup", handleMouseUp);
-  }, [isSelecting, handleMouseMove, handleMouseUp]);
+  }, [isSelecting, handleMouseMove, handleMouseUp, suppressTooltipsOnSelection]);
 
   const handleClear = useCallback(() => {
     // Reset range and context
@@ -1482,7 +1487,8 @@ DateRangePickerNew.propTypes = {
   showSubmitButton: PropTypes.bool,
   showFooter: PropTypes.bool,
   singleMonthWidth: PropTypes.number,
-  enableOutOfBoundsScroll: PropTypes.bool
+  enableOutOfBoundsScroll: PropTypes.bool,
+  suppressTooltipsOnSelection: PropTypes.bool,
 };
 
 export default DateRangePickerNew;
