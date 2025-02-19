@@ -17,6 +17,46 @@ const SAMPLE_EVENTS_DATA = [
   { date: '2025-03-22', title: 'Weekend Trip', type: 'personal', time: 'All day', description: 'Beach getaway' }
 ];
 
+// Common styles we can reuse
+const styles = {
+  sectionHeading: {
+    margin: '0 0 16px 0',
+    fontSize: '16px',
+    color: '#444',
+    fontWeight: '600'
+  },
+  select: {
+    width: '100%',
+    padding: '6px 10px',
+    fontSize: '13px',
+    border: '1px solid #dee2e6',
+    borderRadius: '6px',
+    backgroundColor: '#fff',
+    color: '#444',
+    cursor: 'pointer',
+    appearance: 'none',
+    backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'right 8px center',
+    backgroundSize: '16px',
+    '&:hover': {
+      borderColor: '#0366d6'
+    },
+    '&:focus': {
+      outline: 'none',
+      borderColor: '#0366d6',
+      boxShadow: '0 0 0 2px rgba(3, 102, 214, 0.2)'
+    }
+  },
+  label: {
+    display: 'block',
+    marginBottom: '4px',
+    fontSize: '12px',
+    color: '#666',
+    fontWeight: '600'
+  }
+};
+
 function App() {
   const [settings, setSettings] = useState({
     ...getDefaultSettings(),
@@ -243,89 +283,17 @@ function App() {
       null;
 
     return (
-      <div style={{ 
-        padding: '12px',
-        border: '1px solid #eee',
-        borderRadius: '6px',
-        backgroundColor: isDisabled ? '#f5f5f5' : isOverridden ? '#fff' : '#fafafa',
-        width: '100%',
-        opacity: isDisabled ? 0.7 : 1
-      }}>
-        {/* Control Header */}
+      <div style={{ marginBottom: '16px' }}>
         <div style={{ marginBottom: '8px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontWeight: 500 }}>{config.label}</span>
-              <button
-                onClick={() => setShowMeta(prev => !prev)}
-                style={{
-                  border: 'none',
-                  background: 'none',
-                  padding: '2px 6px',
-                  cursor: 'pointer',
-                  color: '#666',
-                  fontSize: '12px',
-                  opacity: showMeta ? 1 : 0.6,
-                  outline: 'none'
-                }}
-              >
-                ⓘ
-              </button>
-            </div>
-            {isOverridden && (
-              <span style={{ 
-                fontSize: '12px', 
-                color: '#666',
-                backgroundColor: '#f0f0f0',
-                padding: '2px 6px',
-                borderRadius: '4px'
-              }}>
-                Modified
-              </span>
-            )}
-          </div>
-          <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+          <label style={styles.label}>
+            {config.label}
+          </label>
+          <div style={{ fontSize: '12px', color: '#666' }}>
             {config.description}
           </div>
         </div>
 
-        {/* Metadata */}
-        {showMeta && (
-          <div style={{ 
-            fontSize: '12px', 
-            color: '#888',
-            display: 'grid',
-            gridTemplateColumns: 'auto 1fr',
-            gap: '4px 12px',
-            marginBottom: '12px',
-            padding: '8px',
-            backgroundColor: '#f5f5f5',
-            borderRadius: '4px'
-          }}>
-            <span>ID:</span>
-            <code style={{ color: '#666' }}>{config.id}</code>
-            <span>Type:</span>
-            <code style={{ color: '#666' }}>{config.type}</code>
-            <span>Default:</span>
-            <code style={{ color: '#666' }}>{String(config.default)}</code>
-            <span>Current:</span>
-            <code style={{ color: '#666' }}>{String(settings[config.id])}</code>
-          </div>
-        )}
-
-        {constraintMessage && (
-          <div style={{ 
-            fontSize: '12px', 
-            color: '#666', 
-            fontStyle: 'italic',
-            marginTop: '4px' 
-          }}>
-            {constraintMessage}
-          </div>
-        )}
-
-        {/* Control Input */}
-        <div style={{ pointerEvents: isDisabled ? 'none' : 'auto' }}>
+        <div>
           {config.type === 'style-editor' ? (
             <StyleEditor
               config={config}
@@ -339,7 +307,7 @@ function App() {
                 checked={settings[config.id]}
                 onChange={handleChange(config.id)}
               />
-              <span style={{ fontSize: '14px' }}>Enable</span>
+              <span style={{ fontSize: '13px', color: '#444' }}>Enable</span>
             </label>
           ) : config.type === 'number' ? (
             <input
@@ -350,21 +318,15 @@ function App() {
               onChange={handleChange(config.id)}
               style={{ 
                 width: config.width,
-                padding: '4px 8px',
-                borderRadius: '4px',
-                border: '1px solid #dee2e6'
+                ...styles.select,
+                backgroundImage: 'none'
               }}
             />
           ) : config.type === 'select' ? (
             <select
               value={settings[config.id]}
               onChange={handleChange(config.id)}
-              style={{ 
-                width: config.width,
-                padding: '4px 8px',
-                borderRadius: '4px',
-                border: '1px solid #dee2e6'
-              }}
+              style={styles.select}
             >
               {config.options.map(opt => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -546,24 +508,11 @@ function App() {
           borderRadius: '8px',
           border: '1px solid #dee2e6'
         }}>
-          <h3 style={{ 
-            margin: '0 0 16px 0',
-            fontSize: '16px',
-            color: '#666'
-          }}>
-            Layer Settings
-          </h3>
+          <h3 style={styles.sectionHeading}>Layer Settings</h3>
           
           <div style={{ display: 'grid', gap: '12px' }}>
             <div>
-              <label style={{ 
-                display: 'block',
-                marginBottom: '4px',
-                fontSize: '12px',
-                color: '#666'
-              }}>
-                Default Layer
-              </label>
+              <label style={styles.label}>Default Layer</label>
               <select
                 value={settings.defaultLayer}
                 onChange={(e) => {
@@ -572,13 +521,7 @@ function App() {
                     defaultLayer: e.target.value
                   }));
                 }}
-                style={{
-                  width: '100%',
-                  padding: '4px 8px',
-                  fontSize: '12px',
-                  border: '1px solid #dee2e6',
-                  borderRadius: '4px'
-                }}
+                style={styles.select}
               >
                 {layers.map(layer => (
                   <option key={layer.name} value={layer.name}>
@@ -589,14 +532,7 @@ function App() {
             </div>
 
             <div>
-              <label style={{ 
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                fontSize: '12px',
-                color: '#666',
-                cursor: 'pointer'
-              }}>
+              <label style={styles.label}>
                 <input
                   type="checkbox"
                   checked={settings.showLayerControls}
@@ -606,6 +542,7 @@ function App() {
                       showLayerControls: e.target.checked
                     }));
                   }}
+                  style={{ marginRight: '8px' }}
                 />
                 Show Layer Controls
               </label>
@@ -620,23 +557,21 @@ function App() {
           alignItems: 'center',
           marginBottom: '16px'
         }}>
-          <h3 style={{ 
-            margin: 0,
-            fontSize: '16px',
-            color: '#666'
-          }}>
-            Layers
-          </h3>
+          <h3 style={styles.sectionHeading}>Layers</h3>
           <button
             onClick={handleAddLayer}
             style={{
-              padding: '4px 8px',
+              padding: '6px 12px',
               background: 'transparent',
               color: '#0366d6',
               border: '1px solid #0366d6',
-              borderRadius: '4px',
+              borderRadius: '6px',
               cursor: 'pointer',
-              fontSize: '12px'
+              fontSize: '13px',
+              transition: 'all 0.2s ease',
+              '&:hover': {
+                backgroundColor: '#f6f8fa'
+              }
             }}
           >
             Add Layer
