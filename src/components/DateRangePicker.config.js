@@ -139,10 +139,46 @@ export const SETTINGS = {
   },
   layers: {
     id: 'layers',
-    type: 'layers',
+    type: 'layer-controls',
     label: 'Calendar Layers',
     description: 'Configure calendar data layers and visualization',
-    default: DEFAULT_LAYERS
+    default: DEFAULT_LAYERS,
+    controls: {
+      name: {
+        type: 'text',
+        label: 'Layer Name',
+        description: 'Unique identifier for the layer',
+        required: true
+      },
+      title: {
+        type: 'text',
+        label: 'Display Title',
+        description: 'Human-readable title for the layer',
+        required: true
+      },
+      type: {
+        type: 'select',
+        label: 'Layer Type',
+        description: 'Type of layer visualization',
+        options: [
+          { value: 'base', label: 'Base Layer' },
+          { value: 'overlay', label: 'Overlay' }
+        ],
+        required: true
+      },
+      description: {
+        type: 'text',
+        label: 'Description',
+        description: 'Brief description of the layer purpose',
+        required: true
+      },
+      required: {
+        type: 'boolean',
+        label: 'Required Layer',
+        description: 'Whether this layer is required for calendar operation',
+        default: false
+      }
+    }
   }
 };
 

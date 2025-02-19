@@ -441,6 +441,85 @@ function App() {
     );
   };
 
+  const LayerMetadataEditor = ({ layer, onUpdate }) => {
+    const handleChange = (field) => (event) => {
+      const value = event.target.type === 'checkbox' 
+        ? event.target.checked 
+        : event.target.value;
+
+      onUpdate(layer.name, {
+        ...layer,
+        [field]: value
+      });
+    };
+
+    return (
+      <div style={{ marginBottom: '16px' }}>
+        {Object.entries(SETTINGS.layers.controls).map(([field, control]) => (
+          <div key={field} style={{ marginBottom: '8px' }}>
+            <label style={{ 
+              display: 'block', 
+              marginBottom: '4px',
+              fontSize: '12px',
+              color: '#666'
+            }}>
+              {control.label}
+              {control.required && <span style={{ color: '#dc3545' }}> *</span>}
+            </label>
+            {control.type === 'text' ? (
+              <input
+                type="text"
+                value={layer[field] || ''}
+                onChange={handleChange(field)}
+                disabled={field === 'name' && layer.required} // Prevent editing name of required layers
+                style={{
+                  width: '100%',
+                  padding: '4px 8px',
+                  fontSize: '12px',
+                  border: '1px solid #dee2e6',
+                  borderRadius: '4px'
+                }}
+              />
+            ) : control.type === 'select' ? (
+              <select
+                value={layer[field] || ''}
+                onChange={handleChange(field)}
+                disabled={field === 'type' && layer.required} // Prevent editing type of required layers
+                style={{
+                  width: '100%',
+                  padding: '4px 8px',
+                  fontSize: '12px',
+                  border: '1px solid #dee2e6',
+                  borderRadius: '4px'
+                }}
+              >
+                {control.options.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            ) : control.type === 'boolean' ? (
+              <label style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '8px',
+                fontSize: '12px',
+                cursor: layer.required ? 'not-allowed' : 'pointer'
+              }}>
+                <input
+                  type="checkbox"
+                  checked={layer[field] || false}
+                  onChange={handleChange(field)}
+                  disabled={layer.required} // Prevent editing required status of required layers
+                />
+                <span>Enable</span>
+              </label>
+            ) : null}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'core':
@@ -469,40 +548,17 @@ function App() {
                 borderRadius: '8px',
                 backgroundColor: '#fff'
               }}>
-                <div style={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between',
-                  alignItems: 'flex-start',
-                  marginBottom: '12px'
-                }}>
-                  <div>
-                    <h3 style={{ 
-                      margin: '0 0 4px',
-                      fontSize: '18px',
-                      color: '#0366d6'
-                    }}>
-                      {layer.title}
-                    </h3>
-                    <p style={{ 
-                      margin: '0',
-                      color: '#666',
-                      fontSize: '14px'
-                    }}>
-                      {layer.description}
-                    </p>
-                  </div>
-                  <div style={{
-                    fontSize: '12px',
-                    padding: '4px 8px',
-                    backgroundColor: layer.required ? '#e1e4e8' : '#f6f8fa',
-                    borderRadius: '12px',
-                    color: '#666'
-                  }}>
-                    {layer.type}
-                  </div>
-                </div>
-
-                {/* Replace the old data display with the new editor */}
+                <LayerMetadataEditor 
+                  layer={layer}
+                  onUpdate={(layerName, updatedLayer) => {
+                    setSettings(prev => ({
+                      ...prev,
+                      layers: prev.layers.map(l => 
+                        l.name === layerName ? updatedLayer : l
+                      )
+                    }));
+                  }}
+                />
                 <LayerDataEditor 
                   layer={layer} 
                   onUpdate={(layerName, newData) => {
