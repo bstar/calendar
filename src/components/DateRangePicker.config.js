@@ -168,11 +168,24 @@ export const SETTINGS = {
       }
     },
     controls: {
+      type: {
+        id: 'type',
+        type: 'select',
+        label: 'Layer Type',
+        description: 'The type of functionality for this layer',
+        options: [
+          { value: LAYER_TYPES.BASE, label: 'Base' },
+          { value: LAYER_TYPES.BACKGROUND, label: 'Background' },
+          { value: LAYER_TYPES.EVENTS, label: 'Events' }
+        ],
+        width: '150px'
+      },
       title: {
+        id: 'title',
         type: 'text',
-        label: 'Display Title',
-        description: 'Human-readable title for the layer',
-        required: true
+        label: 'Title',
+        description: 'Display name for the layer',
+        width: '200px'
       },
       description: {
         type: 'text',
