@@ -554,7 +554,7 @@ const MonthGrid = ({
   );
 };
 
-// Update the Tooltip component to handle both positioning and visibility
+// Update the Tooltip component to remove console logs
 const Tooltip = ({ content, show, children }) => {
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const [isHovered, setIsHovered] = useState(false);
@@ -563,7 +563,6 @@ const Tooltip = ({ content, show, children }) => {
 
   useEffect(() => {
     if (show && isHovered && targetRef.current && tooltipRef.current) {
-      console.log('Calculating tooltip position'); // Debug log
       const targetRect = targetRef.current.getBoundingClientRect();
       const tooltipRect = tooltipRef.current.getBoundingClientRect();
       
@@ -572,7 +571,6 @@ const Tooltip = ({ content, show, children }) => {
         left: targetRect.left + (targetRect.width - tooltipRect.width) / 2
       };
 
-      console.log('Tooltip position:', newPosition); // Debug log
       setPosition(newPosition);
     }
   }, [show, isHovered, content]);
@@ -581,14 +579,8 @@ const Tooltip = ({ content, show, children }) => {
     <div 
       ref={targetRef} 
       style={{ position: 'relative', width: '100%', height: '100%' }}
-      onMouseEnter={() => {
-        console.log('Tooltip target mouse enter');
-        setIsHovered(true);
-      }}
-      onMouseLeave={() => {
-        console.log('Tooltip target mouse leave');
-        setIsHovered(false);
-      }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       {children}
       {show && isHovered && (
@@ -599,14 +591,14 @@ const Tooltip = ({ content, show, children }) => {
             top: position.top,
             left: position.left,
             backgroundColor: 'white',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.25)',  // Darker shadow
+            boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
             borderRadius: '4px',
             zIndex: 9999,
             fontSize: '14px',
             maxWidth: '300px',
             padding: '8px',
             pointerEvents: 'none',
-            border: '1px solid rgba(0,0,0,0.2)'  // Darker border
+            border: '1px solid rgba(0,0,0,0.2)'
           }}
         >
           {content}
@@ -659,19 +651,11 @@ const DayCell = ({
 
   const handleMouseEnter = (e) => {
     const content = renderContent?.(date);
-    if (content) {
-      console.log('Mouse enter event cell:', date, content);
-      console.log('Tooltip content:', content.tooltipContent); // Debug log
-    }
     setIsHovered(true);
     onMouseEnter?.(e);
   };
 
   const handleMouseLeave = () => {
-    const content = renderContent?.(date);
-    if (content) {
-      console.log('Mouse leave event cell:', date);
-    }
     setIsHovered(false);
   };
 
@@ -915,8 +899,6 @@ const EventsLayer = ({
     );
     
     if (dayEvents.length === 0) return null;
-
-    console.log('Rendering event cell for date:', date, 'with events:', dayEvents);
 
     const mainEvent = dayEvents[0];
     
@@ -1207,15 +1189,12 @@ const DateRangePickerNew = ({
 
   const handleMouseUp = useCallback(() => {
     setIsSelecting(false);
+    console.log('ending selection');
     setOutOfBoundsDirection(null);
     setInitialDate(null);
 
-    const resetUserSelect = () => {
-      const styles = ['userSelect', 'webkitUserSelect', 'mozUserSelect', 'msUserSelect'];
-      styles.forEach(style => document.body.style[style] = '');
-    };
-
-    resetUserSelect();
+    const styles = ['userSelect', 'webkitUserSelect', 'mozUserSelect', 'msUserSelect'];
+    styles.forEach(style => document.body.style[style] = '');
 
     document.removeEventListener("mousemove", handleMouseMove);
     document.removeEventListener("mouseup", handleMouseUp);
@@ -1231,6 +1210,7 @@ const DateRangePickerNew = ({
     };
 
     setIsSelecting(true);
+    console.log('starting selection');
     setUserSelectNone();
 
     document.addEventListener("mousemove", handleMouseMove);
