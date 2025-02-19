@@ -327,27 +327,31 @@ function App() {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
         {!isEditing && (
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            {Object.keys(config.presets).map(presetName => (
-              <button
-                key={presetName}
-                onClick={() => handlePresetToggle(presetName)}
-                style={{
-                  ...styles.containerStyleButton,
-                  ...(value === config.presets[presetName] ? styles.containerStyleButtonSelected : {})
-                }}
-              >
-                {value === config.presets[presetName] && (
-                  <span style={{ fontSize: '16px', marginRight: '4px' }}>✓</span>
-                )}
-                {presetName}
-              </button>
-            ))}
+          <>
+            {/* Preset buttons container */}
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
+              {Object.keys(config.presets).map(presetName => (
+                <button
+                  key={presetName}
+                  onClick={() => handlePresetToggle(presetName)}
+                  style={{
+                    ...styles.containerStyleButton,
+                    ...(value === config.presets[presetName] ? styles.containerStyleButtonSelected : {})
+                  }}
+                >
+                  {value === config.presets[presetName] && (
+                    <span style={{ fontSize: '16px', marginRight: '4px' }}>✓</span>
+                  )}
+                  {presetName}
+                </button>
+              ))}
+            </div>
+
+            {/* Edit JSON button on its own line */}
             <button
               onClick={() => setIsEditing(true)}
               style={{
                 ...styles.containerStyleButton,
-                marginLeft: 0,
                 backgroundColor: '#f3e8fd',
                 color: '#6f42c1',
                 '&:hover': {
@@ -359,7 +363,7 @@ function App() {
               <span style={{ fontSize: '14px', marginRight: '4px' }}>{ }︎</span>
               Edit JSON
             </button>
-          </div>
+          </>
         )}
 
         {isEditing && (
