@@ -1,3 +1,19 @@
+export const DEFAULT_LAYERS = [
+  {
+    name: 'Calendar',
+    type: 'base',
+    required: true,
+    title: 'Base Calendar Layer',
+    description: 'Basic calendar functionality with date selection'
+  },
+  {
+    name: 'Events',
+    type: 'overlay',
+    title: 'Event Management',
+    description: 'Display and manage calendar events'
+  }
+];
+
 export const SETTINGS = {
   core: {
     displayMode: {
@@ -120,6 +136,13 @@ export const SETTINGS = {
       description: 'Allow month scrolling when dragging outside calendar',
       default: true
     }
+  },
+  layers: {
+    id: 'layers',
+    type: 'layers',
+    label: 'Calendar Layers',
+    description: 'Configure calendar data layers and visualization',
+    default: DEFAULT_LAYERS
   }
 };
 
@@ -144,6 +167,9 @@ export const getDefaultSettings = (displayMode = 'popup') => {
   Object.values(SETTINGS.features).forEach(feature => {
     defaults[feature.id] = feature.default;
   });
+  
+  // Add layers default
+  defaults.layers = DEFAULT_LAYERS;
 
   // Apply mode-specific constraints
   if (displayMode === 'embedded') {

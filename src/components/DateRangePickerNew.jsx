@@ -17,7 +17,7 @@ import {
 } from "date-fns";
 import './DateRangePicker.css';
 import PropTypes from "prop-types";
-import { DEFAULT_CONTAINER_STYLES } from './DateRangePicker.config';
+import { DEFAULT_CONTAINER_STYLES, DEFAULT_LAYERS } from './DateRangePicker.config';
 
 // Custom components
 const Card = React.forwardRef(({ children, className, ...props }, ref) => (
@@ -816,33 +816,6 @@ const SideChevronIndicator = ({ outOfBoundsDirection, isSelecting }) => {
   );
 };
 
-const INITIAL_LAYERS = [
-  {
-    id: 'base',
-    name: 'Calendar',
-    type: 'base',
-    required: true,
-  },
-  {
-    id: 'events',
-    name: 'Events',
-    type: 'overlay',
-    required: false,
-  },
-  {
-    id: 'restrictions',
-    name: 'Restrictions',
-    type: 'overlay',
-    required: false,
-  },
-  {
-    id: 'alerts',
-    name: 'Alerts',
-    type: 'overlay',
-    required: false,
-  }
-];
-
 const LayerControl = ({ layers, activeLayer, onLayerChange }) => {
   return (
     <div className="cla-layer-control" style={{
@@ -853,15 +826,15 @@ const LayerControl = ({ layers, activeLayer, onLayerChange }) => {
     }}>
       {layers.map(layer => (
         <button
-          key={layer.id}
-          onClick={() => onLayerChange(layer.id)}
-          className={`cla-layer-button ${activeLayer === layer.id ? 'active' : ''}`}
+          key={layer.name}
+          onClick={() => onLayerChange(layer.name)}
+          className={`cla-layer-button ${activeLayer === layer.name ? 'active' : ''}`}
           style={{
             padding: '6px 12px',
             borderRadius: '4px',
             border: '1px solid #dee2e6',
-            backgroundColor: activeLayer === layer.id ? '#e7f3ff' : '#fff',
-            color: activeLayer === layer.id ? '#0366d6' : '#666',
+            backgroundColor: activeLayer === layer.name ? '#e7f3ff' : '#fff',
+            color: activeLayer === layer.name ? '#0366d6' : '#666',
             cursor: 'pointer'
           }}
         >
@@ -875,26 +848,16 @@ const LayerControl = ({ layers, activeLayer, onLayerChange }) => {
 const EventsLayer = ({
   months,
   selectedRange,
+  onSelectionStart,
+  onSelectionMove,
+  isSelecting,
   visibleMonths,
   showMonthHeadings,
   showTooltips,
-  onSelectionStart,
-  onSelectionMove,
-  isSelecting
+  data = []
 }) => {
-  // Sample events data
-  const events = [
-    { date: '2025-02-15', title: 'Team Meeting', type: 'work', time: '10:00 AM', description: 'Weekly sync' },
-    { date: '2025-02-20', title: 'Lunch with Client', type: 'work', time: '12:30 PM', description: 'Project discussion' },
-    { date: '2025-02-25', title: 'Birthday Party', type: 'personal', time: '7:00 PM', description: 'Cake and presents!' },
-    { date: '2025-03-05', title: 'Conference', type: 'work', time: '9:00 AM', description: 'Annual tech summit' },
-    { date: '2025-03-12', title: 'Dentist', type: 'personal', time: '2:00 PM', description: 'Regular checkup' },
-    { date: '2025-03-18', title: 'Project Deadline', type: 'work', time: '5:00 PM', description: 'Final deliverables due' },
-    { date: '2025-03-22', title: 'Weekend Trip', type: 'personal', time: 'All day', description: 'Beach getaway' }
-  ];
-
   const renderDay = (date) => {
-    const dayEvents = events.filter(event => 
+    const dayEvents = data.filter(event => 
       event.date === format(date, 'yyyy-MM-dd')
     );
     
@@ -989,7 +952,8 @@ const DateRangePickerNew = ({
   showFooter = true,
   singleMonthWidth = 500,
   enableOutOfBoundsScroll = true,
-  suppressTooltipsOnSelection = false
+  suppressTooltipsOnSelection = false,
+  layers: initialLayers = DEFAULT_LAYERS
 }) => {
   const [isOpen, setIsOpen] = useState(displayMode === 'embedded' || initialIsOpen);
   const [selectedRange, setSelectedRange] = useState({ start: null, end: null });
@@ -1004,8 +968,8 @@ const DateRangePickerNew = ({
     currentField: null
   });
   const [validationErrors, setValidationErrors] = useState({});
-  const [layers] = useState(INITIAL_LAYERS);
-  const [activeLayer, setActiveLayer] = useState('base');
+  const [activeLayers, setActiveLayers] = useState(initialLayers);  // Rename state variable
+  const [activeLayer, setActiveLayer] = useState('Calendar');
   const [forceShowTooltips, setForceShowTooltips] = useState(true);
 
   const containerRef = useRef(null);
@@ -1294,7 +1258,8 @@ const DateRangePickerNew = ({
     isSelecting,
     visibleMonths,
     showMonthHeadings,
-    showTooltips
+    showTooltips,
+    data = []
   }) => {
     return (
       <MonthPair
@@ -1318,6 +1283,42 @@ const DateRangePickerNew = ({
   // Add back the tooltipProps
   const tooltipProps = {
     showTooltips: showTooltips || forceShowTooltips
+  };
+
+  const renderLayer = (layer) => {
+    switch (layer.name) {
+      case 'Calendar':
+        return (
+          <BaseLayer
+            months={months}
+            selectedRange={selectedRange}
+            onSelectionStart={handleSelectionStart}
+            onSelectionMove={handleSelectionMove}
+            isSelecting={isSelecting}
+            visibleMonths={visibleMonths}
+            showMonthHeadings={showMonthHeadings}
+            showTooltips={tooltipProps.showTooltips}
+            data={layer.data}
+          />
+        );
+      case 'Events':
+        return (
+          <EventsLayer
+            months={months}
+            selectedRange={selectedRange}
+            onSelectionStart={handleSelectionStart}
+            onSelectionMove={handleSelectionMove}
+            isSelecting={isSelecting}
+            visibleMonths={visibleMonths}
+            showMonthHeadings={showMonthHeadings}
+            showTooltips={tooltipProps.showTooltips}
+            data={layer.data}
+          />
+        );
+      default:
+        console.warn(`Unknown layer type: ${layer.name}`);
+        return null;
+    }
   };
 
   return (
@@ -1400,44 +1401,19 @@ const DateRangePickerNew = ({
           )}
 
           <LayerControl
-            layers={layers}
+            layers={activeLayers}
             activeLayer={activeLayer}
             onLayerChange={handleLayerChange}
           />
 
           <div className="cla-card-body" style={{ padding: '16px' }}>
             <div style={{ display: 'flex' }}>
-              {activeLayer === 'base' && (
-                <BaseLayer
-                  months={months}
-                  selectedRange={selectedRange}
-                  onSelectionStart={handleSelectionStart}
-                  onSelectionMove={handleSelectionMove}
-                  isSelecting={isSelecting}
-                  visibleMonths={visibleMonths}
-                  showMonthHeadings={showMonthHeadings}
-                  showTooltips={tooltipProps.showTooltips}
-                />
-              )}
-              {activeLayer === 'events' && (
-                <EventsLayer
-                  months={months}
-                  selectedRange={selectedRange}
-                  onSelectionStart={handleSelectionStart}
-                  onSelectionMove={handleSelectionMove}
-                  isSelecting={isSelecting}
-                  visibleMonths={visibleMonths}
-                  showMonthHeadings={showMonthHeadings}
-                  showTooltips={tooltipProps.showTooltips}
-                />
-              )}
-              {activeLayer === 'restrictions' && (
-                // Placeholder for restrictions layer
-                <div>Restrictions Layer (Coming Soon)</div>
-              )}
-              {activeLayer === 'alerts' && (
-                // Placeholder for alerts layer
-                <div>Alerts Layer (Coming Soon)</div>
+              {activeLayers.map(layer => 
+                layer.name === activeLayer && (
+                  <div key={layer.name} style={{ width: '100%' }}>
+                    {renderLayer(layer)}
+                  </div>
+                )
               )}
             </div>
           </div>
@@ -1489,6 +1465,14 @@ DateRangePickerNew.propTypes = {
   singleMonthWidth: PropTypes.number,
   enableOutOfBoundsScroll: PropTypes.bool,
   suppressTooltipsOnSelection: PropTypes.bool,
+  layers: PropTypes.arrayOf(PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    required: PropTypes.bool,
+    data: PropTypes.array
+  }))
 };
 
 export default DateRangePickerNew;

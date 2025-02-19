@@ -7,6 +7,16 @@ import DateRangePickerNew from './components/DateRangePickerNew';
 // Import package.json to access version, description, and name
 import packageInfo from '../package.json';
 
+const SAMPLE_EVENTS_DATA = [
+  { date: '2025-02-15', title: 'Team Meeting', type: 'work', time: '10:00 AM', description: 'Weekly sync' },
+  { date: '2025-02-20', title: 'Lunch with Client', type: 'work', time: '12:30 PM', description: 'Project discussion' },
+  { date: '2025-02-25', title: 'Birthday Party', type: 'personal', time: '7:00 PM', description: 'Cake and presents!' },
+  { date: '2025-03-05', title: 'Conference', type: 'work', time: '9:00 AM', description: 'Annual tech summit' },
+  { date: '2025-03-12', title: 'Dentist', type: 'personal', time: '2:00 PM', description: 'Regular checkup' },
+  { date: '2025-03-18', title: 'Project Deadline', type: 'work', time: '5:00 PM', description: 'Final deliverables due' },
+  { date: '2025-03-22', title: 'Weekend Trip', type: 'personal', time: 'All day', description: 'Beach getaway' }
+];
+
 function App() {
   const [settings, setSettings] = useState({
     ...getDefaultSettings(),
@@ -14,6 +24,18 @@ function App() {
   });
 
   const [activeTab, setActiveTab] = useState('core');
+
+  // Initialize layers with data
+  useEffect(() => {
+    setSettings(prev => ({
+      ...prev,
+      layers: prev.layers.map(layer => 
+        layer.name === 'Events' 
+          ? { ...layer, data: SAMPLE_EVENTS_DATA }
+          : layer
+      )
+    }));
+  }, []);
 
   const handleChange = (prop) => (event) => {
     const value = event.target.type === 'checkbox' 
@@ -358,8 +380,76 @@ function App() {
             ))}
           </div>
         );
-      case 'data':
-        return <div>Data content will be added here later.</div>;
+      case 'layers':
+        return (
+          <div style={{ display: 'grid', gap: '24px' }}>
+            {settings.layers.map((layer, index) => (
+              <div key={layer.name} style={{ 
+                padding: '16px',
+                border: '1px solid #dee2e6',
+                borderRadius: '8px',
+                backgroundColor: '#fff'
+              }}>
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start',
+                  marginBottom: '12px'
+                }}>
+                  <div>
+                    <h3 style={{ 
+                      margin: '0 0 4px',
+                      fontSize: '18px',
+                      color: '#0366d6'
+                    }}>
+                      {layer.title}
+                    </h3>
+                    <p style={{ 
+                      margin: '0',
+                      color: '#666',
+                      fontSize: '14px'
+                    }}>
+                      {layer.description}
+                    </p>
+                  </div>
+                  <div style={{
+                    fontSize: '12px',
+                    padding: '4px 8px',
+                    backgroundColor: layer.required ? '#e1e4e8' : '#f6f8fa',
+                    borderRadius: '12px',
+                    color: '#666'
+                  }}>
+                    {layer.type}
+                  </div>
+                </div>
+
+                {/* Show data if it exists */}
+                {layer.data && layer.data.length > 0 && (
+                  <div style={{ marginTop: '12px' }}>
+                    <h4 style={{ 
+                      margin: '0 0 8px',
+                      fontSize: '14px',
+                      color: '#666'
+                    }}>
+                      Layer Data
+                    </h4>
+                    <pre style={{ 
+                      margin: 0,
+                      padding: '12px',
+                      backgroundColor: '#f6f8fa',
+                      borderRadius: '6px',
+                      fontSize: '12px',
+                      overflow: 'auto',
+                      maxHeight: '200px'
+                    }}>
+                      {JSON.stringify(layer.data, null, 2)}
+                    </pre>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        );
       default:
         return null;
     }
@@ -432,7 +522,7 @@ function App() {
         }}>
           {/* Tabs */}
           <div style={{ display: 'flex', marginBottom: '16px', borderBottom: '1px solid #dee2e6' }}>
-            {['core', 'features', 'data'].map(tab => (
+            {['core', 'features', 'layers'].map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
