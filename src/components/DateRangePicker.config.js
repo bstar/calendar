@@ -145,12 +145,14 @@ export const SETTINGS = {
     default: DEFAULT_LAYERS,
     globalControls: {
       defaultLayer: {
+        id: 'defaultLayer',
         type: 'select',
         label: 'Default Layer',
         description: 'Select the default active layer',
-        // options will be populated dynamically from available layers
+        default: 'Calendar'
       },
       showLayerControls: {
+        id: 'showLayerControls',
         type: 'boolean',
         label: 'Show Layer Controls',
         description: 'Display layer selection controls in calendar',
@@ -158,12 +160,6 @@ export const SETTINGS = {
       }
     },
     controls: {
-      name: {
-        type: 'text',
-        label: 'Layer Name',
-        description: 'Unique identifier for the layer',
-        required: true
-      },
       title: {
         type: 'text',
         label: 'Display Title',
@@ -222,6 +218,10 @@ export const getDefaultSettings = (displayMode = 'popup') => {
       defaults[key] = value;
     });
   }
+
+  // Add layer control defaults
+  defaults.defaultLayer = SETTINGS.layers.globalControls.defaultLayer.default;
+  defaults.showLayerControls = SETTINGS.layers.globalControls.showLayerControls.default;
 
   return defaults;
 };

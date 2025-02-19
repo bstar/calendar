@@ -565,12 +565,12 @@ function App() {
                 Default Layer
               </label>
               <select
-                value={layers.find(l => l.isDefault)?.name || 'Calendar'}
+                value={settings.defaultLayer}
                 onChange={(e) => {
-                  onUpdate(layers.map(l => ({
-                    ...l,
-                    isDefault: l.name === e.target.value
-                  })));
+                  setSettings(prev => ({
+                    ...prev,
+                    defaultLayer: e.target.value
+                  }));
                 }}
                 style={{
                   width: '100%',
@@ -873,7 +873,11 @@ function App() {
             marginBottom: '24px'
           }}>
             <h5 style={{ marginBottom: '16px', color: '#666' }}>Preview</h5>
-            <DateRangePickerNew {...settings} />
+            <DateRangePickerNew 
+              {...settings} 
+              defaultLayer={settings.defaultLayer}
+              showLayerControls={settings.showLayerControls}
+            />
           </div>
 
           {/* Documentation */}

@@ -1045,7 +1045,9 @@ const DateRangePickerNew = ({
   singleMonthWidth = 500,
   enableOutOfBoundsScroll = true,
   suppressTooltipsOnSelection = false,
-  layers: initialLayers = DEFAULT_LAYERS
+  layers: initialLayers = DEFAULT_LAYERS,
+  showLayerControls = true,
+  defaultLayer = 'Calendar'
 }) => {
   const [isOpen, setIsOpen] = useState(displayMode === 'embedded' || initialIsOpen);
   const [selectedRange, setSelectedRange] = useState({ start: null, end: null });
@@ -1061,12 +1063,7 @@ const DateRangePickerNew = ({
   });
   const [validationErrors, setValidationErrors] = useState({});
   const [activeLayers, setActiveLayers] = useState(initialLayers);
-  const [activeLayer, setActiveLayer] = useState(() => {
-    // Find default layer or fall back to first visible layer
-    const defaultLayer = initialLayers.find(l => l.isDefault) 
-      || initialLayers.find(l => l.visible !== false);
-    return defaultLayer?.name || 'Calendar';
-  });
+  const [activeLayer, setActiveLayer] = useState(defaultLayer);
   const [forceShowTooltips, setForceShowTooltips] = useState(true);
 
   const containerRef = useRef(null);
@@ -1090,12 +1087,10 @@ const DateRangePickerNew = ({
     setActiveLayers(initialLayers);
   }, [initialLayers]);
 
-  // Update active layer when layers change
+  // Update active layer when defaultLayer prop changes
   useEffect(() => {
-    const defaultLayer = initialLayers.find(l => l.isDefault) 
-      || initialLayers.find(l => l.visible !== false);
-    setActiveLayer(defaultLayer?.name || 'Calendar');
-  }, [initialLayers]);
+    setActiveLayer(defaultLayer);
+  }, [defaultLayer]);
 
   // Simplified month generation
   const months = useMemo(() => {
@@ -1499,11 +1494,13 @@ const DateRangePickerNew = ({
             </>
           )}
 
-          <LayerControl
-            layers={activeLayers}
-            activeLayer={activeLayer}
-            onLayerChange={handleLayerChange}
-          />
+          {showLayerControls && (
+            <LayerControl
+              layers={activeLayers}
+              activeLayer={activeLayer}
+              onLayerChange={handleLayerChange}
+            />
+          )}
 
           <div className="cla-card-body" style={{ padding: '16px' }}>
             <div style={{ display: 'flex' }}>
@@ -1571,7 +1568,9 @@ DateRangePickerNew.propTypes = {
     description: PropTypes.string.isRequired,
     required: PropTypes.bool,
     data: PropTypes.array
-  }))
+  })),
+  showLayerControls: PropTypes.bool,
+  defaultLayer: PropTypes.string,
 };
 
 export default DateRangePickerNew;
