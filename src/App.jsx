@@ -524,18 +524,96 @@ function App() {
     const handleAddLayer = () => {
       const newLayer = {
         ...SETTINGS.layers.actions.newLayerTemplate,
-        name: `Layer_${Date.now()}`, // Ensure unique name
+        name: `Layer_${Date.now()}`,
         title: `New Layer ${layers.length + 1}`
       };
       onUpdate([...layers, newLayer]);
     };
 
     const handleRemoveLayer = (layerName) => {
+      // Prevent removing the base layer
+      if (layerName === 'Calendar') return;
       onUpdate(layers.filter(l => l.name !== layerName));
     };
 
     return (
       <div style={{ marginBottom: '24px' }}>
+        {/* Global Layer Controls */}
+        <div style={{ 
+          marginBottom: '24px',
+          padding: '16px',
+          backgroundColor: '#f8f9fa',
+          borderRadius: '8px',
+          border: '1px solid #dee2e6'
+        }}>
+          <h3 style={{ 
+            margin: '0 0 16px 0',
+            fontSize: '16px',
+            color: '#666'
+          }}>
+            Layer Settings
+          </h3>
+          
+          <div style={{ display: 'grid', gap: '12px' }}>
+            <div>
+              <label style={{ 
+                display: 'block',
+                marginBottom: '4px',
+                fontSize: '12px',
+                color: '#666'
+              }}>
+                Default Layer
+              </label>
+              <select
+                value={layers.find(l => l.isDefault)?.name || 'Calendar'}
+                onChange={(e) => {
+                  onUpdate(layers.map(l => ({
+                    ...l,
+                    isDefault: l.name === e.target.value
+                  })));
+                }}
+                style={{
+                  width: '100%',
+                  padding: '4px 8px',
+                  fontSize: '12px',
+                  border: '1px solid #dee2e6',
+                  borderRadius: '4px'
+                }}
+              >
+                {layers.map(layer => (
+                  <option key={layer.name} value={layer.name}>
+                    {layer.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label style={{ 
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontSize: '12px',
+                color: '#666',
+                cursor: 'pointer'
+              }}>
+                <input
+                  type="checkbox"
+                  checked={settings.showLayerControls}
+                  onChange={(e) => {
+                    setSettings(prev => ({
+                      ...prev,
+                      showLayerControls: e.target.checked
+                    }));
+                  }}
+                />
+                Show Layer Controls
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {/* Layer List Header */}
         <div style={{ 
           display: 'flex', 
           justifyContent: 'space-between',
@@ -565,6 +643,7 @@ function App() {
           </button>
         </div>
 
+        {/* Layer List */}
         <div style={{ display: 'grid', gap: '16px' }}>
           {layers.map((layer) => (
             <div key={layer.name} style={{ 
@@ -574,7 +653,7 @@ function App() {
               backgroundColor: '#fff',
               position: 'relative'
             }}>
-              {!layer.required && (
+              {layer.name !== 'Calendar' && (
                 <button
                   onClick={() => handleRemoveLayer(layer.name)}
                   style={{

@@ -143,6 +143,20 @@ export const SETTINGS = {
     label: 'Calendar Layers',
     description: 'Configure calendar data layers and visualization',
     default: DEFAULT_LAYERS,
+    globalControls: {
+      defaultLayer: {
+        type: 'select',
+        label: 'Default Layer',
+        description: 'Select the default active layer',
+        // options will be populated dynamically from available layers
+      },
+      showLayerControls: {
+        type: 'boolean',
+        label: 'Show Layer Controls',
+        description: 'Display layer selection controls in calendar',
+        default: true
+      }
+    },
     controls: {
       name: {
         type: 'text',
@@ -156,27 +170,11 @@ export const SETTINGS = {
         description: 'Human-readable title for the layer',
         required: true
       },
-      type: {
-        type: 'select',
-        label: 'Layer Type',
-        description: 'Type of layer visualization',
-        options: [
-          { value: 'base', label: 'Base Layer' },
-          { value: 'overlay', label: 'Overlay' }
-        ],
-        required: true
-      },
       description: {
         type: 'text',
         label: 'Description',
         description: 'Brief description of the layer purpose',
         required: true
-      },
-      required: {
-        type: 'boolean',
-        label: 'Required Layer',
-        description: 'Whether this layer is required for calendar operation',
-        default: false
       }
     },
     actions: {
@@ -187,7 +185,6 @@ export const SETTINGS = {
         type: 'overlay',
         title: 'New Layer',
         description: 'A new calendar layer',
-        required: false,
         data: []
       }
     }

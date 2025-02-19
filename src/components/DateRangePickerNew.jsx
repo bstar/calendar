@@ -824,23 +824,25 @@ const LayerControl = ({ layers, activeLayer, onLayerChange }) => {
       display: 'flex',
       gap: '8px'
     }}>
-      {layers.map(layer => (
-        <button
-          key={layer.name}
-          onClick={() => onLayerChange(layer.name)}
-          className={`cla-layer-button ${activeLayer === layer.name ? 'active' : ''}`}
-          style={{
-            padding: '6px 12px',
-            borderRadius: '4px',
-            border: '1px solid #dee2e6',
-            backgroundColor: activeLayer === layer.name ? '#e7f3ff' : '#fff',
-            color: activeLayer === layer.name ? '#0366d6' : '#666',
-            cursor: 'pointer'
-          }}
-        >
-          {layer.title}
-        </button>
-      ))}
+      {layers
+        .filter(layer => layer.visible !== false) // Only show visible layers
+        .map(layer => (
+          <button
+            key={layer.name}
+            onClick={() => onLayerChange(layer.name)}
+            className={`cla-layer-button ${activeLayer === layer.name ? 'active' : ''}`}
+            style={{
+              padding: '6px 12px',
+              borderRadius: '4px',
+              border: '1px solid #dee2e6',
+              backgroundColor: activeLayer === layer.name ? '#e7f3ff' : '#fff',
+              color: activeLayer === layer.name ? '#0366d6' : '#666',
+              cursor: 'pointer'
+            }}
+          >
+            {layer.title}
+          </button>
+        ))}
     </div>
   );
 };
@@ -1059,7 +1061,12 @@ const DateRangePickerNew = ({
   });
   const [validationErrors, setValidationErrors] = useState({});
   const [activeLayers, setActiveLayers] = useState(initialLayers);
-  const [activeLayer, setActiveLayer] = useState('Calendar');
+  const [activeLayer, setActiveLayer] = useState(() => {
+    // Find default layer or fall back to first visible layer
+    const defaultLayer = initialLayers.find(l => l.isDefault) 
+      || initialLayers.find(l => l.visible !== false);
+    return defaultLayer?.name || 'Calendar';
+  });
   const [forceShowTooltips, setForceShowTooltips] = useState(true);
 
   const containerRef = useRef(null);
@@ -1081,6 +1088,13 @@ const DateRangePickerNew = ({
   // Add this effect to update activeLayers when initialLayers changes
   useEffect(() => {
     setActiveLayers(initialLayers);
+  }, [initialLayers]);
+
+  // Update active layer when layers change
+  useEffect(() => {
+    const defaultLayer = initialLayers.find(l => l.isDefault) 
+      || initialLayers.find(l => l.visible !== false);
+    setActiveLayer(defaultLayer?.name || 'Calendar');
   }, [initialLayers]);
 
   // Simplified month generation
