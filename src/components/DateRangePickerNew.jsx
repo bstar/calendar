@@ -1005,7 +1005,7 @@ const DateRangePickerNew = ({
   const [validationErrors, setValidationErrors] = useState({});
   const [layers] = useState(INITIAL_LAYERS);
   const [activeLayer, setActiveLayer] = useState('base');
-  const [forceShowTooltips] = useState(true);
+  const [forceShowTooltips, setForceShowTooltips] = useState(true);
 
   const containerRef = useRef(null);
   const moveToMonthRef = useRef(null);
@@ -1189,6 +1189,7 @@ const DateRangePickerNew = ({
 
   const handleMouseUp = useCallback(() => {
     setIsSelecting(false);
+    setForceShowTooltips(true);  // Re-enable tooltips after selection
     console.log('ending selection');
     setOutOfBoundsDirection(null);
     setInitialDate(null);
@@ -1210,6 +1211,7 @@ const DateRangePickerNew = ({
     };
 
     setIsSelecting(true);
+    setForceShowTooltips(false);  // Disable tooltips during selection
     console.log('starting selection');
     setUserSelectNone();
 
