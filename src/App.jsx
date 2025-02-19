@@ -96,6 +96,24 @@ const styles = {
         color: '#1a7f37'
       }
     }
+  },
+  containerStyleButton: {
+    padding: '4px 12px',
+    fontSize: '13px',
+    border: '1px solid #cfd4d9',
+    borderRadius: '4px',
+    backgroundColor: '#fff',
+    color: '#666',
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+    display: 'inline-flex',
+    alignItems: 'center',
+    transition: 'all 0.2s ease',
+    minHeight: '32px'
+  },
+  containerStyleButtonSelected: {
+    backgroundColor: 'rgb(231, 243, 255)',
+    color: 'rgb(3, 102, 214)'
   }
 };
 
@@ -297,50 +315,34 @@ function App() {
 
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          {Object.keys(config.presets).map(preset => (
+        {!isEditing && (
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            {Object.keys(config.presets).map(presetName => (
+              <button
+                key={presetName}
+                onClick={() => handlePresetToggle(presetName)}
+                style={{
+                  ...styles.containerStyleButton,
+                  ...(value === config.presets[presetName] ? styles.containerStyleButtonSelected : {})
+                }}
+              >
+                {value === config.presets[presetName] && (
+                  <span style={{ fontSize: '16px', marginRight: '4px' }}>✓</span>
+                )}
+                {presetName}
+              </button>
+            ))}
             <button
-              key={preset}
-              onClick={() => handlePresetToggle(preset)}
+              onClick={() => setIsEditing(true)}
               style={{
-                padding: '4px 12px',
-                borderRadius: '16px',
-                border: '1px solid #dee2e6',
-                backgroundColor: selectedPresets.includes(preset) ? '#e7f3ff' : '#fff',
-                color: selectedPresets.includes(preset) ? '#0366d6' : '#666',
-                cursor: 'pointer',
-                fontSize: '13px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-                transition: 'all 0.2s ease',
-                width: '120px',
-                height: '40px',
-                justifyContent: 'center'
+                ...styles.containerStyleButton,
+                marginLeft: 'auto'
               }}
             >
-              {selectedPresets.includes(preset) && (
-                <span style={{ fontSize: '16px' }}>✓</span>
-              )}
-              {preset}
+              Edit JSON
             </button>
-          ))}
-          <button
-            onClick={() => setIsEditing(!isEditing)}
-            style={{
-              padding: '4px 12px',
-              borderRadius: '16px',
-              border: '1px solid #dee2e6',
-              backgroundColor: isEditing ? '#fff3cd' : '#fff',
-              color: '#666',
-              cursor: 'pointer',
-              fontSize: '13px',
-              marginLeft: 'auto'
-            }}
-          >
-            {isEditing ? 'Cancel' : 'Edit JSON'}
-          </button>
-        </div>
+          </div>
+        )}
 
         {isEditing && (
           <>
@@ -368,13 +370,7 @@ function App() {
                   alert('Invalid style format. Please use valid JSON.');
                 }
               }}
-              style={{
-                padding: '4px 8px',
-                borderRadius: '4px',
-                border: '1px solid #dee2e6',
-                backgroundColor: '#fff',
-                cursor: 'pointer'
-              }}
+              style={styles.containerStyleButton}
             >
               Apply Styles
             </button>
