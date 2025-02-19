@@ -856,17 +856,12 @@ const EventsLayer = ({
   showTooltips,
   data = []
 }) => {
-  const renderDay = (date) => {
-    // Debug logging
-    console.log('Checking date:', format(date, 'yyyy-MM-dd'));
-    console.log('Available events:', data);
-    
+  // Use useMemo to memoize the renderDay function based on data changes
+  const renderDay = useMemo(() => (date) => {
     const dayEvents = data.filter(event => {
       const eventDate = parseISO(event.date);
       return isSameDay(eventDate, date);
     });
-    
-    console.log('Found events:', dayEvents);
     
     if (dayEvents.length === 0) return null;
 
@@ -925,11 +920,12 @@ const EventsLayer = ({
         </div>
       )
     };
-  };
+  }, [data]); // Dependency on data ensures renderDay updates when data changes
 
   return (
     <div style={{ width: '100%' }}>
       <MonthPair
+        key={JSON.stringify(data)} // Force re-render when data changes
         firstMonth={months[0]}
         secondMonth={visibleMonths === 1 ? null : months[1]}
         selectedRange={selectedRange}
@@ -994,6 +990,11 @@ const DateRangePickerNew = ({
     console.log('=== Active Layers Updated ===');
     console.log('activeLayers:', activeLayers);
   }, [activeLayers]);
+
+  // Add this effect to update activeLayers when initialLayers changes
+  useEffect(() => {
+    setActiveLayers(initialLayers);
+  }, [initialLayers]);
 
   // Simplified month generation
   const months = useMemo(() => {
