@@ -17,6 +17,21 @@ const SAMPLE_EVENTS_DATA = [
   { date: '2025-03-22', title: 'Weekend Trip', type: 'personal', time: 'All day', description: 'Beach getaway' }
 ];
 
+const baseButtonStyle = {
+  padding: '4px 12px',
+  fontSize: '13px',
+  border: '1px solid #cfd4d9',
+  borderRadius: '4px',
+  backgroundColor: '#fff',
+  color: '#666',
+  cursor: 'pointer',
+  whiteSpace: 'nowrap',
+  display: 'inline-flex',
+  alignItems: 'center',
+  transition: 'all 0.2s ease',
+  minHeight: '32px'
+};
+
 // Common styles we can reuse
 const styles = {
   sectionHeading: {
@@ -97,23 +112,19 @@ const styles = {
       }
     }
   },
-  containerStyleButton: {
-    padding: '4px 12px',
-    fontSize: '13px',
-    border: '1px solid #cfd4d9',
-    borderRadius: '4px',
-    backgroundColor: '#fff',
-    color: '#666',
-    cursor: 'pointer',
-    whiteSpace: 'nowrap',
-    display: 'inline-flex',
-    alignItems: 'center',
-    transition: 'all 0.2s ease',
-    minHeight: '32px'
-  },
+  containerStyleButton: baseButtonStyle,
   containerStyleButtonSelected: {
-    backgroundColor: 'rgb(231, 243, 255)',
-    color: 'rgb(3, 102, 214)'
+    backgroundColor: '#e3f2fd',
+    color: '#0366d6'
+  },
+  jsonEditButton: {
+    ...baseButtonStyle,
+    marginLeft: 'auto',
+    backgroundColor: '#e3f2fd',
+    '&:hover': {
+      backgroundColor: '#bbdefb',
+      color: '#0366d6'
+    }
   }
 };
 
@@ -336,9 +347,16 @@ function App() {
               onClick={() => setIsEditing(true)}
               style={{
                 ...styles.containerStyleButton,
-                marginLeft: 'auto'
+                marginLeft: 0,
+                backgroundColor: '#f8f9fa',
+                color: '#444',
+                '&:hover': {
+                  backgroundColor: '#e9ecef',
+                  color: '#0366d6'
+                }
               }}
             >
+              <span style={{ fontSize: '14px', marginRight: '4px' }}>{ }︎</span>
               Edit JSON
             </button>
           </div>
