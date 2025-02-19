@@ -1477,7 +1477,10 @@ const DateRangePickerNew = ({
                 )}
               </div>
 
-              <div className="cla-header" style={{ padding: '12px 16px' }}>
+              <div className="cla-header" style={{ 
+                padding: '12px 16px',
+                borderBottom: 'none' // Force remove any border
+              }}>
                 <button className="cla-button-nav" onClick={() => moveToMonth('prev')}>
                   <ChevronLeft size={16} />
                 </button>
@@ -1515,7 +1518,10 @@ const DateRangePickerNew = ({
           </div>
 
           {showFooter && (
-            <div className="cla-card-footer" style={{ padding: '16px' }}>
+            <div className="cla-card-footer" style={{ 
+              padding: '16px',
+              borderTop: 'none' // Force remove any border
+            }}>
               <Button
                 variant="primary"
                 onClick={handleClear}
