@@ -1015,9 +1015,11 @@ function App() {
             </button>
           </div>
 
+          {/* Tabs container */}
           <div style={{ 
             position: 'relative', 
-            marginBottom: '16px' 
+            marginBottom: '16px',
+            marginTop: '16px'  // Reduced from 32px to 16px for minimal spacing
           }}>
             {/* Tabs */}
             <div style={{ 
@@ -1030,19 +1032,19 @@ function App() {
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   style={{
-                    padding: '10px 0',  // Remove horizontal padding
-                    width: '100px',     // Fixed width for all tabs
+                    padding: '10px 0',
+                    width: '100px',
                     border: 'none',
                     borderBottom: activeTab === tab ? '2px solid #0366d6' : '2px solid transparent',
                     backgroundColor: 'transparent',
                     color: activeTab === tab ? '#0366d6' : '#666',
                     cursor: 'pointer',
                     fontSize: '14px',
-                    fontWeight: '600',  // Keep consistent font weight
+                    fontWeight: '600',
                     transition: 'color 0.2s ease',
                     marginRight: '8px',
                     outline: 'none',
-                    textAlign: 'center'  // Center the text
+                    textAlign: 'center'
                   }}
                 >
                   {tab.charAt(0).toUpperCase() + tab.slice(1)}
