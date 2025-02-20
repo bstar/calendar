@@ -17,36 +17,94 @@ import {
   isWithinInterval
 } from "date-fns";
 import './DateRangePicker.css';
-import PropTypes from "prop-types";
-import { DEFAULT_CONTAINER_STYLES, DEFAULT_LAYERS } from './DateRangePicker.config';
+import { 
+  DEFAULT_CONTAINER_STYLES, 
+  DEFAULT_LAYERS,
+  CalendarSettings,
+  Layer,
+  LayerData
+} from './DateRangePicker.config';
 import { LayerRenderer } from './DateRangePickerNew/layers/LayerRenderer';
 
+interface DateRange {
+  start: string | null;
+  end: string | null;
+}
+
+interface DateInputContext {
+  startDate: string | null;
+  endDate: string | null;
+  currentField: string | null;
+}
+
+interface MousePosition {
+  x: number;
+  y: number;
+}
+
+interface ValidationError {
+  message: string;
+  type: string;
+  field: string;
+}
+
+// Add these interfaces after the existing ones
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode;
+  className?: string;
+}
+
+interface CardCompositionProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode;
+  className?: string;
+}
+
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant: string;
+  children: React.ReactNode;
+  className?: string;
+}
+
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  className?: string;
+}
+
+interface ChevronProps {
+  size?: number;
+}
+
+interface CardComponent extends React.ForwardRefExoticComponent<CardProps & React.RefAttributes<HTMLDivElement>> {
+  Header: React.FC<CardCompositionProps>;
+  Body: React.FC<CardCompositionProps>;
+  Footer: React.FC<CardCompositionProps>;
+}
+
 // Custom components
-const Card = React.forwardRef(({ children, className, ...props }, ref) => (
+const Card = React.forwardRef<HTMLDivElement, CardProps>(({ children, className, ...props }, ref) => (
   <div ref={ref} className={`cla-card ${className || ''}`} {...props}>
     {children}
   </div>
-));
+)) as CardComponent;
 
-Card.Header = ({ children, className, ...props }) => (
+Card.Header = ({ children, className, ...props }: CardCompositionProps) => (
   <div className={`cla-card-header ${className || ''}`} {...props}>
     {children}
   </div>
 );
 
-Card.Body = ({ children, className, ...props }) => (
+Card.Body = ({ children, className, ...props }: CardCompositionProps) => (
   <div className={`cla-card-body ${className || ''}`} {...props}>
     {children}
   </div>
 );
 
-Card.Footer = ({ children, className, ...props }) => (
+Card.Footer = ({ children, className, ...props }: CardCompositionProps) => (
   <div className={`cla-card-footer ${className || ''}`} {...props}>
     {children}
   </div>
 );
 
-const Button = ({ variant, children, className, ...props }) => (
+const Button: React.FC<ButtonProps> = ({ variant, children, className, ...props }) => (
   <button 
     className={`cla-button cla-button-${variant} ${className || ''}`} 
     {...props}
@@ -55,37 +113,53 @@ const Button = ({ variant, children, className, ...props }) => (
   </button>
 );
 
-const Input = ({ className, ...props }) => (
+const Input: React.FC<InputProps> = ({ className, ...props }) => (
   <input
     className={`cla-input ${className || ''}`}
     {...props}
   />
 );
 
-const ChevronLeft = ({ size = 16 }) => (
+const ChevronLeft: React.FC<ChevronProps> = ({ size = 16 }) => (
   <span 
     className="cla-chevron cla-chevron-left" 
     style={{ width: size, height: size }}
   />
 );
 
-const ChevronRight = ({ size = 16 }) => (
+const ChevronRight: React.FC<ChevronProps> = ({ size = 16 }) => (
   <span 
     className="cla-chevron cla-chevron-right" 
     style={{ width: size, height: size }}
   />
 );
 
-const useClickOutside = (ref, handler) => {
+// Add these type definitions
+interface IndicatorType {
+  type: 'success' | 'error' | null;
+}
+
+interface RenderResult {
+  backgroundColor?: string;
+  element?: React.ReactNode;
+  tooltipContent?: React.ReactNode;
+}
+
+interface Renderer {
+  (date: Date): RenderResult | null;
+}
+
+const useClickOutside = (
+  ref: React.RefObject<HTMLElement>,
+  handler: (event: MouseEvent) => void
+) => {
   useEffect(() => {
-    const listener = (event) => {
-      // If click is on the ref element or inside it, do nothing
-      if (!ref.current || ref.current.contains(event.target)) {
+    const listener = (event: MouseEvent) => {
+      if (!ref.current || ref.current.contains(event.target as Node)) {
         return;
       }
 
-      // Also ignore clicks on the floating indicator
-      const isFloatingIndicator = event.target.closest('.floating-indicator');
+      const isFloatingIndicator = (event.target as Element).closest('.floating-indicator');
       if (isFloatingIndicator) {
         return;
       }
@@ -93,7 +167,6 @@ const useClickOutside = (ref, handler) => {
       handler(event);
     };
 
-    // Use mousedown instead of click to handle the event earlier in the cycle
     document.addEventListener('mousedown', listener);
     return () => {
       document.removeEventListener('mousedown', listener);
@@ -259,7 +332,7 @@ const DateInput = ({ value, onChange, field, placeholder, context, selectedRange
   const [error, setError] = useState(null);
   const [showError, setShowError] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [showIndicator, setShowIndicator] = useState(null);
+  const [showIndicator, setShowIndicator] = useState<'success' | 'error' | null>(null);
   const previousInputRef = useRef('');
 
   useEffect(() => {
@@ -443,8 +516,125 @@ const DateInput = ({ value, onChange, field, placeholder, context, selectedRange
   );
 };
 
-// Update the MonthGrid component
-const MonthGrid = ({
+// Add these interfaces near the top with other interfaces
+interface CalendarGridProps {
+  months: Date[];
+  selectedRange: DateRange;
+  onSelectionStart: (date: Date) => void;
+  onSelectionMove: (date: Date) => void;
+  isSelecting: boolean;
+  visibleMonths: number;
+  showMonthHeadings: boolean;
+  showTooltips: boolean;
+  layer: Layer;
+  activeLayer: string;
+}
+
+interface MonthGridProps {
+  baseDate: Date;
+  selectedRange: DateRange;
+  onSelectionStart: (date: Date) => void;
+  onSelectionMove: (date: Date) => void;
+  isSelecting: boolean;
+  style?: React.CSSProperties;
+  showMonthHeading?: boolean;
+  showTooltips: boolean;
+  renderDay?: (date: Date) => RenderResult | null;
+  layer: Layer;
+}
+
+interface DayCellProps {
+  date: Date;
+  selectedRange: DateRange;
+  isCurrentMonth: boolean;
+  onMouseDown: () => void;
+  onMouseEnter: () => void;
+  showTooltips: boolean;
+  renderContent?: (date: Date) => RenderResult | null;
+  layer: Layer;
+  activeLayer: string;
+}
+
+interface TooltipProps {
+  content: React.ReactNode;
+  show: boolean;
+  children: React.ReactNode;
+}
+
+interface MonthPairProps extends Omit<MonthGridProps, 'baseDate' | 'style'> {
+  firstMonth: Date;
+  secondMonth: Date | null;
+  visibleMonths: number;
+  showMonthHeadings: boolean;
+}
+
+interface LayerControlProps {
+  layers: Layer[];
+  activeLayer: string;
+  onLayerChange: (layerId: string) => void;
+}
+
+interface SideChevronIndicatorProps {
+  outOfBoundsDirection: 'prev' | 'next' | null;
+  isSelecting: boolean;
+}
+
+// Update the Tooltip component
+const Tooltip: React.FC<TooltipProps> = ({ content, show, children }) => {
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+  const tooltipRef = useRef<HTMLDivElement>(null);
+  const targetRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (show && isHovered && targetRef.current && tooltipRef.current) {
+      const targetRect = targetRef.current.getBoundingClientRect();
+      const tooltipRect = tooltipRef.current.getBoundingClientRect();
+      
+      const newPosition = {
+        top: targetRect.top - tooltipRect.height - 8,
+        left: targetRect.left + (targetRect.width - tooltipRect.width) / 2
+      };
+
+      setPosition(newPosition);
+    }
+  }, [show, isHovered, content]);
+
+  return (
+    <div 
+      ref={targetRef} 
+      style={{ position: 'relative', width: '100%', height: '100%' }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {children}
+      {show && isHovered && (
+        <div
+          ref={tooltipRef}
+          style={{
+            position: 'fixed',
+            top: position.top,
+            left: position.left,
+            backgroundColor: 'white',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
+            borderRadius: '4px',
+            zIndex: 9999,
+            fontSize: '14px',
+            maxWidth: '300px',
+            padding: '8px',
+            pointerEvents: 'none',
+            border: '1px solid rgba(0,0,0,0.2)'
+          }}
+        >
+          {content}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Update MonthGrid to use proper types for weeks
+const MonthGrid: React.FC<MonthGridProps> = ({
   baseDate,
   selectedRange,
   onSelectionStart,
@@ -465,13 +655,13 @@ const MonthGrid = ({
     end: calendarEnd,
   });
 
-  const weeks = calendarDays.reduce((acc, day, index) => {
+  const weeks: Record<number, Date[]> = calendarDays.reduce((acc, day, index) => {
     const weekIndex = Math.floor(index / 7);
     return {
       ...acc,
       [weekIndex]: [...(acc[weekIndex] || []), day]
     };
-  }, {});
+  }, {} as Record<number, Date[]>);
 
   // Always maintain 6 rows of space regardless of actual weeks in month
   const totalWeeks = 6;
@@ -555,60 +745,6 @@ const MonthGrid = ({
           <div key={`empty-${i}`} style={{ backgroundColor: "white" }} />
         ))}
       </div>
-    </div>
-  );
-};
-
-// Update the Tooltip component to remove console logs
-const Tooltip = ({ content, show, children }) => {
-  const [position, setPosition] = useState({ top: 0, left: 0 });
-  const [isHovered, setIsHovered] = useState(false);
-  const tooltipRef = useRef(null);
-  const targetRef = useRef(null);
-
-  useEffect(() => {
-    if (show && isHovered && targetRef.current && tooltipRef.current) {
-      const targetRect = targetRef.current.getBoundingClientRect();
-      const tooltipRect = tooltipRef.current.getBoundingClientRect();
-      
-      const newPosition = {
-        top: targetRect.top - tooltipRect.height - 8,
-        left: targetRect.left + (targetRect.width - tooltipRect.width) / 2
-      };
-
-      setPosition(newPosition);
-    }
-  }, [show, isHovered, content]);
-
-  return (
-    <div 
-      ref={targetRef} 
-      style={{ position: 'relative', width: '100%', height: '100%' }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {children}
-      {show && isHovered && (
-        <div
-          ref={tooltipRef}
-          style={{
-            position: 'fixed',
-            top: position.top,
-            left: position.left,
-            backgroundColor: 'white',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
-            borderRadius: '4px',
-            zIndex: 9999,
-            fontSize: '14px',
-            maxWidth: '300px',
-            padding: '8px',
-            pointerEvents: 'none',
-            border: '1px solid rgba(0,0,0,0.2)'
-          }}
-        >
-          {content}
-        </div>
-      )}
     </div>
   );
 };
@@ -865,7 +1001,7 @@ const LayerControl = ({ layers, activeLayer, onLayerChange }) => {
   );
 };
 
-const CalendarGrid = ({
+const CalendarGrid: React.FC<CalendarGridProps> = ({
   months,
   selectedRange,
   onSelectionStart,
@@ -877,8 +1013,7 @@ const CalendarGrid = ({
   layer,
   activeLayer
 }) => {
-  // Create renderers based on available data types
-  const renderers = [];
+  const renderers: Renderer[] = [];
   
   if (layer.data?.background) {
     renderers.push(LayerRenderer.createBackgroundRenderer(layer.data.background));
@@ -888,15 +1023,13 @@ const CalendarGrid = ({
     renderers.push(LayerRenderer.createEventRenderer(layer.data.events));
   }
   
-  const renderDay = (date) => {
-    // Combine all renderer results for this date
+  const renderDay = (date: Date): RenderResult | null => {
     const results = renderers
       .map(renderer => renderer(date))
-      .filter(Boolean);
+      .filter((result): result is RenderResult => result !== null);
       
     if (results.length === 0) return null;
     
-    // Merge the results
     return results.reduce((combined, result) => ({
       backgroundColor: result.backgroundColor || combined.backgroundColor,
       element: result.element ? (
@@ -931,7 +1064,7 @@ const CalendarGrid = ({
   );
 };
 
-const DateRangePickerNew = ({ 
+const CLACalendar: React.FC<CalendarSettings> = ({
   displayMode = 'popup',
   containerStyle = null,
   isOpen: initialIsOpen = false,
@@ -955,7 +1088,7 @@ const DateRangePickerNew = ({
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date(2025, 1, 1)));
   const [isSelecting, setIsSelecting] = useState(false);
   const [initialDate, setInitialDate] = useState(null);
-  const [outOfBoundsDirection, setOutOfBoundsDirection] = useState(null);
+  const [outOfBoundsDirection, setOutOfBoundsDirection] = useState<'prev' | 'next' | null>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [dateInputContext, setDateInputContext] = useState({
     startDate: null,
@@ -967,9 +1100,9 @@ const DateRangePickerNew = ({
   const [activeLayer, setActiveLayer] = useState(defaultLayer);
   const [forceShowTooltips, setForceShowTooltips] = useState(true);
 
-  const containerRef = useRef(null);
-  const moveToMonthRef = useRef(null);
-  const debouncedMoveToMonthRef = useRef(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const moveToMonthRef = useRef<((direction: 'prev' | 'next') => void) | null>(null);
+  const debouncedMoveToMonthRef = useRef<Function | null>(null);
 
   // Add logging when initialLayers prop changes
   useEffect(() => {
@@ -1435,31 +1568,4 @@ const DateRangePickerNew = ({
   );
 };
 
-DateRangePickerNew.propTypes = {
-  displayMode: PropTypes.string,
-  containerStyle: PropTypes.object,
-  isOpen: PropTypes.bool,
-  visibleMonths: PropTypes.number,
-  showMonthHeadings: PropTypes.bool,
-  selectionMode: PropTypes.string,
-  showTooltips: PropTypes.bool,
-  showHeader: PropTypes.bool,
-  closeOnClickAway: PropTypes.bool,
-  showSubmitButton: PropTypes.bool,
-  showFooter: PropTypes.bool,
-  singleMonthWidth: PropTypes.number,
-  enableOutOfBoundsScroll: PropTypes.bool,
-  suppressTooltipsOnSelection: PropTypes.bool,
-  layers: PropTypes.arrayOf(PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
-    required: PropTypes.bool,
-    data: PropTypes.array
-  })),
-  showLayerControls: PropTypes.bool,
-  defaultLayer: PropTypes.string,
-};
-
-export default DateRangePickerNew;
+export default CLACalendar;

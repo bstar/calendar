@@ -1,4 +1,6 @@
-import { LAYER_TYPES, Layer } from './DateRangePickerNew/layers/types';
+import { CSSProperties } from 'react';
+
+export type LAYER_TYPES = 'base' | 'overlay';
 
 interface LayerFeature {
   name: string;
@@ -42,8 +44,8 @@ interface BooleanSetting extends BaseSetting {
 
 interface StyleSetting extends BaseSetting {
   type: 'style-editor';
-  default: null | Record<string, string>;
-  presets: Record<string, null | Record<string, string>>;
+  default: null | ExtendedCSSProperties;
+  presets: Record<string, null | ExtendedCSSProperties>;
 }
 
 interface LayerControlSetting extends BaseSetting {
@@ -103,37 +105,285 @@ interface Settings {
   layers: LayerControlSetting;
 }
 
+// Core Types
+export interface Layer {
+  name: string;
+  type: LAYER_TYPES;
+  title: string;
+  description: string;
+  data?: LayerData;
+  required?: boolean;
+  visible?: boolean;
+  features?: string[];
+}
+
+export interface LayerData {
+  events?: EventData[];
+  background?: BackgroundData[];
+}
+
+export interface EventData {
+  date: string;
+  title: string;
+  type: string;
+  time: string;
+  description: string;
+}
+
+export interface BackgroundData {
+  startDate: string;
+  endDate: string;
+  color: string;
+}
+
+// Calendar Settings Types
+export interface CalendarSettings {
+  // Core Settings
+  displayMode: 'popup' | 'embedded';
+  containerStyle?: CSSProperties;
+  isOpen?: boolean;
+  visibleMonths: number;
+  singleMonthWidth: number;
+  showMonthHeadings: boolean;
+  
+  // Feature Settings
+  selectionMode: 'single' | 'range';
+  showTooltips: boolean;
+  showHeader: boolean;
+  closeOnClickAway: boolean;
+  showSubmitButton: boolean;
+  showFooter: boolean;
+  enableOutOfBoundsScroll: boolean;
+  suppressTooltipsOnSelection: boolean;
+  
+  // Layer Settings
+  layers: Layer[];
+  showLayerControls: boolean;
+  defaultLayer: string;
+}
+
+// Control Types for App.tsx
+export interface SettingControl {
+  id: string;
+  type: 'boolean' | 'number' | 'select' | 'style-editor' | 'text';
+  label: string;
+  description: string;
+  default: any;
+  options?: SettingOption[];
+  min?: number;
+  max?: number;
+  width?: string;
+  presets?: Record<string, any>;
+  required?: boolean;
+}
+
+export interface SettingsConfig {
+  core: Record<string, SettingControl>;
+  features: Record<string, SettingControl>;
+  layers: {
+    controls: Record<string, SettingControl>;
+    actions: {
+      canAdd: boolean;
+      canRemove: boolean;
+      newLayerTemplate: Omit<Layer, 'features'> & { data: any[] };
+    };
+  };
+}
+
+// Default Settings
+export const DEFAULT_CONTAINER_STYLES: CSSProperties = {
+  backgroundColor: '#fff',
+  border: '1px solid #dee2e6',
+  borderRadius: '6px',
+  boxShadow: '0 0.5rem 1rem rgba(0, 0, 0, 0.15)'
+};
+
 export const DEFAULT_LAYERS: Layer[] = [
   {
-    name: 'calendar',
-    type: LAYER_TYPES.BASE,
-    required: true,
-    title: 'Calendar',
+    name: 'Calendar',
+    type: 'base',
+    title: 'Base Calendar',
     description: 'Basic calendar functionality',
-    features: ['base']
-  },
-  {
-    name: 'sample-background',
-    type: LAYER_TYPES.BACKGROUND,
-    title: 'Sample Background',
-    description: 'Example background colors',
-    features: ['background'],
-    data: {
-      background: []  // Will be populated with sample data in App.jsx
-    }
-  },
-  {
-    name: 'sample-events',
-    type: LAYER_TYPES.EVENTS,
-    title: 'Sample Events',
-    description: 'Example events',
-    features: ['events', 'background'],  // This layer can have both events and background colors
-    data: {
-      events: [],     // Will be populated with sample data in App.jsx
-      background: []  // Optional background data for this layer
-    }
+    required: true
   }
 ];
+
+export const getDefaultSettings = (): CalendarSettings => ({
+  displayMode: 'popup',
+  visibleMonths: 2,
+  singleMonthWidth: 500,
+  showMonthHeadings: false,
+  selectionMode: 'range',
+  showTooltips: true,
+  showHeader: true,
+  closeOnClickAway: true,
+  showSubmitButton: false,
+  showFooter: true,
+  enableOutOfBoundsScroll: true,
+  suppressTooltipsOnSelection: false,
+  layers: DEFAULT_LAYERS,
+  showLayerControls: true,
+  defaultLayer: 'Calendar'
+});
+
+// Settings Configuration
+export const SETTINGS: SettingsConfig = {
+  core: {
+    displayMode: {
+      id: 'displayMode',
+      type: 'select',
+      label: 'Display Mode',
+      description: 'How the calendar should be displayed',
+      default: 'popup',
+      options: [
+        { value: 'popup', label: 'Popup' },
+        { value: 'embedded', label: 'Embedded' }
+      ]
+    },
+    visibleMonths: {
+      id: 'visibleMonths',
+      type: 'number',
+      label: 'Visible Months',
+      description: 'Number of months to display',
+      default: 2,
+      min: 1,
+      max: 6
+    },
+    singleMonthWidth: {
+      id: 'singleMonthWidth',
+      type: 'number',
+      label: 'Month Width',
+      description: 'Width of a single month in pixels',
+      default: 500,
+      min: 200,
+      max: 800
+    },
+    containerStyle: {
+      id: 'containerStyle',
+      type: 'style-editor',
+      label: 'Container Style',
+      description: 'Customize the calendar container appearance',
+      default: DEFAULT_CONTAINER_STYLES,
+      presets: {
+        'Default': null,
+        'No Shadow': {
+          boxShadow: 'none'
+        },
+        'Rounded Corners': {
+          borderRadius: '12px'
+        },
+        'Rigid Corners': {
+          borderRadius: '0'
+        }
+      }
+    }
+  },
+  features: {
+    showMonthHeadings: {
+      id: 'showMonthHeadings',
+      type: 'boolean',
+      label: 'Show Month Headings',
+      description: 'Display month names above each month',
+      default: false
+    },
+    showTooltips: {
+      id: 'showTooltips',
+      type: 'boolean',
+      label: 'Show Tooltips',
+      description: 'Enable tooltips on calendar items',
+      default: true
+    },
+    showHeader: {
+      id: 'showHeader',
+      type: 'boolean',
+      label: 'Show Header',
+      description: 'Display the calendar header',
+      default: true
+    },
+    showFooter: {
+      id: 'showFooter',
+      type: 'boolean',
+      label: 'Show Footer',
+      description: 'Display the calendar footer',
+      default: true
+    },
+    showSubmitButton: {
+      id: 'showSubmitButton',
+      type: 'boolean',
+      label: 'Show Submit Button',
+      description: 'Display a submit button in the footer',
+      default: false
+    },
+    closeOnClickAway: {
+      id: 'closeOnClickAway',
+      type: 'boolean',
+      label: 'Close on Click Away',
+      description: 'Close the calendar when clicking outside',
+      default: true
+    },
+    enableOutOfBoundsScroll: {
+      id: 'enableOutOfBoundsScroll',
+      type: 'boolean',
+      label: 'Enable Out of Bounds Scroll',
+      description: 'Allow scrolling months when dragging to edge',
+      default: true
+    },
+    suppressTooltipsOnSelection: {
+      id: 'suppressTooltipsOnSelection',
+      type: 'boolean',
+      label: 'Suppress Tooltips on Selection',
+      description: 'Hide tooltips while selecting dates',
+      default: false
+    }
+  },
+  layers: {
+    controls: {
+      name: {
+        id: 'name',
+        type: 'text',
+        label: 'Layer Name',
+        description: 'Unique identifier for the layer',
+        required: true
+      },
+      title: {
+        id: 'title',
+        type: 'text',
+        label: 'Display Title',
+        description: 'User-friendly name for the layer',
+        required: true
+      },
+      type: {
+        id: 'type',
+        type: 'select',
+        label: 'Layer Type',
+        description: 'Type of layer functionality',
+        options: [
+          { value: 'base', label: 'Base Layer' },
+          { value: 'overlay', label: 'Overlay Layer' }
+        ],
+        required: true
+      },
+      description: {
+        id: 'description',
+        type: 'text',
+        label: 'Description',
+        description: 'Brief description of the layer purpose',
+        required: true
+      }
+    },
+    actions: {
+      canAdd: true,
+      canRemove: true,
+      newLayerTemplate: {
+        name: '',
+        type: 'overlay',
+        title: '',
+        description: '',
+        data: []
+      }
+    }
+  }
+};
 
 export const LAYER_FEATURES: Record<string, LayerFeature> = {
   base: {
@@ -169,191 +419,6 @@ export const LAYER_FEATURES: Record<string, LayerFeature> = {
   }
 };
 
-export const SETTINGS: Settings = {
-  core: {
-    displayMode: {
-      id: 'displayMode',
-      type: 'select',
-      label: 'Display Mode',
-      description: 'Show calendar as embedded or popup',
-      default: 'popup',
-      options: [
-        { value: 'popup', label: 'Popup' },
-        { value: 'embedded', label: 'Embedded' }
-      ],
-      width: '120px'
-    },
-    visibleMonths: {
-      id: 'visibleMonths',
-      type: 'number',
-      label: 'Visible Months',
-      description: 'Number of months to display in the calendar (1-6)',
-      default: 2,
-      min: 1,
-      max: 6,
-      width: '80px'
-    },
-    selectionMode: {
-      id: 'selectionMode',
-      type: 'select',
-      label: 'Selection Mode',
-      description: 'Choose between single date or date range selection',
-      default: 'range',
-      options: [
-        { value: 'single', label: 'Single' },
-        { value: 'range', label: 'Range' }
-      ],
-      width: '120px'
-    },
-    singleMonthWidth: {
-      id: 'singleMonthWidth',
-      type: 'number',
-      label: 'Month Width',
-      description: 'Width of a single month in pixels (300-800)',
-      default: 500,
-      min: 300,
-      max: 800,
-      width: '100px'
-    },
-    containerStyle: {
-      id: 'containerStyle',
-      type: 'style-editor',
-      label: 'Container Styles',
-      description: 'Override container styles (border, shadow, etc)',
-      default: null,
-      presets: {
-        'Default': null,
-        'No Border': {
-          border: 'none'
-        },
-        'No Shadow': {
-          boxShadow: 'none'
-        },
-        'Shadow': {
-          boxShadow: '0 2px 4px rgba(0,0,0,0.08)'
-        },
-        'Rounded Corners': {
-          borderRadius: '12px'
-        },
-        'Rigid Corners': {
-          borderRadius: '0'
-        }
-      }
-    }
-  },
-  features: {
-    monthHeadings: {
-      id: 'showMonthHeadings',
-      type: 'boolean',
-      label: 'Show Month Headings',
-      description: 'Display month names above each calendar grid',
-      default: false
-    },
-    tooltips: {
-      id: 'showTooltips',
-      type: 'boolean',
-      label: 'Show Tooltips',
-      description: 'Show helpful tooltips on hover',
-      default: false
-    },
-    header: {
-      id: 'showHeader',
-      type: 'boolean',
-      label: 'Show Header',
-      description: 'Display the header with month navigation',
-      default: true
-    },
-    clickAway: {
-      id: 'closeOnClickAway',
-      type: 'boolean',
-      label: 'Close on Click Away',
-      description: 'Close calendar when clicking outside',
-      default: false
-    },
-    submitButton: {
-      id: 'showSubmitButton',
-      type: 'boolean',
-      label: 'Show Submit Button',
-      description: 'Display a submit button in footer',
-      default: false
-    },
-    footer: {
-      id: 'showFooter',
-      type: 'boolean',
-      label: 'Show Footer',
-      description: 'Display the footer with actions',
-      default: true
-    },
-    outOfBoundsScroll: {
-      id: 'enableOutOfBoundsScroll',
-      type: 'boolean',
-      label: 'Enable Out of Bounds Scroll',
-      description: 'Allow month scrolling when dragging outside calendar',
-      default: true
-    }
-  },
-  layers: {
-    id: 'layers',
-    type: 'layer-controls',
-    label: 'Calendar Layers',
-    description: 'Configure calendar data layers and visualization',
-    default: DEFAULT_LAYERS,
-    globalControls: {
-      defaultLayer: {
-        id: 'defaultLayer',
-        type: 'select',
-        label: 'Default Layer',
-        description: 'Select the default active layer',
-        default: 'Calendar'
-      },
-      showLayerControls: {
-        id: 'showLayerControls',
-        type: 'boolean',
-        label: 'Show Layer Controls',
-        description: 'Display layer selection controls in calendar',
-        default: true
-      }
-    },
-    controls: {
-      features: {
-        id: 'features',
-        type: 'multi-select',
-        label: 'Layer Features',
-        description: 'The type of functionality for this layer',
-        options: Object.entries(LAYER_FEATURES).map(([key, feature]) => ({
-          value: key,
-          label: feature.name
-        })),
-        width: '250px'
-      },
-      title: {
-        id: 'title',
-        type: 'text',
-        label: 'Title',
-        description: 'Display name for the layer',
-        width: '200px'
-      },
-      description: {
-        type: 'text',
-        label: 'Description',
-        description: 'Brief description of the layer purpose',
-        required: true
-      }
-    },
-    actions: {
-      canAdd: true,
-      canRemove: true,
-      newLayerTemplate: {
-        name: 'New Layer',
-        type: LAYER_TYPES.OVERLAY,
-        title: 'New Layer',
-        description: 'A new calendar layer',
-        data: []
-      }
-    }
-  }
-};
-
 interface DisplayModeConstraints {
   closeOnClickAway: boolean;
   enableOutOfBoundsScroll: boolean;
@@ -368,37 +433,41 @@ export const DISPLAY_MODE_CONSTRAINTS: Record<string, DisplayModeConstraints> = 
   }
 };
 
-export const DEFAULT_CONTAINER_STYLES = {
-  border: '1px solid #dee2e6',
-  borderRadius: '8px',
-  backgroundColor: '#fff',
-  boxShadow: '0 2px 4px rgba(0,0,0,0.08)'
-};
+// Add type for CSS properties with hover states
+export interface ExtendedCSSProperties extends CSSProperties {
+  '&:hover'?: CSSProperties;
+  '&:focus'?: CSSProperties;
+}
 
-export const getDefaultSettings = (displayMode = 'popup'): Record<string, any> => {
-  const defaults: Record<string, any> = {};
-  
-  // Set base defaults
-  Object.values(SETTINGS.core).forEach(setting => {
-    defaults[setting.id] = setting.default;
-  });
-  Object.values(SETTINGS.features).forEach(feature => {
-    defaults[feature.id] = feature.default;
-  });
-  
-  // Add layers default
-  defaults.layers = DEFAULT_LAYERS;
+// Add Event type for layer events
+export interface Event {
+  date: string;
+  title: string;
+  type: 'work' | 'other';
+  time: string;
+  description: string;
+}
 
-  // Apply mode-specific constraints
-  if (displayMode === 'embedded') {
-    Object.entries(DISPLAY_MODE_CONSTRAINTS.embedded).forEach(([key, value]) => {
-      defaults[key] = value;
-    });
-  }
+// Update EventData to match Event type
+export interface EventData extends Omit<Event, 'type'> {
+  type: string; // Keep this flexible for backward compatibility
+}
 
-  // Add layer control defaults
-  defaults.defaultLayer = SETTINGS.layers.globalControls.defaultLayer.default;
-  defaults.showLayerControls = SETTINGS.layers.globalControls.showLayerControls.default;
+// Update the styles type
+export interface TableStyles {
+  width: string;
+  borderCollapse: BorderCollapse;
+  fontSize: string;
+}
 
-  return defaults;
-}; 
+export interface TableHeaderStyles {
+  backgroundColor: string;
+  padding: string;
+  textAlign: TextAlign;
+  borderBottom: string;
+}
+
+// Add type for the selected presets state
+export interface SelectedPresets {
+  [key: string]: boolean;
+} 

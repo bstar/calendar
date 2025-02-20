@@ -1,14 +1,23 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import './bootstrap.min.css'
 
-import { SETTINGS, getDefaultSettings, DISPLAY_MODE_CONSTRAINTS } from './components/DateRangePicker.config';
+import { 
+  SETTINGS, 
+  getDefaultSettings, 
+  DISPLAY_MODE_CONSTRAINTS,
+  CalendarSettings,
+  Layer,
+  EventData,
+  BackgroundData,
+  SettingControl
+} from './components/DateRangePicker.config';
 import DateRangePickerNew from './components/CLACalendar';
 
 // Import package.json to access version, description, and name
 import packageInfo from '../package.json';
 
 // Sample data for different layers
-const SAMPLE_BACKGROUND_DATA = [
+const SAMPLE_BACKGROUND_DATA: BackgroundData[] = [
   {
     startDate: '2025-01-05',
     endDate: '2025-01-15',
@@ -26,7 +35,7 @@ const SAMPLE_BACKGROUND_DATA = [
   }
 ];
 
-const SAMPLE_EVENTS_DATA = [
+const SAMPLE_EVENTS_DATA: EventData[] = [
   { date: '2025-02-15', title: 'Team Meeting', type: 'work', time: '10:00 AM', description: 'Weekly sync' },
   { date: '2025-02-20', title: 'Lunch with Client', type: 'work', time: '12:30 PM', description: 'Project discussion' },
   { date: '2025-02-25', title: 'Birthday Party', type: 'personal', time: '7:00 PM', description: 'Cake and presents!' },
@@ -35,6 +44,43 @@ const SAMPLE_EVENTS_DATA = [
   { date: '2025-03-18', title: 'Project Deadline', type: 'work', time: '5:00 PM', description: 'Final deliverables due' },
   { date: '2025-03-22', title: 'Weekend Trip', type: 'personal', time: 'All day', description: 'Beach getaway' }
 ];
+
+// Add sample layers with proper configuration
+const SAMPLE_LAYERS: Layer[] = [
+  {
+    name: 'Calendar',
+    type: 'base',
+    title: 'Base Calendar',
+    description: 'Basic calendar functionality',
+    required: true
+  },
+  {
+    name: 'sample-events',
+    type: 'overlay',
+    title: 'Event Calendar',
+    description: 'Display events and appointments',
+    data: {
+      events: SAMPLE_EVENTS_DATA,
+      background: []
+    }
+  },
+  {
+    name: 'sample-background',
+    type: 'overlay',
+    title: 'Background Colors',
+    description: 'Display date range backgrounds',
+    data: {
+      background: SAMPLE_BACKGROUND_DATA
+    }
+  }
+];
+
+// Update getDefaultSettings to include sample layers
+const getInitialSettings = (): CalendarSettings => ({
+  ...getDefaultSettings(),
+  layers: SAMPLE_LAYERS,
+  defaultLayer: 'Calendar'
+});
 
 const baseButtonStyle = {
   padding: '4px 12px',
@@ -51,7 +97,12 @@ const baseButtonStyle = {
   minHeight: '32px'
 };
 
-// Common styles we can reuse
+// Add proper types for styles
+interface StyleProps {
+  style: ExtendedCSSProperties;
+}
+
+// Update the style objects to use proper types
 const styles = {
   sectionHeading: {
     margin: '0 0 16px 0',
@@ -68,7 +119,7 @@ const styles = {
     backgroundColor: '#fff',
     color: '#444',
     cursor: 'pointer',
-    appearance: 'none',
+    appearance: 'none' as const, // Type assertion for appearance
     backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
     backgroundRepeat: 'no-repeat',
     backgroundPosition: 'right 8px center',
@@ -81,7 +132,7 @@ const styles = {
       borderColor: '#0366d6',
       boxShadow: '0 0 0 2px rgba(3, 102, 214, 0.2)'
     }
-  },
+  } as ExtendedCSSProperties,
   label: {
     display: 'block',
     marginBottom: '4px',
@@ -192,15 +243,15 @@ const docStyles = {
   },
   table: {
     width: '100%',
-    borderCollapse: 'collapse',
+    borderCollapse: 'collapse' as BorderCollapse,
     fontSize: '14px'
-  },
+  } as TableStyles,
   tableHeader: {
     backgroundColor: '#f8f9fa',
     padding: '12px',
-    textAlign: 'left',
+    textAlign: 'left' as TextAlign,
     borderBottom: '2px solid #dee2e6'
-  },
+  } as TableHeaderStyles,
   tableCell: {
     padding: '12px',
     borderBottom: '1px solid #dee2e6'
@@ -231,54 +282,15 @@ const docStyles = {
 };
 
 function App() {
-  const [settings, setSettings] = useState({
-    ...getDefaultSettings(),
-    isOpen: true  // Force calendar to be open on initial load
+  const [settings, setSettings] = useState<CalendarSettings>({
+    ...getInitialSettings(),
+    isOpen: true
   });
 
-  const [activeTab, setActiveTab] = useState('core');
+  const [activeTab, setActiveTab] = useState<'core' | 'features' | 'layers'>('core');
 
   // Add new state for import modal
   const [showImportModal, setShowImportModal] = useState(false);
-
-  // Initialize layers with data
-  useEffect(() => {
-    console.log('=== Initial Settings ===');
-    console.log('Before update:', settings.layers);
-    
-    setSettings(prev => {
-      const updatedSettings = {
-        ...prev,
-        layers: prev.layers.map(layer => {
-          if (layer.name === 'sample-events') {
-            return { 
-              ...layer, 
-              data: {
-                events: SAMPLE_EVENTS_DATA,
-                background: []  // Empty background data by default
-              }
-            };
-          }
-          if (layer.name === 'sample-background') {
-            return { 
-              ...layer, 
-              data: {
-                background: SAMPLE_BACKGROUND_DATA
-              }
-            };
-          }
-          return layer;
-        })
-      };
-      console.log('After update:', updatedSettings.layers);
-      return updatedSettings;
-    });
-  }, []);
-
-  // Also log when settings change
-  useEffect(() => {
-    console.log('Settings changed:', settings);
-  }, [settings]);
 
   const handleChange = (prop) => (event) => {
     const value = event.target.type === 'checkbox' 
@@ -524,7 +536,7 @@ function App() {
     const handleApply = () => {
       try {
         const newData = JSON.parse(dataText);
-        onUpdate(layer.name, newData);
+        onUpdate(newData);
       } catch (e) {
         alert('Invalid JSON format');
       }
@@ -1080,7 +1092,7 @@ function App() {
               {['core', 'features', 'layers'].map(tab => (
                 <button
                   key={tab}
-                  onClick={() => setActiveTab(tab)}
+                  onClick={() => setActiveTab(tab as 'core' | 'features' | 'layers')}
                   style={{
                     padding: '10px 0',
                     width: '100px',
