@@ -1233,7 +1233,7 @@ function App() {
             <DateRangePickerNew 
               {...settings} 
               defaultLayer={settings.defaultLayer}
-              showLayerControls={settings.showLayerControls}
+              showLayersNavigation={settings.showLayersNavigation}
             />
           </div>
 
@@ -1567,6 +1567,18 @@ function App() {
                         <td style={docStyles.tableCell}>{setting.description}</td>
                       </tr>
                     ))}
+                    <tr>
+                      <td style={docStyles.tableCell}>
+                        <code style={docStyles.code}>showLayersNavigation</code>
+                      </td>
+                      <td style={docStyles.tableCell}>
+                        <code style={docStyles.code}>boolean</code>
+                      </td>
+                      <td style={docStyles.tableCell}>
+                        <code style={docStyles.code}>true</code>
+                      </td>
+                      <td style={docStyles.tableCell}>Display layers navigation panel in the calendar</td>
+                    </tr>
                   </tbody>
                 </table>
               </div>

@@ -157,7 +157,7 @@ export interface CalendarSettings {
   
   // Layer Settings
   layers: Layer[];
-  showLayerControls: boolean;
+  showLayersNavigation: boolean;
   defaultLayer: string;
 }
 
@@ -221,7 +221,7 @@ export const getDefaultSettings = (): CalendarSettings => ({
   enableOutOfBoundsScroll: true,
   suppressTooltipsOnSelection: false,
   layers: DEFAULT_LAYERS,
-  showLayerControls: true,
+  showLayersNavigation: true,
   defaultLayer: 'Calendar'
 });
 
@@ -283,6 +283,13 @@ export const SETTINGS: SettingsConfig = {
     }
   },
   features: {
+    showLayersNavigation: {
+      id: 'showLayersNavigation',
+      type: 'boolean',
+      label: 'Show Layers Navigation',
+      description: 'Display layers navigation panel in the calendar',
+      default: true
+    },
     showMonthHeadings: {
       id: 'showMonthHeadings',
       type: 'boolean',

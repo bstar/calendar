@@ -1080,7 +1080,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
   enableOutOfBoundsScroll = true,
   suppressTooltipsOnSelection = false,
   layers: initialLayers = DEFAULT_LAYERS,
-  showLayerControls = true,
+  showLayersNavigation = true,
   defaultLayer = 'calendar'
 }) => {
   const [isOpen, setIsOpen] = useState(displayMode === 'embedded' || initialIsOpen);
@@ -1513,7 +1513,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
             </>
           )}
 
-          {showLayerControls && (
+          {showLayersNavigation && (
             <LayerControl
               layers={activeLayers}
               activeLayer={activeLayer}
