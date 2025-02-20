@@ -1,9 +1,11 @@
+/* Container for the layer control buttons */
 .cla-layer-control {
   display: flex;
   gap: 8px;
   padding: 0 16px 16px;
 }
 
+/* Individual layer control button styling */
 .cla-layer-button {
   padding: 6px 12px;
   border-radius: 4px;
@@ -15,10 +17,12 @@
   transition: all 0.2s ease;
 }
 
+/* Hover state for layer buttons */
 .cla-layer-button:hover {
   background-color: #f8f9fa;
 }
 
+/* Active/selected layer button state */
 .cla-layer-button.active {
   background-color: #e7f3ff;
   color: #0366d6;
