@@ -19,8 +19,7 @@ import {
 import './DateRangePicker.css';
 import PropTypes from "prop-types";
 import { DEFAULT_CONTAINER_STYLES, DEFAULT_LAYERS } from './DateRangePicker.config';
-import { LayerRenderer } from './DateRangePickerNew/layers/LayerRenderer.jsx';
-import { LAYER_TYPES } from './DateRangePickerNew/layers/types';
+import { LayerRenderer } from './DateRangePickerNew/layers/LayerRenderer';
 
 // Custom components
 const Card = React.forwardRef(({ children, className, ...props }, ref) => (
