@@ -1,7 +1,5 @@
 import React from 'react';
 import {
-  LAYER_TYPES,
-  LAYER_CAPABILITIES,
   BackgroundRange,
   Event,
   RenderResult
