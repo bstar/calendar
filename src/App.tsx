@@ -238,6 +238,13 @@ const styles = {
         backgroundColor: '#d4eede',
         color: '#1a7f37'
       }
+    },
+    remove: {
+      backgroundColor: '#ffe6e6',  // Light red background
+      '&:hover': {
+        backgroundColor: '#ffcccc',
+        color: '#dc3545'
+      }
     }
   },
   containerStyleButton: baseButtonStyle,
@@ -801,8 +808,36 @@ function App() {
             <div key={layer.name} style={{ 
               padding: '16px',
               border: '1px solid #dee2e6',
-              borderRadius: '8px'
+              borderRadius: '8px',
+              position: 'relative'  // Add this to position the button
             }}>
+              {!layer.required && (
+                <button
+                  onClick={() => onUpdate(layers.filter(l => l.name !== layer.name))}
+                  style={{
+                    ...styles.button,
+                    position: 'absolute',
+                    top: 0,
+                    right: 0,
+                    backgroundColor: '#ffe6e6',
+                    color: '#dc3545',
+                    borderTop: 'none',
+                    borderLeft: 'none',
+                    borderRight: '1px solid #dee2e6',
+                    borderBottom: '1px solid #dee2e6',
+                    borderBottomLeftRadius: '6px',    // Keep bottom left rounded
+                    borderTopRightRadius: '8px',      // Keep top right rounded
+                    borderBottomRightRadius: '0',     // Remove bottom right rounding
+                    padding: '4px 8px',
+                    fontSize: '12px',
+                    '&:hover': {
+                      backgroundColor: '#ffcccc'
+                    }
+                  }}
+                >
+                  Remove
+                </button>
+              )}
               <div>
                 <div style={{ 
                   display: 'flex',
@@ -825,18 +860,6 @@ function App() {
                       </span>
                     )}
                   </h4>
-                  {!layer.required && (
-                    <button
-                      onClick={() => onUpdate(layers.filter(l => l.name !== layer.name))}
-                      style={{
-                        ...styles.button,
-                        color: '#dc3545',
-                        borderColor: '#dc3545'
-                      }}
-                    >
-                      Remove
-                    </button>
-                  )}
                 </div>
 
                 <div style={{ marginBottom: '12px' }}>
