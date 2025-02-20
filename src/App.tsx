@@ -53,8 +53,8 @@ const SAMPLE_LAYERS: Layer[] = [
     name: 'Calendar',
     title: 'Base Calendar',
     description: 'Basic calendar functionality',
-    required: true,  // This makes it non-removable
-    data: {  // Allow data for the base calendar
+    required: true,
+    data: {
       events: [],
       background: []
     }
@@ -74,6 +74,41 @@ const SAMPLE_LAYERS: Layer[] = [
     description: 'Display date range backgrounds',
     data: {
       background: SAMPLE_BACKGROUND_DATA
+    }
+  },
+  {
+    name: 'combined-layer',
+    title: 'Combined View',
+    description: 'Events with background highlighting',
+    data: {
+      events: [
+        { 
+          date: '2025-02-01', 
+          title: 'Sprint Planning', 
+          type: 'work', 
+          time: '10:00 AM', 
+          description: 'Two-week sprint kickoff' 
+        },
+        { 
+          date: '2025-02-14', 
+          title: 'Sprint Review', 
+          type: 'work', 
+          time: '4:00 PM', 
+          description: 'Sprint demo and retrospective' 
+        }
+      ],
+      background: [
+        {
+          startDate: '2025-02-01',
+          endDate: '2025-02-14',
+          color: '#fff3e0'  // Light orange for sprint duration
+        },
+        {
+          startDate: '2025-02-05',
+          endDate: '2025-02-07',
+          color: '#e8f5e9'  // Light green for mid-sprint workshops
+        }
+      ]
     }
   }
 ];
