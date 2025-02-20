@@ -208,10 +208,10 @@ export const DEFAULT_LAYERS: Layer[] = [
 ];
 
 export const getDefaultSettings = (): CalendarSettings => ({
-  displayMode: 'popup',
+  displayMode: 'embedded',
   visibleMonths: 2,
   singleMonthWidth: 500,
-  showMonthHeadings: false,
+  showMonthHeadings: true,
   selectionMode: 'range',
   showTooltips: true,
   showHeader: true,
@@ -238,7 +238,7 @@ export const SETTINGS: SettingsConfig = {
       type: 'select',
       label: 'Display Mode',
       description: 'How the calendar should be displayed',
-      default: 'popup',
+      default: 'embedded',
       options: [
         { value: 'popup', label: 'Popup' },
         { value: 'embedded', label: 'Embedded' }
@@ -288,7 +288,7 @@ export const SETTINGS: SettingsConfig = {
       type: 'boolean',
       label: 'Show Month Headings',
       description: 'Display month names above each month',
-      default: false
+      default: true
     },
     showTooltips: {
       id: 'showTooltips',
