@@ -1,1 +1,0 @@
-export { default as DateRangePicker } from './components/DateRangePicker'; 

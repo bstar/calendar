@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import './bootstrap.min.css'
 
 import { SETTINGS, getDefaultSettings, DISPLAY_MODE_CONSTRAINTS } from './components/DateRangePicker.config';
-import DateRangePickerNew from './components/DateRangePickerNew';
+import DateRangePickerNew from './components/CLACalendar';
 
 // Import package.json to access version, description, and name
 import packageInfo from '../package.json';
