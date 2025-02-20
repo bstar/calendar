@@ -1247,7 +1247,7 @@ function App() {
                         <code style={docStyles.code}>'popup' | 'embedded'</code>
                       </td>
                       <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>'popup'</code>
+                        <code style={docStyles.code}>'embedded'</code>
                       </td>
                       <td style={docStyles.tableCell}>How the calendar should be displayed</td>
                     </tr>
@@ -1262,6 +1262,18 @@ function App() {
                         <code style={docStyles.code}>2</code>
                       </td>
                       <td style={docStyles.tableCell}>Number of months to display</td>
+                    </tr>
+                    <tr>
+                      <td style={docStyles.tableCell}>
+                        <code style={docStyles.code}>showMonthHeadings</code>
+                      </td>
+                      <td style={docStyles.tableCell}>
+                        <code style={docStyles.code}>boolean</code>
+                      </td>
+                      <td style={docStyles.tableCell}>
+                        <code style={docStyles.code}>true</code>
+                      </td>
+                      <td style={docStyles.tableCell}>Display month names above each month</td>
                     </tr>
                     <tr>
                       <td style={docStyles.tableCell}>
