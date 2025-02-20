@@ -1207,7 +1207,6 @@ function App() {
             backgroundColor: '#fff',
             marginBottom: '24px'
           }}>
-            <h5 style={{ marginBottom: '16px', color: '#666' }}>Preview</h5>
             <DateRangePickerNew 
               {...settings} 
               defaultLayer={settings.defaultLayer}
