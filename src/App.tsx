@@ -780,17 +780,16 @@ function App() {
         <div style={{ 
           marginBottom: '16px',
           display: 'flex',
-          justifyContent: 'space-between',
+          justifyContent: 'flex-end',
           alignItems: 'center'
         }}>
-          <h3 style={styles.sectionHeading}>Layers</h3>
           <button
             onClick={() => {
               const newLayer = {
                 ...SETTINGS.layers.actions.newLayerTemplate,
                 name: `Layer_${Date.now()}`,
                 title: `New Layer ${layers.length + 1}`,
-                data: {  // Initialize with empty data structure
+                data: {
                   events: [],
                   background: []
                 }
