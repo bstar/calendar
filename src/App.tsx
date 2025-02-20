@@ -9,7 +9,9 @@ import {
   Layer,
   EventData,
   BackgroundData,
-  SettingControl
+  SettingControl,
+  BaseLayer,
+  OverlayLayer
 } from './components/DateRangePicker.config';
 import DateRangePickerNew from './components/CLACalendar';
 
@@ -49,14 +51,16 @@ const SAMPLE_EVENTS_DATA: EventData[] = [
 const SAMPLE_LAYERS: Layer[] = [
   {
     name: 'Calendar',
-    type: 'base',
     title: 'Base Calendar',
     description: 'Basic calendar functionality',
-    required: true
+    required: true,  // This makes it non-removable
+    data: {  // Allow data for the base calendar
+      events: [],
+      background: []
+    }
   },
   {
     name: 'sample-events',
-    type: 'overlay',
     title: 'Event Calendar',
     description: 'Display events and appointments',
     data: {
@@ -66,7 +70,6 @@ const SAMPLE_LAYERS: Layer[] = [
   },
   {
     name: 'sample-background',
-    type: 'overlay',
     title: 'Background Colors',
     description: 'Display date range backgrounds',
     data: {
@@ -672,150 +675,128 @@ function App() {
     );
   };
 
-  const LayerManager = ({ layers, onUpdate }) => {
-    const handleAddLayer = () => {
-      const newLayer = {
-        ...SETTINGS.layers.actions.newLayerTemplate,
-        name: `Layer_${Date.now()}`,
-        title: `New Layer ${layers.length + 1}`
-      };
-      onUpdate([...layers, newLayer]);
-    };
-
-    const handleRemoveLayer = (layerName) => {
-      // Prevent removing the base layer
-      if (layerName === 'Calendar') return;
-      onUpdate(layers.filter(l => l.name !== layerName));
-    };
-
+  const LayerManager = ({ layers, onUpdate }: { layers: Layer[], onUpdate: (layers: Layer[]) => void }) => {
     return (
       <div style={{ marginBottom: '24px' }}>
-        {/* Global Layer Controls */}
         <div style={{ 
-          marginBottom: '24px',
-          padding: '16px',
-          backgroundColor: '#f8f9fa',
-          borderRadius: '8px',
-          border: '1px solid #cfd4d9'
-        }}>
-          <h3 style={styles.sectionHeading}>Layer Settings</h3>
-          
-          <div style={{ display: 'grid', gap: '12px' }}>
-            <div>
-              <label style={styles.label}>Default Layer</label>
-              <select
-                value={settings.defaultLayer}
-                onChange={(e) => {
-                  setSettings(prev => ({
-                    ...prev,
-                    defaultLayer: e.target.value
-                  }));
-                }}
-                style={styles.select}
-              >
-                {layers.map(layer => (
-                  <option key={layer.name} value={layer.name}>
-                    {layer.title}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label style={styles.label}>
-                <input
-                  type="checkbox"
-                  checked={settings.showLayerControls}
-                  onChange={(e) => {
-                    setSettings(prev => ({
-                      ...prev,
-                      showLayerControls: e.target.checked
-                    }));
-                  }}
-                  style={{ marginRight: '8px' }}
-                />
-                Show Layer Controls
-              </label>
-            </div>
-          </div>
-        </div>
-
-        {/* Layer List Header */}
-        <div style={{ 
-          display: 'flex', 
+          marginBottom: '16px',
+          display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '16px'
+          alignItems: 'center'
         }}>
           <h3 style={styles.sectionHeading}>Layers</h3>
           <button
-            onClick={handleAddLayer}
-            style={{
-              padding: '6px 12px',
-              background: 'transparent',
-              color: '#0366d6',
-              border: '1px solid #0366d6',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontSize: '13px',
-              transition: 'all 0.2s ease',
-              '&:hover': {
-                backgroundColor: '#f6f8fa'
-              }
+            onClick={() => {
+              const newLayer = {
+                ...SETTINGS.layers.actions.newLayerTemplate,
+                name: `Layer_${Date.now()}`,
+                title: `New Layer ${layers.length + 1}`,
+                data: {  // Initialize with empty data structure
+                  events: [],
+                  background: []
+                }
+              };
+              onUpdate([...layers, newLayer]);
             }}
+            style={styles.button}
           >
             Add Layer
           </button>
         </div>
 
-        {/* Layer List */}
         <div style={{ display: 'grid', gap: '16px' }}>
-          {layers.map((layer) => (
+          {layers.map(layer => (
             <div key={layer.name} style={{ 
               padding: '16px',
-              border: '1px solid #cfd4d9',
-              borderRadius: '8px',
-              backgroundColor: '#fff',
-              position: 'relative'
+              border: '1px solid #dee2e6',
+              borderRadius: '8px'
             }}>
-              {layer.name !== 'Calendar' && (
-                <button
-                  onClick={() => handleRemoveLayer(layer.name)}
-                  style={{
-                    position: 'absolute',
-                    top: '8px',
-                    right: '8px',
-                    padding: '4px 8px',
-                    background: 'transparent',
-                    color: '#dc3545',
-                    border: '1px solid #dc3545',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '12px'
-                  }}
-                >
-                  Remove
-                </button>
-              )}
-              
-              <LayerMetadataEditor 
-                layer={layer}
-                onUpdate={(layerName, updatedLayer) => {
-                  onUpdate(layers.map(l => 
-                    l.name === layerName ? updatedLayer : l
-                  ));
-                }}
-              />
-              <LayerDataEditor 
-                layer={layer} 
-                onUpdate={(layerName, newData) => {
-                  onUpdate(layers.map(l => 
-                    l.name === layerName 
-                      ? { ...l, data: newData }
-                      : l
-                  ));
-                }}
-              />
+              <div>
+                <div style={{ 
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  marginBottom: '12px'
+                }}>
+                  <h4 style={{ margin: 0 }}>
+                    {layer.title}
+                    {layer.required && (
+                      <span style={{
+                        marginLeft: '8px',
+                        fontSize: '12px',
+                        color: '#666',
+                        fontWeight: 'normal',
+                        backgroundColor: '#f8f9fa',
+                        padding: '2px 6px',
+                        borderRadius: '4px'
+                      }}>
+                        Required
+                      </span>
+                    )}
+                  </h4>
+                  {!layer.required && (
+                    <button
+                      onClick={() => onUpdate(layers.filter(l => l.name !== layer.name))}
+                      style={{
+                        ...styles.button,
+                        color: '#dc3545',
+                        borderColor: '#dc3545'
+                      }}
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+
+                {/* All layers can be edited */}
+                <div style={{ marginBottom: '12px' }}>
+                  <label style={styles.label}>Title</label>
+                  <input
+                    type="text"
+                    value={layer.title}
+                    onChange={(e) => {
+                      const updatedLayer = { ...layer, title: e.target.value };
+                      onUpdate(layers.map(l => l.name === layer.name ? updatedLayer : l));
+                    }}
+                    style={styles.select}
+                  />
+                </div>
+
+                <div style={{ marginBottom: '12px' }}>
+                  <label style={styles.label}>Description</label>
+                  <input
+                    type="text"
+                    value={layer.description}
+                    onChange={(e) => {
+                      const updatedLayer = { ...layer, description: e.target.value };
+                      onUpdate(layers.map(l => l.name === layer.name ? updatedLayer : l));
+                    }}
+                    style={styles.select}
+                  />
+                </div>
+
+                {/* Data editor for all layers */}
+                <div>
+                  <label style={styles.label}>Layer Data</label>
+                  <textarea
+                    value={JSON.stringify(layer.data || { events: [], background: [] }, null, 2)}
+                    onChange={(e) => {
+                      try {
+                        const newData = JSON.parse(e.target.value);
+                        const updatedLayer = { ...layer, data: newData };
+                        onUpdate(layers.map(l => l.name === layer.name ? updatedLayer : l));
+                      } catch (error) {
+                        console.error('Invalid JSON:', error);
+                      }
+                    }}
+                    style={{
+                      ...styles.select,
+                      height: '100px',
+                      fontFamily: 'monospace',
+                      fontSize: '12px'
+                    }}
+                  />
+                </div>
+              </div>
             </div>
           ))}
         </div>
@@ -971,6 +952,18 @@ function App() {
         </div>
       </div>
     );
+  };
+
+  // Add layer validation to layer updates
+  const handleLayerUpdate = (layers: Layer[]) => {
+    if (!validateLayers(layers)) {
+      alert('Invalid layer configuration. Must have exactly one base layer named "Calendar".');
+      return;
+    }
+    setSettings(prev => ({
+      ...prev,
+      layers
+    }));
   };
 
   return (

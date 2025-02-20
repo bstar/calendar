@@ -105,10 +105,9 @@ interface Settings {
   layers: LayerControlSetting;
 }
 
-// Core Types
+// Simplify Layer type - remove base/overlay distinction
 export interface Layer {
   name: string;
-  type: LAYER_TYPES;
   title: string;
   description: string;
   data?: LayerData;
@@ -198,13 +197,13 @@ export const DEFAULT_CONTAINER_STYLES: CSSProperties = {
   boxShadow: '0 0.5rem 1rem rgba(0, 0, 0, 0.15)'
 };
 
+// Update DEFAULT_LAYERS to use simplified type
 export const DEFAULT_LAYERS: Layer[] = [
   {
     name: 'Calendar',
-    type: 'base',
-    title: 'Base Calendar',
+    title: 'Calendar',
     description: 'Basic calendar functionality',
-    required: true
+    required: true  // First layer is required
   }
 ];
 
@@ -226,7 +225,12 @@ export const getDefaultSettings = (): CalendarSettings => ({
   defaultLayer: 'Calendar'
 });
 
-// Settings Configuration
+// Update layer validation to ensure at least one layer
+export const validateLayers = (layers: Layer[]): boolean => {
+  return layers.length >= 1 && layers.some(layer => layer.required);
+};
+
+// Update SETTINGS to remove type distinction
 export const SETTINGS: SettingsConfig = {
   core: {
     displayMode: {
@@ -343,43 +347,35 @@ export const SETTINGS: SettingsConfig = {
         type: 'text',
         label: 'Layer Name',
         description: 'Unique identifier for the layer',
-        required: true
+        required: true,
+        default: ''
       },
       title: {
         id: 'title',
         type: 'text',
         label: 'Display Title',
         description: 'User-friendly name for the layer',
-        required: true
-      },
-      type: {
-        id: 'type',
-        type: 'select',
-        label: 'Layer Type',
-        description: 'Type of layer functionality',
-        options: [
-          { value: 'base', label: 'Base Layer' },
-          { value: 'overlay', label: 'Overlay Layer' }
-        ],
-        required: true
+        required: true,
+        default: ''
       },
       description: {
         id: 'description',
         type: 'text',
         label: 'Description',
         description: 'Brief description of the layer purpose',
-        required: true
+        required: true,
+        default: ''
       }
     },
     actions: {
       canAdd: true,
-      canRemove: true,
+      canRemove: (layer: Layer) => !layer.required,  // Only prevent removing required layer
       newLayerTemplate: {
         name: '',
-        type: 'overlay',
         title: '',
         description: '',
-        data: []
+        data: [],
+        required: false
       }
     }
   }
