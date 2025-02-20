@@ -394,6 +394,7 @@ function App() {
       const activePresets = Object.entries(config.presets)
         .filter(([name, presetStyles]) => {
           if (name === 'Default' || !presetStyles) return false;
+          // Check if all properties in the preset match the current value
           return Object.entries(presetStyles).every(([key, val]) => 
             value[key] === val
           );
@@ -449,39 +450,58 @@ function App() {
           <>
             {/* Preset buttons container */}
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
-              {Object.keys(config.presets).map(presetName => (
-                <button
-                  key={presetName}
-                  onClick={() => handlePresetToggle(presetName)}
-                  style={{
-                    ...styles.containerStyleButton,
-                    ...(value === config.presets[presetName] ? styles.containerStyleButtonSelected : {})
-                  }}
-                >
-                  {value === config.presets[presetName] && (
-                    <span style={{ fontSize: '16px', marginRight: '4px' }}>✓</span>
-                  )}
-                  {presetName}
-                </button>
-              ))}
+              {Object.entries(config.presets)
+                .filter(([name]) => name !== 'Default')  // Remove Default from presets
+                .map(([name]) => (
+                  <button
+                    key={name}
+                    onClick={() => handlePresetToggle(name)}
+                    style={{
+                      ...styles.containerStyleButton,
+                      ...(value === config.presets[name] ? styles.containerStyleButtonSelected : {})
+                    }}
+                  >
+                    {value === config.presets[name] && (
+                      <span style={{ fontSize: '16px', marginRight: '4px' }}>✓</span>
+                    )}
+                    {name}
+                  </button>
+                ))}
             </div>
 
-            {/* Edit JSON button on its own line */}
-            <button
-              onClick={() => setIsEditing(true)}
-              style={{
-                ...styles.containerStyleButton,
-                backgroundColor: '#f3e8fd',
-                color: '#6f42c1',
-                '&:hover': {
-                  backgroundColor: '#e9d5fc',
-                  color: '#6f42c1'
-                }
-              }}
-            >
-              <span style={{ fontSize: '14px', marginRight: '4px' }}>{ }︎</span>
-              Edit JSON
-            </button>
+            {/* Action buttons container */}
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                onClick={() => handlePresetToggle('Default')}
+                style={{
+                  ...styles.containerStyleButton,
+                  backgroundColor: '#e6f4ea',  // Light green background
+                  color: '#1a7f37',  // Green text
+                  '&:hover': {
+                    backgroundColor: '#d4eede',
+                    color: '#1a7f37'
+                  }
+                }}
+              >
+                <span style={{ fontSize: '14px', marginRight: '4px' }}>↺</span>
+                Reset to Default
+              </button>
+              <button
+                onClick={() => setIsEditing(true)}
+                style={{
+                  ...styles.containerStyleButton,
+                  backgroundColor: '#f3e8fd',  // Light purple background
+                  color: '#6f42c1',  // Purple text
+                  '&:hover': {
+                    backgroundColor: '#e9d5fc',
+                    color: '#6f42c1'
+                  }
+                }}
+              >
+                <span style={{ fontSize: '14px', marginRight: '4px' }}>{ }︎</span>
+                Edit JSON
+              </button>
+            </div>
           </>
         )}
 
