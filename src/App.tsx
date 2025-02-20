@@ -136,6 +136,26 @@ const styles = {
       boxShadow: '0 0 0 2px rgba(3, 102, 214, 0.2)'
     }
   } as ExtendedCSSProperties,
+  textarea: {
+    width: '100%',
+    padding: '6px 10px',
+    fontSize: '13px',
+    border: '1px solid #dee2e6',
+    borderRadius: '6px',
+    backgroundColor: '#fff',
+    color: '#444',
+    fontFamily: 'monospace',
+    resize: 'vertical',
+    minHeight: '100px',
+    '&:hover': {
+      borderColor: '#0366d6'
+    },
+    '&:focus': {
+      outline: 'none',
+      borderColor: '#0366d6',
+      boxShadow: '0 0 0 2px rgba(3, 102, 214, 0.2)'
+    }
+  } as ExtendedCSSProperties,
   label: {
     display: 'block',
     marginBottom: '4px',
@@ -198,7 +218,24 @@ const styles = {
       backgroundColor: '#bbdefb',
       color: '#0366d6'
     }
-  }
+  },
+  input: {
+    width: '100%',
+    padding: '6px 10px',
+    fontSize: '13px',
+    border: '1px solid #dee2e6',
+    borderRadius: '6px',
+    backgroundColor: '#fff',
+    color: '#444',
+    '&:hover': {
+      borderColor: '#0366d6'
+    },
+    '&:focus': {
+      outline: 'none',
+      borderColor: '#0366d6',
+      boxShadow: '0 0 0 2px rgba(3, 102, 214, 0.2)'
+    }
+  } as ExtendedCSSProperties,
 };
 
 // Documentation styles
@@ -747,7 +784,6 @@ function App() {
                   )}
                 </div>
 
-                {/* All layers can be edited */}
                 <div style={{ marginBottom: '12px' }}>
                   <label style={styles.label}>Title</label>
                   <input
@@ -757,7 +793,7 @@ function App() {
                       const updatedLayer = { ...layer, title: e.target.value };
                       onUpdate(layers.map(l => l.name === layer.name ? updatedLayer : l));
                     }}
-                    style={styles.select}
+                    style={styles.input}
                   />
                 </div>
 
@@ -770,11 +806,10 @@ function App() {
                       const updatedLayer = { ...layer, description: e.target.value };
                       onUpdate(layers.map(l => l.name === layer.name ? updatedLayer : l));
                     }}
-                    style={styles.select}
+                    style={styles.input}
                   />
                 </div>
 
-                {/* Data editor for all layers */}
                 <div>
                   <label style={styles.label}>Layer Data</label>
                   <textarea
@@ -788,12 +823,7 @@ function App() {
                         console.error('Invalid JSON:', error);
                       }
                     }}
-                    style={{
-                      ...styles.select,
-                      height: '100px',
-                      fontFamily: 'monospace',
-                      fontSize: '12px'
-                    }}
+                    style={styles.textarea}
                   />
                 </div>
               </div>
