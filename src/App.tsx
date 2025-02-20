@@ -1196,25 +1196,20 @@ function App() {
           </div>
 
           {/* Documentation */}
-          <div style={{ 
-            padding: '20px',
-            border: '1px solid #cfd4d9',
-            borderRadius: '8px',
-            backgroundColor: '#fff'
-          }}>
-            <h2 style={{ marginBottom: '24px', color: '#333', fontSize: '20px' }}>Documentation</h2>
+          <div style={docStyles.container}>
+            <h2 style={docStyles.mainHeading}>Documentation</h2>
             <div style={{ display: 'grid', gap: '24px' }}>
-              {/* Core Props */}
+              {/* Core Settings */}
               <div style={docStyles.section}>
                 <h3 style={docStyles.sectionHeading}>
-                  Core Properties
+                  Core Settings
                   <span style={{ ...docStyles.badge, ...docStyles.badgeVariants.blue }}>
-                    Required configuration
+                    Required
                   </span>
                 </h3>
-                <div style={docStyles.description}>
-                  Core properties define the fundamental behavior and appearance of the calendar component.
-                </div>
+                <p style={docStyles.description}>
+                  Essential configuration options that define the calendar's basic behavior and appearance.
+                </p>
                 <table style={docStyles.table}>
                   <thead>
                     <tr>
@@ -1225,155 +1220,275 @@ function App() {
                     </tr>
                   </thead>
                   <tbody>
-                    {Object.entries(SETTINGS.core).map(([key, config]) => (
-                      <tr key={key}>
-                        <td style={docStyles.tableCell}>
-                          <code style={docStyles.code}>{config.id}</code>
-                        </td>
-                        <td style={docStyles.tableCell}>{config.type}</td>
-                        <td style={docStyles.tableCell}>
-                          <code style={docStyles.code}>{JSON.stringify(config.default)}</code>
-                        </td>
-                        <td style={docStyles.tableCell}>{config.description}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Features */}
-              <div style={docStyles.section}>
-                <h3 style={docStyles.sectionHeading}>
-                  Features
-                  <span style={{ ...docStyles.badge, ...docStyles.badgeVariants.green }}>
-                    Optional enhancements
-                  </span>
-                </h3>
-                <div style={docStyles.description}>
-                  Feature flags that enable or disable various calendar capabilities.
-                </div>
-                <table style={docStyles.table}>
-                  <thead>
                     <tr>
-                      <th style={docStyles.tableHeader}>Feature</th>
-                      <th style={docStyles.tableHeader}>Type</th>
-                      <th style={docStyles.tableHeader}>Default</th>
-                      <th style={docStyles.tableHeader}>Description</th>
+                      <td style={docStyles.tableCell}>
+                        <code style={docStyles.code}>displayMode</code>
+                      </td>
+                      <td style={docStyles.tableCell}>
+                        <code style={docStyles.code}>'popup' | 'embedded'</code>
+                      </td>
+                      <td style={docStyles.tableCell}>
+                        <code style={docStyles.code}>'popup'</code>
+                      </td>
+                      <td style={docStyles.tableCell}>How the calendar should be displayed</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {Object.entries(SETTINGS.features).map(([key, config]) => (
-                      <tr key={key}>
-                        <td style={docStyles.tableCell}>
-                          <code style={docStyles.code}>{config.id}</code>
-                        </td>
-                        <td style={docStyles.tableCell}>{config.type}</td>
-                        <td style={docStyles.tableCell}>
-                          <code style={docStyles.code}>{JSON.stringify(config.default)}</code>
-                        </td>
-                        <td style={docStyles.tableCell}>
-                          {config.description}
-                          {DISPLAY_MODE_CONSTRAINTS.embedded.hasOwnProperty(config.id) && (
-                            <div style={{ 
-                              marginTop: '4px',
-                              fontSize: '12px',
-                              color: '#666',
-                              fontStyle: 'italic'
-                            }}>
-                              {`Note: ${DISPLAY_MODE_CONSTRAINTS.embedded[config.id] ? 'Enabled' : 'Disabled'} in embedded mode`}
-                            </div>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
+                    <tr>
+                      <td style={docStyles.tableCell}>
+                        <code style={docStyles.code}>visibleMonths</code>
+                      </td>
+                      <td style={docStyles.tableCell}>
+                        <code style={docStyles.code}>number</code>
+                      </td>
+                      <td style={docStyles.tableCell}>
+                        <code style={docStyles.code}>2</code>
+                      </td>
+                      <td style={docStyles.tableCell}>Number of months to display</td>
+                    </tr>
+                    <tr>
+                      <td style={docStyles.tableCell}>
+                        <code style={docStyles.code}>singleMonthWidth</code>
+                      </td>
+                      <td style={docStyles.tableCell}>
+                        <code style={docStyles.code}>number</code>
+                      </td>
+                      <td style={docStyles.tableCell}>
+                        <code style={docStyles.code}>500</code>
+                      </td>
+                      <td style={docStyles.tableCell}>Width of a single month in pixels</td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
 
-              {/* Style Presets in a grid */}
-              <div>
-                <h3 style={{ 
-                  marginBottom: '12px', 
-                  color: '#444',
-                  fontSize: '16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}>
-                  <span>Style Presets</span>
-                  <span style={{ 
-                    fontSize: '12px', 
-                    color: '#666', 
-                    fontWeight: 'normal',
-                    backgroundColor: '#f8f9fa',
-                    padding: '2px 8px',
-                    borderRadius: '12px'
-                  }}>
-                    Appearance customization
-                  </span>
-                </h3>
-                <div style={{ 
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-                  gap: '12px'
-                }}>
-                  {Object.entries(SETTINGS.core.containerStyle.presets).map(([name, styles]) => (
-                    <div key={name} style={{ 
-                      padding: '12px',
-                      border: '1px solid #eee',
-                      borderRadius: '6px',
-                      backgroundColor: '#f8f9fa'
-                    }}>
-                      <div style={{ 
-                        marginBottom: '8px',
-                        color: '#0366d6',
-                        fontWeight: 500,
-                        fontSize: '14px'
-                      }}>
-                        {name}
-                      </div>
-                      {styles ? (
-                        <pre style={{ 
-                          margin: 0,
-                          padding: '8px',
-                          backgroundColor: '#fff',
-                          borderRadius: '4px',
-                          fontSize: '12px',
-                          border: '1px solid #eee',
-                          maxHeight: '120px',
-                          overflow: 'auto'
-                        }}>
-                          {JSON.stringify(styles, null, 2)}
-                        </pre>
-                      ) : (
-                        <div style={{ 
-                          padding: '8px',
-                          color: '#666',
-                          fontStyle: 'italic',
-                          fontSize: '13px',
-                          backgroundColor: '#fff',
-                          borderRadius: '4px',
-                          border: '1px solid #eee'
-                        }}>
-                          Uses default container styles
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Layer Props */}
+              {/* Layer Configuration */}
               <div style={docStyles.section}>
                 <h3 style={docStyles.sectionHeading}>
-                  Layer Props
+                  Layer Configuration
                   <span style={{ ...docStyles.badge, ...docStyles.badgeVariants.purple }}>
-                    Layer management
+                    Advanced
                   </span>
                 </h3>
-                <div style={docStyles.description}>
-                  Properties that control the calendar's layer system and visualization modes.
+                <p style={docStyles.description}>
+                  Layers provide a way to organize and display different types of calendar data.
+                </p>
+                <table style={docStyles.table}>
+                  <thead>
+                    <tr>
+                      <th style={docStyles.tableHeader}>Property</th>
+                      <th style={docStyles.tableHeader}>Type</th>
+                      <th style={docStyles.tableHeader}>Required</th>
+                      <th style={docStyles.tableHeader}>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td style={docStyles.tableCell}>
+                        <code style={docStyles.code}>name</code>
+                      </td>
+                      <td style={docStyles.tableCell}>
+                        <code style={docStyles.code}>string</code>
+                      </td>
+                      <td style={docStyles.tableCell}>Yes</td>
+                      <td style={docStyles.tableCell}>Unique identifier for the layer</td>
+                    </tr>
+                    <tr>
+                      <td style={docStyles.tableCell}>
+                        <code style={docStyles.code}>title</code>
+                      </td>
+                      <td style={docStyles.tableCell}>
+                        <code style={docStyles.code}>string</code>
+                      </td>
+                      <td style={docStyles.tableCell}>Yes</td>
+                      <td style={docStyles.tableCell}>Display name for the layer</td>
+                    </tr>
+                    <tr>
+                      <td style={docStyles.tableCell}>
+                        <code style={docStyles.code}>description</code>
+                      </td>
+                      <td style={docStyles.tableCell}>
+                        <code style={docStyles.code}>string</code>
+                      </td>
+                      <td style={docStyles.tableCell}>Yes</td>
+                      <td style={docStyles.tableCell}>Brief description of the layer's purpose</td>
+                    </tr>
+                    <tr>
+                      <td style={docStyles.tableCell}>
+                        <code style={docStyles.code}>data</code>
+                      </td>
+                      <td style={docStyles.tableCell}>
+                        <code style={docStyles.code}>LayerData</code>
+                      </td>
+                      <td style={docStyles.tableCell}>No</td>
+                      <td style={docStyles.tableCell}>Layer-specific data (events or background colors)</td>
+                    </tr>
+                    <tr>
+                      <td style={docStyles.tableCell}>
+                        <code style={docStyles.code}>required</code>
+                      </td>
+                      <td style={docStyles.tableCell}>
+                        <code style={docStyles.code}>boolean</code>
+                      </td>
+                      <td style={docStyles.tableCell}>No</td>
+                      <td style={docStyles.tableCell}>Whether the layer can be removed</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                {/* Add margin after the table */}
+                <div style={{ marginTop: '32px' }}>
+                  <h3 style={docStyles.sectionHeading}>
+                    Layer Data Types
+                    <span style={{ ...docStyles.badge, ...docStyles.badgeVariants.purple }}>
+                      Data Structure
+                    </span>
+                  </h3>
+                  <p style={docStyles.description}>
+                    Layers can contain two types of data: Events and Background Colors. These can be used independently or combined.
+                  </p>
+                  
+                  <div style={{ display: 'grid', gap: '24px', marginTop: '16px' }}>
+                    {/* EventData */}
+                    <div style={{ 
+                      border: '1px solid #e1e4e8',
+                      borderRadius: '8px',
+                      overflow: 'hidden'
+                    }}>
+                      <div style={{
+                        backgroundColor: '#f6f8fa',
+                        padding: '12px 16px',
+                        borderBottom: '1px solid #e1e4e8'
+                      }}>
+                        <h5 style={{
+                          margin: 0,
+                          color: '#24292e',
+                          fontSize: '14px',
+                          fontWeight: '600'
+                        }}>
+                          EventData
+                          <span style={{
+                            marginLeft: '8px',
+                            fontSize: '12px',
+                            color: '#666',
+                            fontWeight: 'normal'
+                          }}>
+                            Single-day events with details
+                          </span>
+                        </h5>
+                      </div>
+                      <div style={{ padding: '16px' }}>
+                        <pre style={{
+                          ...docStyles.codeBlock,
+                          margin: 0,
+                          backgroundColor: '#ffffff',
+                          border: '1px solid #e1e4e8'
+                        }}>
+{`interface EventData {
+  date: string;        // ISO date string (e.g., "2025-02-15")
+  title: string;       // Event title (e.g., "Team Meeting")
+  type: string;        // Event category (e.g., "work", "personal")
+  time: string;        // Event time (e.g., "10:00 AM", "All day")
+  description: string; // Event details
+}`}
+                        </pre>
+                        <div style={{ 
+                          marginTop: '12px',
+                          fontSize: '13px',
+                          color: '#666'
+                        }}>
+                          <p style={{ margin: '0 0 8px 0' }}>Example:</p>
+                          <pre style={{
+                            ...docStyles.codeBlock,
+                            margin: 0,
+                            backgroundColor: '#f8f9fa'
+                          }}>
+{`{
+  "date": "2025-02-15",
+  "title": "Team Meeting",
+  "type": "work",
+  "time": "10:00 AM",
+  "description": "Weekly sync with the development team"
+}`}
+                          </pre>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* BackgroundData */}
+                    <div style={{ 
+                      border: '1px solid #e1e4e8',
+                      borderRadius: '8px',
+                      overflow: 'hidden'
+                    }}>
+                      <div style={{
+                        backgroundColor: '#f6f8fa',
+                        padding: '12px 16px',
+                        borderBottom: '1px solid #e1e4e8'
+                      }}>
+                        <h5 style={{
+                          margin: 0,
+                          color: '#24292e',
+                          fontSize: '14px',
+                          fontWeight: '600'
+                        }}>
+                          BackgroundData
+                          <span style={{
+                            marginLeft: '8px',
+                            fontSize: '12px',
+                            color: '#666',
+                            fontWeight: 'normal'
+                          }}>
+                            Date range highlighting
+                          </span>
+                        </h5>
+                      </div>
+                      <div style={{ padding: '16px' }}>
+                        <pre style={{
+                          ...docStyles.codeBlock,
+                          margin: 0,
+                          backgroundColor: '#ffffff',
+                          border: '1px solid #e1e4e8'
+                        }}>
+{`interface BackgroundData {
+  startDate: string;  // ISO date string (e.g., "2025-02-01")
+  endDate: string;    // ISO date string (e.g., "2025-02-14")
+  color: string;      // CSS color value (e.g., "#e3f2fd")
+}`}
+                        </pre>
+                        <div style={{ 
+                          marginTop: '12px',
+                          fontSize: '13px',
+                          color: '#666'
+                        }}>
+                          <p style={{ margin: '0 0 8px 0' }}>Example:</p>
+                          <pre style={{
+                            ...docStyles.codeBlock,
+                            margin: 0,
+                            backgroundColor: '#f8f9fa'
+                          }}>
+{`{
+  "startDate": "2025-02-01",
+  "endDate": "2025-02-14",
+  "color": "#e3f2fd"  // Light blue background
+}`}
+                          </pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+              </div>
+
+              {/* Feature Settings */}
+              <div style={docStyles.section}>
+                <h3 style={docStyles.sectionHeading}>
+                  Feature Settings
+                  <span style={{ ...docStyles.badge, ...docStyles.badgeVariants.green }}>
+                    Optional
+                  </span>
+                </h3>
+                <p style={docStyles.description}>
+                  Additional features that can be enabled or disabled to customize the calendar's functionality.
+                </p>
                 <table style={docStyles.table}>
                   <thead>
                     <tr>
@@ -1384,214 +1499,22 @@ function App() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>layers</code>
-                      </td>
-                      <td style={docStyles.tableCell}>Array</td>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>DEFAULT_LAYERS</code>
-                      </td>
-                      <td style={docStyles.tableCell}>
-                        Array of layer configurations. Each layer requires:
-                        <ul style={{ marginTop: '8px', marginBottom: 0 }}>
-                          <li>name: Unique identifier</li>
-                          <li>type: 'base' or 'overlay'</li>
-                          <li>title: Display name</li>
-                          <li>description: Layer purpose</li>
-                          <li>data: Optional data array</li>
-                        </ul>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>defaultLayer</code>
-                      </td>
-                      <td style={docStyles.tableCell}>string</td>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>"Calendar"</code>
-                      </td>
-                      <td style={docStyles.tableCell}>Name of the initially active layer</td>
-                    </tr>
-                    <tr>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>showLayerControls</code>
-                      </td>
-                      <td style={docStyles.tableCell}>boolean</td>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>true</code>
-                      </td>
-                      <td style={docStyles.tableCell}>Toggle visibility of layer selection controls</td>
-                    </tr>
+                    {Object.entries(SETTINGS.features).map(([key, setting]) => (
+                      <tr key={key}>
+                        <td style={docStyles.tableCell}>
+                          <code style={docStyles.code}>{key}</code>
+                        </td>
+                        <td style={docStyles.tableCell}>
+                          <code style={docStyles.code}>{setting.type}</code>
+                        </td>
+                        <td style={docStyles.tableCell}>
+                          <code style={docStyles.code}>{String(setting.default)}</code>
+                        </td>
+                        <td style={docStyles.tableCell}>{setting.description}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
-              </div>
-
-              {/* Layer Documentation */}
-              <div>
-                <h3 style={{ 
-                  color: '#444', 
-                  fontSize: '16px', 
-                  marginBottom: '16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}>
-                  Layer System
-                  <span style={{ 
-                    fontSize: '12px', 
-                    color: '#666', 
-                    fontWeight: 'normal',
-                    backgroundColor: '#f8f9fa',
-                    padding: '2px 8px',
-                    borderRadius: '12px'
-                  }}>
-                    Advanced functionality
-                  </span>
-                </h3>
-
-                <div style={{ marginBottom: '24px', fontSize: '14px', color: '#666', lineHeight: '1.6' }}>
-                  The calendar supports a flexible layering system that allows switching between different views and data visualizations. 
-                  Each layer can display its own data and visualization style while maintaining the core calendar functionality.
-                </div>
-
-                <div style={{ display: 'grid', gap: '24px' }}>
-                  {/* Layer Properties */}
-                  <div>
-                    <h4 style={{ color: '#444', fontSize: '14px', marginBottom: '12px' }}>Properties</h4>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
-                      <thead>
-                        <tr style={{ backgroundColor: '#f8f9fa' }}>
-                          <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #dee2e6' }}>Property</th>
-                          <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #dee2e6' }}>Type</th>
-                          <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #dee2e6' }}>Default</th>
-                          <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #dee2e6' }}>Description</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>
-                            <code>layers</code>
-                          </td>
-                          <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>Array</td>
-                          <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>
-                            <code>DEFAULT_LAYERS</code>
-                          </td>
-                          <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>Array of layer configurations</td>
-                        </tr>
-                        <tr>
-                          <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>
-                            <code>defaultLayer</code>
-                          </td>
-                          <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>string</td>
-                          <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>
-                            <code>"Calendar"</code>
-                          </td>
-                          <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>Name of the initially active layer</td>
-                        </tr>
-                        <tr>
-                          <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>
-                            <code>showLayerControls</code>
-                          </td>
-                          <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>boolean</td>
-                          <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>
-                            <code>true</code>
-                          </td>
-                          <td style={{ padding: '12px', borderBottom: '1px solid #dee2e6' }}>Toggle visibility of layer selection controls</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {/* Layer Configuration */}
-                  <div>
-                    <h4 style={{ color: '#444', fontSize: '14px', marginBottom: '12px' }}>Layer Configuration</h4>
-                    <div style={{ fontSize: '14px', color: '#666', marginBottom: '16px' }}>
-                      Each layer in the <code>layers</code> array should have the following structure:
-                    </div>
-                    <pre style={{ 
-                      margin: 0,
-                      padding: '16px',
-                      backgroundColor: '#f6f8fa',
-                      borderRadius: '6px',
-                      fontSize: '13px',
-                      lineHeight: '1.45',
-                      overflow: 'auto'
-                    }}>
-{`{
-  name: string,    // Unique identifier for the layer
-  type: string,    // 'base' or 'overlay'
-  title: string,   // Display name in layer controls
-  description: string,  // Brief description of the layer
-  data?: array     // Optional data array for the layer
-}`}
-                    </pre>
-                  </div>
-
-                  {/* Layer Types */}
-                  <div>
-                    <h4 style={{ color: '#444', fontSize: '14px', marginBottom: '12px' }}>Layer Types</h4>
-                    <div style={{ display: 'grid', gap: '16px' }}>
-                      <div>
-                        <h5 style={{ color: '#444', fontSize: '13px', marginBottom: '8px' }}>Base Layer</h5>
-                        <div style={{ fontSize: '14px', color: '#666' }}>
-                          The foundation layer type that provides core calendar functionality. Typically used for displaying basic indicators or markers.
-                          The calendar must always have at least one base layer.
-                        </div>
-                      </div>
-                      <div>
-                        <h5 style={{ color: '#444', fontSize: '13px', marginBottom: '8px' }}>Overlay Layer</h5>
-                        <div style={{ fontSize: '14px', color: '#666' }}>
-                          Additional layers that can display more complex visualizations like events, appointments, or custom data representations.
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Example Usage */}
-                  <div>
-                    <h4 style={{ color: '#444', fontSize: '14px', marginBottom: '12px' }}>Example Usage</h4>
-                    <pre style={{ 
-                      margin: 0,
-                      padding: '16px',
-                      backgroundColor: '#f6f8fa',
-                      borderRadius: '6px',
-                      fontSize: '13px',
-                      lineHeight: '1.45',
-                      overflow: 'auto'
-                    }}>
-{`const layers = [
-  {
-    name: 'Calendar',
-    type: 'base',
-    title: 'Base Calendar',
-    description: 'Basic calendar functionality'
-  },
-  {
-    name: 'Events',
-    type: 'overlay',
-    title: 'Event Calendar',
-    description: 'Display events and appointments',
-    data: [
-      {
-        date: '2024-03-15',
-        title: 'Team Meeting',
-        time: '10:00 AM',
-        description: 'Weekly sync'
-      }
-      // ... more events
-    ]
-  }
-];
-
-<DateRangePickerNew
-  layers={layers}
-  defaultLayer="Calendar"
-  showLayerControls={true}
-/>`}
-                    </pre>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
