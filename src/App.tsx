@@ -1042,7 +1042,7 @@ function App() {
                         width: 'auto'
                       }}
                     >
-                      <option value="daterange">Date Range</option>
+                      <option value="daterange">Restricted Range</option>
                       <option value="boundary">Date Boundary</option>
                       <option value="allowedranges">Allowed Ranges</option>
                     </select>
@@ -1257,6 +1257,7 @@ function App() {
               <button
                 onClick={() => {
                   setRestrictionConfig(draftRestrictionConfig);
+                  setSettings(prev => ({ ...prev }));
                 }}
                 style={styles.confirmButton}
               >
@@ -1585,6 +1586,7 @@ function App() {
               defaultLayer={settings.defaultLayer}
               showLayersNavigation={settings.showLayersNavigation}
               restrictionConfig={restrictionConfig}
+              key={JSON.stringify(restrictionConfig)}
             />
           </div>
 

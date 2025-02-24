@@ -1117,7 +1117,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
   const [activeLayers, setActiveLayers] = useState(initialLayers);
   const [activeLayer, setActiveLayer] = useState(defaultLayer);
   const [notification, setNotification] = useState<string | null>(null);
-  const restrictionManager = useMemo(() => new RestrictionManager(restrictionConfig), [restrictionConfig]);
+  const restrictionManager = useMemo(() => new RestrictionManager(restrictionConfig || { restrictions: [] }), [restrictionConfig]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const moveToMonthRef = useRef<((direction: 'prev' | 'next') => void) | null>(null);
@@ -1270,49 +1270,29 @@ const CLACalendar: React.FC<CalendarSettings> = ({
   };
 
   const handleSelectionStart = useCallback(date => {
-    // Check if selection is allowed
-    const result = restrictionManager.checkSelection(date, date);
-    if (!result.allowed) {
-      setNotification(result.message || 'Selection not allowed');
+    if (isDateRestricted(date, restrictionConfig)) {
       return;
     }
-
     setIsSelecting(true);
-    setInitialDate(date);
-    
-    if (selectionMode === 'single') {
-      setSelectedRange({
-        start: date.toISOString(),
-        end: date.toISOString()
-      });
-      setIsSelecting(false);
-    } else {
-      setSelectedRange({
-        start: date.toISOString(),
-        end: null
-      });
-    }
-  }, [selectionMode, restrictionManager]);
+    setSelectedRange({ start: format(date, 'yyyy-MM-dd'), end: null });
+  }, [selectionMode, restrictionConfig]);
 
   const handleSelectionMove = useCallback(date => {
-    if (selectionMode === 'single' || !isSelecting || !initialDate) return;
+    if (!isSelecting) return;
+    
+    const start = selectedRange.start ? parseISO(selectedRange.start) : null;
+    if (!start) return;
 
-    const [start, end] = date < initialDate
-      ? [date, initialDate]
-      : [initialDate, date];
-
-    // Check if selection is allowed
-    const result = restrictionManager.checkSelection(start, end);
+    // Check if selection would be restricted
+    const result = restrictionManager.checkSelection(start, date);
     if (!result.allowed) {
-      setNotification(result.message || 'Selection not allowed');
+      setNotification(result.message);
       return;
     }
 
-    setSelectedRange({
-      start: start.toISOString(),
-      end: end.toISOString()
-    });
-  }, [isSelecting, initialDate, selectionMode, restrictionManager]);
+    setSelectedRange(prev => ({ ...prev, end: format(date, 'yyyy-MM-dd') }));
+    setNotification(null);
+  }, [isSelecting, selectedRange.start, selectionMode, restrictionManager]);
 
   const handleMouseMove = useCallback((e) => {
     e.preventDefault();
@@ -1456,40 +1436,59 @@ const CLACalendar: React.FC<CalendarSettings> = ({
 
   // Create background data from restrictions
   const restrictionBackgroundData = useMemo(() => {
-    if (!restrictionConfig?.restrictions) {
-      return [];
-    }
+    if (!restrictionConfig?.restrictions) return [];
     
     return restrictionConfig.restrictions.flatMap(restriction => {
-      // Skip disabled restrictions
       if (!restriction.enabled) return [];
       
-      // Handle boundary restrictions
-      if (restriction.type === 'boundary') {
-        const boundaryDate = parseISO(restriction.date);
-        if (!isValid(boundaryDate)) return [];
-        
-        return [{
-          startDate: restriction.direction === 'before' 
-            ? '1900-01-01' 
-            : restriction.date,
-          endDate: restriction.direction === 'before' 
-            ? restriction.date 
-            : '2100-12-31',
-          className: 'restricted-date-pattern'
-        }];
+      switch (restriction.type) {
+        case 'daterange':
+          return restriction.ranges
+            .filter(range => {
+              const start = parseISO(range.start);
+              const end = parseISO(range.end);
+              return isValid(start) && isValid(end) && start <= end;
+            })
+            .map(range => ({
+              startDate: range.start,
+              endDate: range.end,
+              className: 'restricted-date-pattern'
+            }));
+          
+        case 'allowedranges':
+          // For allowed ranges, we show everything outside as restricted
+          return restriction.ranges
+            .filter(range => {
+              const start = parseISO(range.start);
+              const end = parseISO(range.end);
+              return isValid(start) && isValid(end) && start <= end;
+            })
+            .map(range => [
+              {
+                startDate: '1900-01-01',
+                endDate: range.start,
+                className: 'restricted-date-pattern'
+              },
+              {
+                startDate: range.end,
+                endDate: '2100-12-31',
+                className: 'restricted-date-pattern'
+              }
+            ]).flat();
+          
+        case 'boundary':
+          const boundaryDate = parseISO(restriction.date);
+          if (!isValid(boundaryDate)) return [];
+          
+          return [{
+            startDate: restriction.direction === 'before' ? '1900-01-01' : restriction.date,
+            endDate: restriction.direction === 'before' ? restriction.date : '2100-12-31',
+            className: 'restricted-date-pattern'
+          }];
+          
+        default:
+          return [];
       }
-
-      // Handle readonly restrictions
-      if (restriction.type === 'readonly') {
-        return restriction.ranges.map(range => ({
-          startDate: range.start,
-          endDate: range.end,
-          className: 'restricted-date-pattern'
-        }));
-      }
-
-      return [];
     });
   }, [restrictionConfig]);
   
@@ -1502,10 +1501,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
             ...layer,
             data: {
               ...layer.data,
-              background: [
-                ...(layer.data?.background || []),
-                ...restrictionBackgroundData
-              ]
+              background: restrictionBackgroundData
             }
           };
         }
