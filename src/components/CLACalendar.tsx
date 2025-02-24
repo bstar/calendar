@@ -25,6 +25,9 @@ import {
   LayerData
 } from './DateRangePicker.config';
 import { LayerRenderer } from './DateRangePickerNew/layers/LayerRenderer';
+import { RestrictionManager } from './DateRangePickerNew/restrictions/RestrictionManager';
+import { RestrictionConfig } from './DateRangePickerNew/restrictions/types';
+import { Notification } from './DateRangePickerNew/Notification';
 
 interface DateRange {
   start: string | null;
@@ -1081,7 +1084,8 @@ const CLACalendar: React.FC<CalendarSettings> = ({
   suppressTooltipsOnSelection = false,
   layers: initialLayers = DEFAULT_LAYERS,
   showLayersNavigation = true,
-  defaultLayer = 'calendar'
+  defaultLayer = 'calendar',
+  restrictionConfig
 }) => {
   const [isOpen, setIsOpen] = useState(displayMode === 'embedded' || initialIsOpen);
   const [selectedRange, setSelectedRange] = useState({ start: null, end: null });
@@ -1099,6 +1103,8 @@ const CLACalendar: React.FC<CalendarSettings> = ({
   const [activeLayers, setActiveLayers] = useState(initialLayers);
   const [activeLayer, setActiveLayer] = useState(defaultLayer);
   const [forceShowTooltips, setForceShowTooltips] = useState(true);
+  const [notification, setNotification] = useState<string | null>(null);
+  const restrictionManager = useMemo(() => new RestrictionManager(restrictionConfig), [restrictionConfig]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const moveToMonthRef = useRef<((direction: 'prev' | 'next') => void) | null>(null);
@@ -1244,38 +1250,49 @@ const CLACalendar: React.FC<CalendarSettings> = ({
   };
 
   const handleSelectionStart = useCallback(date => {
+    // Check if selection is allowed
+    const result = restrictionManager.checkSelection(date, date);
+    if (!result.allowed) {
+      setNotification(result.message || 'Selection not allowed');
+      return;
+    }
+
     setIsSelecting(true);
     setInitialDate(date);
     
     if (selectionMode === 'single') {
-      // For single mode, set both start and end to the same date
       setSelectedRange({
         start: date.toISOString(),
         end: date.toISOString()
       });
-      setIsSelecting(false);  // End selection immediately
+      setIsSelecting(false);
     } else {
-      // For range mode, start the selection
       setSelectedRange({
         start: date.toISOString(),
         end: null
       });
     }
-  }, [selectionMode]);
+  }, [selectionMode, restrictionManager]);
 
   const handleSelectionMove = useCallback(date => {
-    // Only handle range selection
     if (selectionMode === 'single' || !isSelecting || !initialDate) return;
 
     const [start, end] = date < initialDate
       ? [date, initialDate]
       : [initialDate, date];
 
+    // Check if selection is allowed
+    const result = restrictionManager.checkSelection(start, end);
+    if (!result.allowed) {
+      setNotification(result.message || 'Selection not allowed');
+      return;
+    }
+
     setSelectedRange({
       start: start.toISOString(),
       end: end.toISOString()
     });
-  }, [isSelecting, initialDate, selectionMode]);
+  }, [isSelecting, initialDate, selectionMode, restrictionManager]);
 
   const handleMouseMove = useCallback((e) => {
     e.preventDefault();
@@ -1560,6 +1577,13 @@ const CLACalendar: React.FC<CalendarSettings> = ({
             <SideChevronIndicator
               outOfBoundsDirection={outOfBoundsDirection}
               isSelecting={isSelecting}
+            />
+          )}
+
+          {notification && (
+            <Notification
+              message={notification}
+              onDismiss={() => setNotification(null)}
             />
           )}
         </div>

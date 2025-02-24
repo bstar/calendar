@@ -369,7 +369,17 @@ function App() {
     isOpen: true
   });
 
-  const [activeTab, setActiveTab] = useState<'core' | 'features' | 'layers'>('core');
+  const [activeTab, setActiveTab] = useState('settings');
+  const [restrictionConfig, setRestrictionConfig] = useState<RestrictionConfig>({
+    readOnlyRanges: [
+      {
+        start: '2025-01-01',
+        end: '2025-01-15',
+        message: 'This date range is read-only for testing'
+      }
+    ],
+    enabled: true
+  });
 
   // Add new state for import modal
   const [showImportModal, setShowImportModal] = useState(false);
@@ -941,6 +951,107 @@ function App() {
             }}
           />
         );
+      case 'restrictions':
+        return (
+          <div style={{ padding: '16px' }}>
+            <div style={{ marginBottom: '16px' }}>
+              <label style={styles.label}>
+                <input
+                  type="checkbox"
+                  checked={restrictionConfig.enabled}
+                  onChange={(e) => setRestrictionConfig(prev => ({
+                    ...prev,
+                    enabled: e.target.checked
+                  }))}
+                />
+                Enable Restrictions
+              </label>
+            </div>
+            
+            <div style={{ marginBottom: '16px' }}>
+              <h3 style={styles.heading}>Read-only Ranges</h3>
+              {restrictionConfig.readOnlyRanges.map((range, index) => (
+                <div key={index} style={{ marginBottom: '12px', padding: '8px', border: '1px solid #dee2e6' }}>
+                  <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                    <div style={{ flex: 1 }}>
+                      <label style={styles.label}>Start Date</label>
+                      <input
+                        type="text"
+                        placeholder="YYYY-MM-DD"
+                        value={range.start}
+                        onChange={(e) => {
+                          const newRanges = [...restrictionConfig.readOnlyRanges];
+                          newRanges[index] = { ...range, start: e.target.value };
+                          setRestrictionConfig(prev => ({
+                            ...prev,
+                            readOnlyRanges: newRanges
+                          }));
+                        }}
+                        style={styles.input}
+                      />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <label style={styles.label}>End Date</label>
+                      <input
+                        type="text"
+                        placeholder="YYYY-MM-DD"
+                        value={range.end}
+                        onChange={(e) => {
+                          const newRanges = [...restrictionConfig.readOnlyRanges];
+                          newRanges[index] = { ...range, end: e.target.value };
+                          setRestrictionConfig(prev => ({
+                            ...prev,
+                            readOnlyRanges: newRanges
+                          }));
+                        }}
+                        style={styles.input}
+                      />
+                    </div>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Message when selection is restricted"
+                    value={range.message}
+                    onChange={(e) => {
+                      const newRanges = [...restrictionConfig.readOnlyRanges];
+                      newRanges[index] = { ...range, message: e.target.value };
+                      setRestrictionConfig(prev => ({
+                        ...prev,
+                        readOnlyRanges: newRanges
+                      }));
+                    }}
+                    style={styles.input}
+                  />
+                  <button
+                    onClick={() => {
+                      setRestrictionConfig(prev => ({
+                        ...prev,
+                        readOnlyRanges: prev.readOnlyRanges.filter((_, i) => i !== index)
+                      }));
+                    }}
+                    style={{ ...styles.button, marginTop: '8px' }}
+                  >
+                    Remove Range
+                  </button>
+                </div>
+              ))}
+              <button
+                onClick={() => {
+                  setRestrictionConfig(prev => ({
+                    ...prev,
+                    readOnlyRanges: [
+                      ...prev.readOnlyRanges,
+                      { start: '', end: '', message: '' }
+                    ]
+                  }));
+                }}
+                style={styles.button}
+              >
+                Add Range
+              </button>
+            </div>
+          </div>
+        );
       default:
         return null;
     }
@@ -1189,10 +1300,10 @@ function App() {
               marginBottom: '16px', 
               borderBottom: '1px solid #dee2e6' 
             }}>
-              {['core', 'features', 'layers'].map(tab => (
+              {['core', 'features', 'layers', 'restrictions'].map(tab => (
                 <button
                   key={tab}
-                  onClick={() => setActiveTab(tab as 'core' | 'features' | 'layers')}
+                  onClick={() => setActiveTab(tab as 'core' | 'features' | 'layers' | 'restrictions')}
                   style={{
                     padding: '10px 0',
                     width: '100px',
@@ -1233,6 +1344,7 @@ function App() {
               {...settings} 
               defaultLayer={settings.defaultLayer}
               showLayersNavigation={settings.showLayersNavigation}
+              restrictionConfig={restrictionConfig}
             />
           </div>
 
