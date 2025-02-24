@@ -1,5 +1,5 @@
 import { parseISO } from 'date-fns';
-import { RestrictionConfig, ReadOnlyRange } from './types';
+import { RestrictionConfig, ReadOnlyRestriction } from './types';
 
 export class RestrictionManager {
   private config: RestrictionConfig;
@@ -12,13 +12,34 @@ export class RestrictionManager {
     allowed: boolean;
     message?: string;
   } {
-    if (!this.config.enabled) return { allowed: true };
+    for (const restriction of this.config.restrictions) {
+      if (!restriction.enabled) continue;
 
-    for (const range of this.config.readOnlyRanges) {
+      switch (restriction.type) {
+        case 'readonly':
+          const result = this.checkReadOnlyRestriction(restriction, startDate, endDate);
+          if (!result.allowed) return result;
+          break;
+        // Add more restriction type checks here
+      }
+    }
+
+    return { allowed: true };
+  }
+
+  private checkReadOnlyRestriction(
+    restriction: ReadOnlyRestriction, 
+    startDate: Date, 
+    endDate: Date
+  ): { allowed: boolean; message?: string; } {
+    for (const range of restriction.ranges) {
+      if (!range.start || !range.end) continue; // Skip incomplete ranges
       const rangeStart = parseISO(range.start);
       const rangeEnd = parseISO(range.end);
 
-      // Check if selection overlaps with any read-only range
+      // Skip invalid dates
+      if (isNaN(rangeStart.getTime()) || isNaN(rangeEnd.getTime())) continue;
+
       if (
         (startDate >= rangeStart && startDate <= rangeEnd) ||
         (endDate >= rangeStart && endDate <= rangeEnd) ||

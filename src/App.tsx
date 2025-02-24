@@ -200,14 +200,28 @@ const styles = {
   },
   button: {
     padding: '6px 12px',
-    fontSize: '12px',
-    border: '1px solid #cfd4d9',
+    backgroundColor: '#f8f9fa',
+    border: '1px solid #dee2e6',
     borderRadius: '4px',
     cursor: 'pointer',
-    whiteSpace: 'nowrap',
-    transition: 'all 0.2s ease',
-    backgroundColor: '#fff',
-    color: '#666'
+    fontSize: '14px',
+    margin: '4px',
+    '&:hover': {
+      backgroundColor: '#e9ecef'
+    }
+  },
+  confirmButton: {
+    padding: '6px 12px',
+    backgroundColor: '#28a745',
+    color: 'white',
+    border: '1px solid #28a745',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    margin: '4px',
+    '&:hover': {
+      backgroundColor: '#218838'
+    }
   },
   // Button variants
   buttonVariants: {
@@ -371,18 +385,26 @@ function App() {
 
   const [activeTab, setActiveTab] = useState('settings');
   const [restrictionConfig, setRestrictionConfig] = useState<RestrictionConfig>({
-    readOnlyRanges: [
+    restrictions: [
       {
-        start: '2025-01-01',
-        end: '2025-01-15',
-        message: 'This date range is read-only for testing'
+        type: 'readonly',
+        enabled: true,
+        ranges: [
+          {
+            start: '2025-01-01',
+            end: '2025-01-15',
+            message: 'This date range is read-only for testing'
+          }
+        ]
       }
-    ],
-    enabled: true
+    ]
   });
 
   // Add new state for import modal
   const [showImportModal, setShowImportModal] = useState(false);
+
+  // Add state for draft changes
+  const [draftRestrictionConfig, setDraftRestrictionConfig] = useState(restrictionConfig);
 
   const handleChange = (prop) => (event) => {
     const value = event.target.type === 'checkbox' 
@@ -955,99 +977,185 @@ function App() {
         return (
           <div style={{ padding: '16px' }}>
             <div style={{ marginBottom: '16px' }}>
-              <label style={styles.label}>
-                <input
-                  type="checkbox"
-                  checked={restrictionConfig.enabled}
-                  onChange={(e) => setRestrictionConfig(prev => ({
-                    ...prev,
-                    enabled: e.target.checked
-                  }))}
-                />
-                Enable Restrictions
-              </label>
-            </div>
-            
-            <div style={{ marginBottom: '16px' }}>
-              <h3 style={styles.heading}>Read-only Ranges</h3>
-              {restrictionConfig.readOnlyRanges.map((range, index) => (
-                <div key={index} style={{ marginBottom: '12px', padding: '8px', border: '1px solid #dee2e6' }}>
-                  <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-                    <div style={{ flex: 1 }}>
-                      <label style={styles.label}>Start Date</label>
-                      <input
-                        type="text"
-                        placeholder="YYYY-MM-DD"
-                        value={range.start}
-                        onChange={(e) => {
-                          const newRanges = [...restrictionConfig.readOnlyRanges];
-                          newRanges[index] = { ...range, start: e.target.value };
-                          setRestrictionConfig(prev => ({
-                            ...prev,
-                            readOnlyRanges: newRanges
-                          }));
-                        }}
-                        style={styles.input}
-                      />
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <label style={styles.label}>End Date</label>
-                      <input
-                        type="text"
-                        placeholder="YYYY-MM-DD"
-                        value={range.end}
-                        onChange={(e) => {
-                          const newRanges = [...restrictionConfig.readOnlyRanges];
-                          newRanges[index] = { ...range, end: e.target.value };
-                          setRestrictionConfig(prev => ({
-                            ...prev,
-                            readOnlyRanges: newRanges
-                          }));
-                        }}
-                        style={styles.input}
-                      />
-                    </div>
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="Message when selection is restricted"
-                    value={range.message}
-                    onChange={(e) => {
-                      const newRanges = [...restrictionConfig.readOnlyRanges];
-                      newRanges[index] = { ...range, message: e.target.value };
-                      setRestrictionConfig(prev => ({
-                        ...prev,
-                        readOnlyRanges: newRanges
-                      }));
-                    }}
-                    style={styles.input}
-                  />
-                  <button
-                    onClick={() => {
-                      setRestrictionConfig(prev => ({
-                        ...prev,
-                        readOnlyRanges: prev.readOnlyRanges.filter((_, i) => i !== index)
-                      }));
-                    }}
-                    style={{ ...styles.button, marginTop: '8px' }}
-                  >
-                    Remove Range
-                  </button>
-                </div>
-              ))}
               <button
-                onClick={() => {
-                  setRestrictionConfig(prev => ({
-                    ...prev,
-                    readOnlyRanges: [
-                      ...prev.readOnlyRanges,
-                      { start: '', end: '', message: '' }
-                    ]
-                  }));
-                }}
+                onClick={() => setDraftRestrictionConfig(prev => ({
+                  restrictions: [
+                    ...prev.restrictions,
+                    {
+                      type: 'readonly',
+                      enabled: true,
+                      ranges: []
+                    }
+                  ]
+                }))}
                 style={styles.button}
               >
-                Add Range
+                Add Restriction
+              </button>
+            </div>
+
+            {draftRestrictionConfig.restrictions.map((restriction, restrictionIndex) => (
+              <div key={restrictionIndex} style={{ marginBottom: '24px', padding: '16px', border: '1px solid #dee2e6' }}>
+                <div style={{ marginBottom: '16px', display: 'flex', gap: '16px', alignItems: 'center' }}>
+                  <select
+                    value={restriction.type}
+                    onChange={(e) => {
+                      const newRestrictions = [...draftRestrictionConfig.restrictions];
+                      // Handle type change when we add more types
+                      newRestrictions[restrictionIndex] = {
+                        ...restriction,
+                        type: e.target.value
+                      };
+                      setDraftRestrictionConfig({ restrictions: newRestrictions });
+                    }}
+                    style={styles.select}
+                  >
+                    <option value="readonly">Read Only</option>
+                  </select>
+
+                  <label style={styles.label}>
+                    <input
+                      type="checkbox"
+                      checked={restriction.enabled}
+                      onChange={(e) => {
+                        const newRestrictions = [...draftRestrictionConfig.restrictions];
+                        newRestrictions[restrictionIndex] = {
+                          ...restriction,
+                          enabled: e.target.checked
+                        };
+                        setDraftRestrictionConfig({ restrictions: newRestrictions });
+                      }}
+                    />
+                    Enable
+                  </label>
+
+                  <button
+                    onClick={() => {
+                      const newRestrictions = draftRestrictionConfig.restrictions.filter(
+                        (_, index) => index !== restrictionIndex
+                      );
+                      setDraftRestrictionConfig({ restrictions: newRestrictions });
+                    }}
+                    style={styles.button}
+                  >
+                    Remove
+                  </button>
+                </div>
+
+                {restriction.type === 'readonly' && (
+                  <div>
+                    <h4 style={styles.subheading}>Read-only Ranges</h4>
+                    {restriction.ranges.map((range, rangeIndex) => (
+                      <div key={rangeIndex} style={{ marginBottom: '12px', padding: '8px', border: '1px solid #dee2e6' }}>
+                        <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                          <div style={{ flex: 1 }}>
+                            <label style={styles.label}>Start Date</label>
+                            <input
+                              type="text"
+                              placeholder="YYYY-MM-DD"
+                              value={range.start}
+                              onChange={(e) => {
+                                const newRanges = [...restriction.ranges];
+                                newRanges[rangeIndex] = { ...range, start: e.target.value };
+                                setDraftRestrictionConfig(prev => ({
+                                  restrictions: prev.restrictions.map(r =>
+                                    r.type === 'readonly' ? { ...r, ranges: newRanges } : r
+                                  )
+                                }));
+                              }}
+                              style={styles.input}
+                            />
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <label style={styles.label}>End Date</label>
+                            <input
+                              type="text"
+                              placeholder="YYYY-MM-DD"
+                              value={range.end}
+                              onChange={(e) => {
+                                const newRanges = [...restriction.ranges];
+                                newRanges[rangeIndex] = { ...range, end: e.target.value };
+                                setDraftRestrictionConfig(prev => ({
+                                  restrictions: prev.restrictions.map(r =>
+                                    r.type === 'readonly' ? { ...r, ranges: newRanges } : r
+                                  )
+                                }));
+                              }}
+                              style={styles.input}
+                            />
+                          </div>
+                        </div>
+                        <input
+                          type="text"
+                          placeholder="Message when selection is restricted"
+                          value={range.message}
+                          onChange={(e) => {
+                            const newRanges = [...restriction.ranges];
+                            newRanges[rangeIndex] = { ...range, message: e.target.value };
+                            setDraftRestrictionConfig(prev => ({
+                              restrictions: prev.restrictions.map(r =>
+                                r.type === 'readonly' ? { ...r, ranges: newRanges } : r
+                              )
+                            }));
+                          }}
+                          style={styles.input}
+                        />
+                        <button
+                          onClick={() => {
+                            const newRanges = [...restriction.ranges];
+                            newRanges.splice(rangeIndex, 1);
+                            setDraftRestrictionConfig(prev => ({
+                              restrictions: prev.restrictions.map(r =>
+                                r.type === 'readonly' ? { ...r, ranges: newRanges } : r
+                              )
+                            }));
+                          }}
+                          style={styles.button}
+                        >
+                          Remove Range
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      onClick={() => {
+                        const newRanges = [...restriction.ranges];
+                        newRanges.push({ start: '', end: '', message: '' });
+                        setDraftRestrictionConfig(prev => ({
+                          restrictions: prev.restrictions.map(r =>
+                            r.type === 'readonly' ? { ...r, ranges: newRanges } : r
+                          )
+                        }));
+                      }}
+                      style={styles.button}
+                    >
+                      Add Range
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
+
+            <div style={{ 
+              marginTop: '24px', 
+              padding: '16px', 
+              borderTop: '1px solid #dee2e6',
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: '8px'
+            }}>
+              <button
+                onClick={() => setDraftRestrictionConfig(restrictionConfig)}
+                style={styles.button}
+              >
+                Reset
+              </button>
+              <button
+                onClick={() => {
+                  setRestrictionConfig(draftRestrictionConfig);
+                }}
+                style={styles.confirmButton}
+              >
+                Apply Changes
               </button>
             </div>
           </div>
