@@ -531,6 +531,7 @@ interface CalendarGridProps {
   showTooltips: boolean;
   layer: Layer;
   activeLayer: string;
+  restrictionConfig?: RestrictionConfig;
 }
 
 interface MonthGridProps {
@@ -544,6 +545,7 @@ interface MonthGridProps {
   showTooltips: boolean;
   renderDay?: (date: Date) => RenderResult | null;
   layer: Layer;
+  restrictionConfig?: RestrictionConfig;
 }
 
 interface DayCellProps {
@@ -556,6 +558,7 @@ interface DayCellProps {
   renderContent?: (date: Date) => RenderResult | null;
   layer: Layer;
   activeLayer: string;
+  restrictionConfig?: RestrictionConfig;
 }
 
 interface TooltipProps {
@@ -647,7 +650,8 @@ const MonthGrid: React.FC<MonthGridProps> = ({
   showMonthHeading = false,
   showTooltips,
   renderDay,
-  layer
+  layer,
+  restrictionConfig
 }) => {
   const monthStart = startOfMonth(baseDate);
   const monthEnd = endOfMonth(monthStart);
@@ -740,6 +744,7 @@ const MonthGrid: React.FC<MonthGridProps> = ({
               renderContent={renderDay}
               layer={layer}
               activeLayer={layer.name}
+              restrictionConfig={restrictionConfig}
             />
           ))
         )}
@@ -762,7 +767,8 @@ const DayCell = ({
   showTooltips,
   renderContent,
   layer,
-  activeLayer
+  activeLayer,
+  restrictionConfig
 }) => {
   const { isSelected, isInRange, isRangeStart, isRangeEnd } = useMemo(() => {
     if (!selectedRange.start) {
@@ -824,6 +830,16 @@ const DayCell = ({
     isSameDay(date, parseISO(event.date))
   ) || [];
 
+  const restrictionManager = useMemo(() => 
+    new RestrictionManager(restrictionConfig || { enabled: false, readOnlyRanges: [] }), 
+    [restrictionConfig]
+  );
+  
+  const isRestricted = useMemo(() => 
+    !restrictionManager.checkSelection(date, date).allowed,
+    [date, restrictionManager]
+  );
+
   const dayCell = (
     <div
       onMouseEnter={handleMouseEnter}
@@ -833,7 +849,7 @@ const DayCell = ({
         width: "100%",
         height: "100%",
         position: "relative",
-        cursor: "pointer",
+        cursor: isRestricted ? 'not-allowed' : 'pointer',
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -906,7 +922,8 @@ const MonthPair = ({
   showMonthHeadings,
   showTooltips,
   renderDay,
-  layer
+  layer,
+  restrictionConfig
 }) => {
   // Create array of months to display
   const monthsToShow = [];
@@ -933,6 +950,7 @@ const MonthPair = ({
           showTooltips={showTooltips}
           renderDay={renderDay}
           layer={layer}
+          restrictionConfig={restrictionConfig}
         />
       ))}
     </div>
@@ -1014,7 +1032,8 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   showMonthHeadings,
   showTooltips,
   layer,
-  activeLayer
+  activeLayer,
+  restrictionConfig
 }) => {
   const renderers: Renderer[] = [];
   
@@ -1063,6 +1082,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       showTooltips={showTooltips}
       renderDay={renderDay}
       layer={layer}
+      restrictionConfig={restrictionConfig}
     />
   );
 };
@@ -1428,10 +1448,6 @@ const CLACalendar: React.FC<CalendarSettings> = ({
   };
 
   const renderLayer = (layer) => {
-    console.log('=== Rendering Layer ===');
-    console.log('Layer:', layer.name);
-    console.log('Layer data:', layer.data);
-    
     return (
       <CalendarGrid
         months={months}
@@ -1444,8 +1460,19 @@ const CLACalendar: React.FC<CalendarSettings> = ({
         showTooltips={tooltipProps.showTooltips}
         layer={layer}
         activeLayer={activeLayer}
+        restrictionConfig={restrictionConfig}
       />
     );
+  };
+
+  const isDateRestricted = (date: Date, restrictionConfig?: RestrictionConfig): boolean => {
+    if (!restrictionConfig?.enabled || !restrictionConfig.readOnlyRanges) return false;
+    
+    return restrictionConfig.readOnlyRanges.some(range => {
+      const rangeStart = parseISO(range.start);
+      const rangeEnd = parseISO(range.end);
+      return date >= rangeStart && date <= rangeEnd;
+    });
   };
 
   return (
