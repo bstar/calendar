@@ -7,6 +7,8 @@ export class RestrictionManager {
   checkSelection(start: Date, end: Date): { allowed: boolean; message?: string } {
     if (!this.config?.restrictions) return { allowed: true };
 
+    const messages: string[] = [];
+    
     for (const restriction of this.config.restrictions) {
       if (!restriction.enabled) continue;
 
@@ -17,20 +19,14 @@ export class RestrictionManager {
 
         if (restriction.direction === 'before') {
           if (start < boundaryDate) {
-            return {
-              allowed: false,
-              message: restriction.message || 'Selection before boundary date is not allowed'
-            };
+            messages.push(restriction.message || 'Selection before boundary date is not allowed');
           }
         } else {
           // For 'after' direction, check if the date is after the boundary
           const boundaryEndOfDay = new Date(boundaryDate);
           boundaryEndOfDay.setHours(23, 59, 59, 999);
           if (start > boundaryEndOfDay) {
-            return {
-              allowed: false,
-              message: restriction.message || 'Selection after boundary date is not allowed'
-            };
+            messages.push(restriction.message || 'Selection after boundary date is not allowed');
           }
         }
       }
@@ -45,10 +41,7 @@ export class RestrictionManager {
 
           if (isWithinInterval(start, { start: rangeStart, end: rangeEnd }) ||
               isWithinInterval(end, { start: rangeStart, end: rangeEnd })) {
-            return {
-              allowed: false,
-              message: range.message || 'Selection includes restricted dates'
-            };
+            messages.push(range.message || 'Selection includes restricted dates');
           }
         }
       }
@@ -75,14 +68,13 @@ export class RestrictionManager {
         }
 
         if (!isAllowed) {
-          return {
-            allowed: false,
-            message
-          };
+          messages.push(message);
         }
       }
     }
 
-    return { allowed: true };
+    return messages.length > 0 
+      ? { allowed: false, message: messages.join('\n') }
+      : { allowed: true };
   }
 } 

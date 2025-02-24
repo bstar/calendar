@@ -793,18 +793,28 @@ const DayCell = ({
   }, [date, selectedRange.start, selectedRange.end]);
 
   const [isHovered, setIsHovered] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  
+  const restrictionManager = useMemo(() => 
+    new RestrictionManager(restrictionConfig ?? { restrictions: [] }), 
+    [restrictionConfig]
+  );
 
-  // Update single day check to handle both cases
-  const isSingleDay = useMemo(() => {
-    if (!selectedRange.start) return false;
-    if (!selectedRange.end) return true;
-    return isSameDay(parseISO(selectedRange.start), parseISO(selectedRange.end));
-  }, [selectedRange.start, selectedRange.end]);
+  const restrictionResult = useMemo(() => 
+    restrictionManager.checkSelection(date, date),
+    [date, restrictionManager]
+  );
 
   const handleMouseEnter = (e) => {
-    const content = renderContent?.(date);
     setIsHovered(true);
     onMouseEnter?.(e);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    setMousePosition({
+      x: e.clientX + 10,
+      y: e.clientY + 10
+    });
   };
 
   const handleMouseLeave = () => {
@@ -830,47 +840,54 @@ const DayCell = ({
     isSameDay(date, parseISO(event.date))
   ) || [];
 
-  const restrictionManager = useMemo(() => 
-    new RestrictionManager(restrictionConfig ?? { enabled: true, readOnlyRanges: [] }), 
-    [restrictionConfig]
-  );
-  
-  const isRestricted = useMemo(() => 
-    !restrictionManager.checkSelection(date, date).allowed,
-    [date, restrictionManager]
-  );
-
   const dayCell = (
     <div
-      className={isRestricted ? 'restricted-date-pattern' : ''}
+      className={!restrictionResult.allowed ? 'restricted-date-pattern' : ''}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      onMouseMove={handleMouseMove}
       onMouseDown={onMouseDown}
       style={{
         width: "100%",
         height: "100%",
         position: "relative",
-        cursor: isRestricted ? 'not-allowed' : 'pointer',
+        cursor: !restrictionResult.allowed ? 'not-allowed' : 'pointer',
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         backgroundColor: (isSelected || isInRange) ? "#b1e4e5" : getBackgroundColor(),
-        borderRadius: isSingleDay && (isSelected || isInRange) ? "50%" : (
-          isRangeStart || isRangeEnd ? 
-            `${isRangeStart ? "15px" : "0"} ${isRangeEnd ? "15px" : "0"} ${isRangeEnd ? "15px" : "0"} ${isRangeStart ? "15px" : "0"}`
-            : "0"
-        ),
+        borderRadius: isRangeStart || isRangeEnd ? 
+          `${isRangeStart ? "15px" : "0"} ${isRangeEnd ? "15px" : "0"} ${isRangeEnd ? "15px" : "0"} ${isRangeStart ? "15px" : "0"}`
+          : "0",
         fontWeight: isSelected ? "600" : "normal",
         margin: 0,
         padding: 0,
         boxSizing: "border-box",
-        ...(isSingleDay && (isSelected || isInRange) ? {
-          width: "36px",
-          height: "36px",
-          margin: "auto"
-        } : {})
       }}
     >
+      {/* Restriction Tooltip */}
+      {isHovered && !restrictionResult.allowed && restrictionResult.message && (
+        <div
+          style={{
+            position: 'fixed',
+            left: mousePosition.x,
+            top: mousePosition.y,
+            backgroundColor: 'rgba(220, 53, 69, 0.9)',
+            color: 'white',
+            padding: '8px 12px',
+            borderRadius: '4px',
+            fontSize: '13px',
+            pointerEvents: 'none',
+            zIndex: 1000,
+            boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+            maxWidth: '250px',
+            whiteSpace: 'pre-line'  // This will respect the newlines in the message
+          }}
+        >
+          {restrictionResult.message}
+        </div>
+      )}
+
       <div style={{ 
         position: 'absolute',
         inset: 0,
