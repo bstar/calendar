@@ -1331,6 +1331,9 @@ const CLACalendar: React.FC<CalendarSettings> = ({
 
     document.removeEventListener("mousemove", handleMouseMove);
     document.removeEventListener("mouseup", handleMouseUp);
+
+    // Ensure out of bounds indicators are cleared
+    setOutOfBoundsDirection(null);
   }, [handleMouseMove]);
 
   const handleMouseDown = useCallback(e => {
@@ -1402,6 +1405,9 @@ const CLACalendar: React.FC<CalendarSettings> = ({
   };
 
   const handleMouseLeave = useCallback((e) => {
+    // Only handle out of bounds when selecting
+    if (!isSelecting) return;
+    
     const containerRect = containerRef.current.getBoundingClientRect();
     const { clientX: mouseX } = e;
 
@@ -1410,7 +1416,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     } else if (mouseX > containerRect.right) {
       setOutOfBoundsDirection('next');
     }
-  }, []);
+  }, [isSelecting]);
 
   const handleLayerChange = (layerId) => {
     setActiveLayer(layerId);
