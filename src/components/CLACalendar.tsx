@@ -1115,13 +1115,19 @@ const CLACalendar: React.FC<CalendarSettings> = ({
   const [validationErrors, setValidationErrors] = useState({});
   const [activeLayers, setActiveLayers] = useState(initialLayers);
   const [activeLayer, setActiveLayer] = useState(defaultLayer);
-  const [forceShowTooltips, setForceShowTooltips] = useState(true);
   const [notification, setNotification] = useState<string | null>(null);
   const restrictionManager = useMemo(() => new RestrictionManager(restrictionConfig), [restrictionConfig]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const moveToMonthRef = useRef<((direction: 'prev' | 'next') => void) | null>(null);
   const debouncedMoveToMonthRef = useRef<Function | null>(null);
+
+  // Calculate if tooltips should be shown based on selection state and settings
+  const shouldShowTooltips = useMemo(() => {
+    if (!showTooltips) return false;
+    if (suppressTooltipsOnSelection && isSelecting) return false;
+    return true;
+  }, [showTooltips, suppressTooltipsOnSelection, isSelecting]);
 
   // Add logging when initialLayers prop changes
   useEffect(() => {
@@ -1335,9 +1341,6 @@ const CLACalendar: React.FC<CalendarSettings> = ({
 
   const handleMouseUp = useCallback(() => {
     setIsSelecting(false);
-    if (suppressTooltipsOnSelection) {
-      setForceShowTooltips(true);  // Only re-enable tooltips if suppression was enabled
-    }
     console.log('ending selection');
     setOutOfBoundsDirection(null);
     setInitialDate(null);
@@ -1347,7 +1350,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
 
     document.removeEventListener("mousemove", handleMouseMove);
     document.removeEventListener("mouseup", handleMouseUp);
-  }, [handleMouseMove, suppressTooltipsOnSelection]);
+  }, [handleMouseMove]);
 
   const handleMouseDown = useCallback(e => {
     if (isSelecting) return;
@@ -1359,15 +1362,12 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     };
 
     setIsSelecting(true);
-    if (suppressTooltipsOnSelection) {
-      setForceShowTooltips(false);  // Only disable tooltips if suppression is enabled
-    }
     console.log('starting selection');
     setUserSelectNone();
 
     document.addEventListener("mousemove", handleMouseMove);
     document.addEventListener("mouseup", handleMouseUp);
-  }, [isSelecting, handleMouseMove, handleMouseUp, suppressTooltipsOnSelection]);
+  }, [isSelecting, handleMouseMove, handleMouseUp]);
 
   const handleClear = useCallback(() => {
     // Reset range and context
@@ -1435,11 +1435,6 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     setActiveLayer(layerId);
   };
 
-  // Add back the tooltipProps
-  const tooltipProps = {
-    showTooltips: showTooltips || forceShowTooltips
-  };
-
   const renderLayer = (layer) => {
     return (
       <CalendarGrid
@@ -1450,7 +1445,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
         isSelecting={isSelecting}
         visibleMonths={visibleMonths}
         showMonthHeadings={showMonthHeadings}
-        showTooltips={tooltipProps.showTooltips}
+        showTooltips={shouldShowTooltips}
         layer={layer}
         activeLayer={activeLayer}
         restrictionConfig={restrictionConfig}
