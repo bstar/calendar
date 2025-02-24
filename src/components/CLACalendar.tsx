@@ -675,6 +675,24 @@ const MonthGrid: React.FC<MonthGridProps> = ({
   const currentWeeks = Object.keys(weeks).length;
   const emptyWeeks = totalWeeks - currentWeeks;
 
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
+  const restrictionManager = useMemo(() => 
+    new RestrictionManager(restrictionConfig ?? { restrictions: [] }), 
+    [restrictionConfig]
+  );
+
+  const handleGridMouseMove = (e: React.MouseEvent) => {
+    setMousePosition({
+      x: e.clientX + 10,
+      y: e.clientY + 10
+    });
+  };
+
+  const handleGridMouseLeave = () => {
+    setHoveredDate(null);
+  };
+
   return (
     <div style={{ 
       width: '100%',
@@ -723,14 +741,18 @@ const MonthGrid: React.FC<MonthGridProps> = ({
       </div>
 
       {/* Days grid */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(7, 1fr)',
-        gridAutoRows: '36px',
-        rowGap: '4px',
-        columnGap: 0,
-        paddingLeft: '2px'  // Match month heading alignment
-      }}>
+      <div 
+        onMouseMove={handleGridMouseMove}
+        onMouseLeave={handleGridMouseLeave}
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(7, 1fr)',
+          gridAutoRows: '36px',
+          rowGap: '4px',
+          columnGap: 0,
+          paddingLeft: '2px'  // Match month heading alignment
+        }}
+      >
         {Object.values(weeks).flatMap(week =>
           week.map(date => (
             <DayCell
@@ -739,7 +761,10 @@ const MonthGrid: React.FC<MonthGridProps> = ({
               selectedRange={selectedRange}
               isCurrentMonth={isSameMonth(date, baseDate)}
               onMouseDown={() => onSelectionStart(date)}
-              onMouseEnter={() => onSelectionMove(date)}
+              onMouseEnter={() => {
+                onSelectionMove(date);
+                setHoveredDate(date);
+              }}
               showTooltips={showTooltips}
               renderContent={renderDay}
               layer={layer}
@@ -753,6 +778,37 @@ const MonthGrid: React.FC<MonthGridProps> = ({
           <div key={`empty-${i}`} style={{ backgroundColor: "white" }} />
         ))}
       </div>
+
+      {/* Tooltip at grid level */}
+      {hoveredDate && restrictionConfig?.restrictions && document.hasFocus() && (
+        (() => {
+          const result = restrictionManager.checkSelection(hoveredDate, hoveredDate);
+          if (!result.allowed && result.message) {
+            return (
+              <div
+                style={{
+                  position: 'fixed',
+                  left: mousePosition.x,
+                  top: mousePosition.y,
+                  backgroundColor: 'rgba(220, 53, 69, 0.9)',
+                  color: 'white',
+                  padding: '8px 12px',
+                  borderRadius: '4px',
+                  fontSize: '13px',
+                  pointerEvents: 'none',
+                  zIndex: 1000,
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                  maxWidth: '250px',
+                  whiteSpace: 'pre-line'
+                }}
+              >
+                {result.message}
+              </div>
+            );
+          }
+          return null;
+        })()
+      )}
     </div>
   );
 };
@@ -793,7 +849,6 @@ const DayCell = ({
   }, [date, selectedRange.start, selectedRange.end]);
 
   const [isHovered, setIsHovered] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   
   const restrictionManager = useMemo(() => 
     new RestrictionManager(restrictionConfig ?? { restrictions: [] }), 
@@ -808,13 +863,6 @@ const DayCell = ({
   const handleMouseEnter = (e) => {
     setIsHovered(true);
     onMouseEnter?.(e);
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    setMousePosition({
-      x: e.clientX + 10,
-      y: e.clientY + 10
-    });
   };
 
   const handleMouseLeave = () => {
@@ -845,7 +893,6 @@ const DayCell = ({
       className={!restrictionResult.allowed ? 'restricted-date-pattern' : ''}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      onMouseMove={handleMouseMove}
       onMouseDown={onMouseDown}
       style={{
         width: "100%",
@@ -865,29 +912,6 @@ const DayCell = ({
         boxSizing: "border-box",
       }}
     >
-      {/* Restriction Tooltip */}
-      {isHovered && !restrictionResult.allowed && restrictionResult.message && (
-        <div
-          style={{
-            position: 'fixed',
-            left: mousePosition.x,
-            top: mousePosition.y,
-            backgroundColor: 'rgba(220, 53, 69, 0.9)',
-            color: 'white',
-            padding: '8px 12px',
-            borderRadius: '4px',
-            fontSize: '13px',
-            pointerEvents: 'none',
-            zIndex: 1000,
-            boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-            maxWidth: '250px',
-            whiteSpace: 'pre-line'  // This will respect the newlines in the message
-          }}
-        >
-          {restrictionResult.message}
-        </div>
-      )}
-
       <div style={{ 
         position: 'absolute',
         inset: 0,
