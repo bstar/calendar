@@ -1250,6 +1250,7 @@ function App() {
   const handleExport = () => {
     const exportConfig = {
       ...settings,
+      restrictionConfig,
       // Remove any internal or unnecessary fields
       isOpen: undefined
     };
@@ -1263,7 +1264,7 @@ function App() {
     });
   };
 
-  // Update the import handler to properly process the configuration
+  // Update the import handler to handle restrictions
   const handleImport = (configText) => {
     try {
       const newConfig = JSON.parse(configText);
@@ -1283,6 +1284,11 @@ function App() {
       };
 
       setSettings(mergedConfig);
+      // Import restrictions if they exist
+      if (newConfig.restrictionConfig) {
+        setRestrictionConfig(newConfig.restrictionConfig);
+        setDraftRestrictionConfig(newConfig.restrictionConfig);
+      }
       setShowImportModal(false);
     } catch (e) {
       console.error('Import error:', e);
