@@ -396,24 +396,6 @@ function App() {
             message: 'This date range is restricted'
           }
         ]
-      },
-      {
-        type: 'boundary',
-        enabled: true,
-        date: '2025-02-15',
-        direction: 'before',
-        message: 'Cannot select dates before February 15, 2025'
-      },
-      {
-        type: 'allowedranges',
-        enabled: true,
-        ranges: [
-          {
-            start: '2025-02-02',
-            end: '2025-02-25',
-            message: 'Selection must be within allowed date range'
-          }
-        ]
       }
     ]
   });
