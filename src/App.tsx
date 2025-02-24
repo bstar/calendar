@@ -383,7 +383,7 @@ function App() {
     isOpen: true
   });
 
-  const [activeTab, setActiveTab] = useState('settings');
+  const [activeTab, setActiveTab] = useState('core');
   const [restrictionConfig, setRestrictionConfig] = useState<RestrictionConfig>({
     restrictions: [
       {
