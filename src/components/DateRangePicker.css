@@ -299,5 +299,6 @@
     rgba(255, 255, 255, 0.8) 5px
   );
   background-size: 7.07px 7.07px; /* 5px * √2 to ensure perfect 45° alignment */
-  background-position: 0 0; /* Ensure pattern starts from top-left corner */
+  background-attachment: fixed; /* Make pattern relative to viewport */
+  background-position: center; /* Center the pattern */
 } 
