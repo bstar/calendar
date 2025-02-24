@@ -869,6 +869,12 @@ const DayCell = ({
     setIsHovered(false);
   };
 
+  const isSingleDay = useMemo(() => {
+    if (!selectedRange.start) return false;
+    if (!selectedRange.end) return true;
+    return isSameDay(parseISO(selectedRange.start), parseISO(selectedRange.end));
+  }, [selectedRange.start, selectedRange.end]);
+
   if (!isCurrentMonth) {
     return <div style={{ width: "100%", height: "100%", position: "relative", backgroundColor: "white" }} />;
   }
@@ -903,13 +909,20 @@ const DayCell = ({
         alignItems: "center",
         justifyContent: "center",
         backgroundColor: (isSelected || isInRange) ? "#b1e4e5" : getBackgroundColor(),
-        borderRadius: isRangeStart || isRangeEnd ? 
-          `${isRangeStart ? "15px" : "0"} ${isRangeEnd ? "15px" : "0"} ${isRangeEnd ? "15px" : "0"} ${isRangeStart ? "15px" : "0"}`
-          : "0",
+        borderRadius: isSingleDay && (isSelected || isInRange) ? "50%" : (
+          isRangeStart || isRangeEnd ? 
+            `${isRangeStart ? "15px" : "0"} ${isRangeEnd ? "15px" : "0"} ${isRangeEnd ? "15px" : "0"} ${isRangeStart ? "15px" : "0"}`
+            : "0"
+        ),
         fontWeight: isSelected ? "600" : "normal",
         margin: 0,
         padding: 0,
         boxSizing: "border-box",
+        ...(isSingleDay && (isSelected || isInRange) ? {
+          width: "36px",
+          height: "36px",
+          margin: "auto"
+        } : {})
       }}
     >
       <div style={{ 
