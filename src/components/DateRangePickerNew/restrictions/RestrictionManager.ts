@@ -52,6 +52,35 @@ export class RestrictionManager {
           }
         }
       }
+
+      // Handle allowed ranges restrictions
+      if (restriction.type === 'allowedranges' && restriction.ranges.length > 0) {
+        let isAllowed = false;
+        let message = restriction.ranges[0]?.message || 'Selection must be within allowed ranges';
+        
+        for (const range of restriction.ranges) {
+          const rangeStart = parseISO(range.start);
+          const rangeEnd = parseISO(range.end);
+          
+          if (!isValid(rangeStart) || !isValid(rangeEnd)) continue;
+
+          // Check if both start and end dates fall within this allowed range
+          const startAllowed = start >= rangeStart && start <= rangeEnd;
+          const endAllowed = end >= rangeStart && end <= rangeEnd;
+          
+          if (startAllowed && endAllowed) {
+            isAllowed = true;
+            break;
+          }
+        }
+
+        if (!isAllowed) {
+          return {
+            allowed: false,
+            message
+          };
+        }
+      }
     }
 
     return { allowed: true };

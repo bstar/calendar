@@ -403,6 +403,17 @@ function App() {
         date: '2025-02-15',
         direction: 'before',
         message: 'Cannot select dates before February 15, 2025'
+      },
+      {
+        type: 'allowedranges',
+        enabled: true,
+        ranges: [
+          {
+            start: '2025-02-02',
+            end: '2025-02-25',
+            message: 'Selection must be within allowed date range'
+          }
+        ]
       }
     ]
   });
@@ -1020,13 +1031,20 @@ function App() {
                           ? { type: 'daterange', enabled: true, ranges: [] }
                           : newType === 'boundary'
                           ? { type: 'boundary', enabled: true, date: '', direction: 'before', message: '' }
+                          : newType === 'allowedranges'
+                          ? { type: 'allowedranges', enabled: true, ranges: [] }
                           : { ...restriction, type: newType };
                         setDraftRestrictionConfig({ restrictions: newRestrictions });
                       }}
-                      style={{ ...styles.select, width: 'auto', minWidth: '150px' }}
+                      style={{
+                        ...styles.select,
+                        minWidth: '160px',
+                        width: 'auto'
+                      }}
                     >
                       <option value="daterange">Date Range</option>
                       <option value="boundary">Date Boundary</option>
+                      <option value="allowedranges">Allowed Ranges</option>
                     </select>
 
                     <label style={{ 
@@ -1068,9 +1086,11 @@ function App() {
                   </div>
                 </div>
 
-                {restriction.type === 'daterange' && (
+                {(restriction.type === 'daterange' || restriction.type === 'allowedranges') && (
                   <div>
-                    <h4 style={styles.subheading}>Date Ranges</h4>
+                    <h4 style={styles.subheading}>
+                      {restriction.type === 'daterange' ? 'Restricted Ranges' : 'Allowed Ranges'}
+                    </h4>
                     {restriction.ranges.map((range, rangeIndex) => (
                       <div key={rangeIndex} style={{ marginBottom: '12px', padding: '8px', border: '1px solid #dee2e6' }}>
                         <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
@@ -1085,7 +1105,7 @@ function App() {
                                 newRanges[rangeIndex] = { ...range, start: e.target.value };
                                 setDraftRestrictionConfig(prev => ({
                                   restrictions: prev.restrictions.map(r =>
-                                    r.type === 'daterange' ? { ...r, ranges: newRanges } : r
+                                    r === restriction ? { ...r, ranges: newRanges } : r
                                   )
                                 }));
                               }}
@@ -1103,7 +1123,7 @@ function App() {
                                 newRanges[rangeIndex] = { ...range, end: e.target.value };
                                 setDraftRestrictionConfig(prev => ({
                                   restrictions: prev.restrictions.map(r =>
-                                    r.type === 'daterange' ? { ...r, ranges: newRanges } : r
+                                    r === restriction ? { ...r, ranges: newRanges } : r
                                   )
                                 }));
                               }}
@@ -1120,7 +1140,7 @@ function App() {
                             newRanges[rangeIndex] = { ...range, message: e.target.value };
                             setDraftRestrictionConfig(prev => ({
                               restrictions: prev.restrictions.map(r =>
-                                r.type === 'daterange' ? { ...r, ranges: newRanges } : r
+                                r === restriction ? { ...r, ranges: newRanges } : r
                               )
                             }));
                           }}
@@ -1132,7 +1152,7 @@ function App() {
                             newRanges.splice(rangeIndex, 1);
                             setDraftRestrictionConfig(prev => ({
                               restrictions: prev.restrictions.map(r =>
-                                r.type === 'daterange' ? { ...r, ranges: newRanges } : r
+                                r === restriction ? { ...r, ranges: newRanges } : r
                               )
                             }));
                           }}
@@ -1144,13 +1164,16 @@ function App() {
                     ))}
                     <button
                       onClick={() => {
-                        const newRanges = [...restriction.ranges];
-                        newRanges.push({ start: '', end: '', message: '' });
-                        setDraftRestrictionConfig(prev => ({
-                          restrictions: prev.restrictions.map(r =>
-                            r.type === 'daterange' ? { ...r, ranges: newRanges } : r
-                          )
-                        }));
+                        const newRestrictions = [...draftRestrictionConfig.restrictions];
+                        const newRanges = [
+                          ...newRestrictions[restrictionIndex].ranges,
+                          { start: '', end: '', message: '' }
+                        ];
+                        newRestrictions[restrictionIndex] = {
+                          ...restriction,
+                          ranges: newRanges
+                        };
+                        setDraftRestrictionConfig({ restrictions: newRestrictions });
                       }}
                       style={styles.button}
                     >
