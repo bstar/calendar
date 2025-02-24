@@ -975,7 +975,7 @@ function App() {
         );
       case 'restrictions':
         return (
-          <div style={{ padding: '16px' }}>
+          <div style={{ display: 'grid', gap: '12px' }}>
             <div style={{ marginBottom: '16px' }}>
               <button
                 onClick={() => setDraftRestrictionConfig(prev => ({
@@ -996,50 +996,66 @@ function App() {
 
             {draftRestrictionConfig.restrictions.map((restriction, restrictionIndex) => (
               <div key={restrictionIndex} style={{ marginBottom: '24px', padding: '16px', border: '1px solid #dee2e6' }}>
-                <div style={{ marginBottom: '16px', display: 'flex', gap: '16px', alignItems: 'center' }}>
-                  <select
-                    value={restriction.type}
-                    onChange={(e) => {
-                      const newRestrictions = [...draftRestrictionConfig.restrictions];
-                      // Handle type change when we add more types
-                      newRestrictions[restrictionIndex] = {
-                        ...restriction,
-                        type: e.target.value
-                      };
-                      setDraftRestrictionConfig({ restrictions: newRestrictions });
-                    }}
-                    style={styles.select}
-                  >
-                    <option value="readonly">Read Only</option>
-                  </select>
-
-                  <label style={styles.label}>
-                    <input
-                      type="checkbox"
-                      checked={restriction.enabled}
+                <div style={{ 
+                  marginBottom: '16px', 
+                  display: 'flex', 
+                  gap: '16px', 
+                  alignItems: 'center',
+                  justifyContent: 'space-between' 
+                }}>
+                  <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                    <select
+                      value={restriction.type}
                       onChange={(e) => {
                         const newRestrictions = [...draftRestrictionConfig.restrictions];
                         newRestrictions[restrictionIndex] = {
                           ...restriction,
-                          enabled: e.target.checked
+                          type: e.target.value
                         };
                         setDraftRestrictionConfig({ restrictions: newRestrictions });
                       }}
-                    />
-                    Enable
-                  </label>
+                      style={{ ...styles.select, width: 'auto', minWidth: '150px' }}
+                    >
+                      <option value="readonly">Read Only</option>
+                    </select>
 
-                  <button
-                    onClick={() => {
-                      const newRestrictions = draftRestrictionConfig.restrictions.filter(
-                        (_, index) => index !== restrictionIndex
-                      );
-                      setDraftRestrictionConfig({ restrictions: newRestrictions });
-                    }}
-                    style={styles.button}
-                  >
-                    Remove
-                  </button>
+                    <label style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '8px',
+                      margin: 0,
+                      fontSize: '14px',
+                      color: '#444'
+                    }}>
+                      <input
+                        type="checkbox"
+                        checked={restriction.enabled}
+                        onChange={(e) => {
+                          const newRestrictions = [...draftRestrictionConfig.restrictions];
+                          newRestrictions[restrictionIndex] = {
+                            ...restriction,
+                            enabled: e.target.checked
+                          };
+                          setDraftRestrictionConfig({ restrictions: newRestrictions });
+                        }}
+                      />
+                      Enable
+                    </label>
+                  </div>
+
+                  <div>
+                    <button
+                      onClick={() => {
+                        const newRestrictions = draftRestrictionConfig.restrictions.filter(
+                          (_, index) => index !== restrictionIndex
+                        );
+                        setDraftRestrictionConfig({ restrictions: newRestrictions });
+                      }}
+                      style={styles.button}
+                    >
+                      Remove
+                    </button>
+                  </div>
                 </div>
 
                 {restriction.type === 'readonly' && (
