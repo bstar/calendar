@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface NotificationProps {
   message: string;
@@ -11,14 +11,36 @@ export const Notification: React.FC<NotificationProps> = ({
   onDismiss, 
   duration = 3000 
 }) => {
+  const [isFading, setIsFading] = useState(false);
+
   useEffect(() => {
-    const timer = setTimeout(onDismiss, duration);
-    return () => clearTimeout(timer);
+    const fadeTimer = setTimeout(() => {
+      setIsFading(true);
+    }, duration - 300); // Start fade out 300ms before dismissal
+
+    const dismissTimer = setTimeout(() => {
+      onDismiss();
+    }, duration);
+
+    return () => {
+      clearTimeout(fadeTimer);
+      clearTimeout(dismissTimer);
+    };
   }, [duration, onDismiss]);
 
   return (
-    <div className="cla-notification">
-      {message}
+    <div className={`cla-notification ${isFading ? 'fade-out' : ''}`}>
+      <span className="cla-notification-message">{message}</span>
+      <button 
+        className="cla-notification-dismiss" 
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsFading(true);
+          setTimeout(onDismiss, 300); // Wait for fade out animation
+        }}
+      >
+        ×
+      </button>
     </div>
   );
 }; 
