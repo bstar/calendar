@@ -1454,27 +1454,43 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     );
   };
 
-  const isDateRestricted = (date: Date, restrictionConfig?: RestrictionConfig): boolean => {
-    if (!restrictionConfig?.enabled || !restrictionConfig.readOnlyRanges) return false;
-    
-    return restrictionConfig.readOnlyRanges.some(range => {
-      const rangeStart = parseISO(range.start);
-      const rangeEnd = parseISO(range.end);
-      return date >= rangeStart && date <= rangeEnd;
-    });
-  };
-
   // Create background data from restrictions
   const restrictionBackgroundData = useMemo(() => {
-    if (!restrictionConfig?.enabled || !restrictionConfig.readOnlyRanges) {
+    if (!restrictionConfig?.restrictions) {
       return [];
     }
     
-    return restrictionConfig.readOnlyRanges.map(range => ({
-      startDate: range.start,
-      endDate: range.end,
-      className: 'restricted-date-pattern'
-    }));
+    return restrictionConfig.restrictions.flatMap(restriction => {
+      // Skip disabled restrictions
+      if (!restriction.enabled) return [];
+      
+      // Handle boundary restrictions
+      if (restriction.type === 'boundary') {
+        const boundaryDate = parseISO(restriction.date);
+        if (!isValid(boundaryDate)) return [];
+        
+        return [{
+          startDate: restriction.direction === 'before' 
+            ? '1900-01-01' 
+            : restriction.date,
+          endDate: restriction.direction === 'before' 
+            ? restriction.date 
+            : '2100-12-31',
+          className: 'restricted-date-pattern'
+        }];
+      }
+
+      // Handle readonly restrictions
+      if (restriction.type === 'readonly') {
+        return restriction.ranges.map(range => ({
+          startDate: range.start,
+          endDate: range.end,
+          className: 'restricted-date-pattern'
+        }));
+      }
+
+      return [];
+    });
   }, [restrictionConfig]);
   
   // Update layers with restriction background
@@ -1497,6 +1513,37 @@ const CLACalendar: React.FC<CalendarSettings> = ({
       })
     );
   }, [restrictionBackgroundData]);
+
+  // Update isDateRestricted to handle both types
+  const isDateRestricted = (date: Date, restrictionConfig?: RestrictionConfig): boolean => {
+    if (!restrictionConfig?.restrictions) return false;
+    
+    return restrictionConfig.restrictions.some(restriction => {
+      if (!restriction.enabled) return false;
+
+      // Check boundary restrictions
+      if (restriction.type === 'boundary') {
+        const boundaryDate = parseISO(restriction.date);
+        if (!isValid(boundaryDate)) return false;
+        
+        return restriction.direction === 'before' 
+          ? date < boundaryDate 
+          : date > boundaryDate;
+      }
+
+      // Check readonly restrictions
+      if (restriction.type === 'readonly') {
+        return restriction.ranges.some(range => {
+          const rangeStart = parseISO(range.start);
+          const rangeEnd = parseISO(range.end);
+          return isValid(rangeStart) && isValid(rangeEnd) && 
+                 date >= rangeStart && date <= rangeEnd;
+        });
+      }
+
+      return false;
+    });
+  };
 
   return (
     <div className="cla-calendar" style={{ width: 'fit-content' }}>

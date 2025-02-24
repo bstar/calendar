@@ -1,4 +1,4 @@
-export type RestrictionType = 'readonly' | 'custom_future_types';
+export type RestrictionType = 'readonly' | 'boundary' | 'custom_future_types';
 
 export interface BaseRestriction {
   type: RestrictionType;
@@ -14,8 +14,15 @@ export interface ReadOnlyRestriction extends BaseRestriction {
   }[];
 }
 
+export interface BoundaryRestriction extends BaseRestriction {
+  type: 'boundary';
+  date: string;  // YYYY-MM-DD format
+  direction: 'before' | 'after';
+  message: string;
+}
+
 // Union type for all restriction types
-export type Restriction = ReadOnlyRestriction; // Add more types as needed
+export type Restriction = ReadOnlyRestriction | BoundaryRestriction;
 
 export interface RestrictionConfig {
   restrictions: Restriction[];

@@ -396,6 +396,13 @@ function App() {
             message: 'This date range is read-only for testing'
           }
         ]
+      },
+      {
+        type: 'boundary',
+        enabled: true,
+        date: '2025-02-15',
+        direction: 'before',
+        message: 'Cannot select dates before February 15, 2025'
       }
     ]
   });
@@ -1008,15 +1015,18 @@ function App() {
                       value={restriction.type}
                       onChange={(e) => {
                         const newRestrictions = [...draftRestrictionConfig.restrictions];
-                        newRestrictions[restrictionIndex] = {
-                          ...restriction,
-                          type: e.target.value
-                        };
+                        const newType = e.target.value as RestrictionType;
+                        newRestrictions[restrictionIndex] = newType === 'readonly' 
+                          ? { type: 'readonly', enabled: true, ranges: [] }
+                          : newType === 'boundary'
+                          ? { type: 'boundary', enabled: true, date: '', direction: 'before', message: '' }
+                          : { ...restriction, type: newType };
                         setDraftRestrictionConfig({ restrictions: newRestrictions });
                       }}
                       style={{ ...styles.select, width: 'auto', minWidth: '150px' }}
                     >
                       <option value="readonly">Read Only</option>
+                      <option value="boundary">Date Boundary</option>
                     </select>
 
                     <label style={{ 
@@ -1146,6 +1156,62 @@ function App() {
                     >
                       Add Range
                     </button>
+                  </div>
+                )}
+                {restriction.type === 'boundary' && (
+                  <div>
+                    <h4 style={styles.subheading}>Date Boundary</h4>
+                    <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                      <div style={{ flex: 1 }}>
+                        <label style={styles.label}>Boundary Date</label>
+                        <input
+                          type="text"
+                          placeholder="YYYY-MM-DD"
+                          value={restriction.date}
+                          onChange={(e) => {
+                            const newRestrictions = [...draftRestrictionConfig.restrictions];
+                            newRestrictions[restrictionIndex] = {
+                              ...restriction,
+                              date: e.target.value
+                            };
+                            setDraftRestrictionConfig({ restrictions: newRestrictions });
+                          }}
+                          style={styles.input}
+                        />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <label style={styles.label}>Direction</label>
+                        <select
+                          value={restriction.direction}
+                          onChange={(e) => {
+                            const newRestrictions = [...draftRestrictionConfig.restrictions];
+                            newRestrictions[restrictionIndex] = {
+                              ...restriction,
+                              direction: e.target.value as 'before' | 'after'
+                            };
+                            setDraftRestrictionConfig({ restrictions: newRestrictions });
+                          }}
+                          style={styles.select}
+                        >
+                          <option value="before">Before Date</option>
+                          <option value="after">After Date</option>
+                        </select>
+                      </div>
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Message when selection is restricted"
+                      value={restriction.message}
+                      onChange={(e) => {
+                        const newRestrictions = [...draftRestrictionConfig.restrictions];
+                        newRestrictions[restrictionIndex] = {
+                          ...restriction,
+                          message: e.target.value
+                        };
+                        setDraftRestrictionConfig({ restrictions: newRestrictions });
+                      }}
+                      style={styles.input}
+                    />
                   </div>
                 )}
               </div>
