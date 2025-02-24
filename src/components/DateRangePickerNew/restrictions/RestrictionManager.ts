@@ -35,8 +35,8 @@ export class RestrictionManager {
         }
       }
 
-      // Handle readonly restrictions
-      if (restriction.type === 'readonly') {
+      // Handle date range restrictions
+      if (restriction.type === 'daterange') {
         for (const range of restriction.ranges) {
           const rangeStart = parseISO(range.start);
           const rangeEnd = parseISO(range.end);

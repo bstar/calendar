@@ -1,12 +1,12 @@
-export type RestrictionType = 'readonly' | 'boundary' | 'custom_future_types';
+export type RestrictionType = 'daterange' | 'boundary' | 'custom_future_types';
 
 export interface BaseRestriction {
   type: RestrictionType;
   enabled: boolean;
 }
 
-export interface ReadOnlyRestriction extends BaseRestriction {
-  type: 'readonly';
+export interface DateRangeRestriction extends BaseRestriction {
+  type: 'daterange';
   ranges: {
     start: string;  // YYYY-MM-DD format
     end: string;    // YYYY-MM-DD format
@@ -22,7 +22,7 @@ export interface BoundaryRestriction extends BaseRestriction {
 }
 
 // Union type for all restriction types
-export type Restriction = ReadOnlyRestriction | BoundaryRestriction;
+export type Restriction = DateRangeRestriction | BoundaryRestriction;
 
 export interface RestrictionConfig {
   restrictions: Restriction[];

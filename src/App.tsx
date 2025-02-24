@@ -387,13 +387,13 @@ function App() {
   const [restrictionConfig, setRestrictionConfig] = useState<RestrictionConfig>({
     restrictions: [
       {
-        type: 'readonly',
+        type: 'daterange',
         enabled: true,
         ranges: [
           {
             start: '2025-01-01',
             end: '2025-01-15',
-            message: 'This date range is read-only for testing'
+            message: 'This date range is restricted'
           }
         ]
       },
@@ -989,7 +989,7 @@ function App() {
                   restrictions: [
                     ...prev.restrictions,
                     {
-                      type: 'readonly',
+                      type: 'daterange',
                       enabled: true,
                       ranges: []
                     }
@@ -1016,8 +1016,8 @@ function App() {
                       onChange={(e) => {
                         const newRestrictions = [...draftRestrictionConfig.restrictions];
                         const newType = e.target.value as RestrictionType;
-                        newRestrictions[restrictionIndex] = newType === 'readonly' 
-                          ? { type: 'readonly', enabled: true, ranges: [] }
+                        newRestrictions[restrictionIndex] = newType === 'daterange' 
+                          ? { type: 'daterange', enabled: true, ranges: [] }
                           : newType === 'boundary'
                           ? { type: 'boundary', enabled: true, date: '', direction: 'before', message: '' }
                           : { ...restriction, type: newType };
@@ -1025,7 +1025,7 @@ function App() {
                       }}
                       style={{ ...styles.select, width: 'auto', minWidth: '150px' }}
                     >
-                      <option value="readonly">Read Only</option>
+                      <option value="daterange">Date Range</option>
                       <option value="boundary">Date Boundary</option>
                     </select>
 
@@ -1068,9 +1068,9 @@ function App() {
                   </div>
                 </div>
 
-                {restriction.type === 'readonly' && (
+                {restriction.type === 'daterange' && (
                   <div>
-                    <h4 style={styles.subheading}>Read-only Ranges</h4>
+                    <h4 style={styles.subheading}>Date Ranges</h4>
                     {restriction.ranges.map((range, rangeIndex) => (
                       <div key={rangeIndex} style={{ marginBottom: '12px', padding: '8px', border: '1px solid #dee2e6' }}>
                         <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
@@ -1085,7 +1085,7 @@ function App() {
                                 newRanges[rangeIndex] = { ...range, start: e.target.value };
                                 setDraftRestrictionConfig(prev => ({
                                   restrictions: prev.restrictions.map(r =>
-                                    r.type === 'readonly' ? { ...r, ranges: newRanges } : r
+                                    r.type === 'daterange' ? { ...r, ranges: newRanges } : r
                                   )
                                 }));
                               }}
@@ -1103,7 +1103,7 @@ function App() {
                                 newRanges[rangeIndex] = { ...range, end: e.target.value };
                                 setDraftRestrictionConfig(prev => ({
                                   restrictions: prev.restrictions.map(r =>
-                                    r.type === 'readonly' ? { ...r, ranges: newRanges } : r
+                                    r.type === 'daterange' ? { ...r, ranges: newRanges } : r
                                   )
                                 }));
                               }}
@@ -1120,7 +1120,7 @@ function App() {
                             newRanges[rangeIndex] = { ...range, message: e.target.value };
                             setDraftRestrictionConfig(prev => ({
                               restrictions: prev.restrictions.map(r =>
-                                r.type === 'readonly' ? { ...r, ranges: newRanges } : r
+                                r.type === 'daterange' ? { ...r, ranges: newRanges } : r
                               )
                             }));
                           }}
@@ -1132,7 +1132,7 @@ function App() {
                             newRanges.splice(rangeIndex, 1);
                             setDraftRestrictionConfig(prev => ({
                               restrictions: prev.restrictions.map(r =>
-                                r.type === 'readonly' ? { ...r, ranges: newRanges } : r
+                                r.type === 'daterange' ? { ...r, ranges: newRanges } : r
                               )
                             }));
                           }}
@@ -1148,7 +1148,7 @@ function App() {
                         newRanges.push({ start: '', end: '', message: '' });
                         setDraftRestrictionConfig(prev => ({
                           restrictions: prev.restrictions.map(r =>
-                            r.type === 'readonly' ? { ...r, ranges: newRanges } : r
+                            r.type === 'daterange' ? { ...r, ranges: newRanges } : r
                           )
                         }));
                       }}
