@@ -831,7 +831,7 @@ const DayCell = ({
   ) || [];
 
   const restrictionManager = useMemo(() => 
-    new RestrictionManager(restrictionConfig || { enabled: false, readOnlyRanges: [] }), 
+    new RestrictionManager(restrictionConfig ?? { enabled: true, readOnlyRanges: [] }), 
     [restrictionConfig]
   );
   
@@ -842,6 +842,7 @@ const DayCell = ({
 
   const dayCell = (
     <div
+      className={isRestricted ? 'restricted-date-pattern' : ''}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onMouseDown={onMouseDown}
@@ -1474,6 +1475,40 @@ const CLACalendar: React.FC<CalendarSettings> = ({
       return date >= rangeStart && date <= rangeEnd;
     });
   };
+
+  // Create background data from restrictions
+  const restrictionBackgroundData = useMemo(() => {
+    if (!restrictionConfig?.enabled || !restrictionConfig.readOnlyRanges) {
+      return [];
+    }
+    
+    return restrictionConfig.readOnlyRanges.map(range => ({
+      startDate: range.start,
+      endDate: range.end,
+      className: 'restricted-date-pattern'
+    }));
+  }, [restrictionConfig]);
+  
+  // Update layers with restriction background
+  useEffect(() => {
+    setActiveLayers(prevLayers => 
+      prevLayers.map(layer => {
+        if (layer.name === 'Calendar') {
+          return {
+            ...layer,
+            data: {
+              ...layer.data,
+              background: [
+                ...(layer.data?.background || []),
+                ...restrictionBackgroundData
+              ]
+            }
+          };
+        }
+        return layer;
+      })
+    );
+  }, [restrictionBackgroundData]);
 
   return (
     <div className="cla-calendar" style={{ width: 'fit-content' }}>
