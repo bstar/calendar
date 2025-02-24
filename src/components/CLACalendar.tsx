@@ -958,40 +958,32 @@ const MonthPair = ({
   );
 };
 
-const SideChevronIndicator = ({ outOfBoundsDirection, isSelecting }) => {
+const SideChevronIndicator: React.FC<SideChevronIndicatorProps> = ({ outOfBoundsDirection, isSelecting }) => {
   if (!outOfBoundsDirection || !isSelecting) return null;
 
-  const isPrev = outOfBoundsDirection === 'prev';
-  
   return (
-    <div
-      className="side-chevron-indicator"
-      style={{
-        position: "absolute",
-        top: "50%",
-        transform: "translateY(-50%)",
-        [isPrev ? 'left' : 'right']: "-24px",
-        backgroundColor: '#fff',
-        color: "#000",
-        padding: "12px 6px",
-        height: "60px",
-        borderRadius: isPrev ? "20px 0 0 20px" : "0 20px 20px 0",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-        zIndex: 1100,
-        transition: "all 0.2s ease",
-        opacity: 0.95,
-        border: '1px solid var(--border-color)',
-        cursor: "pointer",
-        '&:hover': {
-          opacity: 1,
-          backgroundColor: 'var(--bg-hover)'
-        }
-      }}
-    >
-      {isPrev ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+    <div style={{
+      position: 'absolute',
+      top: 0,
+      bottom: 0,
+      [outOfBoundsDirection === 'prev' ? 'left' : 'right']: 0,
+      width: '40px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: 'rgba(227, 242, 253, 0.9)', // Light blue pastel with 90% opacity
+      zIndex: 9999,
+      border: '1px solid var(--border-color)',
+      cursor: "pointer",
+      '&:hover': {
+        backgroundColor: 'rgba(187, 222, 251, 0.95)' // Slightly darker with 95% opacity on hover
+      }
+    }}>
+      {outOfBoundsDirection === 'prev' ? (
+        <ChevronLeft size={24} />
+      ) : (
+        <ChevronRight size={24} />
+      )}
     </div>
   );
 };
