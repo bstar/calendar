@@ -1314,7 +1314,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
       // Only start the month changes after a delay when first entering the boundary
       if (newDirection && !outOfBoundsDirection) {
         setTimeout(() => {
-          moveToMonthRef.current(newDirection);
+          moveToMonthRef.current?.(newDirection);
         }, 1000);
       }
     }
@@ -1408,7 +1408,8 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     // Only handle out of bounds when selecting
     if (!isSelecting) return;
     
-    const containerRect = containerRef.current.getBoundingClientRect();
+    const containerRect = containerRef.current?.getBoundingClientRect();
+    if (!containerRect) return;
     const { clientX: mouseX } = e;
 
     if (mouseX < containerRect.left) {
