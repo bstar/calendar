@@ -1421,10 +1421,13 @@ function App() {
             {/* Tabs */}
             <div style={{ 
               display: 'flex', 
-              marginBottom: '16px', 
-              borderBottom: '1px solid #dee2e6' 
+              marginBottom: '16px',
+              position: 'relative',
+              maxWidth: '400px',
+              width: '100%',
+              gap: '0'
             }}>
-              {['core', 'features', 'layers', 'restrictions'].map(tab => (
+              {['core', 'features', 'layers', 'restrictions'].map((tab, index) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab as 'core' | 'features' | 'layers' | 'restrictions')}
@@ -1432,21 +1435,39 @@ function App() {
                     padding: '10px 0',
                     width: '100px',
                     border: 'none',
-                    borderBottom: activeTab === tab ? '2px solid #0366d6' : '2px solid transparent',
                     backgroundColor: 'transparent',
                     color: activeTab === tab ? '#0366d6' : '#666',
                     cursor: 'pointer',
                     fontSize: '14px',
                     fontWeight: '600',
                     transition: 'color 0.2s ease',
-                    marginRight: '8px',
                     outline: 'none',
-                    textAlign: 'center'
+                    textAlign: 'center',
+                    position: 'relative',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
                   }}
                 >
                   {tab.charAt(0).toUpperCase() + tab.slice(1)}
                 </button>
               ))}
+              {/* Single animated line */}
+              <div style={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                width: '89.5px',  // Match the actual button width
+                height: '2px',
+                backgroundColor: '#0366d6',
+                transform: `translateX(${(index => {
+                  const buttonWidth = 89.5;  // Actual width of each button (400px / 4)
+                  const buttonIndex = ['core', 'features', 'layers', 'restrictions'].indexOf(activeTab);
+                  return buttonIndex * buttonWidth;  // No need for centering since line width matches button
+                })()}px)`,
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                willChange: 'transform'
+              }} />
             </div>
           </div>
 
