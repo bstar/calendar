@@ -1208,7 +1208,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     };
   }, [isSelecting, outOfBoundsDirection, enableOutOfBoundsScroll]);
 
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+  const handleMouseMove = useCallback((e: MouseEvent) => {
     e.preventDefault();
     if (!isSelecting || !containerRef.current) return;
 
@@ -1225,7 +1225,6 @@ const CLACalendar: React.FC<CalendarSettings> = ({
 
     if (newDirection !== outOfBoundsDirection) {
       setOutOfBoundsDirection(newDirection);
-      // Only start the month changes after a delay when first entering the boundary
       if (newDirection && !outOfBoundsDirection) {
         setTimeout(() => {
           moveToMonthRef.current?.(newDirection);
@@ -1236,20 +1235,18 @@ const CLACalendar: React.FC<CalendarSettings> = ({
 
   const handleMouseUp = useCallback(() => {
     setIsSelecting(false);
-    console.log('ending selection');
     setOutOfBoundsDirection(null);
 
     const styles = ['userSelect', 'webkitUserSelect', 'mozUserSelect', 'msUserSelect'];
     styles.forEach(style => document.body.style[style] = '');
 
-    document.removeEventListener("mousemove", handleMouseMove);
+    document.removeEventListener("mousemove", handleMouseMove as EventListener);
     document.removeEventListener("mouseup", handleMouseUp);
 
-    // Ensure out of bounds indicators are cleared
     setOutOfBoundsDirection(null);
   }, [handleMouseMove]);
 
-  const handleMouseDown = useCallback(e => {
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (isSelecting) return;
     e.preventDefault();
 
@@ -1259,10 +1256,9 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     };
 
     setIsSelecting(true);
-    console.log('starting selection');
     setUserSelectNone();
 
-    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mousemove", handleMouseMove as EventListener);
     document.addEventListener("mouseup", handleMouseUp);
   }, [isSelecting, handleMouseMove, handleMouseUp]);
 
@@ -1495,7 +1491,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
         if (showSelectionAlert) {
           setNotification('Cannot select restricted dates');
         }
-        document.removeEventListener("mousemove", handleMouseMove);
+        document.removeEventListener("mousemove", handleMouseMove as EventListener);
         document.removeEventListener("mouseup", handleMouseUp);
         return;
       }
