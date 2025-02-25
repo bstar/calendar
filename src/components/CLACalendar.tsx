@@ -1729,7 +1729,9 @@ const CLACalendar: React.FC<CalendarSettings> = ({
           {showFooter && (
             <div className="cla-card-footer" style={{ 
               padding: '16px',
-              borderTop: 'none' // Force remove any border
+              borderTop: 'none', // Force remove any border
+              display: 'flex',
+              justifyContent: 'space-between'
             }}>
               <Button
                 variant="primary"
@@ -1737,15 +1739,16 @@ const CLACalendar: React.FC<CalendarSettings> = ({
               >
                 Clear
               </Button>
-              {showSubmitButton && (
-                <Button
-                  variant="primary"
-                  onClick={handleSubmit}
-                  style={{ marginLeft: '8px' }}
-                >
-                  Submit
-                </Button>
-              )}
+              <div>
+                {showSubmitButton && (
+                  <Button
+                    variant="primary"
+                    onClick={handleSubmit}
+                  >
+                    Submit
+                  </Button>
+                )}
+              </div>
             </div>
           )}
 

@@ -1054,6 +1054,32 @@ function App() {
                 ))}
               </tbody>
             </table>
+            <div style={{
+              marginTop: '24px',
+              display: 'flex',
+              justifyContent: 'flex-end'
+            }}>
+              <button
+                onClick={() => {
+                  // Handle submit if needed
+                }}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: '#0366d6',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  '&:hover': {
+                    backgroundColor: '#0256b9'
+                  }
+                } as ExtendedCSSProperties}
+              >
+                Apply Changes
+              </button>
+            </div>
           </div>
         );
       case 'layers':
