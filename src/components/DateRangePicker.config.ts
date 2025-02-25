@@ -187,7 +187,7 @@ export interface SettingsConfig {
     controls: Record<string, SettingControl>;
     actions: {
       canAdd: boolean;
-      canRemove: boolean;
+      canRemove: ((layer: Layer) => boolean) | boolean;
       newLayerTemplate: Omit<Layer, 'features'> & { data: any[] };
     };
   };
@@ -396,7 +396,7 @@ export const SETTINGS: SettingsConfig = {
     },
     actions: {
       canAdd: true,
-      canRemove: (layer: Layer) => !layer.required,  // Only prevent removing required layer
+      canRemove: ((layer: Layer) => !layer.required) as ((layer: Layer) => boolean),
       newLayerTemplate: {
         name: '',
         title: '',

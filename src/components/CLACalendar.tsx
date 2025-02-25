@@ -221,9 +221,16 @@ const dateValidator = (() => {
   };
 })();
 
+// Add type for validation error
+interface ValidationError {
+  message: string;
+  type: string;
+  field: string;
+}
+
 const DateInput = ({ value, onChange, field, placeholder, context, selectedRange }) => {
   const [inputValue, setInputValue] = useState('');
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<ValidationError | null>(null);
   const [showError, setShowError] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showIndicator, setShowIndicator] = useState<'success' | 'error' | null>(null);
@@ -404,7 +411,7 @@ const DateInput = ({ value, onChange, field, placeholder, context, selectedRange
           transition: 'height 0.2s ease-in-out, margin-top 0.2s ease-in-out',
         }}
       >
-        {error?.message}
+        {(error as ValidationError)?.message}
       </div>
     </div>
   );
@@ -1059,6 +1066,13 @@ const Button: React.FC<ButtonProps> = ({ variant, children, className, ...props 
   </button>
 );
 
+// Add interface for restriction background data
+interface RestrictionBackgroundData {
+  startDate: string;
+  endDate: string;
+  color: string;
+}
+
 const CLACalendar: React.FC<CalendarSettings> = ({
   displayMode = 'popup',
   containerStyle = null,
@@ -1092,7 +1106,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     endDate: null,
     currentField: null
   });
-  const [validationErrors, setValidationErrors] = useState({});
+  const [validationErrors, setValidationErrors] = useState<Record<string, ValidationError>>({});
   const [activeLayers, setActiveLayers] = useState(initialLayers);
   const [activeLayer, setActiveLayer] = useState(defaultLayer);
   const [notification, setNotification] = useState<string | null>(null);
@@ -1392,7 +1406,11 @@ const CLACalendar: React.FC<CalendarSettings> = ({
             ...layer,
             data: {
               ...layer.data,
-              background: restrictionBackgroundData
+              background: restrictionBackgroundData.map(item => ({
+                startDate: item.startDate,
+                endDate: item.endDate,
+                color: '#ffe6e6' // Use a light red color for restricted dates
+              })) as BackgroundData[]
             }
           };
         }
@@ -1549,8 +1567,8 @@ const CLACalendar: React.FC<CalendarSettings> = ({
   const handleSelectionStart = useCallback((date: Date) => {
     const result = restrictionManager.checkSelection(date, date);
     if (!result.allowed) {
-      if (showSelectionAlert && result.message) {
-        setNotification(result.message);
+      if (showSelectionAlert) {
+        setNotification(result.message ?? 'Selection not allowed');
       }
       return;
     }
