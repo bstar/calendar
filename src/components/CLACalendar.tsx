@@ -14,7 +14,8 @@ import {
   endOfWeek,
   isSameMonth,
   isValid,
-  isWithinInterval
+  isWithinInterval,
+  addDays
 } from "date-fns";
 import './DateRangePicker.css';
 import { 
@@ -532,6 +533,7 @@ interface CalendarGridProps {
   layer: Layer;
   activeLayer: string;
   restrictionConfig?: RestrictionConfig;
+  startWeekOnSunday: boolean;
 }
 
 interface MonthGridProps {
@@ -546,6 +548,7 @@ interface MonthGridProps {
   renderDay?: (date: Date) => RenderResult | null;
   layer: Layer;
   restrictionConfig?: RestrictionConfig;
+  startWeekOnSunday?: boolean;
 }
 
 interface DayCellProps {
@@ -651,15 +654,16 @@ const MonthGrid: React.FC<MonthGridProps> = ({
   showTooltips,
   renderDay,
   layer,
+  startWeekOnSunday = false,
   restrictionConfig
 }) => {
   const monthStart = startOfMonth(baseDate);
   const monthEnd = endOfMonth(monthStart);
-  const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 });
-  const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
+  const weekStart = startOfWeek(monthStart, { weekStartsOn: startWeekOnSunday ? 0 : 1 });
+  const weekEnd = endOfWeek(monthEnd, { weekStartsOn: startWeekOnSunday ? 0 : 1 });
   const calendarDays = eachDayOfInterval({
-    start: calendarStart,
-    end: calendarEnd,
+    start: weekStart,
+    end: weekEnd,
   });
 
   const weeks: Record<number, Date[]> = calendarDays.reduce((acc, day, index) => {
@@ -681,6 +685,13 @@ const MonthGrid: React.FC<MonthGridProps> = ({
     new RestrictionManager(restrictionConfig ?? { restrictions: [] }), 
     [restrictionConfig]
   );
+
+  const weekDays = useMemo(() => {
+    const days = startWeekOnSunday 
+      ? ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+      : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    return days;
+  }, [startWeekOnSunday]);
 
   const handleGridMouseMove = (e: React.MouseEvent) => {
     setMousePosition({
@@ -722,7 +733,7 @@ const MonthGrid: React.FC<MonthGridProps> = ({
         marginBottom: '8px',
         paddingLeft: '2px'  // Match month heading alignment
       }}>
-        {["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"].map(day => (
+        {weekDays.map(day => (
           <div
             key={day}
             style={{
@@ -979,7 +990,8 @@ const MonthPair = ({
   showTooltips,
   renderDay,
   layer,
-  restrictionConfig
+  restrictionConfig,
+  startWeekOnSunday
 }) => {
   // Create array of months to display
   const monthsToShow = [];
@@ -1006,7 +1018,9 @@ const MonthPair = ({
           showTooltips={showTooltips}
           renderDay={renderDay}
           layer={layer}
+          activeLayer={layer.name}
           restrictionConfig={restrictionConfig}
+          startWeekOnSunday={startWeekOnSunday}
         />
       ))}
     </div>
@@ -1081,7 +1095,8 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   showTooltips,
   layer,
   activeLayer,
-  restrictionConfig
+  restrictionConfig,
+  startWeekOnSunday
 }) => {
   const renderers: Renderer[] = [];
   
@@ -1131,6 +1146,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       renderDay={renderDay}
       layer={layer}
       restrictionConfig={restrictionConfig}
+      startWeekOnSunday={startWeekOnSunday}
     />
   );
 };
@@ -1154,7 +1170,8 @@ const CLACalendar: React.FC<CalendarSettings> = ({
   layers: initialLayers = DEFAULT_LAYERS,
   showLayersNavigation = true,
   defaultLayer = 'calendar',
-  restrictionConfig
+  restrictionConfig,
+  startWeekOnSunday = false
 }) => {
   const [isOpen, setIsOpen] = useState(displayMode === 'embedded' || initialIsOpen);
   const [selectedRange, setSelectedRange] = useState({ start: null, end: null });
@@ -1399,6 +1416,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
         layer={layer}
         activeLayer={activeLayer}
         restrictionConfig={restrictionConfig}
+        startWeekOnSunday={startWeekOnSunday}
       />
     );
   };

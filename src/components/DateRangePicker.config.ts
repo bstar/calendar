@@ -155,6 +155,7 @@ export interface CalendarSettings {
   enableOutOfBoundsScroll: boolean;
   suppressTooltipsOnSelection: boolean;
   showSelectionAlert: boolean;
+  startWeekOnSunday: boolean;
   
   // Layer Settings
   layers: Layer[];
@@ -222,6 +223,7 @@ export const getDefaultSettings = (): CalendarSettings => ({
   enableOutOfBoundsScroll: true,
   suppressTooltipsOnSelection: false,
   showSelectionAlert: false,
+  startWeekOnSunday: false,
   layers: DEFAULT_LAYERS,
   showLayersNavigation: true,
   defaultLayer: 'Calendar'
@@ -353,6 +355,13 @@ export const SETTINGS: SettingsConfig = {
       type: 'boolean',
       label: 'Show Selection Alert',
       description: 'Display alert when selection is restricted',
+      default: false
+    },
+    startWeekOnSunday: {
+      id: 'startWeekOnSunday',
+      type: 'boolean',
+      label: 'Start Week on Sunday',
+      description: 'Set Sunday as the first day of the week',
       default: false
     }
   },
