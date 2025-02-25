@@ -23,7 +23,8 @@ import {
   DEFAULT_LAYERS,
   CalendarSettings,
   Layer,
-  LayerData
+  LayerData,
+  BackgroundData
 } from './DateRangePicker.config';
 import { LayerRenderer } from './DateRangePickerNew/layers/LayerRenderer';
 import { RestrictionManager } from './DateRangePickerNew/restrictions/RestrictionManager';
@@ -1341,10 +1342,10 @@ const CLACalendar: React.FC<CalendarSettings> = ({
 
   // Create background data from restrictions
   const restrictionBackgroundData = useMemo(() => {
-    if (!restrictionConfig?.restrictions) return [];
+    if (!restrictionConfig?.restrictions) return [] as BackgroundData[];
     
     return restrictionConfig.restrictions.flatMap(restriction => {
-      if (!restriction.enabled) return [];
+      if (!restriction.enabled) return [] as BackgroundData[];
       
       switch (restriction.type) {
         case 'daterange':
@@ -1357,11 +1358,10 @@ const CLACalendar: React.FC<CalendarSettings> = ({
             .map(range => ({
               startDate: range.start,
               endDate: range.end,
-              className: 'restricted-date-pattern'
-            }));
+              color: '#ffe6e6'
+            })) as BackgroundData[];
           
         case 'allowedranges':
-          // For allowed ranges, we show everything outside as restricted
           return restriction.ranges
             .filter(range => {
               const start = parseISO(range.start);
@@ -1372,27 +1372,27 @@ const CLACalendar: React.FC<CalendarSettings> = ({
               {
                 startDate: '1900-01-01',
                 endDate: range.start,
-                className: 'restricted-date-pattern'
+                color: '#ffe6e6'
               },
               {
                 startDate: range.end,
                 endDate: '2100-12-31',
-                className: 'restricted-date-pattern'
+                color: '#ffe6e6'
               }
-            ]).flat();
+            ]).flat() as BackgroundData[];
           
         case 'boundary':
           const boundaryDate = parseISO(restriction.date);
-          if (!isValid(boundaryDate)) return [];
+          if (!isValid(boundaryDate)) return [] as BackgroundData[];
           
           return [{
             startDate: restriction.direction === 'before' ? '1900-01-01' : restriction.date,
             endDate: restriction.direction === 'before' ? restriction.date : '2100-12-31',
-            className: 'restricted-date-pattern'
-          }];
+            color: '#ffe6e6'
+          }] as BackgroundData[];
           
         default:
-          return [];
+          return [] as BackgroundData[];
       }
     });
   }, [restrictionConfig]);
@@ -1586,7 +1586,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     const targetResult = restrictionManager.checkSelection(date, date);
     if (!targetResult.allowed) {
       if (showSelectionAlert && targetResult.message) {
-        setNotification(targetResult.message || 'Selection not allowed');
+        setNotification(targetResult.message ?? 'Selection not allowed');
       }
       return;
     }
@@ -1599,8 +1599,8 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     for (const day of daysInRange) {
       const result = restrictionManager.checkSelection(day, day);
       if (!result.allowed) {
-        if (showSelectionAlert) {
-          setNotification(result.message);
+        if (showSelectionAlert && result.message) {
+          setNotification(result.message ?? 'Selection not allowed');
         }
         return;
       }
