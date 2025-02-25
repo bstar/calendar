@@ -1754,7 +1754,11 @@ const CLACalendar: React.FC<CalendarSettings> = ({
                 padding: '12px 16px',
                 borderBottom: 'none' // Force remove any border
               }}>
-                <button className="cla-button-nav" onClick={() => moveToMonth('prev')}>
+                <button 
+                  className="cla-button-nav" 
+                  onClick={() => moveToMonth('prev')}
+                  style={{ outline: 'none' }}
+                >
                   <ChevronLeft size={16} />
                 </button>
                 <span className="cla-header-title">
@@ -1763,7 +1767,11 @@ const CLACalendar: React.FC<CalendarSettings> = ({
                     : `${format(months[0], "MMMM yyyy")} - ${format(months[months.length - 1], "MMMM yyyy")}`
                   }
                 </span>
-                <button className="cla-button-nav" onClick={() => moveToMonth('next')}>
+                <button 
+                  className="cla-button-nav" 
+                  onClick={() => moveToMonth('next')}
+                  style={{ outline: 'none' }}
+                >
                   <ChevronRight size={16} />
                 </button>
               </div>
