@@ -1324,11 +1324,14 @@ const CLACalendar: React.FC<CalendarSettings> = ({
   };
 
   const handleSelectionStart = useCallback(date => {
-    if (isDateRestricted(date, restrictionConfig)) {
+    const result = restrictionManager.checkSelection(date, date);
+    if (!result.allowed) {
+      setNotification(result.message);
       return;
     }
     setIsSelecting(true);
     setSelectedRange({ start: format(date, 'yyyy-MM-dd'), end: null });
+    setNotification(null);
   }, [selectionMode, restrictionConfig]);
 
   const handleSelectionMove = useCallback(date => {
@@ -1336,6 +1339,13 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     
     const start = selectedRange.start ? parseISO(selectedRange.start) : null;
     if (!start) return;
+
+    // Check if target date is restricted - if so, keep current selection
+    const targetResult = restrictionManager.checkSelection(date, date);
+    if (!targetResult.allowed) {
+      setNotification(targetResult.message);
+      return;
+    }
 
     // Check if there are any restricted dates between start and target date
     const startDate = start < date ? start : date;
@@ -1346,16 +1356,6 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     for (const day of daysInRange) {
       const result = restrictionManager.checkSelection(day, day);
       if (!result.allowed) {
-        // If moving forward, stop before restricted date
-        // If moving backward, stop after restricted date
-        const stopDate = start < date ? 
-          new Date(day.getTime() - 86400000) : // day before restricted
-          new Date(day.getTime() + 86400000);  // day after restricted
-        
-        setSelectedRange(prev => ({ 
-          ...prev, 
-          end: format(stopDate, 'yyyy-MM-dd')
-        }));
         setNotification(result.message);
         return;
       }
