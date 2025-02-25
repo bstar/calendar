@@ -46,12 +46,6 @@ interface CardCompositionProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
 }
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant: string;
-  children: React.ReactNode;
-  className?: string;
-}
-
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   className?: string;
 }
@@ -89,15 +83,6 @@ Card.Footer = ({ children, className, ...props }: CardCompositionProps) => (
   <div className={`cla-card-footer ${className || ''}`} {...props}>
     {children}
   </div>
-);
-
-const Button: React.FC<ButtonProps> = ({ variant, children, className, ...props }) => (
-  <button 
-    className={`cla-button cla-button-${variant} ${className || ''}`} 
-    {...props}
-  >
-    {children}
-  </button>
 );
 
 const Input: React.FC<InputProps> = ({ className, ...props }) => (
@@ -897,8 +882,8 @@ const MonthPair = ({
   restrictionConfig,
   startWeekOnSunday
 }) => {
-  // Create array of months to display
-  const monthsToShow = [];
+  // Add explicit type for monthsToShow
+  const monthsToShow: Date[] = [];
   for (let i = 0; i < visibleMonths && i < 6; i++) {
     monthsToShow.push(addMonths(firstMonth, i));
   }
@@ -1055,6 +1040,22 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   );
 };
 
+// Keep the ButtonProps interface and Button component
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant: string;
+  children: React.ReactNode;
+  className?: string;
+}
+
+const Button: React.FC<ButtonProps> = ({ variant, children, className, ...props }) => (
+  <button 
+    className={`cla-button cla-button-${variant} ${className || ''}`} 
+    {...props}
+  >
+    {children}
+  </button>
+);
+
 const CLACalendar: React.FC<CalendarSettings> = ({
   displayMode = 'popup',
   containerStyle = null,
@@ -1078,7 +1079,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
   startWeekOnSunday = false
 }) => {
   const [isOpen, setIsOpen] = useState(displayMode === 'embedded' || initialIsOpen);
-  const [selectedRange, setSelectedRange] = useState({ start: null, end: null });
+  const [selectedRange, setSelectedRange] = useState<DateRange>({ start: null, end: null });
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date(2025, 1, 1)));
   const [isSelecting, setIsSelecting] = useState(false);
   const [outOfBoundsDirection, setOutOfBoundsDirection] = useState<'prev' | 'next' | null>(null);
@@ -1096,7 +1097,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
 
   const containerRef = useRef<HTMLDivElement>(null);
   const moveToMonthRef = useRef<((direction: 'prev' | 'next') => void) | null>(null);
-  const debouncedMoveToMonthRef = useRef<Function | null>(null);
+  const debouncedMoveToMonthRef = useRef<ReturnType<typeof debounce> | null>(null);
 
   // Calculate if tooltips should be shown based on selection state and settings
   const shouldShowTooltips = useMemo(() => {
@@ -1128,10 +1129,10 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     }
   }, [initialLayers, defaultLayer, activeLayer]);
 
-  // Simplified month generation
+  // In the months memo, update the result array type
   const months = useMemo(() => {
     const validVisibleMonths = Math.min(6, Math.max(1, visibleMonths));
-    const result = [];
+    const result: Date[] = [];
     for (let i = 0; i < validVisibleMonths; i++) {
       result.push(addMonths(currentMonth, i));
     }
@@ -1467,10 +1468,10 @@ const CLACalendar: React.FC<CalendarSettings> = ({
 
       // Update the selection to include the new month
       const newEnd = direction === 'next' ? lastDayOfMonth : firstDayOfMonth;
-      setSelectedRange(prev => ({
+      setSelectedRange((prev: DateRange) => ({
         ...prev,
         end: format(newEnd, 'yyyy-MM-dd')
-      }));
+      } as DateRange));
     }
 
     setCurrentMonth(prev => {
@@ -1542,20 +1543,20 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     }
   };
 
-  const handleSelectionStart = useCallback(date => {
+  const handleSelectionStart = useCallback((date: Date) => {
     const result = restrictionManager.checkSelection(date, date);
     if (!result.allowed) {
-      if (showSelectionAlert) {
+      if (showSelectionAlert && result.message) {
         setNotification(result.message);
       }
       return;
     }
     setIsSelecting(true);
-    setSelectedRange({ start: format(date, 'yyyy-MM-dd'), end: null });
+    setSelectedRange({ start: format(date, 'yyyy-MM-dd'), end: null } as DateRange);
     setNotification(null);
   }, [selectionMode, restrictionConfig, showSelectionAlert]);
 
-  const handleSelectionMove = useCallback(date => {
+  const handleSelectionMove = useCallback((date: Date) => {
     if (!isSelecting) return;
     
     const start = selectedRange.start ? parseISO(selectedRange.start) : null;
@@ -1584,7 +1585,10 @@ const CLACalendar: React.FC<CalendarSettings> = ({
       }
     }
 
-    setSelectedRange(prev => ({ ...prev, end: format(date, 'yyyy-MM-dd') }));
+    setSelectedRange((prev: DateRange) => ({
+      ...prev,
+      end: format(date, 'yyyy-MM-dd')
+    } as DateRange));
     setNotification(null);
   }, [isSelecting, selectedRange.start, selectionMode, restrictionManager, showSelectionAlert]);
 

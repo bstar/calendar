@@ -1,4 +1,5 @@
 import { CSSProperties } from 'react';
+import { RestrictionConfig } from './DateRangePickerNew/restrictions/types';
 
 export type LAYER_TYPES = 'base' | 'overlay';
 
@@ -161,6 +162,7 @@ export interface CalendarSettings {
   layers: Layer[];
   showLayersNavigation: boolean;
   defaultLayer: string;
+  restrictionConfig?: RestrictionConfig;
 }
 
 // Control Types for App.tsx
@@ -457,4 +459,15 @@ export interface TableHeaderStyles {
 // Add type for the selected presets state
 export interface SelectedPresets {
   [key: string]: boolean;
+}
+
+// Add these type definitions
+type BorderCollapse = 'collapse' | 'separate';
+type TextAlign = 'left' | 'center' | 'right';
+
+// Update the actions type to allow a function
+export interface LayerActions {
+  canAdd: boolean;
+  canRemove: boolean | ((layer: Layer) => boolean);
+  newLayerTemplate: Omit<Layer, 'features'> & { data: any[] };
 } 
