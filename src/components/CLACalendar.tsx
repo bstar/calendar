@@ -1257,9 +1257,53 @@ const CLACalendar: React.FC<CalendarSettings> = ({
   }, [isSelecting, outOfBoundsDirection, enableOutOfBoundsScroll]);
 
   // Simple month navigation
-  const moveToMonth = useCallback((direction) => {
-    setCurrentMonth(prev => addMonths(prev, direction === 'next' ? 1 : -1));
-  }, []);
+  const moveToMonth = useCallback((direction: 'prev' | 'next') => {
+    // Only check restrictions during out-of-bounds scrolling
+    if (isSelecting && outOfBoundsDirection) {
+      const start = selectedRange.start ? parseISO(selectedRange.start) : null;
+      if (!start) return;
+
+      const nextMonth = direction === 'next' 
+        ? addMonths(months[months.length - 1], 1)
+        : addMonths(months[0], -1);
+        
+      const firstDayOfMonth = startOfMonth(nextMonth);
+      const lastDayOfMonth = endOfMonth(nextMonth);
+
+      // Check if selection would extend into restricted dates
+      const selectionEnd = direction === 'next' ? lastDayOfMonth : firstDayOfMonth;
+      const daysToCheck = eachDayOfInterval({ 
+        start: start < selectionEnd ? start : selectionEnd,
+        end: start < selectionEnd ? selectionEnd : start 
+      });
+      
+      const hasRestriction = daysToCheck.some(day => {
+        const result = restrictionManager.checkSelection(day, day);
+        return !result.allowed;
+      });
+      
+      if (hasRestriction) {
+        setOutOfBoundsDirection(null);
+        if (showSelectionAlert) {
+          setNotification('Cannot select restricted dates');
+        }
+        return;
+      }
+
+      // Update the selection to include the new month
+      const newEnd = direction === 'next' ? lastDayOfMonth : firstDayOfMonth;
+      setSelectedRange(prev => ({
+        ...prev,
+        end: format(newEnd, 'yyyy-MM-dd')
+      }));
+    }
+
+    setCurrentMonth(prev => {
+      return direction === 'next'
+        ? addMonths(prev, 1)
+        : addMonths(prev, -1);
+    });
+  }, [months, restrictionManager, showSelectionAlert, isSelecting, outOfBoundsDirection, selectedRange.start]);
 
   // Set the ref for out-of-bounds scrolling
   moveToMonthRef.current = moveToMonth;
