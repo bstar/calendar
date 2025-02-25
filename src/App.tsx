@@ -955,10 +955,68 @@ function App() {
         );
       case 'features':
         return (
-          <div style={{ display: 'grid', gap: '12px' }}>
-            {Object.entries(SETTINGS.features).map(([key, config]) => (
-              <SettingControl key={key} config={config} />
-            ))}
+          <div style={styles.tabContent}>
+            <h3 style={styles.heading}>Features</h3>
+            <p style={styles.description}>
+              Toggle various calendar features and behaviors. Changes are applied immediately.
+            </p>
+            <table style={{
+              ...styles.table,
+              width: '100%',
+              borderSpacing: '0 12px',
+              borderCollapse: 'separate'
+            }}>
+              <tbody>
+                {Object.entries(SETTINGS.features).map(([key, setting]) => (
+                  <tr key={key}>
+                    <td style={{
+                      ...styles.labelCell,
+                      width: '70%',
+                      paddingRight: '24px'
+                    }}>
+                      <label style={{
+                        ...styles.label,
+                        display: 'block',
+                        marginBottom: '4px',
+                        fontWeight: '500'
+                      }}>
+                        {setting.label}
+                      </label>
+                      <span style={{
+                        fontSize: '13px',
+                        color: '#666',
+                        display: 'block',
+                        lineHeight: '1.4'
+                      }}>
+                        {setting.description}
+                      </span>
+                    </td>
+                    <td style={{
+                      ...styles.controlCell,
+                      width: '30%',
+                      textAlign: 'right',
+                      verticalAlign: 'top',
+                      paddingTop: '4px'
+                    }}>
+                      <input
+                        type="checkbox"
+                        checked={settings[key] as boolean}
+                        onChange={(e) => {
+                          setSettings(prev => ({
+                            ...prev,
+                            [key]: e.target.checked
+                          }));
+                        }}
+                        style={{
+                          width: '16px',
+                          height: '16px'
+                        }}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         );
       case 'layers':

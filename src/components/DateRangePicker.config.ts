@@ -154,6 +154,7 @@ export interface CalendarSettings {
   showFooter: boolean;
   enableOutOfBoundsScroll: boolean;
   suppressTooltipsOnSelection: boolean;
+  showSelectionAlert: boolean;
   
   // Layer Settings
   layers: Layer[];
@@ -220,6 +221,7 @@ export const getDefaultSettings = (): CalendarSettings => ({
   showFooter: true,
   enableOutOfBoundsScroll: true,
   suppressTooltipsOnSelection: false,
+  showSelectionAlert: true,
   layers: DEFAULT_LAYERS,
   showLayersNavigation: true,
   defaultLayer: 'Calendar'
@@ -345,6 +347,13 @@ export const SETTINGS: SettingsConfig = {
       label: 'Suppress Tooltips on Selection',
       description: 'Hide tooltips while selecting dates',
       default: false
+    },
+    showSelectionAlert: {
+      id: 'showSelectionAlert',
+      type: 'boolean',
+      label: 'Show Selection Alert',
+      description: 'Display alert when selection is restricted',
+      default: true
     }
   },
   layers: {

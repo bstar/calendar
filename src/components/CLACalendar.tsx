@@ -1150,6 +1150,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
   singleMonthWidth = 500,
   enableOutOfBoundsScroll = true,
   suppressTooltipsOnSelection = false,
+  showSelectionAlert = true,
   layers: initialLayers = DEFAULT_LAYERS,
   showLayersNavigation = true,
   defaultLayer = 'calendar',
@@ -1326,13 +1327,15 @@ const CLACalendar: React.FC<CalendarSettings> = ({
   const handleSelectionStart = useCallback(date => {
     const result = restrictionManager.checkSelection(date, date);
     if (!result.allowed) {
-      setNotification(result.message);
+      if (showSelectionAlert) {
+        setNotification(result.message);
+      }
       return;
     }
     setIsSelecting(true);
     setSelectedRange({ start: format(date, 'yyyy-MM-dd'), end: null });
     setNotification(null);
-  }, [selectionMode, restrictionConfig]);
+  }, [selectionMode, restrictionConfig, showSelectionAlert]);
 
   const handleSelectionMove = useCallback(date => {
     if (!isSelecting) return;
@@ -1340,10 +1343,11 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     const start = selectedRange.start ? parseISO(selectedRange.start) : null;
     if (!start) return;
 
-    // Check if target date is restricted - if so, keep current selection
     const targetResult = restrictionManager.checkSelection(date, date);
     if (!targetResult.allowed) {
-      setNotification(targetResult.message);
+      if (showSelectionAlert) {
+        setNotification(targetResult.message);
+      }
       return;
     }
 
@@ -1352,18 +1356,19 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     const endDate = start < date ? date : start;
     const daysInRange = eachDayOfInterval({ start: startDate, end: endDate });
     
-    // Find first restricted date in range
     for (const day of daysInRange) {
       const result = restrictionManager.checkSelection(day, day);
       if (!result.allowed) {
-        setNotification(result.message);
+        if (showSelectionAlert) {
+          setNotification(result.message);
+        }
         return;
       }
     }
 
     setSelectedRange(prev => ({ ...prev, end: format(date, 'yyyy-MM-dd') }));
     setNotification(null);
-  }, [isSelecting, selectedRange.start, selectionMode, restrictionManager]);
+  }, [isSelecting, selectedRange.start, selectionMode, restrictionManager, showSelectionAlert]);
 
   const handleMouseMove = useCallback((e) => {
     e.preventDefault();
@@ -1751,7 +1756,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
             />
           )}
 
-          {notification && (
+          {showSelectionAlert && notification && (
             <Notification
               message={notification}
               onDismiss={() => setNotification(null)}
