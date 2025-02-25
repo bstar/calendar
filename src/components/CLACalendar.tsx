@@ -229,7 +229,20 @@ interface ValidationError {
   field: string;
 }
 
-const DateInput = ({ value, onChange, field, placeholder, context, selectedRange }) => {
+interface DateInputProps {
+  value: Date | null;
+  onChange: (date: Date | null, isClearingError?: boolean, validationError?: ValidationError) => void;
+  field: 'start' | 'end';
+  placeholder: string;
+  context: {
+    startDate: string | null;
+    endDate: string | null;
+    currentField: string | null;
+  };
+  selectedRange: DateRange;
+}
+
+const DateInput: React.FC<DateInputProps> = ({ value, onChange, field, placeholder, context, selectedRange }) => {
   const [inputValue, setInputValue] = useState('');
   const [error, setError] = useState<ValidationError | null>(null);
   const [showError, setShowError] = useState(false);
@@ -1195,7 +1208,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     };
   }, [isSelecting, outOfBoundsDirection, enableOutOfBoundsScroll]);
 
-  const handleMouseMove = useCallback((e) => {
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     if (!isSelecting || !containerRef.current) return;
 
@@ -1302,7 +1315,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     enableOutOfBoundsScroll
   };
 
-  const handleMouseLeave = useCallback((e) => {
+  const handleMouseLeave = useCallback((e: React.MouseEvent) => {
     // Only handle out of bounds when selecting
     if (!isSelecting) return;
     
@@ -1317,11 +1330,11 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     }
   }, [isSelecting]);
 
-  const handleLayerChange = (layerId) => {
+  const handleLayerChange = (layerId: string) => {
     setActiveLayer(layerId);
   };
 
-  const renderLayer = (layer) => {
+  const renderLayer = (layer: Layer) => {
     return (
       <CalendarGrid
         months={months}
@@ -1514,7 +1527,11 @@ const CLACalendar: React.FC<CalendarSettings> = ({
 
   useClickOutside(containerRef, handleClickOutside);
 
-  const handleDateChange = (field) => (date, isClearingError, validationError) => {
+  const handleDateChange = (field: 'start' | 'end') => (
+    date: Date | null,
+    isClearingError?: boolean,
+    validationError?: ValidationError
+  ) => {
     if (isClearingError) {
       setValidationErrors(prev =>
         Object.entries(prev)
