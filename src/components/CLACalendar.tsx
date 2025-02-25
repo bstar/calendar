@@ -1256,164 +1256,6 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     };
   }, [isSelecting, outOfBoundsDirection, enableOutOfBoundsScroll]);
 
-  // Simple month navigation
-  const moveToMonth = useCallback((direction: 'prev' | 'next') => {
-    // Only check restrictions during out-of-bounds scrolling
-    if (isSelecting && outOfBoundsDirection) {
-      const start = selectedRange.start ? parseISO(selectedRange.start) : null;
-      if (!start) return;
-
-      const nextMonth = direction === 'next' 
-        ? addMonths(months[months.length - 1], 1)
-        : addMonths(months[0], -1);
-        
-      const firstDayOfMonth = startOfMonth(nextMonth);
-      const lastDayOfMonth = endOfMonth(nextMonth);
-
-      // Check if selection would extend into restricted dates
-      const selectionEnd = direction === 'next' ? lastDayOfMonth : firstDayOfMonth;
-      const daysToCheck = eachDayOfInterval({ 
-        start: start < selectionEnd ? start : selectionEnd,
-        end: start < selectionEnd ? selectionEnd : start 
-      });
-      
-      const hasRestriction = daysToCheck.some(day => {
-        const result = restrictionManager.checkSelection(day, day);
-        return !result.allowed;
-      });
-      
-      if (hasRestriction) {
-        setOutOfBoundsDirection(null);
-        if (showSelectionAlert) {
-          setNotification('Cannot select restricted dates');
-        }
-        return;
-      }
-
-      // Update the selection to include the new month
-      const newEnd = direction === 'next' ? lastDayOfMonth : firstDayOfMonth;
-      setSelectedRange(prev => ({
-        ...prev,
-        end: format(newEnd, 'yyyy-MM-dd')
-      }));
-    }
-
-    setCurrentMonth(prev => {
-      return direction === 'next'
-        ? addMonths(prev, 1)
-        : addMonths(prev, -1);
-    });
-  }, [months, restrictionManager, showSelectionAlert, isSelecting, outOfBoundsDirection, selectedRange.start]);
-
-  // Set the ref for out-of-bounds scrolling
-  moveToMonthRef.current = moveToMonth;
-
-  const handleClickOutside = useCallback(() => {
-    if (isOpen && closeOnClickAway) {
-      setIsOpen(false);
-      setIsSelecting(false);
-      setInitialDate(null);
-    }
-  }, [isOpen, closeOnClickAway]);
-
-  useClickOutside(containerRef, handleClickOutside);
-
-  const handleDateChange = (field) => (date, isClearingError, validationError) => {
-    if (isClearingError) {
-      setValidationErrors(prev =>
-        Object.entries(prev)
-          .filter(([key]) => key !== field)
-          .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {})
-      );
-      return;
-    }
-
-    if (validationError) {
-      setValidationErrors(prev => ({
-        ...prev,
-        [field]: validationError
-      }));
-      return;
-    }
-
-    const newState = {
-      range: { ...selectedRange, [field]: date?.toISOString() || null },
-      context: {
-        ...dateInputContext,
-        [`${field}Date`]: date ? dateValidator.formatValue(date) : null
-      }
-    };
-
-    setSelectedRange(newState.range);
-    setDateInputContext(newState.context);
-    setValidationErrors({});
-
-    // Only update calendar position if we have a valid date
-    if (date) {
-      const validVisibleMonths = Math.min(6, Math.max(1, visibleMonths));
-      
-      if (field === 'start') {
-        // For start date, we want it in the leftmost month
-        // If we want March to show on the left, and we're showing 3 months,
-        // we need March to be our currentMonth (since we show currentMonth to currentMonth + 2)
-        const newBaseMonth = startOfMonth(date);
-        setCurrentMonth(newBaseMonth);
-      } else {
-        // For end date, we want it in the rightmost month
-        // If we want April to show on the right, and we're showing 3 months,
-        // we need February to be our currentMonth (since we show currentMonth + 2)
-        const newBaseMonth = addMonths(startOfMonth(date), -(validVisibleMonths - 1));
-        setCurrentMonth(newBaseMonth);
-      }
-    }
-  };
-
-  const handleSelectionStart = useCallback(date => {
-    const result = restrictionManager.checkSelection(date, date);
-    if (!result.allowed) {
-      if (showSelectionAlert) {
-        setNotification(result.message);
-      }
-      return;
-    }
-    setIsSelecting(true);
-    setSelectedRange({ start: format(date, 'yyyy-MM-dd'), end: null });
-    setNotification(null);
-  }, [selectionMode, restrictionConfig, showSelectionAlert]);
-
-  const handleSelectionMove = useCallback(date => {
-    if (!isSelecting) return;
-    
-    const start = selectedRange.start ? parseISO(selectedRange.start) : null;
-    if (!start) return;
-
-    const targetResult = restrictionManager.checkSelection(date, date);
-    if (!targetResult.allowed) {
-      if (showSelectionAlert) {
-        setNotification(targetResult.message);
-      }
-      return;
-    }
-
-    // Check if there are any restricted dates between start and target date
-    const startDate = start < date ? start : date;
-    const endDate = start < date ? date : start;
-    const daysInRange = eachDayOfInterval({ start: startDate, end: endDate });
-    
-    for (const day of daysInRange) {
-      const result = restrictionManager.checkSelection(day, day);
-      if (!result.allowed) {
-        if (showSelectionAlert) {
-          setNotification(result.message);
-        }
-        return;
-      }
-    }
-
-    setSelectedRange(prev => ({ ...prev, end: format(date, 'yyyy-MM-dd') }));
-    setNotification(null);
-  }, [isSelecting, selectedRange.start, selectionMode, restrictionManager, showSelectionAlert]);
-
   const handleMouseMove = useCallback((e) => {
     e.preventDefault();
     if (!isSelecting || !containerRef.current) return;
@@ -1667,6 +1509,167 @@ const CLACalendar: React.FC<CalendarSettings> = ({
       return false;
     });
   };
+
+  // Simple month navigation - moved after handlers are defined
+  const moveToMonth = useCallback((direction: 'prev' | 'next') => {
+    // Only check restrictions during out-of-bounds scrolling
+    if (isSelecting && outOfBoundsDirection) {
+      const start = selectedRange.start ? parseISO(selectedRange.start) : null;
+      if (!start) return;
+
+      const nextMonth = direction === 'next' 
+        ? addMonths(months[months.length - 1], 1)
+        : addMonths(months[0], -1);
+        
+      const firstDayOfMonth = startOfMonth(nextMonth);
+      const lastDayOfMonth = endOfMonth(nextMonth);
+
+      // Check if selection would extend into restricted dates
+      const selectionEnd = direction === 'next' ? lastDayOfMonth : firstDayOfMonth;
+      const daysToCheck = eachDayOfInterval({ 
+        start: start < selectionEnd ? start : selectionEnd,
+        end: start < selectionEnd ? selectionEnd : start 
+      });
+      
+      const hasRestriction = daysToCheck.some(day => {
+        const result = restrictionManager.checkSelection(day, day);
+        return !result.allowed;
+      });
+      
+      if (hasRestriction) {
+        setIsSelecting(false);
+        setOutOfBoundsDirection(null);
+        if (showSelectionAlert) {
+          setNotification('Cannot select restricted dates');
+        }
+        document.removeEventListener("mousemove", handleMouseMove);
+        document.removeEventListener("mouseup", handleMouseUp);
+        return;
+      }
+
+      // Update the selection to include the new month
+      const newEnd = direction === 'next' ? lastDayOfMonth : firstDayOfMonth;
+      setSelectedRange(prev => ({
+        ...prev,
+        end: format(newEnd, 'yyyy-MM-dd')
+      }));
+    }
+
+    setCurrentMonth(prev => {
+      return direction === 'next'
+        ? addMonths(prev, 1)
+        : addMonths(prev, -1);
+    });
+  }, [months, restrictionManager, showSelectionAlert, isSelecting, outOfBoundsDirection, selectedRange.start, handleMouseMove, handleMouseUp]);
+
+  // Set the ref for out-of-bounds scrolling
+  moveToMonthRef.current = moveToMonth;
+
+  const handleClickOutside = useCallback(() => {
+    if (isOpen && closeOnClickAway) {
+      setIsOpen(false);
+      setIsSelecting(false);
+      setInitialDate(null);
+    }
+  }, [isOpen, closeOnClickAway]);
+
+  useClickOutside(containerRef, handleClickOutside);
+
+  const handleDateChange = (field) => (date, isClearingError, validationError) => {
+    if (isClearingError) {
+      setValidationErrors(prev =>
+        Object.entries(prev)
+          .filter(([key]) => key !== field)
+          .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {})
+      );
+      return;
+    }
+
+    if (validationError) {
+      setValidationErrors(prev => ({
+        ...prev,
+        [field]: validationError
+      }));
+      return;
+    }
+
+    const newState = {
+      range: { ...selectedRange, [field]: date?.toISOString() || null },
+      context: {
+        ...dateInputContext,
+        [`${field}Date`]: date ? dateValidator.formatValue(date) : null
+      }
+    };
+
+    setSelectedRange(newState.range);
+    setDateInputContext(newState.context);
+    setValidationErrors({});
+
+    // Only update calendar position if we have a valid date
+    if (date) {
+      const validVisibleMonths = Math.min(6, Math.max(1, visibleMonths));
+      
+      if (field === 'start') {
+        // For start date, we want it in the leftmost month
+        // If we want March to show on the left, and we're showing 3 months,
+        // we need March to be our currentMonth (since we show currentMonth to currentMonth + 2)
+        const newBaseMonth = startOfMonth(date);
+        setCurrentMonth(newBaseMonth);
+      } else {
+        // For end date, we want it in the rightmost month
+        // If we want April to show on the right, and we're showing 3 months,
+        // we need February to be our currentMonth (since we show currentMonth + 2)
+        const newBaseMonth = addMonths(startOfMonth(date), -(validVisibleMonths - 1));
+        setCurrentMonth(newBaseMonth);
+      }
+    }
+  };
+
+  const handleSelectionStart = useCallback(date => {
+    const result = restrictionManager.checkSelection(date, date);
+    if (!result.allowed) {
+      if (showSelectionAlert) {
+        setNotification(result.message);
+      }
+      return;
+    }
+    setIsSelecting(true);
+    setSelectedRange({ start: format(date, 'yyyy-MM-dd'), end: null });
+    setNotification(null);
+  }, [selectionMode, restrictionConfig, showSelectionAlert]);
+
+  const handleSelectionMove = useCallback(date => {
+    if (!isSelecting) return;
+    
+    const start = selectedRange.start ? parseISO(selectedRange.start) : null;
+    if (!start) return;
+
+    const targetResult = restrictionManager.checkSelection(date, date);
+    if (!targetResult.allowed) {
+      if (showSelectionAlert) {
+        setNotification(targetResult.message);
+      }
+      return;
+    }
+
+    // Check if there are any restricted dates between start and target date
+    const startDate = start < date ? start : date;
+    const endDate = start < date ? date : start;
+    const daysInRange = eachDayOfInterval({ start: startDate, end: endDate });
+    
+    for (const day of daysInRange) {
+      const result = restrictionManager.checkSelection(day, day);
+      if (!result.allowed) {
+        if (showSelectionAlert) {
+          setNotification(result.message);
+        }
+        return;
+      }
+    }
+
+    setSelectedRange(prev => ({ ...prev, end: format(date, 'yyyy-MM-dd') }));
+    setNotification(null);
+  }, [isSelecting, selectedRange.start, selectionMode, restrictionManager, showSelectionAlert]);
 
   return (
     <div className="cla-calendar" style={{ width: 'fit-content' }}>
