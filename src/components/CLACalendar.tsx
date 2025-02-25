@@ -1337,11 +1337,28 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     const start = selectedRange.start ? parseISO(selectedRange.start) : null;
     if (!start) return;
 
-    // Check if selection would be restricted
-    const result = restrictionManager.checkSelection(start, date);
-    if (!result.allowed) {
-      setNotification(result.message);
-      return;
+    // Check if there are any restricted dates between start and target date
+    const startDate = start < date ? start : date;
+    const endDate = start < date ? date : start;
+    const daysInRange = eachDayOfInterval({ start: startDate, end: endDate });
+    
+    // Find first restricted date in range
+    for (const day of daysInRange) {
+      const result = restrictionManager.checkSelection(day, day);
+      if (!result.allowed) {
+        // If moving forward, stop before restricted date
+        // If moving backward, stop after restricted date
+        const stopDate = start < date ? 
+          new Date(day.getTime() - 86400000) : // day before restricted
+          new Date(day.getTime() + 86400000);  // day after restricted
+        
+        setSelectedRange(prev => ({ 
+          ...prev, 
+          end: format(stopDate, 'yyyy-MM-dd')
+        }));
+        setNotification(result.message);
+        return;
+      }
     }
 
     setSelectedRange(prev => ({ ...prev, end: format(date, 'yyyy-MM-dd') }));
