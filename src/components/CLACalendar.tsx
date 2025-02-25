@@ -1792,7 +1792,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
 
           {showFooter && (
             <div className="cla-card-footer" style={{ 
-              padding: '16px',
+              padding: '0 16px 16px 16px',
               borderTop: 'none', // Force remove any border
               display: 'flex',
               justifyContent: 'space-between'
