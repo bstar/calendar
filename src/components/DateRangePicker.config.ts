@@ -406,40 +406,6 @@ export const SETTINGS: SettingsConfig = {
   }
 };
 
-export const LAYER_FEATURES: Record<string, LayerFeature> = {
-  base: {
-    name: 'Base Calendar',
-    description: 'Basic calendar functionality',
-    dataSchema: null
-  },
-  background: {
-    name: 'Background Colors',
-    description: 'Apply background colors to date ranges',
-    dataSchema: {
-      type: 'array',
-      items: {
-        startDate: 'string',
-        endDate: 'string',
-        color: 'string'
-      }
-    }
-  },
-  events: {
-    name: 'Events',
-    description: 'Display and manage calendar events',
-    dataSchema: {
-      type: 'array',
-      items: {
-        date: 'string',
-        title: 'string',
-        type: 'string',
-        time: 'string',
-        description: 'string'
-      }
-    }
-  }
-};
-
 interface DisplayModeConstraints {
   closeOnClickAway: boolean;
   enableOutOfBoundsScroll: boolean;

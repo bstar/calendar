@@ -35,23 +35,6 @@ interface DateRange {
   end: string | null;
 }
 
-interface DateInputContext {
-  startDate: string | null;
-  endDate: string | null;
-  currentField: string | null;
-}
-
-interface MousePosition {
-  x: number;
-  y: number;
-}
-
-interface ValidationError {
-  message: string;
-  type: string;
-  field: string;
-}
-
 // Add these interfaces after the existing ones
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
@@ -139,10 +122,6 @@ const ChevronRight: React.FC<ChevronProps> = ({ size = 16 }) => (
 );
 
 // Add these type definitions
-interface IndicatorType {
-  type: 'success' | 'error' | null;
-}
-
 interface RenderResult {
   backgroundColor?: string;
   element?: React.ReactNode;
@@ -214,80 +193,6 @@ const dateValidator = (() => {
     console.log('Is valid?', isValid);
     
     return isValid ? date : null;
-  };
-
-  const rules = {
-    isValidFormat: (value) => {
-      if (!value) return { isValid: true, error: null };
-      try {
-        parse(value, DATE_FORMAT, new Date());
-        return { isValid: true, error: null };
-      } catch {
-        return {
-          isValid: false,
-          error: {
-            message: `Please use format: January 15, 2024`,
-            type: 'error',
-            field: 'format'
-          }
-        };
-      }
-    },
-
-    isValidDate: (value) => {
-      if (!value) return { isValid: true, error: null };
-      try {
-        const date = parse(value, DATE_FORMAT, new Date());
-        return isValid(date)
-          ? { isValid: true, error: null }
-          : {
-            isValid: false,
-            error: {
-              message: 'Invalid date',
-              type: 'error',
-              field: 'date'
-            }
-          };
-      } catch {
-        return {
-          isValid: false,
-          error: {
-            message: 'Invalid date',
-            type: 'error',
-            field: 'date'
-          }
-        };
-      }
-    },
-
-    isValidRange: (start, end) => {
-      if (!start || !end) return { isValid: true, error: null };
-
-      try {
-        const startDate = parse(start, DATE_FORMAT, new Date());
-        const endDate = parse(end, DATE_FORMAT, new Date());
-
-        return startDate > endDate
-          ? {
-            isValid: false,
-            error: {
-              message: 'Start date must be before end date',
-              type: 'error',
-              field: 'range'
-            }
-          }
-          : { isValid: true, error: null };
-      } catch {
-        return {
-          isValid: false,
-          error: {
-            message: 'Invalid date range',
-            type: 'error',
-            field: 'range'
-          }
-        };
-      }
-    }
   };
 
   return {
@@ -1176,7 +1081,6 @@ const CLACalendar: React.FC<CalendarSettings> = ({
   const [selectedRange, setSelectedRange] = useState({ start: null, end: null });
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date(2025, 1, 1)));
   const [isSelecting, setIsSelecting] = useState(false);
-  const [initialDate, setInitialDate] = useState(null);
   const [outOfBoundsDirection, setOutOfBoundsDirection] = useState<'prev' | 'next' | null>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [dateInputContext, setDateInputContext] = useState({
@@ -1302,7 +1206,6 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     setIsSelecting(false);
     console.log('ending selection');
     setOutOfBoundsDirection(null);
-    setInitialDate(null);
 
     const styles = ['userSelect', 'webkitUserSelect', 'mozUserSelect', 'msUserSelect'];
     styles.forEach(style => document.body.style[style] = '');
@@ -1338,7 +1241,6 @@ const CLACalendar: React.FC<CalendarSettings> = ({
 
     // Reset selection states
     setIsSelecting(false);
-    setInitialDate(null);
 
     // Reset validation
     setValidationErrors({});
@@ -1351,7 +1253,6 @@ const CLACalendar: React.FC<CalendarSettings> = ({
   const handleSubmit = useCallback(() => {
     setIsOpen(false);
     setIsSelecting(false);
-    setInitialDate(null);
   }, []);
 
   const getDisplayText = useCallback(() => {
@@ -1586,7 +1487,6 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     if (isOpen && closeOnClickAway) {
       setIsOpen(false);
       setIsSelecting(false);
-      setInitialDate(null);
     }
   }, [isOpen, closeOnClickAway]);
 
