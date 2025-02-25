@@ -221,7 +221,7 @@ export const getDefaultSettings = (): CalendarSettings => ({
   showFooter: true,
   enableOutOfBoundsScroll: true,
   suppressTooltipsOnSelection: false,
-  showSelectionAlert: true,
+  showSelectionAlert: false,
   layers: DEFAULT_LAYERS,
   showLayersNavigation: true,
   defaultLayer: 'Calendar'
@@ -353,7 +353,7 @@ export const SETTINGS: SettingsConfig = {
       type: 'boolean',
       label: 'Show Selection Alert',
       description: 'Display alert when selection is restricted',
-      default: true
+      default: false
     }
   },
   layers: {
