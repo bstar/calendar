@@ -437,6 +437,7 @@ interface MonthGridProps {
   showTooltips: boolean;
   renderDay?: (date: Date) => RenderResult | null;
   layer: Layer;
+  activeLayer: string;
   restrictionConfig?: RestrictionConfig;
   startWeekOnSunday?: boolean;
 }
@@ -929,14 +930,11 @@ const SideChevronIndicator: React.FC<SideChevronIndicatorProps> = ({ outOfBounds
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: 'rgba(227, 242, 253, 0.9)', // Light blue pastel with 90% opacity
+      backgroundColor: 'rgba(227, 242, 253, 0.9)',
       zIndex: 9999,
       border: '1px solid var(--border-color)',
       cursor: "pointer",
-      '&:hover': {
-        backgroundColor: 'rgba(187, 222, 251, 0.95)' // Slightly darker with 95% opacity on hover
-      }
-    }}>
+    } as React.CSSProperties}>
       {outOfBoundsDirection === 'prev' ? (
         <ChevronLeft size={24} />
       ) : (
@@ -994,7 +992,12 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   }
   
   if (layer.data?.events) {
-    renderers.push(LayerRenderer.createEventRenderer(layer.data.events));
+    renderers.push(LayerRenderer.createEventRenderer(
+      layer.data.events.map(event => ({
+        ...event,
+        type: event.type as 'work' | 'other'
+      }))
+    ));
   }
   
   const renderDay = (date: Date): RenderResult | null => {
@@ -1158,11 +1161,11 @@ const CLACalendar: React.FC<CalendarSettings> = ({
   useEffect(() => {
     if (!enableOutOfBoundsScroll) return () => {};
 
-    const shouldAdvance = isSelecting && outOfBoundsDirection && moveToMonthRef.current;
+    const shouldAdvance = Boolean(isSelecting && outOfBoundsDirection && moveToMonthRef.current);
     if (!shouldAdvance) return () => {};
 
     const advanceMonth = () => {
-      if (shouldAdvance) {
+      if (moveToMonthRef.current && outOfBoundsDirection) {
         moveToMonthRef.current(outOfBoundsDirection);
       }
     };
@@ -1415,8 +1418,8 @@ const CLACalendar: React.FC<CalendarSettings> = ({
           : date > boundaryDate;
       }
 
-      // Check readonly restrictions
-      if (restriction.type === 'readonly') {
+      // Check daterange restrictions
+      if (restriction.type === 'daterange' && restriction.ranges) {
         return restriction.ranges.some(range => {
           const rangeStart = parseISO(range.start);
           const rangeEnd = parseISO(range.end);
@@ -1564,8 +1567,8 @@ const CLACalendar: React.FC<CalendarSettings> = ({
 
     const targetResult = restrictionManager.checkSelection(date, date);
     if (!targetResult.allowed) {
-      if (showSelectionAlert) {
-        setNotification(targetResult.message);
+      if (showSelectionAlert && targetResult.message) {
+        setNotification(targetResult.message || 'Selection not allowed');
       }
       return;
     }
