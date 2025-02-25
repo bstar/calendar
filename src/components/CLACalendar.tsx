@@ -759,6 +759,7 @@ const MonthGrid: React.FC<MonthGridProps> = ({
           display: 'grid',
           gridTemplateColumns: 'repeat(7, 1fr)',
           gridAutoRows: '36px',
+          rowGap: '4px',
           paddingLeft: '2px'  // Match month heading alignment
         }}
       >
