@@ -292,6 +292,27 @@ const styles = {
       boxShadow: '0 0 0 2px rgba(3, 102, 214, 0.2)'
     }
   } as ExtendedCSSProperties,
+  tabContent: {
+    padding: '20px',
+    border: '1px solid #cfd4d9',
+    borderRadius: '8px',
+    backgroundColor: '#fff'
+  },
+  heading: {
+    marginBottom: '24px',
+    color: '#333',
+    fontSize: '20px'
+  },
+  labelCell: {
+    width: '70%',
+    paddingRight: '24px'
+  },
+  controlCell: {
+    width: '30%',
+    textAlign: 'right',
+    verticalAlign: 'top',
+    paddingTop: '4px'
+  }
 };
 
 // Documentation styles
@@ -956,8 +977,21 @@ function App() {
       case 'features':
         return (
           <div style={styles.tabContent}>
-            <h3 style={styles.heading}>Features</h3>
-            <p style={styles.description}>
+            <h3 style={{
+              ...styles.heading,
+              fontSize: '18px',
+              fontWeight: '500',
+              color: '#2c3e50',
+              marginBottom: '16px'
+            }}>
+              Features
+            </h3>
+            <p style={{
+              fontSize: '14px',
+              color: '#64748b',
+              marginBottom: '24px',
+              lineHeight: '1.5'
+            }}>
               Toggle various calendar features and behaviors. Changes are applied immediately.
             </p>
             <table style={{
@@ -978,15 +1012,17 @@ function App() {
                         ...styles.label,
                         display: 'block',
                         marginBottom: '4px',
-                        fontWeight: '500'
+                        fontWeight: '400',
+                        fontSize: '15px',
+                        color: '#334155'
                       }}>
                         {setting.label}
                       </label>
                       <span style={{
                         fontSize: '13px',
-                        color: '#666',
+                        color: '#64748b',
                         display: 'block',
-                        lineHeight: '1.4'
+                        lineHeight: '1.5'
                       }}>
                         {setting.description}
                       </span>
@@ -1009,7 +1045,8 @@ function App() {
                         }}
                         style={{
                           width: '16px',
-                          height: '16px'
+                          height: '16px',
+                          cursor: 'pointer'
                         }}
                       />
                     </td>
