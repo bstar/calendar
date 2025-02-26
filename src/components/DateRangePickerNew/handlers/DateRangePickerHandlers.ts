@@ -250,13 +250,14 @@ export class DateRangePickerHandlers {
     setSelectedRange: (range: DateRange) => void,
     setNotification: (message: string | null) => void,
     showSelectionAlert: boolean,
-    selectedRange: DateRange
+    selectedRange: DateRange,
+    outOfBoundsDirection: 'prev' | 'next' | null
   ) {
     const handleSelectionStart = (date: Date) => {
       const result = selectionManager.startSelection(date);
       
       if (!result.success) {
-        if (showSelectionAlert && result.message) {
+        if (showSelectionAlert && outOfBoundsDirection) {
           setNotification(result.message);
         }
         return;
@@ -273,7 +274,7 @@ export class DateRangePickerHandlers {
       const result = selectionManager.updateSelection(selectedRange, date);
       
       if (!result.success) {
-        if (showSelectionAlert && result.message) {
+        if (showSelectionAlert && outOfBoundsDirection) {
           setNotification(result.message);
         }
         return;

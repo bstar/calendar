@@ -1278,9 +1278,10 @@ const CLACalendar: React.FC<CalendarSettings> = ({
       setSelectedRange,
       setNotification,
       showSelectionAlert,
-      selectedRange
+      selectedRange,
+      outOfBoundsDirection
     ),
-    [selectionManager, isSelecting, setIsSelecting, setSelectedRange, setNotification, showSelectionAlert, selectedRange]
+    [selectionManager, isSelecting, setIsSelecting, setSelectedRange, setNotification, showSelectionAlert, selectedRange, outOfBoundsDirection]
   );
 
   // Use the abstracted calendar action handlers
@@ -1333,7 +1334,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     return !result.allowed;
   }, [selectionManager]);
 
-  // Update the moveToMonth function to properly handle all restriction scenarios
+  // Update the moveToMonth function to only show notifications during out-of-bounds scrolling
   const moveToMonth = useCallback((direction: 'prev' | 'next') => {
     // First move the month - this happens regardless of selection state
     setCurrentMonth(prev => {
@@ -1397,9 +1398,17 @@ const CLACalendar: React.FC<CalendarSettings> = ({
         // End the selection and show message
         setIsSelecting(false);
         setOutOfBoundsDirection(null);
-        if (showSelectionAlert) {
-          setNotification("Selection cannot include restricted dates.");
+        
+        // Only show notification during out-of-bounds scrolling
+        if (showSelectionAlert && outOfBoundsDirection) {
+          // Get the specific restriction message
+          const restrictionResult = selectionManager.canSelectDate(firstRestrictedDay);
+          const message = restrictionResult.message || 
+            `Selection cannot include restricted date: ${format(firstRestrictedDay, 'MMM dd, yyyy')}`;
+          
+          setNotification(message);
         }
+        
         document.removeEventListener("mousemove", handleDocumentMouseMove);
         document.removeEventListener("mouseup", handleMouseUp);
       } else {
