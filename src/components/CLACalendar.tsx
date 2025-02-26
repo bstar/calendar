@@ -1164,18 +1164,6 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     return true;
   }, [showTooltips, suppressTooltipsOnSelection, isSelecting]);
 
-  // Add logging when initialLayers prop changes
-  useEffect(() => {
-    console.log('=== DateRangePickerNew Layers ===');
-    console.log('initialLayers:', layers);
-  }, [layers]);
-
-  // Add logging when activeLayers state changes
-  useEffect(() => {
-    console.log('=== Active Layers Updated ===');
-    console.log('activeLayers:', activeLayers);
-  }, [activeLayers]);
-
   // Add this effect to update activeLayers when initialLayers changes
   useEffect(() => {
     setActiveLayers(layerManager.getLayers());
@@ -1277,7 +1265,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     DateRangePickerHandlers.createDisplayTextFormatter(
       selectedRange,
       selectionMode
-    )(),
+    ),
     [selectedRange, selectionMode]
   );
 
@@ -1395,6 +1383,22 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     // Set the ref to the current moveToMonth function
     moveToMonthRef.current = moveToMonth;
   }, [moveToMonth]);
+
+  // Add this effect to handle clicks outside the calendar
+  useEffect(() => {
+    if (!closeOnClickAway || displayMode === 'embedded' || !isOpen) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [closeOnClickAway, displayMode, isOpen]);
 
   return (
     <div className="cla-calendar" style={{ width: 'fit-content' }}>
