@@ -43,7 +43,8 @@ import {
   CalendarHeader,
   DateInputSection,
   CalendarFooter,
-  CalendarContainer
+  CalendarContainer,
+  SideChevronIndicator
 } from './DateRangePickerNew/CalendarComponents';
 
 // Add these interfaces after the existing ones
@@ -724,33 +725,6 @@ const MonthPair = ({
           startWeekOnSunday={startWeekOnSunday}
         />
       ))}
-    </div>
-  );
-};
-
-const SideChevronIndicator: React.FC<SideChevronIndicatorProps> = ({ outOfBoundsDirection, isSelecting }) => {
-  if (!outOfBoundsDirection || !isSelecting) return null;
-
-  return (
-    <div style={{
-      position: 'absolute',
-      top: 0,
-      bottom: 0,
-      [outOfBoundsDirection === 'prev' ? 'left' : 'right']: 0,
-      width: '40px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: 'rgba(227, 242, 253, 0.9)',
-      zIndex: 9999,
-      border: '1px solid var(--border-color)',
-      cursor: "pointer",
-    } as React.CSSProperties}>
-      {outOfBoundsDirection === 'prev' ? (
-        <ChevronLeft size={24} />
-      ) : (
-        <ChevronRight size={24} />
-      )}
     </div>
   );
 };
