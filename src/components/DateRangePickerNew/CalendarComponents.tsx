@@ -1,7 +1,20 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { format, parseISO, isSameDay } from 'date-fns';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { 
+  format, 
+  parseISO, 
+  isSameDay, 
+  startOfMonth, 
+  endOfMonth, 
+  eachDayOfInterval, 
+  startOfWeek, 
+  endOfWeek, 
+  isSameMonth 
+} from 'date-fns';
 import { DateRange } from './selection/DateRangeSelectionManager';
 import { DEFAULT_CONTAINER_STYLES } from '../DateRangePicker.config';
+import { RestrictionManager } from './restrictions/RestrictionManager';
+import { RestrictionConfig } from './restrictions/types';
+import { Layer } from '../DateRangePicker.config';
 
 // Button component
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -447,6 +460,68 @@ export const SideChevronIndicator: React.FC<SideChevronIndicatorProps> = ({
         <ChevronLeft size={24} />
       ) : (
         <ChevronRight size={24} />
+      )}
+    </div>
+  );
+};
+
+// Add the Tooltip component
+export interface TooltipProps {
+  content: React.ReactNode;
+  show: boolean;
+  children: React.ReactNode;
+}
+
+export const Tooltip: React.FC<TooltipProps> = ({ content, show, children }) => {
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+  const tooltipRef = useRef<HTMLDivElement>(null);
+  const targetRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (show && targetRef.current && tooltipRef.current) {
+      const targetRect = targetRef.current.getBoundingClientRect();
+      const tooltipRect = tooltipRef.current.getBoundingClientRect();
+      
+      const newPosition = {
+        top: targetRect.top - tooltipRect.height - 8,
+        left: targetRect.left + (targetRect.width - tooltipRect.width) / 2
+      };
+
+      setPosition(newPosition);
+    }
+  }, [show, content]);
+
+  if (!show && !content) return <>{children}</>;
+  
+  return (
+    <div 
+      ref={targetRef} 
+      style={{ position: 'relative', width: '100%', height: '100%' }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {children}
+      {show && isHovered && (
+        <div
+          ref={tooltipRef}
+          style={{
+            position: 'fixed',
+            top: position.top,
+            left: position.left,
+            backgroundColor: 'white',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
+            borderRadius: '4px',
+            zIndex: 9999,
+            fontSize: '14px',
+            maxWidth: '300px',
+            padding: '8px',
+            pointerEvents: 'none',
+            border: '1px solid rgba(0,0,0,0.2)'
+          }}
+        >
+          {content}
+        </div>
       )}
     </div>
   );

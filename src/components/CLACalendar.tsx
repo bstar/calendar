@@ -44,7 +44,9 @@ import {
   DateInputSection,
   CalendarFooter,
   CalendarContainer,
-  SideChevronIndicator
+  SideChevronIndicator,
+  Tooltip,
+  TooltipProps
 } from './DateRangePickerNew/CalendarComponents';
 
 // Add these interfaces after the existing ones
@@ -295,61 +297,7 @@ interface SideChevronIndicatorProps {
   isSelecting: boolean;
 }
 
-// Update the Tooltip component
-const Tooltip: React.FC<TooltipProps> = ({ content, show, children }) => {
-  const [position, setPosition] = useState({ top: 0, left: 0 });
-  const [isHovered, setIsHovered] = useState(false);
-  const tooltipRef = useRef<HTMLDivElement>(null);
-  const targetRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (show && isHovered && targetRef.current && tooltipRef.current) {
-      const targetRect = targetRef.current.getBoundingClientRect();
-      const tooltipRect = tooltipRef.current.getBoundingClientRect();
-      
-      const newPosition = {
-        top: targetRect.top - tooltipRect.height - 8,
-        left: targetRect.left + (targetRect.width - tooltipRect.width) / 2
-      };
-
-      setPosition(newPosition);
-    }
-  }, [show, isHovered, content]);
-
-  return (
-    <div 
-      ref={targetRef} 
-      style={{ position: 'relative', width: '100%', height: '100%' }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {children}
-      {show && isHovered && (
-        <div
-          ref={tooltipRef}
-          style={{
-            position: 'fixed',
-            top: position.top,
-            left: position.left,
-            backgroundColor: 'white',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
-            borderRadius: '4px',
-            zIndex: 9999,
-            fontSize: '14px',
-            maxWidth: '300px',
-            padding: '8px',
-            pointerEvents: 'none',
-            border: '1px solid rgba(0,0,0,0.2)'
-          }}
-        >
-          {content}
-        </div>
-      )}
-    </div>
-  );
-};
-
-// Update MonthGrid to use proper types for weeks
+// Update the MonthGrid to use proper types for weeks
 const MonthGrid: React.FC<MonthGridProps> = ({
   baseDate,
   selectedRange,
