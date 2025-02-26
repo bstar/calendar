@@ -1333,13 +1333,21 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     return !result.allowed;
   }, [selectionManager]);
 
-  // Update the moveToMonth function to use selectionManager for restriction checking
+  // Update the moveToMonth function using a more functional approach
   const moveToMonth = useCallback((direction: 'prev' | 'next') => {
-    // Only check restrictions during out-of-bounds scrolling
+    // First move the month - this happens regardless of selection state
+    setCurrentMonth(prev => {
+      return direction === 'next'
+        ? addMonths(prev, 1)
+        : addMonths(prev, -1);
+    });
+
+    // Then handle selection logic only if we're in an out-of-bounds selection
     if (isSelecting && outOfBoundsDirection) {
       const start = selectedRange.start ? parseISO(selectedRange.start) : null;
       if (!start) return;
 
+      // Calculate the month we just moved to
       const nextMonth = direction === 'next' 
         ? addMonths(months[months.length - 1], 1)
         : addMonths(months[0], -1);
@@ -1347,35 +1355,45 @@ const CLACalendar: React.FC<CalendarSettings> = ({
       const firstDayOfMonth = startOfMonth(nextMonth);
       const lastDayOfMonth = endOfMonth(nextMonth);
 
-      // Check if selection would extend into restricted dates
-      const selectionEnd = direction === 'next' ? lastDayOfMonth : firstDayOfMonth;
-      
-      const result = selectionManager.canSelectRange(start, selectionEnd);
-      
-      if (!result.allowed) {
+      // Check each day in the visible month to see if it's restricted
+      const daysInNextMonth = eachDayOfInterval({ 
+        start: firstDayOfMonth, 
+        end: lastDayOfMonth 
+      });
+
+      // Find the first restricted day in the month, if any
+      const firstRestrictedDay = daysInNextMonth.find(day => 
+        !selectionManager.canSelectDate(day).allowed
+      );
+
+      if (firstRestrictedDay) {
+        // If there's a restriction in the visible month, stop the selection
+        // at the day before the restriction
+        const dayBeforeRestriction = addDays(firstRestrictedDay, -1);
+        
+        // Update the selection to go up to the day before the restriction
+        setSelectedRange((prev: DateRange) => ({
+          ...prev,
+          end: format(dayBeforeRestriction, 'yyyy-MM-dd')
+        }));
+        
+        // End the selection and show message
         setIsSelecting(false);
         setOutOfBoundsDirection(null);
-        if (showSelectionAlert && result.message) {
-          setNotification(result.message);
+        if (showSelectionAlert) {
+          setNotification("Selection cannot include restricted dates.");
         }
         document.removeEventListener("mousemove", handleDocumentMouseMove);
         document.removeEventListener("mouseup", handleMouseUp);
-        return;
+      } else {
+        // No restrictions in this month, extend selection to include it
+        const newEnd = direction === 'next' ? lastDayOfMonth : firstDayOfMonth;
+        setSelectedRange((prev: DateRange) => ({
+          ...prev,
+          end: format(newEnd, 'yyyy-MM-dd')
+        }));
       }
-
-      // Update the selection to include the new month
-      const newEnd = direction === 'next' ? lastDayOfMonth : firstDayOfMonth;
-      setSelectedRange((prev: DateRange) => ({
-        ...prev,
-        end: format(newEnd, 'yyyy-MM-dd')
-      }));
     }
-
-    setCurrentMonth(prev => {
-      return direction === 'next'
-        ? addMonths(prev, 1)
-        : addMonths(prev, -1);
-    });
   }, [months, selectionManager, showSelectionAlert, isSelecting, outOfBoundsDirection, selectedRange.start, handleDocumentMouseMove, handleMouseUp]);
 
   // After the existing moveToMonth function is defined (around line 1480), add:
