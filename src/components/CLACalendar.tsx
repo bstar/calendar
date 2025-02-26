@@ -1333,7 +1333,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     return !result.allowed;
   }, [selectionManager]);
 
-  // Update the moveToMonth function using a more functional approach
+  // Update the moveToMonth function to properly handle all restriction scenarios
   const moveToMonth = useCallback((direction: 'prev' | 'next') => {
     // First move the month - this happens regardless of selection state
     setCurrentMonth(prev => {
@@ -1355,26 +1355,43 @@ const CLACalendar: React.FC<CalendarSettings> = ({
       const firstDayOfMonth = startOfMonth(nextMonth);
       const lastDayOfMonth = endOfMonth(nextMonth);
 
-      // Check each day in the visible month to see if it's restricted
-      const daysInNextMonth = eachDayOfInterval({ 
-        start: firstDayOfMonth, 
-        end: lastDayOfMonth 
+      // Determine the potential new end of the selection
+      const potentialEnd = direction === 'next' ? lastDayOfMonth : firstDayOfMonth;
+      
+      // Check if the entire selection range would cross any restrictions
+      // We need to check from the earliest date to the latest date
+      const earliestDate = start < potentialEnd ? start : potentialEnd;
+      const latestDate = start < potentialEnd ? potentialEnd : start;
+      
+      // Get all days in the potential selection range
+      const allDaysInRange = eachDayOfInterval({
+        start: earliestDate,
+        end: latestDate
       });
-
-      // Find the first restricted day in the month, if any
-      const firstRestrictedDay = daysInNextMonth.find(day => 
+      
+      // Find the first restricted day in the entire range, if any
+      const firstRestrictedDay = allDaysInRange.find(day => 
         !selectionManager.canSelectDate(day).allowed
       );
-
+      
       if (firstRestrictedDay) {
-        // If there's a restriction in the visible month, stop the selection
+        // If there's a restriction in the range, we need to stop the selection
         // at the day before the restriction
-        const dayBeforeRestriction = addDays(firstRestrictedDay, -1);
         
-        // Update the selection to go up to the day before the restriction
+        // Calculate the valid end date based on the direction of selection
+        const validEndDate = start < firstRestrictedDay 
+          ? addDays(firstRestrictedDay, -1)  // Forward selection: day before restriction
+          : addDays(firstRestrictedDay, 1);  // Backward selection: day after restriction
+        
+        // Ensure the valid end date is between start and potential end
+        const finalEndDate = start < potentialEnd
+          ? Math.min(validEndDate.getTime(), potentialEnd.getTime())
+          : Math.max(validEndDate.getTime(), potentialEnd.getTime());
+        
+        // Update the selection to the valid range
         setSelectedRange((prev: DateRange) => ({
           ...prev,
-          end: format(dayBeforeRestriction, 'yyyy-MM-dd')
+          end: format(new Date(finalEndDate), 'yyyy-MM-dd')
         }));
         
         // End the selection and show message
@@ -1386,11 +1403,10 @@ const CLACalendar: React.FC<CalendarSettings> = ({
         document.removeEventListener("mousemove", handleDocumentMouseMove);
         document.removeEventListener("mouseup", handleMouseUp);
       } else {
-        // No restrictions in this month, extend selection to include it
-        const newEnd = direction === 'next' ? lastDayOfMonth : firstDayOfMonth;
+        // No restrictions in the range, extend selection to include the new month
         setSelectedRange((prev: DateRange) => ({
           ...prev,
-          end: format(newEnd, 'yyyy-MM-dd')
+          end: format(potentialEnd, 'yyyy-MM-dd')
         }));
       }
     }
