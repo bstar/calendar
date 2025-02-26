@@ -815,10 +815,6 @@ const DayCell = ({
     return 'transparent';
   };
 
-  const events = layer.data?.events?.filter(event => 
-    isSameDay(date, parseISO(event.date))
-  ) || [];
-
   const dayCell = (
     <div
       className={!restrictionResult.allowed ? 'restricted-date-pattern' : ''}
