@@ -33,6 +33,7 @@ import { Notification } from './DateRangePickerNew/Notification';
 import { LayerManager } from './DateRangePickerNew/layers/LayerManager';
 import { RestrictionBackgroundGenerator } from './DateRangePickerNew/restrictions/RestrictionBackgroundGenerator';
 import { DateRangeSelectionManager, DateRange } from './DateRangePickerNew/selection/DateRangeSelectionManager';
+import { DateRangePickerHandlers, ValidationError, DateInputContext, MousePosition } from './DateRangePickerNew/handlers/DateRangePickerHandlers';
 
 // Add these interfaces after the existing ones
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -1234,84 +1235,50 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     };
   }, [isSelecting, outOfBoundsDirection, enableOutOfBoundsScroll]);
 
-  const handleDocumentMouseMove: DocumentMouseHandler = useCallback((e) => {
-    e.preventDefault();
-    if (!isSelecting || !containerRef.current) return;
-
-    const containerRect = containerRef.current.getBoundingClientRect();
-    const { clientX: mouseX, clientY: mouseY } = e;
-    const BOUNDARY_THRESHOLD = 20;
-
-    setMousePosition({ x: mouseX, y: mouseY });
-
-    // Check both boundaries with equal thresholds
-    const newDirection = mouseX < containerRect.left + BOUNDARY_THRESHOLD ? 'prev'
-      : mouseX > containerRect.right - BOUNDARY_THRESHOLD ? 'next'
-        : null;
-
-    if (newDirection !== outOfBoundsDirection) {
-      setOutOfBoundsDirection(newDirection);
-      if (newDirection && !outOfBoundsDirection) {
-        setTimeout(() => {
-          moveToMonthRef.current?.(newDirection);
-        }, 1000);
-      }
-    }
-  }, [isSelecting, outOfBoundsDirection]);
-
-  const handleMouseMove: ReactMouseHandler = useCallback((e) => {
-    e.preventDefault();
-    if (!isSelecting || !containerRef.current) return;
-
-    const containerRect = containerRef.current.getBoundingClientRect();
-    const { clientX: mouseX, clientY: mouseY } = e;
-    const BOUNDARY_THRESHOLD = 20;
-
-    setMousePosition({ x: mouseX, y: mouseY });
-
-    // Check both boundaries with equal thresholds
-    const newDirection = mouseX < containerRect.left + BOUNDARY_THRESHOLD ? 'prev'
-      : mouseX > containerRect.right - BOUNDARY_THRESHOLD ? 'next'
-        : null;
-
-    if (newDirection !== outOfBoundsDirection) {
-      setOutOfBoundsDirection(newDirection);
-      if (newDirection && !outOfBoundsDirection) {
-        setTimeout(() => {
-          moveToMonthRef.current?.(newDirection);
-        }, 1000);
-      }
-    }
-  }, [isSelecting, outOfBoundsDirection]);
-
-  const handleMouseUp = useCallback(() => {
-    setIsSelecting(false);
-    setOutOfBoundsDirection(null);
-
-    const styles = ['userSelect', 'webkitUserSelect', 'mozUserSelect', 'msUserSelect'] as const;
-    styles.forEach(style => document.body.style[style as any] = '');
-
-    document.removeEventListener("mousemove", handleDocumentMouseMove);
-    document.removeEventListener("mouseup", handleMouseUp);
-
-    setOutOfBoundsDirection(null);
-  }, [handleDocumentMouseMove]);
-
-  const handleMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (isSelecting) return;
-    e.preventDefault();
-
-    const setUserSelectNone = () => {
-      const styles = ['userSelect', 'webkitUserSelect', 'mozUserSelect', 'msUserSelect'];
-      styles.forEach(style => document.body.style[style] = 'none');
-    };
-
-    setIsSelecting(true);
-    setUserSelectNone();
-
-    document.addEventListener("mousemove", handleDocumentMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
-  }, [isSelecting, handleDocumentMouseMove, handleMouseUp]);
+  // Use the abstracted handlers
+  const { handleMouseMove, handleMouseLeave } = useMemo(() => 
+    DateRangePickerHandlers.createMouseHandlers(
+      containerRef,
+      isSelecting,
+      setOutOfBoundsDirection,
+      setMousePosition
+    ),
+    [containerRef, isSelecting, setOutOfBoundsDirection, setMousePosition]
+  );
+  
+  const { handleDocumentMouseMove, handleMouseUp, handleMouseDown } = useMemo(() => 
+    DateRangePickerHandlers.createDocumentMouseHandlers(
+      containerRef,
+      isSelecting,
+      outOfBoundsDirection,
+      setOutOfBoundsDirection,
+      setMousePosition,
+      moveToMonthRef
+    ),
+    [containerRef, isSelecting, outOfBoundsDirection, setOutOfBoundsDirection, setMousePosition, moveToMonthRef]
+  );
+  
+  const handleDateChange = useMemo(() => 
+    DateRangePickerHandlers.createDateChangeHandler(
+      selectedRange,
+      dateInputContext,
+      setSelectedRange,
+      setDateInputContext,
+      setValidationErrors,
+      setCurrentMonth,
+      visibleMonths,
+      dateValidator
+    ),
+    [selectedRange, dateInputContext, setSelectedRange, setDateInputContext, setValidationErrors, setCurrentMonth, visibleMonths, dateValidator]
+  );
+  
+  const getDisplayText = useMemo(() => 
+    DateRangePickerHandlers.createDisplayTextFormatter(
+      selectedRange,
+      selectionMode
+    )(),
+    [selectedRange, selectionMode]
+  );
 
   const handleClear = useCallback(() => {
     // Reset range and context
@@ -1333,49 +1300,6 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     setIsOpen(false);
     setIsSelecting(false);
   }, []);
-
-  const getDisplayText = useCallback(() => {
-    const { start, end } = selectedRange;
-    if (!start) return "Select date";
-    
-    if (selectionMode === 'single') {
-      return format(parseISO(start), "MMM dd, yyyy");
-    }
-    
-    return !end
-      ? format(parseISO(start), "MMM dd, yyyy")
-      : `${format(parseISO(start), "MMM dd, yyyy")} - ${format(parseISO(end), "MMM dd, yyyy")}`;
-  }, [selectedRange, selectionMode]);
-
-  // Fix the props reference in settings
-  const settings = {
-    displayMode,
-    visibleMonths,
-    showMonthHeadings,
-    selectionMode,
-    showTooltips,
-    showHeader,
-    closeOnClickAway,
-    showSubmitButton,
-    showFooter,
-    singleMonthWidth,
-    enableOutOfBoundsScroll
-  };
-
-  const handleMouseLeave = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    // Only handle out of bounds when selecting
-    if (!isSelecting) return;
-    
-    const containerRect = containerRef.current?.getBoundingClientRect();
-    if (!containerRect) return;
-    const { clientX: mouseX } = e;
-
-    if (mouseX < containerRect.left) {
-      setOutOfBoundsDirection('prev');
-    } else if (mouseX > containerRect.right) {
-      setOutOfBoundsDirection('next');
-    }
-  }, [isSelecting]);
 
   const handleLayerChange = (layerId: string) => {
     setActiveLayer(layerId);
@@ -1494,67 +1418,13 @@ const CLACalendar: React.FC<CalendarSettings> = ({
         : addMonths(prev, -1);
     });
   }, [months, selectionManager, showSelectionAlert, isSelecting, outOfBoundsDirection, selectedRange.start, handleDocumentMouseMove, handleMouseUp]);
-  
-  // Update the useEffect that watches for restrictionConfig changes
+
+  // After the existing moveToMonth function is defined (around line 1480), add:
   useEffect(() => {
-    if (restrictionConfig) {
-      selectionManager.updateRestrictions(restrictionConfig);
-    }
-  }, [restrictionConfig, selectionManager]);
+    // Set the ref to the current moveToMonth function
+    moveToMonthRef.current = moveToMonth;
+  }, [moveToMonth]);
 
-  // Add this function back to the component
-  const handleDateChange = (field: 'start' | 'end') => (
-    date: Date | null,
-    isClearingError?: boolean,
-    validationError?: ValidationError
-  ) => {
-    if (isClearingError) {
-      setValidationErrors(prev =>
-        Object.entries(prev)
-          .filter(([key]) => key !== field)
-          .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {})
-      );
-      return;
-    }
-
-    if (validationError) {
-      setValidationErrors(prev => ({
-        ...prev,
-        [field]: validationError
-      }));
-      return;
-    }
-
-    const newState = {
-      range: { ...selectedRange, [field]: date?.toISOString() || null },
-      context: {
-        ...dateInputContext,
-        [`${field}Date`]: date ? dateValidator.formatValue(date) : null
-      }
-    };
-
-    setSelectedRange(newState.range);
-    setDateInputContext(newState.context);
-    setValidationErrors({});
-
-    // Only update calendar position if we have a valid date
-    if (date) {
-      const validVisibleMonths = Math.min(6, Math.max(1, visibleMonths));
-      
-      if (field === 'start') {
-        // For start date, we want it in the leftmost month
-        const newBaseMonth = startOfMonth(date);
-        setCurrentMonth(newBaseMonth);
-      } else {
-        // For end date, we want it in the rightmost month
-        const newBaseMonth = addMonths(startOfMonth(date), -(validVisibleMonths - 1));
-        setCurrentMonth(newBaseMonth);
-      }
-    }
-  };
-
-  // The rest of the component remains the same...
-  
   return (
     <div className="cla-calendar" style={{ width: 'fit-content' }}>
       {displayMode === 'popup' && (
