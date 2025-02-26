@@ -1281,30 +1281,33 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     [selectedRange, selectionMode]
   );
 
-  const handleClear = useCallback(() => {
-    // Reset range and context
-    setSelectedRange({ start: null, end: null });
-    setDateInputContext({ startDate: null, endDate: null, currentField: null });
+  // Use the abstracted selection handlers with all required parameters
+  const { handleSelectionStart, handleSelectionMove } = useMemo(() => 
+    DateRangePickerHandlers.createSelectionHandlers(
+      selectionManager,
+      isSelecting,
+      setIsSelecting,
+      setSelectedRange,
+      setNotification,
+      showSelectionAlert,
+      selectedRange
+    ),
+    [selectionManager, isSelecting, setIsSelecting, setSelectedRange, setNotification, showSelectionAlert, selectedRange]
+  );
 
-    // Reset selection states
-    setIsSelecting(false);
-
-    // Reset validation
-    setValidationErrors({});
-
-    // Reset to current month view
-    const currentDate = startOfMonth(new Date());
-    setCurrentMonth(currentDate);
-  }, []);
-
-  const handleSubmit = useCallback(() => {
-    setIsOpen(false);
-    setIsSelecting(false);
-  }, []);
-
-  const handleLayerChange = (layerId: string) => {
-    setActiveLayer(layerId);
-  };
+  // Use the abstracted calendar action handlers
+  const { handleClear, handleSubmit, handleLayerChange } = useMemo(() => 
+    DateRangePickerHandlers.createCalendarActionHandlers(
+      setSelectedRange,
+      setDateInputContext,
+      setIsSelecting,
+      setValidationErrors,
+      setCurrentMonth,
+      setIsOpen,
+      setActiveLayer
+    ),
+    [setSelectedRange, setDateInputContext, setIsSelecting, setValidationErrors, setCurrentMonth, setIsOpen, setActiveLayer]
+  );
 
   const renderLayer = (layer: Layer) => {
     return (
@@ -1342,39 +1345,6 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     return !result.allowed;
   }, [selectionManager]);
 
-  // Update the handleSelectionStart function to use selectionManager
-  const handleSelectionStart = useCallback((date: Date) => {
-    const result = selectionManager.startSelection(date);
-    
-    if (!result.success) {
-      if (showSelectionAlert && result.message) {
-        setNotification(result.message);
-      }
-      return;
-    }
-    
-    setIsSelecting(true);
-    setSelectedRange(result.range);
-    setNotification(null);
-  }, [selectionManager, showSelectionAlert]);
-  
-  // Update the handleSelectionMove function to use selectionManager
-  const handleSelectionMove = useCallback((date: Date) => {
-    if (!isSelecting) return;
-    
-    const result = selectionManager.updateSelection(selectedRange, date);
-    
-    if (!result.success) {
-      if (showSelectionAlert && result.message) {
-        setNotification(result.message);
-      }
-      return;
-    }
-    
-    setSelectedRange(result.range);
-    setNotification(null);
-  }, [isSelecting, selectedRange, selectionManager, showSelectionAlert]);
-  
   // Update the moveToMonth function to use selectionManager for restriction checking
   const moveToMonth = useCallback((direction: 'prev' | 'next') => {
     // Only check restrictions during out-of-bounds scrolling

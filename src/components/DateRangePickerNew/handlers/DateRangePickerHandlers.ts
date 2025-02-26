@@ -239,4 +239,97 @@ export class DateRangePickerHandlers {
         : `${format(parseISO(start), "MMM dd, yyyy")} - ${format(parseISO(end), "MMM dd, yyyy")}`;
     };
   }
+
+  /**
+   * Create handlers for selection actions
+   */
+  static createSelectionHandlers(
+    selectionManager: any,
+    isSelecting: boolean,
+    setIsSelecting: (isSelecting: boolean) => void,
+    setSelectedRange: (range: DateRange) => void,
+    setNotification: (message: string | null) => void,
+    showSelectionAlert: boolean,
+    selectedRange: DateRange
+  ) {
+    const handleSelectionStart = (date: Date) => {
+      const result = selectionManager.startSelection(date);
+      
+      if (!result.success) {
+        if (showSelectionAlert && result.message) {
+          setNotification(result.message);
+        }
+        return;
+      }
+      
+      setIsSelecting(true);
+      setSelectedRange(result.range);
+      setNotification(null);
+    };
+    
+    const handleSelectionMove = (date: Date) => {
+      if (!isSelecting) return;
+      
+      const result = selectionManager.updateSelection(selectedRange, date);
+      
+      if (!result.success) {
+        if (showSelectionAlert && result.message) {
+          setNotification(result.message);
+        }
+        return;
+      }
+      
+      setSelectedRange(result.range);
+      setNotification(null);
+    };
+    
+    return {
+      handleSelectionStart,
+      handleSelectionMove
+    };
+  }
+
+  /**
+   * Create handlers for calendar actions (clear, submit, layer change)
+   */
+  static createCalendarActionHandlers(
+    setSelectedRange: (range: DateRange) => void,
+    setDateInputContext: (context: DateInputContext) => void,
+    setIsSelecting: (isSelecting: boolean) => void,
+    setValidationErrors: (errors: Record<string, ValidationError>) => void,
+    setCurrentMonth: (month: Date) => void,
+    setIsOpen: (isOpen: boolean) => void,
+    setActiveLayer: (layerId: string) => void
+  ) {
+    const handleClear = () => {
+      // Reset range and context
+      setSelectedRange({ start: null, end: null });
+      setDateInputContext({ startDate: null, endDate: null, currentField: null });
+
+      // Reset selection states
+      setIsSelecting(false);
+
+      // Reset validation
+      setValidationErrors({});
+
+      // Reset to current month view
+      const currentDate = startOfMonth(new Date());
+      setCurrentMonth(currentDate);
+    };
+
+    const handleSubmit = () => {
+      setIsOpen(false);
+      setIsSelecting(false);
+    };
+
+    const handleLayerChange = (layerId: string) => {
+      setActiveLayer(layerId);
+    };
+    
+    return {
+      handleClear,
+      handleSubmit,
+      handleLayerChange
+    };
+  }
 } 
