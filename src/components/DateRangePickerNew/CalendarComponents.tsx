@@ -3,16 +3,9 @@ import {
   format, 
   parseISO, 
   isSameDay, 
-  startOfMonth, 
-  endOfMonth, 
-  eachDayOfInterval, 
-  startOfWeek, 
-  endOfWeek, 
-  isSameMonth 
 } from 'date-fns';
 import { DateRange } from './selection/DateRangeSelectionManager';
 import { DEFAULT_CONTAINER_STYLES } from '../DateRangePicker.config';
-import { RestrictionManager } from './restrictions/RestrictionManager';
 import { RestrictionConfig } from './restrictions/types';
 import { Layer } from '../DateRangePicker.config';
 
@@ -23,6 +16,14 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string;
 }
 
+/**
+ * Reusable button component with variant styling
+ * @param variant - Button style variant
+ * @param children - Button content
+ * @param className - Additional CSS class names
+ * @param props - Additional button HTML attributes
+ * @returns Styled button element
+ */
 export const Button: React.FC<ButtonProps> = ({ variant, children, className, ...props }) => (
   <button 
     className={`cla-button cla-button-${variant} ${className || ''}`} 
@@ -37,6 +38,11 @@ interface ChevronProps {
   size?: number;
 }
 
+/**
+ * Left-pointing chevron icon component
+ * @param size - Size of the chevron icon in pixels
+ * @returns Chevron icon element
+ */
 export const ChevronLeft: React.FC<ChevronProps> = ({ size = 16 }) => (
   <span 
     className="cla-chevron cla-chevron-left" 
@@ -44,6 +50,11 @@ export const ChevronLeft: React.FC<ChevronProps> = ({ size = 16 }) => (
   />
 );
 
+/**
+ * Right-pointing chevron icon component
+ * @param size - Size of the chevron icon in pixels
+ * @returns Chevron icon element
+ */
 export const ChevronRight: React.FC<ChevronProps> = ({ size = 16 }) => (
   <span 
     className="cla-chevron cla-chevron-right" 
@@ -65,13 +76,20 @@ export interface DateInputProps {
   selectedRange: DateRange;
 }
 
-// This is the exact implementation from CLACalendar.tsx
+/**
+ * Date input field with validation and formatting
+ * @param value - Currently selected date value
+ * @param onChange - Callback function when date changes
+ * @param field - Which field this input represents (start or end date)
+ * @param placeholder - Placeholder text when no date is selected
+ * @param selectedRange - The currently selected date range
+ * @returns Date input field with validation
+ */
 export const DateInput: React.FC<DateInputProps> = ({ 
   value, 
   onChange, 
   field, 
   placeholder, 
-  context,
   selectedRange 
 }) => {
   const [inputValue, setInputValue] = useState('');
@@ -268,6 +286,13 @@ export interface CalendarHeaderProps {
   moveToMonth: (direction: 'prev' | 'next') => void;
 }
 
+/**
+ * Calendar header with navigation controls
+ * @param months - Array of month dates to display
+ * @param visibleMonths - Number of months visible at once
+ * @param moveToMonth - Function to navigate between months
+ * @returns Calendar header with navigation buttons
+ */
 export const CalendarHeader: React.FC<CalendarHeaderProps> = ({ 
   months, 
   visibleMonths, 
@@ -312,6 +337,14 @@ export interface DateInputSectionProps {
   selectionMode: 'single' | 'range';
 }
 
+/**
+ * Section containing date input fields
+ * @param selectedRange - Currently selected date range
+ * @param handleDateChange - Function to handle date changes
+ * @param dateInputContext - Context for date input fields
+ * @param selectionMode - Mode of selection (single or range)
+ * @returns Section with date input fields
+ */
 export const DateInputSection: React.FC<DateInputSectionProps> = ({
   selectedRange,
   handleDateChange,
@@ -351,6 +384,13 @@ export interface CalendarFooterProps {
   handleSubmit: () => void;
 }
 
+/**
+ * Footer with action buttons for the calendar
+ * @param showSubmitButton - Whether to show the submit button
+ * @param handleClear - Function to clear the selection
+ * @param handleSubmit - Function to submit the selection
+ * @returns Footer with clear and submit buttons
+ */
 export const CalendarFooter: React.FC<CalendarFooterProps> = ({ 
   showSubmitButton, 
   handleClear, 
@@ -396,6 +436,21 @@ export interface CalendarContainerProps {
   handleMouseLeave: (e: React.MouseEvent) => void;
 }
 
+/**
+ * Main container for the calendar component
+ * @param isOpen - Whether the calendar is open
+ * @param displayMode - Display mode (popup or embedded)
+ * @param children - Child components
+ * @param containerRef - Reference to the container element
+ * @param containerStyle - Additional container styles
+ * @param visibleMonths - Number of months visible at once
+ * @param singleMonthWidth - Width of a single month view
+ * @param enableOutOfBoundsScroll - Whether to enable scrolling when mouse is out of bounds
+ * @param handleMouseDown - Mouse down event handler
+ * @param handleMouseMove - Mouse move event handler
+ * @param handleMouseLeave - Mouse leave event handler
+ * @returns Calendar container or null if not visible
+ */
 export const CalendarContainer: React.FC<CalendarContainerProps> = ({
   isOpen,
   displayMode,
@@ -435,6 +490,12 @@ export interface SideChevronIndicatorProps {
   isSelecting: boolean;
 }
 
+/**
+ * Indicator for out-of-bounds scrolling during selection
+ * @param outOfBoundsDirection - Direction of out-of-bounds scrolling
+ * @param isSelecting - Whether user is currently selecting a date range
+ * @returns Chevron indicator or null if not needed
+ */
 export const SideChevronIndicator: React.FC<SideChevronIndicatorProps> = ({ 
   outOfBoundsDirection, 
   isSelecting 
@@ -472,6 +533,13 @@ export interface TooltipProps {
   children: React.ReactNode;
 }
 
+/**
+ * Tooltip component for displaying additional information
+ * @param content - Content to display in the tooltip
+ * @param show - Whether the tooltip should be shown
+ * @param children - Element that triggers the tooltip
+ * @returns Tooltip with content
+ */
 export const Tooltip: React.FC<TooltipProps> = ({ content, show, children }) => {
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const [isHovered, setIsHovered] = useState(false);
@@ -596,60 +664,6 @@ export interface LayerControlProps {
   activeLayer: string;
   onLayerChange: (layerId: string) => void;
 }
-
-// Add the DayCell component
-export const DayCell: React.FC<DayCellProps> = ({
-  date,
-  selectedRange,
-  isCurrentMonth,
-  onMouseDown,
-  onMouseEnter,
-  showTooltips,
-  renderContent,
-  layer,
-  activeLayer,
-  restrictionConfig
-}) => {
-  // ... implementation from CLACalendar.tsx
-};
-
-// Add the MonthGrid component
-export const MonthGrid: React.FC<MonthGridProps> = ({
-  baseDate,
-  selectedRange,
-  onSelectionStart,
-  onSelectionMove,
-  isSelecting,
-  style,
-  showMonthHeading = true,
-  showTooltips,
-  renderDay,
-  layer,
-  activeLayer,
-  restrictionConfig,
-  startWeekOnSunday = false
-}) => {
-  // ... implementation from CLACalendar.tsx
-};
-
-// Add the MonthPair component
-export const MonthPair: React.FC<MonthPairProps> = ({
-  firstMonth,
-  secondMonth,
-  selectedRange,
-  onSelectionStart,
-  onSelectionMove,
-  isSelecting,
-  visibleMonths,
-  showMonthHeadings,
-  showTooltips,
-  renderDay,
-  layer,
-  restrictionConfig,
-  startWeekOnSunday
-}) => {
-  // ... implementation from CLACalendar.tsx
-};
 
 // Add these types
 export type DocumentMouseHandler = (e: MouseEvent) => void;
