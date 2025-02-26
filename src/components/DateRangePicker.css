@@ -8,11 +8,13 @@
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   color: var(--text-color);
   position: relative;
-  overflow: hidden;
 }
 
 .cla-card {
-  /* Remove padding from here as it's now controlled by individual sections */
+  border-radius: 8px;
+  background-color: #fff;
+  /* Remove overflow: hidden to allow shadows to extend */
+  position: relative;
 }
 
 .cla-button {
