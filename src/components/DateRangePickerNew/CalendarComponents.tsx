@@ -525,4 +525,132 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, show, children }) => 
       )}
     </div>
   );
-}; 
+};
+
+// Add these interfaces and export them
+export interface RenderResult {
+  backgroundColor?: string;
+  element?: React.ReactNode;
+  tooltipContent?: React.ReactNode;
+}
+
+export interface DayCellProps {
+  date: Date;
+  selectedRange: DateRange;
+  isCurrentMonth: boolean;
+  onMouseDown: () => void;
+  onMouseEnter: () => void;
+  showTooltips: boolean;
+  renderContent?: (date: Date) => RenderResult | null;
+  layer: Layer;
+  activeLayer: string;
+  restrictionConfig?: RestrictionConfig;
+}
+
+export interface MonthGridProps {
+  baseDate: Date;
+  selectedRange: DateRange;
+  onSelectionStart: (date: Date) => void;
+  onSelectionMove: (date: Date) => void;
+  isSelecting: boolean;
+  style?: React.CSSProperties;
+  showMonthHeading?: boolean;
+  showTooltips: boolean;
+  renderDay?: (date: Date) => RenderResult | null;
+  layer: Layer;
+  activeLayer: string;
+  restrictionConfig?: RestrictionConfig;
+  startWeekOnSunday?: boolean;
+}
+
+export interface MonthPairProps extends Omit<MonthGridProps, 'baseDate' | 'style'> {
+  firstMonth: Date;
+  secondMonth: Date | null;
+  visibleMonths: number;
+  showMonthHeadings: boolean;
+}
+
+export interface CalendarGridProps {
+  months: Date[];
+  selectedRange: DateRange;
+  onSelectionStart: (date: Date) => void;
+  onSelectionMove: (date: Date) => void;
+  isSelecting: boolean;
+  visibleMonths: number;
+  showMonthHeadings: boolean;
+  showTooltips: boolean;
+  layer: Layer;
+  activeLayer: string;
+  restrictionConfig?: RestrictionConfig;
+  startWeekOnSunday: boolean;
+}
+
+export interface ValidationError {
+  message: string;
+  type: string;
+  field: string;
+}
+
+export interface LayerControlProps {
+  layers: Layer[];
+  activeLayer: string;
+  onLayerChange: (layerId: string) => void;
+}
+
+// Add the DayCell component
+export const DayCell: React.FC<DayCellProps> = ({
+  date,
+  selectedRange,
+  isCurrentMonth,
+  onMouseDown,
+  onMouseEnter,
+  showTooltips,
+  renderContent,
+  layer,
+  activeLayer,
+  restrictionConfig
+}) => {
+  // ... implementation from CLACalendar.tsx
+};
+
+// Add the MonthGrid component
+export const MonthGrid: React.FC<MonthGridProps> = ({
+  baseDate,
+  selectedRange,
+  onSelectionStart,
+  onSelectionMove,
+  isSelecting,
+  style,
+  showMonthHeading = true,
+  showTooltips,
+  renderDay,
+  layer,
+  activeLayer,
+  restrictionConfig,
+  startWeekOnSunday = false
+}) => {
+  // ... implementation from CLACalendar.tsx
+};
+
+// Add the MonthPair component
+export const MonthPair: React.FC<MonthPairProps> = ({
+  firstMonth,
+  secondMonth,
+  selectedRange,
+  onSelectionStart,
+  onSelectionMove,
+  isSelecting,
+  visibleMonths,
+  showMonthHeadings,
+  showTooltips,
+  renderDay,
+  layer,
+  restrictionConfig,
+  startWeekOnSunday
+}) => {
+  // ... implementation from CLACalendar.tsx
+};
+
+// Add these types
+export type DocumentMouseHandler = (e: MouseEvent) => void;
+export type ReactMouseHandler = (e: React.MouseEvent<HTMLDivElement>) => void; 

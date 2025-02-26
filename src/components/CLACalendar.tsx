@@ -9,44 +9,35 @@ import {
   eachDayOfInterval,
   isSameDay,
   parseISO,
-  getISOWeek,
   startOfWeek,
   endOfWeek,
   isSameMonth,
-  isValid,
-  isWithinInterval,
   addDays
 } from "date-fns";
 import './DateRangePicker.css';
 import { 
-  DEFAULT_CONTAINER_STYLES, 
   DEFAULT_LAYERS,
   CalendarSettings,
   Layer,
-  LayerData,
-  BackgroundData
 } from './DateRangePicker.config';
 import { LayerRenderer } from './DateRangePickerNew/layers/LayerRenderer';
 import { RestrictionManager } from './DateRangePickerNew/restrictions/RestrictionManager';
-import { RestrictionConfig } from './DateRangePickerNew/restrictions/types';
 import { Notification } from './DateRangePickerNew/Notification';
 import { LayerManager } from './DateRangePickerNew/layers/LayerManager';
 import { RestrictionBackgroundGenerator } from './DateRangePickerNew/restrictions/RestrictionBackgroundGenerator';
 import { DateRangeSelectionManager, DateRange } from './DateRangePickerNew/selection/DateRangeSelectionManager';
-import { DateRangePickerHandlers, ValidationError, DateInputContext, MousePosition } from './DateRangePickerNew/handlers/DateRangePickerHandlers';
+import { DateRangePickerHandlers, DateInputContext, MousePosition } from './DateRangePickerNew/handlers/DateRangePickerHandlers';
 import {
-  Button,
-  ChevronLeft,
-  ChevronRight,
-  DateInput,
-  DateInputProps,
   CalendarHeader,
   DateInputSection,
   CalendarFooter,
   CalendarContainer,
   SideChevronIndicator,
   Tooltip,
-  TooltipProps
+  RenderResult,
+  MonthGridProps,
+  CalendarGridProps,
+  ValidationError,
 } from './DateRangePickerNew/CalendarComponents';
 
 // Add these interfaces after the existing ones
@@ -103,19 +94,9 @@ const Input: React.FC<InputProps> = ({ className, ...props }) => (
 );
 
 // Add these type definitions
-interface RenderResult {
-  backgroundColor?: string;
-  element?: React.ReactNode;
-  tooltipContent?: React.ReactNode;
-}
-
 interface Renderer {
   (date: Date): RenderResult | null;
 }
-
-// Add these types near the top with other interfaces
-type DocumentMouseHandler = (e: MouseEvent) => void;
-type ReactMouseHandler = (e: React.MouseEvent<HTMLDivElement>) => void;
 
 const useClickOutside = (
   ref: React.RefObject<HTMLElement>,
@@ -228,82 +209,12 @@ interface ValidationError {
   field: string;
 }
 
-// Add these interfaces near the top with other interfaces
-interface CalendarGridProps {
-  months: Date[];
-  selectedRange: DateRange;
-  onSelectionStart: (date: Date) => void;
-  onSelectionMove: (date: Date) => void;
-  isSelecting: boolean;
-  visibleMonths: number;
-  showMonthHeadings: boolean;
-  showTooltips: boolean;
-  layer: Layer;
-  activeLayer: string;
-  restrictionConfig?: RestrictionConfig;
-  startWeekOnSunday: boolean;
-}
-
-interface MonthGridProps {
-  baseDate: Date;
-  selectedRange: DateRange;
-  onSelectionStart: (date: Date) => void;
-  onSelectionMove: (date: Date) => void;
-  isSelecting: boolean;
-  style?: React.CSSProperties;
-  showMonthHeading?: boolean;
-  showTooltips: boolean;
-  renderDay?: (date: Date) => RenderResult | null;
-  layer: Layer;
-  activeLayer: string;
-  restrictionConfig?: RestrictionConfig;
-  startWeekOnSunday?: boolean;
-}
-
-interface DayCellProps {
-  date: Date;
-  selectedRange: DateRange;
-  isCurrentMonth: boolean;
-  onMouseDown: () => void;
-  onMouseEnter: () => void;
-  showTooltips: boolean;
-  renderContent?: (date: Date) => RenderResult | null;
-  layer: Layer;
-  activeLayer: string;
-  restrictionConfig?: RestrictionConfig;
-}
-
-interface TooltipProps {
-  content: React.ReactNode;
-  show: boolean;
-  children: React.ReactNode;
-}
-
-interface MonthPairProps extends Omit<MonthGridProps, 'baseDate' | 'style'> {
-  firstMonth: Date;
-  secondMonth: Date | null;
-  visibleMonths: number;
-  showMonthHeadings: boolean;
-}
-
-interface LayerControlProps {
-  layers: Layer[];
-  activeLayer: string;
-  onLayerChange: (layerId: string) => void;
-}
-
-interface SideChevronIndicatorProps {
-  outOfBoundsDirection: 'prev' | 'next' | null;
-  isSelecting: boolean;
-}
-
 // Update the MonthGrid to use proper types for weeks
 const MonthGrid: React.FC<MonthGridProps> = ({
   baseDate,
   selectedRange,
   onSelectionStart,
   onSelectionMove,
-  isSelecting,
   style,
   showMonthHeading = false,
   showTooltips,
@@ -488,7 +399,6 @@ const DayCell = ({
   showTooltips,
   renderContent,
   layer,
-  activeLayer,
   restrictionConfig
 }) => {
   const { isSelected, isInRange, isRangeStart, isRangeEnd } = useMemo(() => {
@@ -630,7 +540,6 @@ const DayCell = ({
 
 const MonthPair = ({
   firstMonth,
-  secondMonth,
   selectedRange,
   onSelectionStart,
   onSelectionMove,
@@ -714,7 +623,6 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   showMonthHeadings,
   showTooltips,
   layer,
-  activeLayer,
   restrictionConfig,
   startWeekOnSunday
 }) => {
@@ -776,13 +684,6 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   );
 };
 
-// Add interface for restriction background data
-interface RestrictionBackgroundData {
-  startDate: string;
-  endDate: string;
-  color: string;
-}
-
 const CLACalendar: React.FC<CalendarSettings> = ({
   displayMode = 'popup',
   containerStyle = null,
@@ -810,7 +711,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date(2025, 1, 1)));
   const [isSelecting, setIsSelecting] = useState(false);
   const [outOfBoundsDirection, setOutOfBoundsDirection] = useState<'prev' | 'next' | null>(null);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 }); // TODO probably not needed
   const [dateInputContext, setDateInputContext] = useState({
     startDate: null,
     endDate: null,
