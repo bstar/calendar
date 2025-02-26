@@ -34,6 +34,17 @@ import { LayerManager } from './DateRangePickerNew/layers/LayerManager';
 import { RestrictionBackgroundGenerator } from './DateRangePickerNew/restrictions/RestrictionBackgroundGenerator';
 import { DateRangeSelectionManager, DateRange } from './DateRangePickerNew/selection/DateRangeSelectionManager';
 import { DateRangePickerHandlers, ValidationError, DateInputContext, MousePosition } from './DateRangePickerNew/handlers/DateRangePickerHandlers';
+import {
+  Button,
+  ChevronLeft,
+  ChevronRight,
+  DateInput,
+  DateInputProps,
+  CalendarHeader,
+  DateInputSection,
+  CalendarFooter,
+  CalendarContainer
+} from './DateRangePickerNew/CalendarComponents';
 
 // Add these interfaces after the existing ones
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -48,10 +59,6 @@ interface CardCompositionProps extends React.HTMLAttributes<HTMLDivElement> {
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   className?: string;
-}
-
-interface ChevronProps {
-  size?: number;
 }
 
 interface CardComponent extends React.ForwardRefExoticComponent<CardProps & React.RefAttributes<HTMLDivElement>> {
@@ -89,20 +96,6 @@ const Input: React.FC<InputProps> = ({ className, ...props }) => (
   <input
     className={`cla-input ${className || ''}`}
     {...props}
-  />
-);
-
-const ChevronLeft: React.FC<ChevronProps> = ({ size = 16 }) => (
-  <span 
-    className="cla-chevron cla-chevron-left" 
-    style={{ width: size, height: size }}
-  />
-);
-
-const ChevronRight: React.FC<ChevronProps> = ({ size = 16 }) => (
-  <span 
-    className="cla-chevron cla-chevron-right" 
-    style={{ width: size, height: size }}
   />
 );
 
@@ -231,208 +224,6 @@ interface ValidationError {
   type: string;
   field: string;
 }
-
-interface DateInputProps {
-  value: Date | null;
-  onChange: (date: Date | null, isClearingError?: boolean, validationError?: ValidationError) => void;
-  field: 'start' | 'end';
-  placeholder: string;
-  context: {
-    startDate: string | null;
-    endDate: string | null;
-    currentField: string | null;
-  };
-  selectedRange: DateRange;
-}
-
-const DateInput: React.FC<DateInputProps> = ({ value, onChange, field, placeholder, context, selectedRange }) => {
-  const [inputValue, setInputValue] = useState('');
-  const [error, setError] = useState<ValidationError | null>(null);
-  const [showError, setShowError] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [showIndicator, setShowIndicator] = useState<'success' | 'error' | null>(null);
-  const previousInputRef = useRef('');
-
-  useEffect(() => {
-    if (!isEditing && value) {
-      const formattedValue = dateValidator.formatValue(value);
-      setInputValue(formattedValue);
-      previousInputRef.current = formattedValue;
-    } else if (!isEditing && !value) {
-      setInputValue('');
-      previousInputRef.current = '';
-    }
-  }, [value, isEditing]);
-
-  const handleChange = (e) => {
-    const newValue = e.target.value;
-    setInputValue(newValue);
-    setIsEditing(true);
-
-    if (error) {
-      setError(null);
-      setShowError(false);
-      onChange(null, true);
-    }
-  };
-
-  const validateAndUpdate = () => {
-    console.log('Validating input:', inputValue);
-
-    if (inputValue === previousInputRef.current) {
-      console.log('No change in input');
-      return;
-    }
-
-    previousInputRef.current = inputValue;
-
-    // Handle empty input
-    if (!inputValue.trim()) {
-      console.log('Empty input');
-      onChange(null);
-      setError(null);
-      setShowError(false);
-      if (value) {
-        setShowIndicator('error');
-        setTimeout(() => setShowIndicator(null), 1500);
-      }
-      return;
-    }
-
-    // Try to parse the input value using our flexible parser
-    console.log('Attempting to parse:', inputValue);
-    const parsedDate = dateValidator.parseValue(inputValue);
-    console.log('Parse result:', parsedDate);
-
-    if (!parsedDate) {
-      console.log('Parse failed, showing error');
-      showValidationError({
-        message: `Please use format: MM/DD/YY or ${dateValidator.DATE_FORMAT}`,
-        type: 'error',
-        field: 'format'
-      });
-      return;
-    }
-
-    // Range validation
-    if (field === 'start' && selectedRange?.end) {
-      const endDate = parseISO(selectedRange.end);
-      if (parsedDate > endDate) {
-        showValidationError({
-          message: 'Start date must be before end date',
-          type: 'error',
-          field: 'range'
-        });
-        return;
-      }
-    } else if (field === 'end' && selectedRange?.start) {
-      const startDate = parseISO(selectedRange.start);
-      if (parsedDate < startDate) {
-        showValidationError({
-          message: 'End date must be after start date',
-          type: 'error',
-          field: 'range'
-        });
-        return;
-      }
-    }
-
-    // Only show success for valid new values
-    const isNewValue = !value || !isSameDay(parsedDate, value);
-    if (isNewValue) {
-      setShowIndicator('success');
-      setTimeout(() => setShowIndicator(null), 1500);
-    }
-
-    onChange(parsedDate);
-    setError(null);
-    setShowError(false);
-  };
-
-  const showValidationError = (error) => {
-    setError(error);
-    setShowError(true);
-    setShowIndicator('error');
-    onChange(null, false, error);
-
-    setTimeout(() => {
-      setShowError(false);
-      setError(null);
-      setShowIndicator(null);
-    }, 1500);
-  };
-
-  return (
-    <div
-      style={{
-        position: 'relative',
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column'
-      }}
-      onClick={(e) => e.stopPropagation()}
-      onMouseDown={(e) => e.stopPropagation()}
-    >
-      <input
-        type="text"
-        value={inputValue}
-        onChange={handleChange}
-        onBlur={() => {
-          setIsEditing(false);
-          validateAndUpdate();
-        }}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            setIsEditing(false);
-            validateAndUpdate();
-          }
-        }}
-        placeholder={placeholder}
-        autoComplete="off"
-        style={{
-          width: '100%',
-          padding: '8px 12px',
-          borderRadius: '4px',
-          backgroundColor: 'white',
-          color: '#000',
-          transition: 'border-color 0.15s ease',
-          cursor: 'text',
-          userSelect: 'text',
-          WebkitUserSelect: 'text',
-          MozUserSelect: 'text',
-          border: '1px solid #979797',
-          textAlign: 'center',
-        }}
-      />
-      {showIndicator && (
-        <div
-          style={{
-            position: 'absolute',
-            right: '8px',
-            top: '8px',
-            color: showIndicator === 'success' ? '#28a745' : '#dc3545',
-            fontSize: '14px',
-            fontWeight: 'bold'
-          }}
-        >
-          {showIndicator === 'success' ? '✓' : '×'}
-        </div>
-      )}
-      <div
-        style={{
-          height: error && showError ? '24px' : '0',
-          marginTop: error && showError ? '4px' : '0',
-          fontSize: '0.875rem',
-          color: '#dc3545',
-          overflow: 'hidden',
-          transition: 'height 0.2s ease-in-out, margin-top 0.2s ease-in-out',
-        }}
-      >
-        {(error as ValidationError)?.message}
-      </div>
-    </div>
-  );
-};
 
 // Add these interfaces near the top with other interfaces
 interface CalendarGridProps {
@@ -1063,22 +854,6 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   );
 };
 
-// Keep the ButtonProps interface and Button component
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant: string;
-  children: React.ReactNode;
-  className?: string;
-}
-
-const Button: React.FC<ButtonProps> = ({ variant, children, className, ...props }) => (
-  <button 
-    className={`cla-button cla-button-${variant} ${className || ''}`} 
-    {...props}
-  >
-    {children}
-  </button>
-);
-
 // Add interface for restriction background data
 interface RestrictionBackgroundData {
   startDate: string;
@@ -1457,137 +1232,77 @@ const CLACalendar: React.FC<CalendarSettings> = ({
         />
       )}
 
-      {(isOpen || displayMode === 'embedded') && (
-        <div 
-          ref={containerRef}
-          className={`cla-card ${displayMode === 'popup' ? 'cla-card-popup' : ''}`}
-          style={{
-            width: visibleMonths === 1 ? `${singleMonthWidth}px` : `${400 * Math.min(6, Math.max(1, visibleMonths))}px`,
-            position: displayMode === 'popup' ? 'relative' : 'static',
-            padding: 0,
-            ...DEFAULT_CONTAINER_STYLES,
-            ...containerStyle
-          }}
-          onMouseDown={enableOutOfBoundsScroll ? handleMouseDown : undefined}
-          onMouseMove={enableOutOfBoundsScroll ? handleMouseMove : undefined}
-          onMouseLeave={enableOutOfBoundsScroll ? handleMouseLeave : undefined}
-        >
-          {showHeader && (
-            <>
-              <div className="cla-input-container" style={{ padding: '16px' }}>
-                <div className="cla-input-wrapper">
-                  <DateInput
-                    value={selectedRange.start ? parseISO(selectedRange.start) : null}
-                    onChange={handleDateChange('start')}
-                    field="start"
-                    placeholder={selectionMode === 'single' ? "Select date" : "Start date"}
-                    context={dateInputContext}
-                    selectedRange={selectedRange}
-                  />
+      <CalendarContainer
+        isOpen={isOpen}
+        displayMode={displayMode}
+        containerRef={containerRef}
+        containerStyle={containerStyle}
+        visibleMonths={visibleMonths}
+        singleMonthWidth={singleMonthWidth}
+        enableOutOfBoundsScroll={enableOutOfBoundsScroll}
+        handleMouseDown={handleMouseDown}
+        handleMouseMove={handleMouseMove}
+        handleMouseLeave={handleMouseLeave}
+      >
+        {showHeader && (
+          <>
+            <DateInputSection
+              selectedRange={selectedRange}
+              handleDateChange={handleDateChange}
+              dateInputContext={dateInputContext}
+              selectionMode={selectionMode}
+            />
+
+            <CalendarHeader
+              months={months}
+              visibleMonths={visibleMonths}
+              moveToMonth={moveToMonth}
+            />
+          </>
+        )}
+
+        {showLayersNavigation && (
+          <LayerControl
+            layers={activeLayers}
+            activeLayer={activeLayer}
+            onLayerChange={handleLayerChange}
+          />
+        )}
+
+        <div className="cla-card-body" style={{ padding: '16px' }}>
+          <div style={{ display: 'flex' }}>
+            {activeLayers.map(layer => 
+              layer.name === activeLayer && (
+                <div key={layer.name} style={{ width: '100%' }}>
+                  {renderLayer(layer)}
                 </div>
-                {selectionMode === 'range' && (
-                  <div className="cla-input-wrapper">
-                    <DateInput
-                      value={selectedRange.end ? parseISO(selectedRange.end) : null}
-                      onChange={handleDateChange('end')}
-                      field="end"
-                      placeholder="End date"
-                      context={dateInputContext}
-                      selectedRange={selectedRange}
-                    />
-                  </div>
-                )}
-              </div>
-
-              <div className="cla-header" style={{ 
-                padding: '12px 16px',
-                borderBottom: 'none' // Force remove any border
-              }}>
-                <button 
-                  className="cla-button-nav" 
-                  onClick={() => moveToMonth('prev')}
-                  style={{ outline: 'none' }}
-                >
-                  <ChevronLeft size={16} />
-                </button>
-                <span className="cla-header-title">
-                  {visibleMonths === 1 
-                    ? format(months[0], "MMMM yyyy")
-                    : `${format(months[0], "MMMM yyyy")} - ${format(months[months.length - 1], "MMMM yyyy")}`
-                  }
-                </span>
-                <button 
-                  className="cla-button-nav" 
-                  onClick={() => moveToMonth('next')}
-                  style={{ outline: 'none' }}
-                >
-                  <ChevronRight size={16} />
-                </button>
-              </div>
-            </>
-          )}
-
-          {showLayersNavigation && (
-            <LayerControl
-              layers={activeLayers}
-              activeLayer={activeLayer}
-              onLayerChange={handleLayerChange}
-            />
-          )}
-
-          <div className="cla-card-body" style={{ padding: '16px' }}>
-            <div style={{ display: 'flex' }}>
-              {activeLayers.map(layer => 
-                layer.name === activeLayer && (
-                  <div key={layer.name} style={{ width: '100%' }}>
-                    {renderLayer(layer)}
-                  </div>
-                )
-              )}
-            </div>
+              )
+            )}
           </div>
-
-          {showFooter && (
-            <div className="cla-card-footer" style={{ 
-              padding: '0 16px 16px 16px',
-              borderTop: 'none', // Force remove any border
-              display: 'flex',
-              justifyContent: 'space-between'
-            }}>
-              <Button
-                variant="primary"
-                onClick={handleClear}
-              >
-                Clear
-              </Button>
-              <div>
-                {showSubmitButton && (
-                  <Button
-                    variant="primary"
-                    onClick={handleSubmit}
-                  >
-                    Submit
-                  </Button>
-                )}
-              </div>
-            </div>
-          )}
-
-          {enableOutOfBoundsScroll && (
-            <SideChevronIndicator
-              outOfBoundsDirection={outOfBoundsDirection}
-              isSelecting={isSelecting}
-            />
-          )}
-
-          {showSelectionAlert && notification && (
-            <Notification
-              message={notification}
-              onDismiss={() => setNotification(null)}
-            />
-          )}
         </div>
-      )}
+
+        {showFooter && (
+          <CalendarFooter
+            showSubmitButton={showSubmitButton}
+            handleClear={handleClear}
+            handleSubmit={handleSubmit}
+          />
+        )}
+
+        {enableOutOfBoundsScroll && (
+          <SideChevronIndicator
+            outOfBoundsDirection={outOfBoundsDirection}
+            isSelecting={isSelecting}
+          />
+        )}
+
+        {showSelectionAlert && notification && (
+          <Notification
+            message={notification}
+            onDismiss={() => setNotification(null)}
+          />
+        )}
+      </CalendarContainer>
     </div>
   );
 };
