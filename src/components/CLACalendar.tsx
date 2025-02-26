@@ -15,7 +15,7 @@ import {
   addDays
 } from "date-fns";
 import './DateRangePicker.css';
-import { 
+import {
   DEFAULT_LAYERS,
   CalendarSettings,
   Layer,
@@ -128,7 +128,7 @@ const dateValidator = (() => {
 
   const parseDotNotation = (input) => {
     console.log('Input:', input);
-    
+
     // Quick test for dot notation attempt
     if (!/\d\./.test(input)) {
       console.log('Not dot notation');
@@ -138,7 +138,7 @@ const dateValidator = (() => {
     // Parse the components
     const match = input.match(/(\d?\d)\.(\d?\d)\.(\d?\d?\d\d)/);
     console.log('Regex match:', match);
-    
+
     if (!match) {
       console.log('No match found');
       return null;
@@ -146,18 +146,18 @@ const dateValidator = (() => {
 
     const [_, month, day, year] = match;
     console.log('Parsed components:', { month, day, year });
-    
+
     const fullYear = year.length === 2 ? `20${year}` : year;
     console.log('Full year:', fullYear);
-    
+
     // Create and validate date
     const date = new Date(fullYear, parseInt(month) - 1, parseInt(day));
     console.log('Created date:', date);
     console.log('Month check:', date.getMonth(), parseInt(month) - 1);
-    
+
     const isValid = date.getMonth() === parseInt(month) - 1;
     console.log('Is valid?', isValid);
-    
+
     return isValid ? date : null;
   };
 
@@ -247,13 +247,13 @@ const MonthGrid: React.FC<MonthGridProps> = ({
 
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
-  const restrictionManager = useMemo(() => 
-    new RestrictionManager(restrictionConfig ?? { restrictions: [] }), 
+  const restrictionManager = useMemo(() =>
+    new RestrictionManager(restrictionConfig ?? { restrictions: [] }),
     [restrictionConfig]
   );
 
   const weekDays = useMemo(() => {
-    const days = startWeekOnSunday 
+    const days = startWeekOnSunday
       ? ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
       : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     return days;
@@ -271,7 +271,7 @@ const MonthGrid: React.FC<MonthGridProps> = ({
   };
 
   return (
-    <div style={{ 
+    <div style={{
       width: '100%',
       padding: '0 8px',
       marginTop: 0,  // Ensure no top margin
@@ -318,7 +318,7 @@ const MonthGrid: React.FC<MonthGridProps> = ({
       </div>
 
       {/* Days grid */}
-      <div 
+      <div
         onMouseMove={handleGridMouseMove}
         onMouseLeave={handleGridMouseLeave}
         style={{
@@ -349,7 +349,7 @@ const MonthGrid: React.FC<MonthGridProps> = ({
             />
           ))
         )}
-        
+
         {[...Array(emptyWeeks * 7)].map((_, i) => (
           <div key={`empty-${i}`} style={{ backgroundColor: "white" }} />
         ))}
@@ -424,13 +424,13 @@ const DayCell = ({
   }, [date, selectedRange.start, selectedRange.end]);
 
   const [isHovered, setIsHovered] = useState(false);
-  
-  const restrictionManager = useMemo(() => 
-    new RestrictionManager(restrictionConfig ?? { restrictions: [] }), 
+
+  const restrictionManager = useMemo(() =>
+    new RestrictionManager(restrictionConfig ?? { restrictions: [] }),
     [restrictionConfig]
   );
 
-  const restrictionResult = useMemo(() => 
+  const restrictionResult = useMemo(() =>
     restrictionManager.checkSelection(date, date),
     [date, restrictionManager]
   );
@@ -455,7 +455,7 @@ const DayCell = ({
   }
 
   const eventContent = renderContent?.(date);
-  
+
   const getBackgroundColor = () => {
     if (layer.data?.background) {
       const renderer = LayerRenderer.createBackgroundRenderer(layer.data.background);
@@ -481,7 +481,7 @@ const DayCell = ({
         justifyContent: "center",
         backgroundColor: (isSelected || isInRange) ? "#b1e4e5" : getBackgroundColor(),
         borderRadius: isSingleDay && (isSelected || isInRange) ? "50%" : (
-          isRangeStart || isRangeEnd ? 
+          isRangeStart || isRangeEnd ?
             `${isRangeStart ? "15px" : "0"} ${isRangeEnd ? "15px" : "0"} ${isRangeEnd ? "15px" : "0"} ${isRangeStart ? "15px" : "0"}`
             : "0"
         ),
@@ -496,7 +496,7 @@ const DayCell = ({
         } : {})
       }}
     >
-      <div style={{ 
+      <div style={{
         position: 'absolute',
         inset: 0,
         display: 'flex',
@@ -504,10 +504,10 @@ const DayCell = ({
         justifyContent: 'center',
         pointerEvents: 'none'
       }}>
-        <span style={{ 
-          position: 'relative', 
+        <span style={{
+          position: 'relative',
           zIndex: 1,
-          pointerEvents: 'none' 
+          pointerEvents: 'none'
         }}>
           {format(date, "d")}
         </span>
@@ -529,7 +529,7 @@ const DayCell = ({
 
   // Only show tooltips if showTooltips is true and we have tooltip content
   return (showTooltips && eventContent?.tooltipContent) ? (
-    <Tooltip 
+    <Tooltip
       content={eventContent?.tooltipContent}
       show={isHovered}
     >
@@ -559,8 +559,8 @@ const MonthPair = ({
   }
 
   return (
-    <div style={{ 
-      display: 'flex', 
+    <div style={{
+      display: 'flex',
       width: '100%',
       gap: '1rem'
     }}>
@@ -627,11 +627,11 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   startWeekOnSunday
 }) => {
   const renderers: Renderer[] = [];
-  
+
   if (layer.data?.background) {
     renderers.push(LayerRenderer.createBackgroundRenderer(layer.data.background));
   }
-  
+
   if (layer.data?.events) {
     renderers.push(LayerRenderer.createEventRenderer(
       layer.data.events.map(event => ({
@@ -640,14 +640,14 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       }))
     ));
   }
-  
+
   const renderDay = (date: Date): RenderResult | null => {
     const results = renderers
       .map(renderer => renderer(date))
       .filter((result): result is RenderResult => result !== null);
-      
+
     if (results.length === 0) return null;
-    
+
     return results.reduce((combined, result) => ({
       backgroundColor: result.backgroundColor || combined.backgroundColor,
       element: result.element ? (
@@ -664,7 +664,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       ) : combined.tooltipContent
     }));
   };
-  
+
   return (
     <MonthPair
       firstMonth={months[0]}
@@ -718,31 +718,31 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     currentField: null
   });
   const [validationErrors, setValidationErrors] = useState<Record<string, ValidationError>>({});
-  
+
   // Create layerManager before using it
-  const layerManager = useMemo(() => 
+  const layerManager = useMemo(() =>
     new LayerManager(layers),
     [layers]
   );
-  
+
   // Now we can use layerManager
   const [activeLayers, setActiveLayers] = useState<Layer[]>(
     layerManager.getLayers()
   );
-  
+
   const [activeLayer, setActiveLayer] = useState(defaultLayer);
   const [notification, setNotification] = useState<string | null>(null);
-  
-  const selectionManager = useMemo(() => 
+
+  const selectionManager = useMemo(() =>
     new DateRangeSelectionManager(
       restrictionConfig,
       selectionMode,
       showSelectionAlert
-    ), 
+    ),
     [restrictionConfig, selectionMode, showSelectionAlert]
   );
-  
-  const restrictionBackgroundData = useMemo(() => 
+
+  const restrictionBackgroundData = useMemo(() =>
     RestrictionBackgroundGenerator.generateBackgroundData(restrictionConfig),
     [restrictionConfig]
   );
@@ -796,10 +796,10 @@ const CLACalendar: React.FC<CalendarSettings> = ({
 
   // Add back the continuous month advancement effect with enableOutOfBoundsScroll check
   useEffect(() => {
-    if (!enableOutOfBoundsScroll) return () => {};
+    if (!enableOutOfBoundsScroll) return () => { };
 
     const shouldAdvance = Boolean(isSelecting && outOfBoundsDirection && moveToMonthRef.current);
-    if (!shouldAdvance) return () => {};
+    if (!shouldAdvance) return () => { };
 
     const advanceMonth = () => {
       if (moveToMonthRef.current && outOfBoundsDirection) {
@@ -818,7 +818,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
   }, [isSelecting, outOfBoundsDirection, enableOutOfBoundsScroll]);
 
   // Use the abstracted handlers
-  const { handleMouseMove, handleMouseLeave } = useMemo(() => 
+  const { handleMouseMove, handleMouseLeave } = useMemo(() =>
     DateRangePickerHandlers.createMouseHandlers(
       containerRef,
       isSelecting,
@@ -827,8 +827,8 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     ),
     [containerRef, isSelecting, setOutOfBoundsDirection, setMousePosition]
   );
-  
-  const { handleDocumentMouseMove, handleMouseUp, handleMouseDown } = useMemo(() => 
+
+  const { handleDocumentMouseMove, handleMouseUp, handleMouseDown } = useMemo(() =>
     DateRangePickerHandlers.createDocumentMouseHandlers(
       containerRef,
       isSelecting,
@@ -840,8 +840,8 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     ),
     [containerRef, isSelecting, outOfBoundsDirection, setOutOfBoundsDirection, setMousePosition, moveToMonthRef, setIsSelecting]
   );
-  
-  const handleDateChange = useMemo(() => 
+
+  const handleDateChange = useMemo(() =>
     DateRangePickerHandlers.createDateChangeHandler(
       selectedRange,
       dateInputContext,
@@ -854,8 +854,8 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     ),
     [selectedRange, dateInputContext, setSelectedRange, setDateInputContext, setValidationErrors, setCurrentMonth, visibleMonths, dateValidator]
   );
-  
-  const getDisplayText = useMemo(() => 
+
+  const getDisplayText = useMemo(() =>
     DateRangePickerHandlers.createDisplayTextFormatter(
       selectedRange,
       selectionMode
@@ -864,7 +864,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
   );
 
   // Use the abstracted selection handlers with all required parameters
-  const { handleSelectionStart, handleSelectionMove } = useMemo(() => 
+  const { handleSelectionStart, handleSelectionMove } = useMemo(() =>
     DateRangePickerHandlers.createSelectionHandlers(
       selectionManager,
       isSelecting,
@@ -879,7 +879,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
   );
 
   // Use the abstracted calendar action handlers
-  const { handleClear, handleSubmit, handleLayerChange } = useMemo(() => 
+  const { handleClear, handleSubmit, handleLayerChange } = useMemo(() =>
     DateRangePickerHandlers.createCalendarActionHandlers(
       setSelectedRange,
       setDateInputContext,
@@ -915,7 +915,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
   useEffect(() => {
     const updatedLayers = [...layerManager.getLayers()];
     const calendarLayer = updatedLayers.find(layer => layer.name === 'Calendar');
-    
+
     if (calendarLayer) {
       layerManager.setBackgroundData('Calendar', restrictionBackgroundData);
       setActiveLayers(layerManager.getLayers());
@@ -943,66 +943,66 @@ const CLACalendar: React.FC<CalendarSettings> = ({
       if (!start) return;
 
       // Calculate the month we just moved to
-      const nextMonth = direction === 'next' 
+      const nextMonth = direction === 'next'
         ? addMonths(months[months.length - 1], 1)
         : addMonths(months[0], -1);
-        
+
       const firstDayOfMonth = startOfMonth(nextMonth);
       const lastDayOfMonth = endOfMonth(nextMonth);
 
       // Determine the potential new end of the selection
       const potentialEnd = direction === 'next' ? lastDayOfMonth : firstDayOfMonth;
-      
+
       // Check if the entire selection range would cross any restrictions
       // We need to check from the earliest date to the latest date
       const earliestDate = start < potentialEnd ? start : potentialEnd;
       const latestDate = start < potentialEnd ? potentialEnd : start;
-      
+
       // Get all days in the potential selection range
       const allDaysInRange = eachDayOfInterval({
         start: earliestDate,
         end: latestDate
       });
-      
+
       // Find the first restricted day in the entire range, if any
-      const firstRestrictedDay = allDaysInRange.find(day => 
+      const firstRestrictedDay = allDaysInRange.find(day =>
         !selectionManager.canSelectDate(day).allowed
       );
-      
+
       if (firstRestrictedDay) {
         // If there's a restriction in the range, we need to stop the selection
         // at the day before the restriction
-        
+
         // Calculate the valid end date based on the direction of selection
-        const validEndDate = start < firstRestrictedDay 
+        const validEndDate = start < firstRestrictedDay
           ? addDays(firstRestrictedDay, -1)  // Forward selection: day before restriction
           : addDays(firstRestrictedDay, 1);  // Backward selection: day after restriction
-        
+
         // Ensure the valid end date is between start and potential end
         const finalEndDate = start < potentialEnd
           ? Math.min(validEndDate.getTime(), potentialEnd.getTime())
           : Math.max(validEndDate.getTime(), potentialEnd.getTime());
-        
+
         // Update the selection to the valid range
         setSelectedRange((prev: DateRange) => ({
           ...prev,
           end: format(new Date(finalEndDate), 'yyyy-MM-dd')
         }));
-        
+
         // End the selection and show message
         setIsSelecting(false);
         setOutOfBoundsDirection(null);
-        
+
         // Only show notification during out-of-bounds scrolling
         if (showSelectionAlert && outOfBoundsDirection) {
           // Get the specific restriction message
           const restrictionResult = selectionManager.canSelectDate(firstRestrictedDay);
-          const message = restrictionResult.message || 
+          const message = restrictionResult.message ||
             `Selection cannot include restricted date: ${format(firstRestrictedDay, 'MMM dd, yyyy')}`;
-          
+
           setNotification(message);
         }
-        
+
         document.removeEventListener("mousemove", handleDocumentMouseMove);
         document.removeEventListener("mouseup", handleMouseUp);
       } else {
@@ -1094,7 +1094,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
 
         <div className="cla-card-body" style={{ padding: '16px' }}>
           <div style={{ display: 'flex' }}>
-            {activeLayers.map(layer => 
+            {activeLayers.map(layer =>
               layer.name === activeLayer && (
                 <div key={layer.name} style={{ width: '100%' }}>
                   {renderLayer(layer)}

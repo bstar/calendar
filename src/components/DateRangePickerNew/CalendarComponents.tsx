@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { 
-  format, 
-  parseISO, 
-  isSameDay, 
+import {
+  format,
+  parseISO,
+  isSameDay,
 } from 'date-fns';
 import { DateRange } from './selection/DateRangeSelectionManager';
 import { DEFAULT_CONTAINER_STYLES } from '../DateRangePicker.config';
@@ -25,8 +25,8 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
  * @returns Styled button element
  */
 export const Button: React.FC<ButtonProps> = ({ variant, children, className, ...props }) => (
-  <button 
-    className={`cla-button cla-button-${variant} ${className || ''}`} 
+  <button
+    className={`cla-button cla-button-${variant} ${className || ''}`}
     {...props}
   >
     {children}
@@ -44,8 +44,8 @@ interface ChevronProps {
  * @returns Chevron icon element
  */
 export const ChevronLeft: React.FC<ChevronProps> = ({ size = 16 }) => (
-  <span 
-    className="cla-chevron cla-chevron-left" 
+  <span
+    className="cla-chevron cla-chevron-left"
     style={{ width: size, height: size }}
   />
 );
@@ -56,8 +56,8 @@ export const ChevronLeft: React.FC<ChevronProps> = ({ size = 16 }) => (
  * @returns Chevron icon element
  */
 export const ChevronRight: React.FC<ChevronProps> = ({ size = 16 }) => (
-  <span 
-    className="cla-chevron cla-chevron-right" 
+  <span
+    className="cla-chevron cla-chevron-right"
     style={{ width: size, height: size }}
   />
 );
@@ -85,12 +85,12 @@ export interface DateInputProps {
  * @param selectedRange - The currently selected date range
  * @returns Date input field with validation
  */
-export const DateInput: React.FC<DateInputProps> = ({ 
-  value, 
-  onChange, 
-  field, 
-  placeholder, 
-  selectedRange 
+export const DateInput: React.FC<DateInputProps> = ({
+  value,
+  onChange,
+  field,
+  placeholder,
+  selectedRange
 }) => {
   const [inputValue, setInputValue] = useState('');
   const [error, setError] = useState<any | null>(null);
@@ -293,30 +293,30 @@ export interface CalendarHeaderProps {
  * @param moveToMonth - Function to navigate between months
  * @returns Calendar header with navigation buttons
  */
-export const CalendarHeader: React.FC<CalendarHeaderProps> = ({ 
-  months, 
-  visibleMonths, 
-  moveToMonth 
+export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
+  months,
+  visibleMonths,
+  moveToMonth
 }) => (
-  <div className="cla-header" style={{ 
+  <div className="cla-header" style={{
     padding: '12px 16px',
     borderBottom: 'none' // Force remove any border
   }}>
-    <button 
-      className="cla-button-nav" 
+    <button
+      className="cla-button-nav"
       onClick={() => moveToMonth('prev')}
       style={{ outline: 'none' }}
     >
       <ChevronLeft size={16} />
     </button>
     <span className="cla-header-title">
-      {visibleMonths === 1 
+      {visibleMonths === 1
         ? format(months[0], "MMMM yyyy")
         : `${format(months[0], "MMMM yyyy")} - ${format(months[months.length - 1], "MMMM yyyy")}`
       }
     </span>
-    <button 
-      className="cla-button-nav" 
+    <button
+      className="cla-button-nav"
       onClick={() => moveToMonth('next')}
       style={{ outline: 'none' }}
     >
@@ -391,12 +391,12 @@ export interface CalendarFooterProps {
  * @param handleSubmit - Function to submit the selection
  * @returns Footer with clear and submit buttons
  */
-export const CalendarFooter: React.FC<CalendarFooterProps> = ({ 
-  showSubmitButton, 
-  handleClear, 
-  handleSubmit 
+export const CalendarFooter: React.FC<CalendarFooterProps> = ({
+  showSubmitButton,
+  handleClear,
+  handleSubmit
 }) => (
-  <div className="cla-card-footer" style={{ 
+  <div className="cla-card-footer" style={{
     padding: '0 16px 16px 16px',
     borderTop: 'none', // Force remove any border
     display: 'flex',
@@ -465,7 +465,7 @@ export const CalendarContainer: React.FC<CalendarContainerProps> = ({
   handleMouseLeave
 }) => (
   (isOpen || displayMode === 'embedded') && (
-    <div 
+    <div
       ref={containerRef}
       className={`cla-card ${displayMode === 'popup' ? 'cla-card-popup' : ''}`}
       style={{
@@ -496,9 +496,9 @@ export interface SideChevronIndicatorProps {
  * @param isSelecting - Whether user is currently selecting a date range
  * @returns Chevron indicator or null if not needed
  */
-export const SideChevronIndicator: React.FC<SideChevronIndicatorProps> = ({ 
-  outOfBoundsDirection, 
-  isSelecting 
+export const SideChevronIndicator: React.FC<SideChevronIndicatorProps> = ({
+  outOfBoundsDirection,
+  isSelecting
 }) => {
   if (!outOfBoundsDirection || !isSelecting) return null;
 
@@ -550,7 +550,7 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, show, children }) => 
     if (show && targetRef.current && tooltipRef.current) {
       const targetRect = targetRef.current.getBoundingClientRect();
       const tooltipRect = tooltipRef.current.getBoundingClientRect();
-      
+
       const newPosition = {
         top: targetRect.top - tooltipRect.height - 8,
         left: targetRect.left + (targetRect.width - tooltipRect.width) / 2
@@ -561,10 +561,10 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, show, children }) => 
   }, [show, content]);
 
   if (!show && !content) return <>{children}</>;
-  
+
   return (
-    <div 
-      ref={targetRef} 
+    <div
+      ref={targetRef}
       style={{ position: 'relative', width: '100%', height: '100%' }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
