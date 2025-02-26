@@ -1253,9 +1253,10 @@ const CLACalendar: React.FC<CalendarSettings> = ({
       outOfBoundsDirection,
       setOutOfBoundsDirection,
       setMousePosition,
-      moveToMonthRef
+      moveToMonthRef,
+      setIsSelecting
     ),
-    [containerRef, isSelecting, outOfBoundsDirection, setOutOfBoundsDirection, setMousePosition, moveToMonthRef]
+    [containerRef, isSelecting, outOfBoundsDirection, setOutOfBoundsDirection, setMousePosition, moveToMonthRef, setIsSelecting]
   );
   
   const handleDateChange = useMemo(() => 

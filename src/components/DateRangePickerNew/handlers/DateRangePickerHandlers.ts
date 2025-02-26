@@ -141,7 +141,8 @@ export class DateRangePickerHandlers {
     outOfBoundsDirection: 'prev' | 'next' | null,
     setOutOfBoundsDirection: (direction: 'prev' | 'next' | null) => void,
     setMousePosition: (position: MousePosition) => void,
-    moveToMonthRef: RefObject<((direction: 'prev' | 'next') => void) | null>
+    moveToMonthRef: RefObject<((direction: 'prev' | 'next') => void) | null>,
+    setIsSelecting: (isSelecting: boolean) => void
   ) {
     const handleDocumentMouseMove = (e: MouseEvent) => {
       e.preventDefault();
@@ -180,6 +181,7 @@ export class DateRangePickerHandlers {
     };
 
     const handleMouseUp = () => {
+      setIsSelecting(false);
       setOutOfBoundsDirection(null);
 
       const styles = ['userSelect', 'webkitUserSelect', 'mozUserSelect', 'msUserSelect'] as const;
