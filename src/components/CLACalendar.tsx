@@ -30,11 +30,9 @@ import { LayerRenderer } from './DateRangePickerNew/layers/LayerRenderer';
 import { RestrictionManager } from './DateRangePickerNew/restrictions/RestrictionManager';
 import { RestrictionConfig } from './DateRangePickerNew/restrictions/types';
 import { Notification } from './DateRangePickerNew/Notification';
-
-interface DateRange {
-  start: string | null;
-  end: string | null;
-}
+import { LayerManager } from './DateRangePickerNew/layers/LayerManager';
+import { RestrictionBackgroundGenerator } from './DateRangePickerNew/restrictions/RestrictionBackgroundGenerator';
+import { DateRangeSelectionManager, DateRange } from './DateRangePickerNew/selection/DateRangeSelectionManager';
 
 // Add these interfaces after the existing ones
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -117,6 +115,10 @@ interface RenderResult {
 interface Renderer {
   (date: Date): RenderResult | null;
 }
+
+// Add these types near the top with other interfaces
+type DocumentMouseHandler = (e: MouseEvent) => void;
+type ReactMouseHandler = (e: React.MouseEvent<HTMLDivElement>) => void;
 
 const useClickOutside = (
   ref: React.RefObject<HTMLElement>,
@@ -605,7 +607,7 @@ const MonthGrid: React.FC<MonthGridProps> = ({
     return days;
   }, [startWeekOnSunday]);
 
-  const handleGridMouseMove = (e: React.MouseEvent) => {
+  const handleGridMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     setMousePosition({
       x: e.clientX + 10,
       y: e.clientY + 10
@@ -1103,7 +1105,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
   enableOutOfBoundsScroll = true,
   suppressTooltipsOnSelection = false,
   showSelectionAlert = false,
-  layers: initialLayers = DEFAULT_LAYERS,
+  layers = DEFAULT_LAYERS,
   showLayersNavigation = true,
   defaultLayer = 'calendar',
   restrictionConfig,
@@ -1121,10 +1123,34 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     currentField: null
   });
   const [validationErrors, setValidationErrors] = useState<Record<string, ValidationError>>({});
-  const [activeLayers, setActiveLayers] = useState(initialLayers);
+  
+  // Create layerManager before using it
+  const layerManager = useMemo(() => 
+    new LayerManager(layers),
+    [layers]
+  );
+  
+  // Now we can use layerManager
+  const [activeLayers, setActiveLayers] = useState<Layer[]>(
+    layerManager.getLayers()
+  );
+  
   const [activeLayer, setActiveLayer] = useState(defaultLayer);
   const [notification, setNotification] = useState<string | null>(null);
-  const restrictionManager = useMemo(() => new RestrictionManager(restrictionConfig || { restrictions: [] }), [restrictionConfig]);
+  
+  const selectionManager = useMemo(() => 
+    new DateRangeSelectionManager(
+      restrictionConfig,
+      selectionMode,
+      showSelectionAlert
+    ), 
+    [restrictionConfig, selectionMode, showSelectionAlert]
+  );
+  
+  const restrictionBackgroundData = useMemo(() => 
+    RestrictionBackgroundGenerator.generateBackgroundData(restrictionConfig),
+    [restrictionConfig]
+  );
 
   const containerRef = useRef<HTMLDivElement>(null);
   const moveToMonthRef = useRef<((direction: 'prev' | 'next') => void) | null>(null);
@@ -1140,8 +1166,8 @@ const CLACalendar: React.FC<CalendarSettings> = ({
   // Add logging when initialLayers prop changes
   useEffect(() => {
     console.log('=== DateRangePickerNew Layers ===');
-    console.log('initialLayers:', initialLayers);
-  }, [initialLayers]);
+    console.log('initialLayers:', layers);
+  }, [layers]);
 
   // Add logging when activeLayers state changes
   useEffect(() => {
@@ -1151,14 +1177,14 @@ const CLACalendar: React.FC<CalendarSettings> = ({
 
   // Add this effect to update activeLayers when initialLayers changes
   useEffect(() => {
-    setActiveLayers(initialLayers);
+    setActiveLayers(layerManager.getLayers());
     // Ensure we have a valid active layer
-    if (!activeLayer || !initialLayers.find(l => l.name === activeLayer)) {
-      const defaultLayerExists = initialLayers.find(l => l.name === defaultLayer);
-      const firstLayer = initialLayers[0];
+    if (!activeLayer || !layers.find(l => l.name === activeLayer)) {
+      const defaultLayerExists = layers.find(l => l.name === defaultLayer);
+      const firstLayer = layers[0];
       setActiveLayer(defaultLayerExists ? defaultLayer : firstLayer?.name);
     }
-  }, [initialLayers, defaultLayer, activeLayer]);
+  }, [layers, defaultLayer, activeLayer]);
 
   // In the months memo, update the result array type
   const months = useMemo(() => {
@@ -1208,7 +1234,32 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     };
   }, [isSelecting, outOfBoundsDirection, enableOutOfBoundsScroll]);
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
+  const handleDocumentMouseMove: DocumentMouseHandler = useCallback((e) => {
+    e.preventDefault();
+    if (!isSelecting || !containerRef.current) return;
+
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const { clientX: mouseX, clientY: mouseY } = e;
+    const BOUNDARY_THRESHOLD = 20;
+
+    setMousePosition({ x: mouseX, y: mouseY });
+
+    // Check both boundaries with equal thresholds
+    const newDirection = mouseX < containerRect.left + BOUNDARY_THRESHOLD ? 'prev'
+      : mouseX > containerRect.right - BOUNDARY_THRESHOLD ? 'next'
+        : null;
+
+    if (newDirection !== outOfBoundsDirection) {
+      setOutOfBoundsDirection(newDirection);
+      if (newDirection && !outOfBoundsDirection) {
+        setTimeout(() => {
+          moveToMonthRef.current?.(newDirection);
+        }, 1000);
+      }
+    }
+  }, [isSelecting, outOfBoundsDirection]);
+
+  const handleMouseMove: ReactMouseHandler = useCallback((e) => {
     e.preventDefault();
     if (!isSelecting || !containerRef.current) return;
 
@@ -1237,16 +1288,16 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     setIsSelecting(false);
     setOutOfBoundsDirection(null);
 
-    const styles = ['userSelect', 'webkitUserSelect', 'mozUserSelect', 'msUserSelect'];
-    styles.forEach(style => document.body.style[style] = '');
+    const styles = ['userSelect', 'webkitUserSelect', 'mozUserSelect', 'msUserSelect'] as const;
+    styles.forEach(style => document.body.style[style as any] = '');
 
-    document.removeEventListener("mousemove", handleMouseMove as EventListener);
+    document.removeEventListener("mousemove", handleDocumentMouseMove);
     document.removeEventListener("mouseup", handleMouseUp);
 
     setOutOfBoundsDirection(null);
-  }, [handleMouseMove]);
+  }, [handleDocumentMouseMove]);
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+  const handleMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (isSelecting) return;
     e.preventDefault();
 
@@ -1258,9 +1309,9 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     setIsSelecting(true);
     setUserSelectNone();
 
-    document.addEventListener("mousemove", handleMouseMove as EventListener);
+    document.addEventListener("mousemove", handleDocumentMouseMove);
     document.addEventListener("mouseup", handleMouseUp);
-  }, [isSelecting, handleMouseMove, handleMouseUp]);
+  }, [isSelecting, handleDocumentMouseMove, handleMouseUp]);
 
   const handleClear = useCallback(() => {
     // Reset range and context
@@ -1311,7 +1362,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     enableOutOfBoundsScroll
   };
 
-  const handleMouseLeave = useCallback((e: React.MouseEvent) => {
+  const handleMouseLeave = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     // Only handle out of bounds when selecting
     if (!isSelecting) return;
     
@@ -1349,117 +1400,57 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     );
   };
 
-  // Create background data from restrictions
-  const restrictionBackgroundData = useMemo(() => {
-    if (!restrictionConfig?.restrictions) return [] as BackgroundData[];
-    
-    return restrictionConfig.restrictions.flatMap(restriction => {
-      if (!restriction.enabled) return [] as BackgroundData[];
-      
-      switch (restriction.type) {
-        case 'daterange':
-          return restriction.ranges
-            .filter(range => {
-              const start = parseISO(range.start);
-              const end = parseISO(range.end);
-              return isValid(start) && isValid(end) && start <= end;
-            })
-            .map(range => ({
-              startDate: range.start,
-              endDate: range.end,
-              color: '#ffe6e6'
-            })) as BackgroundData[];
-          
-        case 'allowedranges':
-          return restriction.ranges
-            .filter(range => {
-              const start = parseISO(range.start);
-              const end = parseISO(range.end);
-              return isValid(start) && isValid(end) && start <= end;
-            })
-            .map(range => [
-              {
-                startDate: '1900-01-01',
-                endDate: range.start,
-                color: '#ffe6e6'
-              },
-              {
-                startDate: range.end,
-                endDate: '2100-12-31',
-                color: '#ffe6e6'
-              }
-            ]).flat() as BackgroundData[];
-          
-        case 'boundary':
-          const boundaryDate = parseISO(restriction.date);
-          if (!isValid(boundaryDate)) return [] as BackgroundData[];
-          
-          return [{
-            startDate: restriction.direction === 'before' ? '1900-01-01' : restriction.date,
-            endDate: restriction.direction === 'before' ? restriction.date : '2100-12-31',
-            color: '#ffe6e6'
-          }] as BackgroundData[];
-          
-        default:
-          return [] as BackgroundData[];
-      }
-    });
-  }, [restrictionConfig]);
-  
   // Update layers with restriction background
   useEffect(() => {
-    setActiveLayers(prevLayers => 
-      prevLayers.map(layer => {
-        if (layer.name === 'Calendar') {
-          return {
-            ...layer,
-            data: {
-              ...layer.data,
-              background: restrictionBackgroundData.map(item => ({
-                startDate: item.startDate,
-                endDate: item.endDate,
-                color: '#ffe6e6' // Use a light red color for restricted dates
-              })) as BackgroundData[]
-            }
-          };
-        }
-        return layer;
-      })
-    );
-  }, [restrictionBackgroundData]);
+    const updatedLayers = [...layerManager.getLayers()];
+    const calendarLayer = updatedLayers.find(layer => layer.name === 'Calendar');
+    
+    if (calendarLayer) {
+      layerManager.setBackgroundData('Calendar', restrictionBackgroundData);
+      setActiveLayers(layerManager.getLayers());
+    }
+  }, [restrictionBackgroundData, layerManager]);
 
   // Update isDateRestricted to handle both types
-  const isDateRestricted = (date: Date, restrictionConfig?: RestrictionConfig): boolean => {
-    if (!restrictionConfig?.restrictions) return false;
+  const isDateRestricted = useCallback((date: Date): boolean => {
+    const result = selectionManager.canSelectDate(date);
+    return !result.allowed;
+  }, [selectionManager]);
+
+  // Update the handleSelectionStart function to use selectionManager
+  const handleSelectionStart = useCallback((date: Date) => {
+    const result = selectionManager.startSelection(date);
     
-    return restrictionConfig.restrictions.some(restriction => {
-      if (!restriction.enabled) return false;
-
-      // Check boundary restrictions
-      if (restriction.type === 'boundary') {
-        const boundaryDate = parseISO(restriction.date);
-        if (!isValid(boundaryDate)) return false;
-        
-        return restriction.direction === 'before' 
-          ? date < boundaryDate 
-          : date > boundaryDate;
+    if (!result.success) {
+      if (showSelectionAlert && result.message) {
+        setNotification(result.message);
       }
-
-      // Check daterange restrictions
-      if (restriction.type === 'daterange' && restriction.ranges) {
-        return restriction.ranges.some(range => {
-          const rangeStart = parseISO(range.start);
-          const rangeEnd = parseISO(range.end);
-          return isValid(rangeStart) && isValid(rangeEnd) && 
-                 date >= rangeStart && date <= rangeEnd;
-        });
+      return;
+    }
+    
+    setIsSelecting(true);
+    setSelectedRange(result.range);
+    setNotification(null);
+  }, [selectionManager, showSelectionAlert]);
+  
+  // Update the handleSelectionMove function to use selectionManager
+  const handleSelectionMove = useCallback((date: Date) => {
+    if (!isSelecting) return;
+    
+    const result = selectionManager.updateSelection(selectedRange, date);
+    
+    if (!result.success) {
+      if (showSelectionAlert && result.message) {
+        setNotification(result.message);
       }
-
-      return false;
-    });
-  };
-
-  // Simple month navigation - moved after handlers are defined
+      return;
+    }
+    
+    setSelectedRange(result.range);
+    setNotification(null);
+  }, [isSelecting, selectedRange, selectionManager, showSelectionAlert]);
+  
+  // Update the moveToMonth function to use selectionManager for restriction checking
   const moveToMonth = useCallback((direction: 'prev' | 'next') => {
     // Only check restrictions during out-of-bounds scrolling
     if (isSelecting && outOfBoundsDirection) {
@@ -1475,23 +1466,16 @@ const CLACalendar: React.FC<CalendarSettings> = ({
 
       // Check if selection would extend into restricted dates
       const selectionEnd = direction === 'next' ? lastDayOfMonth : firstDayOfMonth;
-      const daysToCheck = eachDayOfInterval({ 
-        start: start < selectionEnd ? start : selectionEnd,
-        end: start < selectionEnd ? selectionEnd : start 
-      });
       
-      const hasRestriction = daysToCheck.some(day => {
-        const result = restrictionManager.checkSelection(day, day);
-        return !result.allowed;
-      });
+      const result = selectionManager.canSelectRange(start, selectionEnd);
       
-      if (hasRestriction) {
+      if (!result.allowed) {
         setIsSelecting(false);
         setOutOfBoundsDirection(null);
-        if (showSelectionAlert) {
-          setNotification('Cannot select restricted dates');
+        if (showSelectionAlert && result.message) {
+          setNotification(result.message);
         }
-        document.removeEventListener("mousemove", handleMouseMove as EventListener);
+        document.removeEventListener("mousemove", handleDocumentMouseMove);
         document.removeEventListener("mouseup", handleMouseUp);
         return;
       }
@@ -1501,7 +1485,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
       setSelectedRange((prev: DateRange) => ({
         ...prev,
         end: format(newEnd, 'yyyy-MM-dd')
-      } as DateRange));
+      }));
     }
 
     setCurrentMonth(prev => {
@@ -1509,20 +1493,16 @@ const CLACalendar: React.FC<CalendarSettings> = ({
         ? addMonths(prev, 1)
         : addMonths(prev, -1);
     });
-  }, [months, restrictionManager, showSelectionAlert, isSelecting, outOfBoundsDirection, selectedRange.start, handleMouseMove, handleMouseUp]);
-
-  // Set the ref for out-of-bounds scrolling
-  moveToMonthRef.current = moveToMonth;
-
-  const handleClickOutside = useCallback(() => {
-    if (isOpen && closeOnClickAway) {
-      setIsOpen(false);
-      setIsSelecting(false);
+  }, [months, selectionManager, showSelectionAlert, isSelecting, outOfBoundsDirection, selectedRange.start, handleDocumentMouseMove, handleMouseUp]);
+  
+  // Update the useEffect that watches for restrictionConfig changes
+  useEffect(() => {
+    if (restrictionConfig) {
+      selectionManager.updateRestrictions(restrictionConfig);
     }
-  }, [isOpen, closeOnClickAway]);
+  }, [restrictionConfig, selectionManager]);
 
-  useClickOutside(containerRef, handleClickOutside);
-
+  // Add this function back to the component
   const handleDateChange = (field: 'start' | 'end') => (
     date: Date | null,
     isClearingError?: boolean,
@@ -1563,69 +1543,18 @@ const CLACalendar: React.FC<CalendarSettings> = ({
       
       if (field === 'start') {
         // For start date, we want it in the leftmost month
-        // If we want March to show on the left, and we're showing 3 months,
-        // we need March to be our currentMonth (since we show currentMonth to currentMonth + 2)
         const newBaseMonth = startOfMonth(date);
         setCurrentMonth(newBaseMonth);
       } else {
         // For end date, we want it in the rightmost month
-        // If we want April to show on the right, and we're showing 3 months,
-        // we need February to be our currentMonth (since we show currentMonth + 2)
         const newBaseMonth = addMonths(startOfMonth(date), -(validVisibleMonths - 1));
         setCurrentMonth(newBaseMonth);
       }
     }
   };
 
-  const handleSelectionStart = useCallback((date: Date) => {
-    const result = restrictionManager.checkSelection(date, date);
-    if (!result.allowed) {
-      if (showSelectionAlert) {
-        setNotification(result.message ?? 'Selection not allowed');
-      }
-      return;
-    }
-    setIsSelecting(true);
-    setSelectedRange({ start: format(date, 'yyyy-MM-dd'), end: null } as DateRange);
-    setNotification(null);
-  }, [selectionMode, restrictionConfig, showSelectionAlert]);
-
-  const handleSelectionMove = useCallback((date: Date) => {
-    if (!isSelecting) return;
-    
-    const start = selectedRange.start ? parseISO(selectedRange.start) : null;
-    if (!start) return;
-
-    const targetResult = restrictionManager.checkSelection(date, date);
-    if (!targetResult.allowed) {
-      if (showSelectionAlert && targetResult.message) {
-        setNotification(targetResult.message ?? 'Selection not allowed');
-      }
-      return;
-    }
-
-    // Check if there are any restricted dates between start and target date
-    const startDate = start < date ? start : date;
-    const endDate = start < date ? date : start;
-    const daysInRange = eachDayOfInterval({ start: startDate, end: endDate });
-    
-    for (const day of daysInRange) {
-      const result = restrictionManager.checkSelection(day, day);
-      if (!result.allowed) {
-        if (showSelectionAlert && result.message) {
-          setNotification(result.message ?? 'Selection not allowed');
-        }
-        return;
-      }
-    }
-
-    setSelectedRange((prev: DateRange) => ({
-      ...prev,
-      end: format(date, 'yyyy-MM-dd')
-    } as DateRange));
-    setNotification(null);
-  }, [isSelecting, selectedRange.start, selectionMode, restrictionManager, showSelectionAlert]);
-
+  // The rest of the component remains the same...
+  
   return (
     <div className="cla-calendar" style={{ width: 'fit-content' }}>
       {displayMode === 'popup' && (
@@ -1655,11 +1584,9 @@ const CLACalendar: React.FC<CalendarSettings> = ({
             ...DEFAULT_CONTAINER_STYLES,
             ...containerStyle
           }}
-          {...(settings.enableOutOfBoundsScroll ? {
-            onMouseDown: handleMouseDown,
-            onMouseMove: handleMouseMove,
-            onMouseLeave: handleMouseLeave
-          } : {})}
+          onMouseDown={enableOutOfBoundsScroll ? handleMouseDown : undefined}
+          onMouseMove={enableOutOfBoundsScroll ? handleMouseMove : undefined}
+          onMouseLeave={enableOutOfBoundsScroll ? handleMouseLeave : undefined}
         >
           {showHeader && (
             <>
