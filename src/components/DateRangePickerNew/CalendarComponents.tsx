@@ -600,6 +600,7 @@ export interface MonthPairProps extends Omit<MonthGridProps, 'baseDate' | 'style
   secondMonth: Date | null;
   visibleMonths: number;
   showMonthHeadings: boolean;
+  restrictionConfig?: RestrictionConfig;
 }
 
 export interface CalendarGridProps {
@@ -631,4 +632,48 @@ export interface LayerControlProps {
 
 // Add these types
 export type DocumentMouseHandler = (e: MouseEvent) => void;
-export type ReactMouseHandler = (e: React.MouseEvent<HTMLDivElement>) => void; 
+export type ReactMouseHandler = (e: React.MouseEvent<HTMLDivElement>) => void;
+
+// Update MonthPair to pass restrictionConfig
+const MonthPair: React.FC<MonthPairProps> = ({
+  firstMonth,
+  selectedRange,
+  onSelectionStart,
+  onSelectionMove,
+  isSelecting,
+  visibleMonths,
+  showMonthHeadings,
+  showTooltips,
+  renderDay,
+  layer,
+  restrictionConfig,
+  startWeekOnSunday
+}) => {
+  // ... existing code ...
+  return (
+    <div style={{
+      display: 'flex',
+      width: '100%',
+      gap: '1rem'
+    }}>
+      {monthsToShow.map((month, index) => (
+        <MonthGrid
+          key={month.toISOString()}
+          baseDate={month}
+          selectedRange={selectedRange}
+          onSelectionStart={onSelectionStart}
+          onSelectionMove={onSelectionMove}
+          isSelecting={isSelecting}
+          style={{ width: `${100 / visibleMonths}%` }}
+          showMonthHeading={showMonthHeadings}
+          showTooltips={showTooltips}
+          renderDay={renderDay}
+          layer={layer}
+          activeLayer={layer.name}
+          restrictionConfig={restrictionConfig}
+          startWeekOnSunday={startWeekOnSunday}
+        />
+      ))}
+    </div>
+  );
+}; 

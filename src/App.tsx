@@ -163,7 +163,22 @@ const getInitialSettings = (): CalendarSettings => ({
   ...getDefaultSettings(),
   layers: INITIAL_LAYERS,
   defaultLayer: 'Calendar',
-  colors: DEFAULT_COLORS  // Allow colors to be overridden
+  colors: DEFAULT_COLORS,  // Allow colors to be overridden
+  restrictionConfig: {
+    restrictions: [
+      {
+        type: "daterange",
+        enabled: true,
+        ranges: [
+          {
+            start: "2025-01-01",
+            end: "2025-01-15",
+            message: "This date range is restricted"
+          }
+        ]
+      }
+    ]
+  }
 });
 
 const baseButtonStyle = {

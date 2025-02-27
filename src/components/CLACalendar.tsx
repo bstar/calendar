@@ -402,6 +402,7 @@ const DayCell = ({
   layer,
   restrictionConfig
 }) => {
+  console.log('DayCell restrictionConfig:', restrictionConfig);
   const { isSelected, isInRange, isRangeStart, isRangeEnd } = useMemo(() => {
     if (!selectedRange.start) {
       return { isSelected: false, isInRange: false, isRangeStart: false, isRangeEnd: false };
@@ -431,10 +432,11 @@ const DayCell = ({
     [restrictionConfig]
   );
 
-  const restrictionResult = useMemo(() =>
-    restrictionManager.checkSelection(date, date),
-    [date, restrictionManager]
-  );
+  const restrictionResult = useMemo(() => {
+    const result = restrictionManager.checkSelection(date, date);
+    console.log('Date Check:', date, 'Restricted:', !result.allowed);
+    return result;
+  }, [date, restrictionManager]);
 
   const handleMouseEnter = (e) => {
     setIsHovered(true);
@@ -694,6 +696,8 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   settings,
   onSettingsChange
 }) => {
+  console.log('Calendar Settings:', settings);
+  console.log('Restriction Config:', settings.restrictionConfig);
   const colors = settings.colors || DEFAULT_COLORS;
   
   // Use colors throughout the component
@@ -701,7 +705,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
 
   const [isOpen, setIsOpen] = useState(settings.displayMode === 'embedded' || settings.isOpen);
   const [selectedRange, setSelectedRange] = useState<DateRange>({ start: null, end: null });
-  const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date(2025, 1, 1)));
+  const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date(2025, 0, 1)));
   const [isSelecting, setIsSelecting] = useState(false);
   const [outOfBoundsDirection, setOutOfBoundsDirection] = useState<'prev' | 'next' | null>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 }); // TODO probably not needed
@@ -910,10 +914,15 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     const calendarLayer = updatedLayers.find(layer => layer.name === 'Calendar');
 
     if (calendarLayer) {
-      layerManager.setBackgroundData('Calendar', restrictionBackgroundData);
+      const backgrounds = RestrictionBackgroundGenerator.generateBackgroundData(settings.restrictionConfig);
+      console.log('Restriction Config:', settings.restrictionConfig);
+      console.log('Generated Backgrounds:', backgrounds);
+      
+      layerManager.setBackgroundData('Calendar', backgrounds);
+      console.log('Updated Layer:', layerManager.getLayer('Calendar'));
       setActiveLayers(layerManager.getLayers());
     }
-  }, [restrictionBackgroundData, layerManager]);
+  }, [settings.restrictionConfig, layerManager]);
 
   // Update isDateRestricted to handle both types
   const isDateRestricted = useCallback((date: Date): boolean => {
