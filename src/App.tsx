@@ -1417,10 +1417,24 @@ function App() {
               </button>
               <button
                 onClick={() => {
-                  setRestrictionConfig(draftRestrictionConfig);
-                  setSettings(prev => ({ ...prev }));
+                  setSettings(prev => ({
+                    ...prev,
+                    restrictionConfig: {
+                      ...draftRestrictionConfig  // Create new object to ensure state update
+                    }
+                  }));
                 }}
-                style={styles.confirmButton}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: '#0366d6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  '&:hover': {
+                    backgroundColor: '#0256b9'
+                  }
+                } as ExtendedCSSProperties}
               >
                 Apply Changes
               </button>
