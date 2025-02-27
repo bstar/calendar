@@ -11,49 +11,94 @@ import {
   BackgroundData,
   SettingControl,
   BaseLayer,
-  OverlayLayer
+  OverlayLayer,
+  DEFAULT_COLORS
 } from './components/DateRangePicker.config';
 import DateRangePickerNew from './components/CLACalendar';
 
 // Import package.json to access version, description, and name
 import packageInfo from '../package.json';
 
-// Sample data for different layers
+const INITIAL_LAYER_DATA = {
+  events: [
+    {
+      date: "2025-02-15",
+      title: "Team Meeting",
+      time: "10:00 AM",
+      description: "Weekly sync",
+      color: DEFAULT_COLORS.primary
+    },
+    {
+      date: "2025-02-20",
+      title: "Lunch with Client",
+      time: "12:30 PM",
+      description: "Project discussion",
+      color: DEFAULT_COLORS.purple  // Purple for client interactions
+    },
+    {
+      date: "2025-02-25",
+      title: "Birthday Party",
+      time: "7:00 PM",
+      description: "Cake and presents!",
+      color: DEFAULT_COLORS.pink  // Pink for celebrations
+    },
+    {
+      date: "2025-03-05",
+      title: "Conference",
+      time: "9:00 AM",
+      description: "Annual tech summit",
+      color: DEFAULT_COLORS.teal  // Teal for professional events
+    },
+    {
+      date: "2025-03-12",
+      title: "Dentist",
+      time: "2:00 PM",
+      description: "Regular checkup",
+      color: DEFAULT_COLORS.orange  // Orange for appointments
+    },
+    {
+      date: "2025-03-18",
+      title: "Project Deadline",
+      time: "5:00 PM",
+      description: "Final deliverables due",
+      color: DEFAULT_COLORS.danger  // Red for deadlines
+    },
+    {
+      date: "2025-03-22",
+      title: "Weekend Trip",
+      time: "All day",
+      description: "Beach getaway",
+      color: DEFAULT_COLORS.success  // Green for leisure
+    }
+  ],
+  background: []
+};
+
 const SAMPLE_BACKGROUND_DATA: BackgroundData[] = [
   {
     startDate: '2025-01-05',
     endDate: '2025-01-15',
-    color: '#cce5ff'  // Darker pastel blue
+    color: `${DEFAULT_COLORS.primary}33`  // Light blue
   },
   {
     startDate: '2025-02-10',
     endDate: '2025-02-20',
-    color: '#ffe6e6'  // Darker pastel red
+    color: `${DEFAULT_COLORS.danger}33`   // Light red
   },
   {
     startDate: '2025-03-01',
     endDate: '2025-03-10',
-    color: '#e6ffe6'  // Darker pastel green
+    color: `${DEFAULT_COLORS.success}33`  // Light green
   }
 ];
 
-const SAMPLE_EVENTS_DATA: EventData[] = [
-  { date: '2025-02-15', title: 'Team Meeting', type: 'work', time: '10:00 AM', description: 'Weekly sync' },
-  { date: '2025-02-20', title: 'Lunch with Client', type: 'work', time: '12:30 PM', description: 'Project discussion' },
-  { date: '2025-02-25', title: 'Birthday Party', type: 'personal', time: '7:00 PM', description: 'Cake and presents!' },
-  { date: '2025-03-05', title: 'Conference', type: 'work', time: '9:00 AM', description: 'Annual tech summit' },
-  { date: '2025-03-12', title: 'Dentist', type: 'personal', time: '2:00 PM', description: 'Regular checkup' },
-  { date: '2025-03-18', title: 'Project Deadline', type: 'work', time: '5:00 PM', description: 'Final deliverables due' },
-  { date: '2025-03-22', title: 'Weekend Trip', type: 'personal', time: 'All day', description: 'Beach getaway' }
-];
-
-// Add sample layers with proper configuration
-const SAMPLE_LAYERS: Layer[] = [
+const INITIAL_LAYERS: Layer[] = [
   {
     name: 'Calendar',
     title: 'Base Calendar',
     description: 'Basic calendar functionality',
     required: true,
+    visible: true,
     data: {
       events: [],
       background: []
@@ -63,15 +108,14 @@ const SAMPLE_LAYERS: Layer[] = [
     name: 'sample-events',
     title: 'Event Calendar',
     description: 'Display events and appointments',
-    data: {
-      events: SAMPLE_EVENTS_DATA,
-      background: []
-    }
+    visible: true,
+    data: INITIAL_LAYER_DATA
   },
   {
     name: 'sample-background',
     title: 'Background Colors',
     description: 'Display date range backgrounds',
+    visible: true,
     data: {
       background: SAMPLE_BACKGROUND_DATA
     }
@@ -80,33 +124,34 @@ const SAMPLE_LAYERS: Layer[] = [
     name: 'combined-layer',
     title: 'Combined View',
     description: 'Events with background highlighting',
+    visible: true,
     data: {
       events: [
         { 
           date: '2025-02-01', 
-          title: 'Sprint Planning', 
-          type: 'work', 
+          title: 'Sprint Planning',
           time: '10:00 AM', 
-          description: 'Two-week sprint kickoff' 
+          description: 'Two-week sprint kickoff',
+          color: DEFAULT_COLORS.primary
         },
         { 
           date: '2025-02-14', 
-          title: 'Sprint Review', 
-          type: 'work', 
+          title: 'Sprint Review',
           time: '4:00 PM', 
-          description: 'Sprint demo and retrospective' 
+          description: 'Sprint demo and retrospective',
+          color: DEFAULT_COLORS.success
         }
       ],
       background: [
         {
           startDate: '2025-02-01',
           endDate: '2025-02-14',
-          color: '#fff3e0'  // Light orange for sprint duration
+          color: `${DEFAULT_COLORS.warning}33`  // Light orange for sprint duration
         },
         {
           startDate: '2025-02-05',
           endDate: '2025-02-07',
-          color: '#e8f5e9'  // Light green for mid-sprint workshops
+          color: `${DEFAULT_COLORS.success}33`  // Light green for mid-sprint workshops
         }
       ]
     }
@@ -116,7 +161,7 @@ const SAMPLE_LAYERS: Layer[] = [
 // Update getDefaultSettings to include sample layers
 const getInitialSettings = (): CalendarSettings => ({
   ...getDefaultSettings(),
-  layers: SAMPLE_LAYERS,
+  layers: INITIAL_LAYERS,
   defaultLayer: 'Calendar'
 });
 

@@ -1,5 +1,6 @@
 import { CSSProperties } from 'react';
 import { RestrictionConfig } from './DateRangePickerNew/restrictions/types';
+import { Layer } from './DateRangePickerNew/layers/types';
 
 export type LAYER_TYPES = 'base' | 'overlay';
 
@@ -115,6 +116,9 @@ export interface Layer {
   required?: boolean;
   visible?: boolean;
   features?: string[];
+  color?: string;
+  enabled?: boolean;
+  events?: EventData[];
 }
 
 export interface LayerData {
@@ -128,6 +132,7 @@ export interface EventData {
   type: string;
   time: string;
   description: string;
+  color?: string;
 }
 
 export interface BackgroundData {
@@ -193,7 +198,19 @@ export interface SettingsConfig {
   };
 }
 
-// Default Settings
+// Default colors available for events
+export const DEFAULT_COLORS = {
+  primary: '#0366d6',    // Blue
+  success: '#28a745',    // Green
+  warning: '#f6c23e',    // Yellow
+  danger: '#dc3545',     // Red
+  purple: '#6f42c1',
+  teal: '#20c997',
+  orange: '#fd7e14',
+  pink: '#e83e8c'
+};
+
+// Default container styles
 export const DEFAULT_CONTAINER_STYLES: CSSProperties = {
   backgroundColor: '#fff',
   border: '1px solid #dee2e6',
@@ -201,15 +218,8 @@ export const DEFAULT_CONTAINER_STYLES: CSSProperties = {
   boxShadow: '0 0.5rem 1rem rgba(0, 0, 0, 0.15)'
 };
 
-// Update DEFAULT_LAYERS to use simplified type
-export const DEFAULT_LAYERS: Layer[] = [
-  {
-    name: 'Calendar',
-    title: 'Calendar',
-    description: 'Basic calendar functionality',
-    required: true  // First layer is required
-  }
-];
+// Empty default layers - actual data should be provided by the implementing application
+export const DEFAULT_LAYERS: Layer[] = [];
 
 export const getDefaultSettings = (): CalendarSettings => ({
   displayMode: 'embedded',
@@ -228,7 +238,7 @@ export const getDefaultSettings = (): CalendarSettings => ({
   startWeekOnSunday: false,
   layers: DEFAULT_LAYERS,
   showLayersNavigation: true,
-  defaultLayer: 'Calendar'
+  defaultLayer: ''
 });
 
 // Update layer validation to ensure at least one layer
