@@ -121,18 +121,14 @@ export class RestrictionBackgroundGenerator {
   private handleAllowedRangesRestriction(date: Date, restriction: any): string | undefined {
     if (!restriction.ranges.length) return undefined;
 
-    let isAllowed = false;
-    for (const range of restriction.ranges) {
+    const isAllowed = restriction.ranges.some(range => {
       const rangeStart = parseISO(range.start);
       const rangeEnd = parseISO(range.end);
 
-      if (!isValid(rangeStart) || !isValid(rangeEnd)) continue;
+      if (!isValid(rangeStart) || !isValid(rangeEnd)) return false;
 
-      if (isWithinInterval(date, { start: rangeStart, end: rangeEnd })) {
-        isAllowed = true;
-        break;
-      }
-    }
+      return isWithinInterval(date, { start: rangeStart, end: rangeEnd });
+    });
 
     return isAllowed ? undefined : 'rgba(0, 0, 0, 0.1)';
   }
