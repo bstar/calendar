@@ -1,0 +1,176 @@
+/* General styles */
+.cla-calendar {
+  width: fit-content;
+}
+
+.cla-form-control {
+  width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Button styles */
+.cla-button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.cla-button-primary {
+  background-color: #1976d2;
+  color: white;
+  border: none;
+}
+
+.cla-button-primary:hover {
+  background-color: #1565c0;
+}
+
+.cla-button-secondary {
+  background-color: #f5f5f5;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.cla-button-secondary:hover {
+  background-color: #e0e0e0;
+}
+
+/* DateInput styles */
+.date-input-container {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.date-input {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 4px;
+  background-color: white;
+  color: #000;
+  transition: border-color 0.15s ease;
+  cursor: text;
+  user-select: text;
+  border: 1px solid #979797;
+  text-align: center;
+}
+
+.date-input-indicator {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.date-input-indicator-success {
+  color: #28a745;
+}
+
+.date-input-indicator-error {
+  color: #dc3545;
+}
+
+.date-input-error {
+  font-size: 0.875rem;
+  color: #dc3545;
+  overflow: hidden;
+  transition: height 0.2s ease-in-out, margin-top 0.2s ease-in-out;
+}
+
+/* Calendar header styles */
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.calendar-header-month {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* DateInputSection styles */
+.date-input-section {
+  display: flex;
+  padding: 16px;
+  gap: 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* CalendarFooter styles */
+.calendar-footer {
+  padding: 0 16px 16px 16px;
+  border-top: none;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* CalendarContainer styles */
+.cla-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.cla-card-popup {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 1000;
+}
+
+.cla-card-body {
+  padding: 16px;
+}
+
+/* SideChevronIndicator styles */
+.side-chevron-indicator {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(227, 242, 253, 0.9);
+  z-index: 9999;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+}
+
+.side-chevron-indicator-prev {
+  left: 0;
+}
+
+.side-chevron-indicator-next {
+  right: 0;
+}
+
+/* Tooltip styles */
+.tooltip-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.tooltip {
+  position: fixed;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  border-radius: 4px;
+  z-index: 9999;
+  font-size: 14px;
+  max-width: 300px;
+  padding: 8px;
+  pointer-events: none;
+  border: 1px solid rgba(0,0,0,0.2);
+} 
