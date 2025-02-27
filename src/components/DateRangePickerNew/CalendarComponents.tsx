@@ -8,6 +8,7 @@ import { DateRange } from './selection/DateRangeSelectionManager';
 import { DEFAULT_CONTAINER_STYLES } from '../DateRangePicker.config';
 import { RestrictionConfig } from './restrictions/types';
 import { Layer } from '../DateRangePicker.config';
+import './CalendarComponents.css';
 
 // Button component
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -209,12 +210,7 @@ export const DateInput: React.FC<DateInputProps> = ({
 
   return (
     <div
-      style={{
-        position: 'relative',
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column'
-      }}
+      className="date-input-container"
       onClick={(e) => e.stopPropagation()}
       onMouseDown={(e) => e.stopPropagation()}
     >
@@ -234,43 +230,18 @@ export const DateInput: React.FC<DateInputProps> = ({
         }}
         placeholder={placeholder}
         autoComplete="off"
-        style={{
-          width: '100%',
-          padding: '8px 12px',
-          borderRadius: '4px',
-          backgroundColor: 'white',
-          color: '#000',
-          transition: 'border-color 0.15s ease',
-          cursor: 'text',
-          userSelect: 'text',
-          WebkitUserSelect: 'text',
-          MozUserSelect: 'text',
-          border: '1px solid #979797',
-          textAlign: 'center',
-        }}
+        className="date-input"
       />
       {showIndicator && (
-        <div
-          style={{
-            position: 'absolute',
-            right: '8px',
-            top: '8px',
-            color: showIndicator === 'success' ? '#28a745' : '#dc3545',
-            fontSize: '14px',
-            fontWeight: 'bold'
-          }}
-        >
+        <div className={`date-input-indicator date-input-indicator-${showIndicator}`}>
           {showIndicator === 'success' ? '✓' : '×'}
         </div>
       )}
       <div
+        className="date-input-error"
         style={{
           height: error && showError ? '24px' : '0',
           marginTop: error && showError ? '4px' : '0',
-          fontSize: '0.875rem',
-          color: '#dc3545',
-          overflow: 'hidden',
-          transition: 'height 0.2s ease-in-out, margin-top 0.2s ease-in-out',
         }}
       >
         {error?.message}
@@ -396,28 +367,21 @@ export const CalendarFooter: React.FC<CalendarFooterProps> = ({
   handleClear,
   handleSubmit
 }) => (
-  <div className="cla-card-footer" style={{
-    padding: '0 16px 16px 16px',
-    borderTop: 'none', // Force remove any border
-    display: 'flex',
-    justifyContent: 'space-between'
-  }}>
+  <div className="calendar-footer">
     <Button
-      variant="primary"
+      variant="secondary"
       onClick={handleClear}
     >
       Clear
     </Button>
-    <div>
-      {showSubmitButton && (
-        <Button
-          variant="primary"
-          onClick={handleSubmit}
-        >
-          Submit
-        </Button>
-      )}
-    </div>
+    {showSubmitButton && (
+      <Button
+        variant="secondary"
+        onClick={handleSubmit}
+      >
+        Submit
+      </Button>
+    )}
   </div>
 );
 
