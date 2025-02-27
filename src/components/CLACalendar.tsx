@@ -402,7 +402,6 @@ const DayCell = ({
   layer,
   restrictionConfig
 }) => {
-  console.log('DayCell restrictionConfig:', restrictionConfig);
   const { isSelected, isInRange, isRangeStart, isRangeEnd } = useMemo(() => {
     if (!selectedRange.start) {
       return { isSelected: false, isInRange: false, isRangeStart: false, isRangeEnd: false };
@@ -434,7 +433,6 @@ const DayCell = ({
 
   const restrictionResult = useMemo(() => {
     const result = restrictionManager.checkSelection(date, date);
-    console.log('Date Check:', date, 'Restricted:', !result.allowed);
     return result;
   }, [date, restrictionManager]);
 
