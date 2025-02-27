@@ -19,6 +19,7 @@ import {
   DEFAULT_LAYERS,
   CalendarSettings,
   Layer,
+  DEFAULT_COLORS
 } from './DateRangePicker.config';
 import { LayerRenderer } from './DateRangePickerNew/layers/LayerRenderer';
 import { RestrictionManager } from './DateRangePickerNew/restrictions/RestrictionManager';
@@ -684,29 +685,21 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   );
 };
 
-const CLACalendar: React.FC<CalendarSettings> = ({
-  displayMode = 'popup',
-  containerStyle = null,
-  isOpen: initialIsOpen = false,
-  visibleMonths = 2,
-  showMonthHeadings = false,
-  selectionMode = 'range',
-  showTooltips = true,
-  showHeader = true,
-  closeOnClickAway = true,
-  showSubmitButton = false,
-  showFooter = true,
-  singleMonthWidth = 500,
-  enableOutOfBoundsScroll = true,
-  suppressTooltipsOnSelection = false,
-  showSelectionAlert = false,
-  layers = DEFAULT_LAYERS,
-  showLayersNavigation = true,
-  defaultLayer = 'calendar',
-  restrictionConfig,
-  startWeekOnSunday = false
+interface CLACalendarProps {
+  settings: CalendarSettings;
+  onSettingsChange: (settings: CalendarSettings) => void;
+}
+
+export const CLACalendar: React.FC<CLACalendarProps> = ({
+  settings,
+  onSettingsChange
 }) => {
-  const [isOpen, setIsOpen] = useState(displayMode === 'embedded' || initialIsOpen);
+  const colors = settings.colors || DEFAULT_COLORS;
+  
+  // Use colors throughout the component
+  // This ensures we always have colors, falling back to defaults if none provided
+
+  const [isOpen, setIsOpen] = useState(settings.displayMode === 'embedded' || settings.isOpen);
   const [selectedRange, setSelectedRange] = useState<DateRange>({ start: null, end: null });
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date(2025, 1, 1)));
   const [isSelecting, setIsSelecting] = useState(false);
@@ -721,8 +714,8 @@ const CLACalendar: React.FC<CalendarSettings> = ({
 
   // Create layerManager before using it
   const layerManager = useMemo(() =>
-    new LayerManager(layers),
-    [layers]
+    new LayerManager(settings.layers),
+    [settings.layers]
   );
 
   // Now we can use layerManager
@@ -730,21 +723,21 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     layerManager.getLayers()
   );
 
-  const [activeLayer, setActiveLayer] = useState(defaultLayer);
+  const [activeLayer, setActiveLayer] = useState(settings.defaultLayer);
   const [notification, setNotification] = useState<string | null>(null);
 
   const selectionManager = useMemo(() =>
     new DateRangeSelectionManager(
-      restrictionConfig,
-      selectionMode,
-      showSelectionAlert
+      settings.restrictionConfig,
+      settings.selectionMode,
+      settings.showSelectionAlert
     ),
-    [restrictionConfig, selectionMode, showSelectionAlert]
+    [settings.restrictionConfig, settings.selectionMode, settings.showSelectionAlert]
   );
 
   const restrictionBackgroundData = useMemo(() =>
-    RestrictionBackgroundGenerator.generateBackgroundData(restrictionConfig),
-    [restrictionConfig]
+    RestrictionBackgroundGenerator.generateBackgroundData(settings.restrictionConfig),
+    [settings.restrictionConfig]
   );
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -753,31 +746,31 @@ const CLACalendar: React.FC<CalendarSettings> = ({
 
   // Calculate if tooltips should be shown based on selection state and settings
   const shouldShowTooltips = useMemo(() => {
-    if (!showTooltips) return false;
-    if (suppressTooltipsOnSelection && isSelecting) return false;
+    if (!settings.showTooltips) return false;
+    if (settings.suppressTooltipsOnSelection && isSelecting) return false;
     return true;
-  }, [showTooltips, suppressTooltipsOnSelection, isSelecting]);
+  }, [settings.showTooltips, settings.suppressTooltipsOnSelection, isSelecting]);
 
   // Add this effect to update activeLayers when initialLayers changes
   useEffect(() => {
     setActiveLayers(layerManager.getLayers());
     // Ensure we have a valid active layer
-    if (!activeLayer || !layers.find(l => l.name === activeLayer)) {
-      const defaultLayerExists = layers.find(l => l.name === defaultLayer);
-      const firstLayer = layers[0];
-      setActiveLayer(defaultLayerExists ? defaultLayer : firstLayer?.name);
+    if (!activeLayer || !settings.layers.find(l => l.name === activeLayer)) {
+      const defaultLayerExists = settings.layers.find(l => l.name === settings.defaultLayer);
+      const firstLayer = settings.layers[0];
+      setActiveLayer(defaultLayerExists ? settings.defaultLayer : firstLayer?.name);
     }
-  }, [layers, defaultLayer, activeLayer]);
+  }, [settings.layers, settings.defaultLayer, activeLayer]);
 
   // In the months memo, update the result array type
   const months = useMemo(() => {
-    const validVisibleMonths = Math.min(6, Math.max(1, visibleMonths));
+    const validVisibleMonths = Math.min(6, Math.max(1, settings.visibleMonths));
     const result: Date[] = [];
     for (let i = 0; i < validVisibleMonths; i++) {
       result.push(addMonths(currentMonth, i));
     }
     return result;
-  }, [currentMonth, visibleMonths]);
+  }, [currentMonth, settings.visibleMonths]);
 
   // Keep debounced month change for out-of-bounds scrolling
   useEffect(() => {
@@ -796,7 +789,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
 
   // Add back the continuous month advancement effect with enableOutOfBoundsScroll check
   useEffect(() => {
-    if (!enableOutOfBoundsScroll) return () => { };
+    if (!settings.enableOutOfBoundsScroll) return () => { };
 
     const shouldAdvance = Boolean(isSelecting && outOfBoundsDirection && moveToMonthRef.current);
     if (!shouldAdvance) return () => { };
@@ -815,7 +808,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
       clearTimeout(initialAdvance);
       clearInterval(continuousAdvance);
     };
-  }, [isSelecting, outOfBoundsDirection, enableOutOfBoundsScroll]);
+  }, [isSelecting, outOfBoundsDirection, settings.enableOutOfBoundsScroll]);
 
   // Use the abstracted handlers
   const { handleMouseMove, handleMouseLeave } = useMemo(() =>
@@ -849,18 +842,18 @@ const CLACalendar: React.FC<CalendarSettings> = ({
       setDateInputContext,
       setValidationErrors,
       setCurrentMonth,
-      visibleMonths,
+      settings.visibleMonths,
       dateValidator
     ),
-    [selectedRange, dateInputContext, setSelectedRange, setDateInputContext, setValidationErrors, setCurrentMonth, visibleMonths, dateValidator]
+    [selectedRange, dateInputContext, setSelectedRange, setDateInputContext, setValidationErrors, setCurrentMonth, settings.visibleMonths, dateValidator]
   );
 
   const getDisplayText = useMemo(() =>
     DateRangePickerHandlers.createDisplayTextFormatter(
       selectedRange,
-      selectionMode
+      settings.selectionMode
     ),
-    [selectedRange, selectionMode]
+    [selectedRange, settings.selectionMode]
   );
 
   // Use the abstracted selection handlers with all required parameters
@@ -871,11 +864,11 @@ const CLACalendar: React.FC<CalendarSettings> = ({
       setIsSelecting,
       setSelectedRange,
       setNotification,
-      showSelectionAlert,
+      settings.showSelectionAlert,
       selectedRange,
       outOfBoundsDirection
     ),
-    [selectionManager, isSelecting, setIsSelecting, setSelectedRange, setNotification, showSelectionAlert, selectedRange, outOfBoundsDirection]
+    [selectionManager, isSelecting, setIsSelecting, setSelectedRange, setNotification, settings.showSelectionAlert, selectedRange, outOfBoundsDirection]
   );
 
   // Use the abstracted calendar action handlers
@@ -900,13 +893,13 @@ const CLACalendar: React.FC<CalendarSettings> = ({
         onSelectionStart={handleSelectionStart}
         onSelectionMove={handleSelectionMove}
         isSelecting={isSelecting}
-        visibleMonths={visibleMonths}
-        showMonthHeadings={showMonthHeadings}
+        visibleMonths={settings.visibleMonths}
+        showMonthHeadings={settings.showMonthHeadings}
         showTooltips={shouldShowTooltips}
         layer={layer}
         activeLayer={activeLayer}
-        restrictionConfig={restrictionConfig}
-        startWeekOnSunday={startWeekOnSunday}
+        restrictionConfig={settings.restrictionConfig}
+        startWeekOnSunday={settings.startWeekOnSunday}
       />
     );
   };
@@ -994,7 +987,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
         setOutOfBoundsDirection(null);
 
         // Only show notification during out-of-bounds scrolling
-        if (showSelectionAlert && outOfBoundsDirection) {
+        if (settings.showSelectionAlert && outOfBoundsDirection) {
           // Get the specific restriction message
           const restrictionResult = selectionManager.canSelectDate(firstRestrictedDay);
           const message = restrictionResult.message ||
@@ -1013,7 +1006,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
         }));
       }
     }
-  }, [months, selectionManager, showSelectionAlert, isSelecting, outOfBoundsDirection, selectedRange.start, handleDocumentMouseMove, handleMouseUp]);
+  }, [months, selectionManager, settings.showSelectionAlert, isSelecting, outOfBoundsDirection, selectedRange.start, handleDocumentMouseMove, handleMouseUp]);
 
   // After the existing moveToMonth function is defined (around line 1480), add:
   useEffect(() => {
@@ -1023,7 +1016,7 @@ const CLACalendar: React.FC<CalendarSettings> = ({
 
   // Add this effect to handle clicks outside the calendar
   useEffect(() => {
-    if (!closeOnClickAway || displayMode === 'embedded' || !isOpen) return;
+    if (!settings.closeOnClickAway || settings.displayMode === 'embedded' || !isOpen) return;
 
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
@@ -1035,11 +1028,11 @@ const CLACalendar: React.FC<CalendarSettings> = ({
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [closeOnClickAway, displayMode, isOpen]);
+  }, [settings.closeOnClickAway, settings.displayMode, isOpen]);
 
   return (
     <div className="cla-calendar" style={{ width: 'fit-content' }}>
-      {displayMode === 'popup' && (
+      {settings.displayMode === 'popup' && (
         <input
           type="text"
           value={getDisplayText()}
@@ -1057,34 +1050,34 @@ const CLACalendar: React.FC<CalendarSettings> = ({
 
       <CalendarContainer
         isOpen={isOpen}
-        displayMode={displayMode}
+        displayMode={settings.displayMode}
         containerRef={containerRef}
-        containerStyle={containerStyle}
-        visibleMonths={visibleMonths}
-        singleMonthWidth={singleMonthWidth}
-        enableOutOfBoundsScroll={enableOutOfBoundsScroll}
+        containerStyle={settings.containerStyle}
+        visibleMonths={settings.visibleMonths}
+        singleMonthWidth={settings.singleMonthWidth}
+        enableOutOfBoundsScroll={settings.enableOutOfBoundsScroll}
         handleMouseDown={handleMouseDown}
         handleMouseMove={handleMouseMove}
         handleMouseLeave={handleMouseLeave}
       >
-        {showHeader && (
+        {settings.showHeader && (
           <>
             <DateInputSection
               selectedRange={selectedRange}
               handleDateChange={handleDateChange}
               dateInputContext={dateInputContext}
-              selectionMode={selectionMode}
+              selectionMode={settings.selectionMode}
             />
 
             <CalendarHeader
               months={months}
-              visibleMonths={visibleMonths}
+              visibleMonths={settings.visibleMonths}
               moveToMonth={moveToMonth}
             />
           </>
         )}
 
-        {showLayersNavigation && (
+        {settings.showLayersNavigation && (
           <LayerControl
             layers={activeLayers}
             activeLayer={activeLayer}
@@ -1104,22 +1097,22 @@ const CLACalendar: React.FC<CalendarSettings> = ({
           </div>
         </div>
 
-        {showFooter && (
+        {settings.showFooter && (
           <CalendarFooter
-            showSubmitButton={showSubmitButton}
+            showSubmitButton={settings.showSubmitButton}
             handleClear={handleClear}
             handleSubmit={handleSubmit}
           />
         )}
 
-        {enableOutOfBoundsScroll && (
+        {settings.enableOutOfBoundsScroll && (
           <SideChevronIndicator
             outOfBoundsDirection={outOfBoundsDirection}
             isSelecting={isSelecting}
           />
         )}
 
-        {showSelectionAlert && notification && (
+        {settings.showSelectionAlert && notification && (
           <Notification
             message={notification}
             onDismiss={() => setNotification(null)}

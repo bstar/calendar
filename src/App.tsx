@@ -162,7 +162,8 @@ const INITIAL_LAYERS: Layer[] = [
 const getInitialSettings = (): CalendarSettings => ({
   ...getDefaultSettings(),
   layers: INITIAL_LAYERS,
-  defaultLayer: 'Calendar'
+  defaultLayer: 'Calendar',
+  colors: DEFAULT_COLORS  // Allow colors to be overridden
 });
 
 const baseButtonStyle = {
@@ -444,10 +445,7 @@ const docStyles = {
 };
 
 function App() {
-  const [settings, setSettings] = useState<CalendarSettings>({
-    ...getInitialSettings(),
-    isOpen: true
-  });
+  const [settings, setSettings] = useState<CalendarSettings>(getInitialSettings());
 
   const [activeTab, setActiveTab] = useState('core');
   const [restrictionConfig, setRestrictionConfig] = useState<RestrictionConfig>({
@@ -1729,12 +1727,9 @@ function App() {
             backgroundColor: '#fff',
             marginBottom: '24px'
           }}>
-            <DateRangePickerNew 
-              {...settings} 
-              defaultLayer={settings.defaultLayer}
-              showLayersNavigation={settings.showLayersNavigation}
-              restrictionConfig={restrictionConfig}
-              key={JSON.stringify(restrictionConfig)}
+            <DateRangePickerNew
+              settings={settings}
+              onSettingsChange={setSettings}
             />
           </div>
 

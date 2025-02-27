@@ -168,6 +168,18 @@ export interface CalendarSettings {
   showLayersNavigation: boolean;
   defaultLayer: string;
   restrictionConfig?: RestrictionConfig;
+  
+  // Color Settings
+  colors?: {
+    primary?: string;    // Default blue
+    success?: string;    // Default green
+    warning?: string;    // Default yellow
+    danger?: string;     // Default red
+    purple?: string;
+    teal?: string;
+    orange?: string;
+    pink?: string;
+  };
 }
 
 // Control Types for App.tsx
@@ -198,7 +210,7 @@ export interface SettingsConfig {
   };
 }
 
-// Default colors available for events
+// Default colors that can be overridden
 export const DEFAULT_COLORS = {
   primary: '#0366d6',    // Blue
   success: '#28a745',    // Green
@@ -238,7 +250,8 @@ export const getDefaultSettings = (): CalendarSettings => ({
   startWeekOnSunday: false,
   layers: DEFAULT_LAYERS,
   showLayersNavigation: true,
-  defaultLayer: ''
+  defaultLayer: '',
+  colors: DEFAULT_COLORS
 });
 
 // Update layer validation to ensure at least one layer
