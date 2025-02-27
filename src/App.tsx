@@ -1192,9 +1192,9 @@ function App() {
                           ? { type: 'daterange', enabled: true, ranges: [] }
                           : newType === 'boundary'
                           ? { type: 'boundary', enabled: true, date: '', direction: 'before', message: '' }
-                          : newType === 'allowedranges'
-                          ? { type: 'allowedranges', enabled: true, ranges: [] }
-                          : { ...restriction, type: newType };
+                          : newType === 'boundaryrange'
+                          ? { type: 'boundaryrange', enabled: true, ranges: [] }
+                          : { type: 'allowedranges', enabled: true, ranges: [] };
                         setDraftRestrictionConfig({ restrictions: newRestrictions });
                       }}
                       style={{
@@ -1206,6 +1206,7 @@ function App() {
                       <option value="daterange">Restricted Range</option>
                       <option value="boundary">Date Boundary</option>
                       <option value="allowedranges">Allowed Ranges</option>
+                      <option value="boundaryrange">Boundary Range</option>
                     </select>
 
                     <label style={{ 
@@ -1247,10 +1248,14 @@ function App() {
                   </div>
                 </div>
 
-                {(restriction.type === 'daterange' || restriction.type === 'allowedranges') && (
+                {(restriction.type === 'daterange' || 
+                  restriction.type === 'allowedranges' || 
+                  restriction.type === 'boundaryrange') && (
                   <div>
                     <h4 style={styles.subheading}>
-                      {restriction.type === 'daterange' ? 'Restricted Ranges' : 'Allowed Ranges'}
+                      {restriction.type === 'daterange' ? 'Restricted Ranges' : 
+                       restriction.type === 'boundaryrange' ? 'Boundary Ranges' :
+                       'Allowed Ranges'}
                     </h4>
                     {restriction.ranges.map((range, rangeIndex) => (
                       <div key={rangeIndex} style={{ marginBottom: '12px', padding: '8px', border: '1px solid #dee2e6' }}>
