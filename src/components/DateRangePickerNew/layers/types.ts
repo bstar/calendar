@@ -50,14 +50,14 @@ export interface BackgroundRange {
  * Properties:
  * - date: Date of the event in ISO string format (YYYY-MM-DD)
  * - title: Title/name of the event
- * - type: Type of event ('work' or 'other'), affects visual styling
+ * - color: Color for the event indicator (optional)
  * - time: Time of the event in display format
  * - description: Detailed description of the event
  */
 export interface Event {
   date: string;
   title: string;
-  type: 'work' | 'other';
+  color?: string;  // Optional color override
   time: string;
   description: string;
 }
@@ -81,23 +81,17 @@ export interface LayerData {
  * 
  * Properties:
  * - name: Unique identifier for the layer
- * - type: Type of layer (LAYER_TYPES), determines basic behavior
- * - title: Display name for the layer in the UI
- * - description: Description of the layer's purpose
- * - required: Whether the layer is required and cannot be disabled
- * - visible: Whether the layer is currently visible
- * - features: Array of capability identifiers that this layer supports
- * - data: Data used by the layer for rendering
+ * - color: Color directly used for the layer
+ * - events: Array of events to display
+ * - enabled: Whether the layer is currently enabled
+ * - renderContent: Optional function to render custom content for a date
  */
 export interface Layer {
   name: string;
-  type: LAYER_TYPES;
-  title: string;
-  description: string;
-  required?: boolean;
-  visible?: boolean;
-  features: string[];
-  data?: LayerData;
+  color: string;
+  events: Event[];
+  enabled: boolean;
+  renderContent?: (date: Date) => RenderResult | null;
 }
 
 /**
