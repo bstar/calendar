@@ -705,7 +705,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
 
   const [isOpen, setIsOpen] = useState(settings.displayMode === 'embedded' || settings.isOpen);
   const [selectedRange, setSelectedRange] = useState<DateRange>({ start: null, end: null });
-  const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date(2025, 0, 1)));
+  const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date()));
   const [isSelecting, setIsSelecting] = useState(false);
   const [outOfBoundsDirection, setOutOfBoundsDirection] = useState<'prev' | 'next' | null>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 }); // TODO probably not needed

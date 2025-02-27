@@ -649,13 +649,8 @@ const MonthPair: React.FC<MonthPairProps> = ({
   restrictionConfig,
   startWeekOnSunday
 }) => {
-  // ... existing code ...
   return (
-    <div style={{
-      display: 'flex',
-      width: '100%',
-      gap: '1rem'
-    }}>
+    <div style={{ display: 'flex', width: '100%', gap: '1rem' }}>
       {monthsToShow.map((month, index) => (
         <MonthGrid
           key={month.toISOString()}

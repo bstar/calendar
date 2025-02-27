@@ -33,51 +33,33 @@
  * 3. Create static handler for background data generation
  * 4. Add both handlers to their respective maps
  * 
- * Example - Adding a weekend restriction:
- * 
- * // 1. Add to types.ts
- * interface WeekendRestriction extends BaseRestriction {
- *   type: 'weekend';
- *   allowWeekends: boolean;
- * }
- * 
- * // 2. Create instance handler
- * private handleWeekendRestriction(date: Date, restriction: any): string | undefined {
- *   const isWeekend = date.getDay() === 0 || date.getDay() === 6;
- *   if (isWeekend && !restriction.allowWeekends) {
- *     return 'rgba(0, 0, 0, 0.1)';
- *   }
- *   return undefined;
- * }
- * 
- * // 3. Create static handler
- * private static backgroundDataHandlers = {
- *   ...existing handlers...,
- *   weekend: (restriction: any): BackgroundData[] => {
- *     if (restriction.allowWeekends) return [];
- *     // Return background data for all weekends in visible range
- *     return [{
- *       startDate: '2024-01-06', // Example Saturday
- *       endDate: '2024-01-07',   // Example Sunday
- *       color: '#ffe6e6'
- *     }];
- *   }
- * }
- * 
- * // 4. Add to handler maps
- * private restrictionHandlers = {
- *   ...existing handlers...,
- *   weekend: this.handleWeekendRestriction.bind(this)
- * };
+ * RestrictionBackgroundGenerator converts restriction configs into visual styles
+ * for the calendar UI. It handles two types of visual representations:
+ *
+ * 1. Background Data (for rendering restricted date ranges):
+ * const backgrounds = RestrictionBackgroundGenerator.generateBackgroundData({
+ *   restrictions: [{
+ *     type: 'daterange',
+ *     enabled: true,
+ *     ranges: [{ start: '2024-01-01', end: '2024-01-15' }]
+ *   }]
+ * });
+ * Returns: [{
+ *   startDate: '2024-01-01',
+ *   endDate: '2024-01-15',
+ *   color: '#ffe6e6'  // Light red background for restricted ranges
+ * }]
+ *
+ * 2. Individual Date Styling:
+ * const generator = new RestrictionBackgroundGenerator(config);
+ * const background = generator.generateBackground(date);
+ * Returns: 'rgba(0, 0, 0, 0.1)' or undefined  // Grey overlay for restricted dates
  */
 
 import { parseISO, isValid, isWithinInterval } from 'date-fns';
 import { RestrictionConfig } from './types';
 import { BackgroundData } from '../../DateRangePicker.config';
 
-/**
- * Generates background styles for restricted dates in the calendar
- */
 export class RestrictionBackgroundGenerator {
   /**
    * Creates an instance of RestrictionBackgroundGenerator
@@ -89,7 +71,8 @@ export class RestrictionBackgroundGenerator {
    * Handler for boundary type restrictions
    * @param {Date} date - Date to check
    * @param {any} restriction - Boundary restriction configuration
-   * @returns {string | undefined} Background color if restricted
+   * @returns {string | undefined} Background color if restricted, undefined if allowed
+   * @private
    */
   private handleBoundaryRestriction(date: Date, restriction: any): string | undefined {
     const boundaryDate = parseISO(restriction.date);
@@ -111,7 +94,8 @@ export class RestrictionBackgroundGenerator {
    * Handler for daterange type restrictions
    * @param {Date} date - Date to check
    * @param {any} restriction - Date range restriction configuration
-   * @returns {string | undefined} Background color if restricted
+   * @returns {string | undefined} Background color if restricted, undefined if allowed
+   * @private
    */
   private handleDateRangeRestriction(date: Date, restriction: any): string | undefined {
     for (const range of restriction.ranges) {
@@ -131,7 +115,8 @@ export class RestrictionBackgroundGenerator {
    * Handler for allowedranges type restrictions
    * @param {Date} date - Date to check
    * @param {any} restriction - Allowed ranges restriction configuration
-   * @returns {string | undefined} Background color if restricted
+   * @returns {string | undefined} Background color if restricted, undefined if allowed
+   * @private
    */
   private handleAllowedRangesRestriction(date: Date, restriction: any): string | undefined {
     if (!restriction.ranges.length) return undefined;
@@ -152,7 +137,10 @@ export class RestrictionBackgroundGenerator {
     return isAllowed ? undefined : 'rgba(0, 0, 0, 0.1)';
   }
 
-  // Map of restriction types to their handlers
+  /**
+   * Map of restriction types to their handlers
+   * @private
+   */
   private restrictionHandlers = {
     boundary: this.handleBoundaryRestriction.bind(this),
     daterange: this.handleDateRangeRestriction.bind(this),
@@ -181,7 +169,8 @@ export class RestrictionBackgroundGenerator {
   }
 
   /**
-   * Static handlers for generating background data
+   * Static handlers for generating background data for each restriction type
+   * @private
    */
   private static backgroundDataHandlers = {
     daterange: (restriction: any): BackgroundData[] => {
@@ -236,14 +225,6 @@ export class RestrictionBackgroundGenerator {
    * @param {RestrictionConfig} [restrictionConfig] - Configuration object containing restriction rules
    * @returns {BackgroundData[]} Array of background data objects for rendering restricted date ranges
    * @static
-   * 
-   * @example
-   * // Returns array of background data objects like:
-   * // [{
-   * //   start: "2024-01-01",
-   * //   end: "2024-01-15",
-   * //   color: "rgba(0, 0, 0, 0.1)"
-   * // }]
    */
   static generateBackgroundData(restrictionConfig?: RestrictionConfig): BackgroundData[] {
     if (!restrictionConfig?.restrictions) return [];
