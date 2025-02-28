@@ -10,160 +10,207 @@ import {
   EventData,
   BackgroundData,
   SettingControl,
-  BaseLayer,
-  OverlayLayer,
   DEFAULT_COLORS
 } from './components/DateRangePicker.config';
+import { RestrictionConfig, RestrictionType } from './components/DateRangePickerNew/restrictions/types';
 import DateRangePickerNew from './components/CLACalendar';
 
 // Import package.json to access version, description, and name
 import packageInfo from '../package.json';
 
-const INITIAL_LAYER_DATA = {
-  events: [
+// CSS-in-JS types
+interface ExtendedCSSProperties extends React.CSSProperties {
+  '&:hover'?: React.CSSProperties;
+  '&:focus'?: React.CSSProperties;
+}
+
+type BorderCollapse = 'collapse' | 'separate';
+type TextAlign = 'left' | 'center' | 'right';
+
+interface TableStyles {
+  width: string;
+  borderCollapse: BorderCollapse;
+  fontSize: string;
+}
+
+interface TableHeaderStyles {
+  backgroundColor: string;
+  padding: string;
+  textAlign: TextAlign;
+  borderBottom: string;
+}
+
+// Initial settings that exactly match the export structure
+const getInitialSettings = (): CalendarSettings => ({
+  displayMode: "embedded",
+  visibleMonths: 2,
+  singleMonthWidth: 500,
+  showMonthHeadings: true,
+  selectionMode: "range",
+  showTooltips: true,
+  showHeader: true,
+  closeOnClickAway: true,
+  showSubmitButton: false,
+  showFooter: true,
+  enableOutOfBoundsScroll: true,
+  suppressTooltipsOnSelection: false,
+  showSelectionAlert: false,
+  startWeekOnSunday: false,
+  layers: [
     {
-      date: "2025-02-15",
-      title: "Team Meeting",
-      time: "10:00 AM",
-      description: "Weekly sync",
-      color: DEFAULT_COLORS.primary
+      name: "Calendar",
+      title: "Base Calendar",
+      description: "Basic calendar functionality",
+      required: true,
+      visible: true,
+      data: {
+        events: [],
+        background: []
+      }
     },
     {
-      date: "2025-02-20",
-      title: "Lunch with Client",
-      time: "12:30 PM",
-      description: "Project discussion",
-      color: DEFAULT_COLORS.purple  // Purple for client interactions
+      name: "sample-events",
+      title: "Event Calendar",
+      description: "Display events and appointments",
+      visible: true,
+      data: {
+        events: [
+          {
+            date: "2025-02-15",
+            title: "Team Meeting",
+            type: "meeting",
+            time: "10:00 AM",
+            description: "Weekly sync",
+            color: "#0366d6"
+          },
+          {
+            date: "2025-02-20",
+            title: "Lunch with Client",
+            type: "meeting",
+            time: "12:30 PM",
+            description: "Project discussion",
+            color: "#6f42c1"
+          },
+          {
+            date: "2025-02-25",
+            title: "Birthday Party",
+            type: "meeting",
+            time: "7:00 PM",
+            description: "Cake and presents!",
+            color: "#e83e8c"
+          },
+          {
+            date: "2025-03-05",
+            title: "Conference",
+            type: "meeting",
+            time: "9:00 AM",
+            description: "Annual tech summit",
+            color: "#20c997"
+          },
+          {
+            date: "2025-03-12",
+            title: "Dentist",
+            type: "meeting",
+            time: "2:00 PM",
+            description: "Regular checkup",
+            color: "#fd7e14"
+          },
+          {
+            date: "2025-03-18",
+            title: "Project Deadline",
+            type: "meeting",
+            time: "5:00 PM",
+            description: "Final deliverables due",
+            color: "#dc3545"
+          },
+          {
+            date: "2025-03-22",
+            title: "Weekend Trip",
+            type: "meeting",
+            time: "All day",
+            description: "Beach getaway",
+            color: "#28a745"
+          }
+        ],
+        background: []
+      }
     },
     {
-      date: "2025-02-25",
-      title: "Birthday Party",
-      time: "7:00 PM",
-      description: "Cake and presents!",
-      color: DEFAULT_COLORS.pink  // Pink for celebrations
+      name: "sample-background",
+      title: "Background Colors",
+      description: "Display date range backgrounds",
+      visible: true,
+      data: {
+        background: [
+          {
+            startDate: "2025-01-05",
+            endDate: "2025-01-15",
+            color: "#0366d633"
+          },
+          {
+            startDate: "2025-02-10",
+            endDate: "2025-02-20",
+            color: "#dc354533"
+          },
+          {
+            startDate: "2025-03-01",
+            endDate: "2025-03-10",
+            color: "#28a74533"
+          }
+        ]
+      }
     },
     {
-      date: "2025-03-05",
-      title: "Conference",
-      time: "9:00 AM",
-      description: "Annual tech summit",
-      color: DEFAULT_COLORS.teal  // Teal for professional events
-    },
-    {
-      date: "2025-03-12",
-      title: "Dentist",
-      time: "2:00 PM",
-      description: "Regular checkup",
-      color: DEFAULT_COLORS.orange  // Orange for appointments
-    },
-    {
-      date: "2025-03-18",
-      title: "Project Deadline",
-      time: "5:00 PM",
-      description: "Final deliverables due",
-      color: DEFAULT_COLORS.danger  // Red for deadlines
-    },
-    {
-      date: "2025-03-22",
-      title: "Weekend Trip",
-      time: "All day",
-      description: "Beach getaway",
-      color: DEFAULT_COLORS.success  // Green for leisure
+      name: "combined-layer",
+      title: "Combined View",
+      description: "Events with background highlighting",
+      visible: true,
+      data: {
+        events: [
+          {
+            date: "2025-02-01",
+            title: "Sprint Planning",
+            type: "meeting",
+            time: "10:00 AM",
+            description: "Two-week sprint kickoff",
+            color: "#0366d6"
+          },
+          {
+            date: "2025-02-14",
+            title: "Sprint Review",
+            type: "meeting",
+            time: "4:00 PM",
+            description: "Sprint demo and retrospective",
+            color: "#28a745"
+          }
+        ],
+        background: [
+          {
+            startDate: "2025-02-01",
+            endDate: "2025-02-14",
+            color: "#f6c23e33"
+          },
+          {
+            startDate: "2025-02-05",
+            endDate: "2025-02-07",
+            color: "#28a74533"
+          }
+        ]
+      }
     }
   ],
-  background: []
-};
-
-const SAMPLE_BACKGROUND_DATA: BackgroundData[] = [
-  {
-    startDate: '2025-01-05',
-    endDate: '2025-01-15',
-    color: `${DEFAULT_COLORS.primary}33`  // Light blue
+  showLayersNavigation: true,
+  defaultLayer: "Calendar",
+  colors: {
+    primary: "#0366d6",
+    success: "#28a745",
+    warning: "#f6c23e",
+    danger: "#dc3545",
+    purple: "#6f42c1",
+    teal: "#20c997",
+    orange: "#fd7e14",
+    pink: "#e83e8c"
   },
-  {
-    startDate: '2025-02-10',
-    endDate: '2025-02-20',
-    color: `${DEFAULT_COLORS.danger}33`   // Light red
-  },
-  {
-    startDate: '2025-03-01',
-    endDate: '2025-03-10',
-    color: `${DEFAULT_COLORS.success}33`  // Light green
-  }
-];
-
-const INITIAL_LAYERS: Layer[] = [
-  {
-    name: 'Calendar',
-    title: 'Base Calendar',
-    description: 'Basic calendar functionality',
-    required: true,
-    visible: true,
-    data: {
-      events: [],
-      background: []
-    }
-  },
-  {
-    name: 'sample-events',
-    title: 'Event Calendar',
-    description: 'Display events and appointments',
-    visible: true,
-    data: INITIAL_LAYER_DATA
-  },
-  {
-    name: 'sample-background',
-    title: 'Background Colors',
-    description: 'Display date range backgrounds',
-    visible: true,
-    data: {
-      background: SAMPLE_BACKGROUND_DATA
-    }
-  },
-  {
-    name: 'combined-layer',
-    title: 'Combined View',
-    description: 'Events with background highlighting',
-    visible: true,
-    data: {
-      events: [
-        { 
-          date: '2025-02-01', 
-          title: 'Sprint Planning',
-          time: '10:00 AM', 
-          description: 'Two-week sprint kickoff',
-          color: DEFAULT_COLORS.primary
-        },
-        { 
-          date: '2025-02-14', 
-          title: 'Sprint Review',
-          time: '4:00 PM', 
-          description: 'Sprint demo and retrospective',
-          color: DEFAULT_COLORS.success
-        }
-      ],
-      background: [
-        {
-          startDate: '2025-02-01',
-          endDate: '2025-02-14',
-          color: `${DEFAULT_COLORS.warning}33`  // Light orange for sprint duration
-        },
-        {
-          startDate: '2025-02-05',
-          endDate: '2025-02-07',
-          color: `${DEFAULT_COLORS.success}33`  // Light green for mid-sprint workshops
-        }
-      ]
-    }
-  }
-];
-
-// Update getDefaultSettings to include sample layers
-const getInitialSettings = (): CalendarSettings => ({
-  ...getDefaultSettings(),
-  layers: INITIAL_LAYERS,
-  defaultLayer: 'Calendar',
-  colors: DEFAULT_COLORS,  // Allow colors to be overridden
   restrictionConfig: {
     restrictions: [
       {
@@ -176,7 +223,18 @@ const getInitialSettings = (): CalendarSettings => ({
             message: "This date range is restricted"
           }
         ]
-      }
+      },
+      {
+        type: "daterange",
+        enabled: true,
+        ranges: [
+          {
+            start: "2025-01-20",
+            end: "2025-01-25",
+            message: "This date range is restricted"
+          }
+        ]
+      },
     ]
   }
 });
@@ -464,19 +522,7 @@ function App() {
 
   const [activeTab, setActiveTab] = useState('core');
   const [restrictionConfig, setRestrictionConfig] = useState<RestrictionConfig>({
-    restrictions: [
-      {
-        type: 'daterange',
-        enabled: true,
-        ranges: [
-          {
-            start: '2025-01-01',
-            end: '2025-01-15',
-            message: 'This date range is restricted'
-          }
-        ]
-      }
-    ]
+    restrictions: settings.restrictionConfig?.restrictions || [],
   });
 
   // Add new state for import modal

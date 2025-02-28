@@ -57,9 +57,10 @@ export interface BackgroundRange {
 export interface Event {
   date: string;
   title: string;
-  color?: string;  // Optional color override
+  type: string;
   time: string;
   description: string;
+  color?: string;
 }
 
 /**
@@ -71,8 +72,8 @@ export interface Event {
  * - events: Optional array of events to display
  */
 export interface LayerData {
-  background?: BackgroundRange[];
   events?: Event[];
+  background?: BackgroundData[];
 }
 
 /**
@@ -81,16 +82,26 @@ export interface LayerData {
  * 
  * Properties:
  * - name: Unique identifier for the layer
+ * - title: Title of the layer
+ * - description: Description of the layer
+ * - required: Whether the layer is required
+ * - visible: Whether the layer is visible
+ * - data: Optional data for the layer
  * - color: Color directly used for the layer
- * - events: Array of events to display
  * - enabled: Whether the layer is currently enabled
+ * - events: Array of events to display
  * - renderContent: Optional function to render custom content for a date
  */
 export interface Layer {
   name: string;
-  color: string;
-  events: Event[];
-  enabled: boolean;
+  title: string;
+  description: string;
+  required?: boolean;
+  visible?: boolean;
+  data?: LayerData;
+  color?: string;
+  enabled?: boolean;
+  events?: Event[];
   renderContent?: (date: Date) => RenderResult | null;
 }
 
@@ -107,4 +118,10 @@ export interface RenderResult {
   backgroundColor?: string;
   element?: React.ReactNode;
   tooltipContent?: React.ReactNode;
+}
+
+export interface BackgroundData {
+  startDate: string;
+  endDate: string;
+  color: string;
 } 

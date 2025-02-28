@@ -1,6 +1,5 @@
 import { CSSProperties } from 'react';
 import { RestrictionConfig } from './DateRangePickerNew/restrictions/types';
-import { Layer } from './DateRangePickerNew/layers/types';
 
 export type LAYER_TYPES = 'base' | 'overlay';
 
@@ -107,15 +106,29 @@ interface Settings {
   layers: LayerControlSetting;
 }
 
-// Simplify Layer type - remove base/overlay distinction
+// Update Event type for layer events
+export interface Event {
+  date: string;
+  title: string;
+  type: string;
+  time: string;
+  description: string;
+  color?: string;
+}
+
+// Update EventData to match Event type
+export interface EventData extends Event {
+  type: string;
+}
+
+// Update Layer interface to match LayerRenderer requirements
 export interface Layer {
   name: string;
   title: string;
   description: string;
-  data?: LayerData;
   required?: boolean;
   visible?: boolean;
-  features?: string[];
+  data?: LayerData;
   color?: string;
   enabled?: boolean;
   events?: EventData[];
@@ -124,15 +137,6 @@ export interface Layer {
 export interface LayerData {
   events?: EventData[];
   background?: BackgroundData[];
-}
-
-export interface EventData {
-  date: string;
-  title: string;
-  type: string;
-  time: string;
-  description: string;
-  color?: string;
 }
 
 export interface BackgroundData {
@@ -449,39 +453,6 @@ export const DISPLAY_MODE_CONSTRAINTS: Record<string, DisplayModeConstraints> = 
 export interface ExtendedCSSProperties extends CSSProperties {
   '&:hover'?: CSSProperties;
   '&:focus'?: CSSProperties;
-}
-
-// Add Event type for layer events
-export interface Event {
-  date: string;
-  title: string;
-  type: 'work' | 'other';
-  time: string;
-  description: string;
-}
-
-// Update EventData to match Event type
-export interface EventData extends Omit<Event, 'type'> {
-  type: string; // Keep this flexible for backward compatibility
-}
-
-// Update the styles type
-export interface TableStyles {
-  width: string;
-  borderCollapse: BorderCollapse;
-  fontSize: string;
-}
-
-export interface TableHeaderStyles {
-  backgroundColor: string;
-  padding: string;
-  textAlign: TextAlign;
-  borderBottom: string;
-}
-
-// Add type for the selected presets state
-export interface SelectedPresets {
-  [key: string]: boolean;
 }
 
 // Add these type definitions

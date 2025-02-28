@@ -1,4 +1,4 @@
-export type RestrictionType = 'daterange' | 'boundary' | 'allowedranges' | 'custom_future_types';
+export type RestrictionType = 'daterange' | 'boundary' | 'allowedranges' | 'conditional_boundary';
 
 export interface BaseRestriction {
   type: RestrictionType;
