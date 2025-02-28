@@ -133,9 +133,13 @@ export class RestrictionManager {
 
       if (!isValid(rangeStart) || !isValid(rangeEnd)) continue;
 
-      if (isWithinInterval(start, { start: rangeStart, end: rangeEnd }) ||
-          isWithinInterval(end, { start: rangeStart, end: rangeEnd })) {
-        return range.message || 'Selection includes restricted boundary dates';
+      // Check if selection extends beyond the boundary range
+      const selectionStartsBeforeBoundary = start < rangeStart;
+      const selectionEndsAfterBoundary = end > rangeEnd;
+
+      // Only return error if selection extends beyond the boundary
+      if (selectionStartsBeforeBoundary || selectionEndsAfterBoundary) {
+        return range.message || 'Selection cannot extend beyond restricted boundary dates';
       }
     }
     return null;
