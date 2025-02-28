@@ -235,6 +235,22 @@ const getInitialSettings = (): CalendarSettings => ({
           }
         ]
       },
+      {
+        type: "restricted_boundary",
+        enabled: true,
+        ranges: [
+          {
+            start: "2025-02-01",
+            end: "2025-02-15",
+            message: "This boundary range is restricted (Feb 1-15)"
+          },
+          {
+            start: "2025-02-20",
+            end: "2025-02-28",
+            message: "This boundary range is restricted (Feb 20-28)"
+          }
+        ]
+      }
     ]
   }
 });
@@ -1240,6 +1256,8 @@ function App() {
                           ? { type: 'boundary', enabled: true, date: '', direction: 'before', message: '' }
                           : newType === 'allowedranges'
                           ? { type: 'allowedranges', enabled: true, ranges: [] }
+                          : newType === 'restricted_boundary'
+                          ? { type: 'restricted_boundary', enabled: true, ranges: [] }
                           : { ...restriction, type: newType };
                         setDraftRestrictionConfig({ restrictions: newRestrictions });
                       }}
@@ -1252,6 +1270,7 @@ function App() {
                       <option value="daterange">Restricted Range</option>
                       <option value="boundary">Date Boundary</option>
                       <option value="allowedranges">Allowed Ranges</option>
+                      <option value="restricted_boundary">Restricted Boundary</option>
                     </select>
 
                     <label style={{ 
@@ -1293,10 +1312,12 @@ function App() {
                   </div>
                 </div>
 
-                {(restriction.type === 'daterange' || restriction.type === 'allowedranges') && (
+                {(restriction.type === 'daterange' || restriction.type === 'allowedranges' || restriction.type === 'restricted_boundary') && (
                   <div>
-                    <h4 style={styles.subheading}>
-                      {restriction.type === 'daterange' ? 'Restricted Ranges' : 'Allowed Ranges'}
+                    <h4 style={docStyles.subHeading}>
+                      {restriction.type === 'daterange' ? 'Restricted Ranges' : 
+                       restriction.type === 'restricted_boundary' ? 'Boundary Ranges' :
+                       'Allowed Ranges'}
                     </h4>
                     {restriction.ranges.map((range, rangeIndex) => (
                       <div key={rangeIndex} style={{ marginBottom: '12px', padding: '8px', border: '1px solid #dee2e6' }}>
@@ -1390,7 +1411,7 @@ function App() {
                 )}
                 {restriction.type === 'boundary' && (
                   <div>
-                    <h4 style={styles.subheading}>Date Boundary</h4>
+                    <h4 style={docStyles.subHeading}>Date Boundary</h4>
                     <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
                       <div style={{ flex: 1 }}>
                         <label style={styles.label}>Boundary Date</label>

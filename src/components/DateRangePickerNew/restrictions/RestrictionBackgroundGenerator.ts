@@ -112,6 +112,27 @@ export class RestrictionBackgroundGenerator {
   }
 
   /**
+   * Handler for restricted boundary type restrictions
+   * @param {Date} date - Date to check
+   * @param {any} restriction - Restricted boundary configuration
+   * @returns {string | undefined} Background color if restricted, undefined if allowed
+   * @private
+   */
+  private handleRestrictedBoundaryRestriction(date: Date, restriction: any): string | undefined {
+    for (const range of restriction.ranges) {
+      const rangeStart = parseISO(range.start);
+      const rangeEnd = parseISO(range.end);
+
+      if (!isValid(rangeStart) || !isValid(rangeEnd)) continue;
+
+      if (isWithinInterval(date, { start: rangeStart, end: rangeEnd })) {
+        return 'rgba(0, 0, 0, 0.1)';
+      }
+    }
+    return undefined;
+  }
+
+  /**
    * Handler for allowedranges type restrictions
    * @param {Date} date - Date to check
    * @param {any} restriction - Allowed ranges restriction configuration
@@ -140,7 +161,8 @@ export class RestrictionBackgroundGenerator {
   private restrictionHandlers = {
     boundary: this.handleBoundaryRestriction.bind(this),
     daterange: this.handleDateRangeRestriction.bind(this),
-    allowedranges: this.handleAllowedRangesRestriction.bind(this)
+    allowedranges: this.handleAllowedRangesRestriction.bind(this),
+    restricted_boundary: this.handleRestrictedBoundaryRestriction.bind(this)
   };
 
   /**
@@ -213,6 +235,20 @@ export class RestrictionBackgroundGenerator {
         endDate: restriction.direction === 'before' ? restriction.date : '2100-12-31',
         color: '#ffe6e6'
       }];
+    },
+
+    restricted_boundary: (restriction: any): BackgroundData[] => {
+      return restriction.ranges
+        .filter(range => {
+          const start = parseISO(range.start);
+          const end = parseISO(range.end);
+          return isValid(start) && isValid(end) && start <= end;
+        })
+        .map(range => ({
+          startDate: range.start,
+          endDate: range.end,
+          color: '#ffe6e6'
+        }));
     }
   };
 

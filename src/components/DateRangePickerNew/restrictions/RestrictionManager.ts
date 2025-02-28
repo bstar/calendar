@@ -119,7 +119,30 @@ export class RestrictionManager {
   }
 
   /**
-   * Checks if a selection falls within allowed date ranges
+   * Checks if a selection overlaps with restricted boundary ranges
+   * @param {Date} start - Start date of the selection
+   * @param {Date} end - End date of the selection
+   * @param {any} restriction - Restricted boundary configuration
+   * @returns {string | null} Error message if restriction is violated, null otherwise
+   * @private
+   */
+  private checkRestrictedBoundaryRestriction(start: Date, end: Date, restriction: any): string | null {
+    for (const range of restriction.ranges) {
+      const rangeStart = parseISO(range.start);
+      const rangeEnd = parseISO(range.end);
+
+      if (!isValid(rangeStart) || !isValid(rangeEnd)) continue;
+
+      if (isWithinInterval(start, { start: rangeStart, end: rangeEnd }) ||
+          isWithinInterval(end, { start: rangeStart, end: rangeEnd })) {
+        return range.message || 'Selection includes restricted boundary dates';
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Checks if a selection falls within allowed ranges
    * @param {Date} start - Start date of the selection
    * @param {Date} end - End date of the selection
    * @param {any} restriction - Allowed ranges restriction configuration
@@ -174,6 +197,7 @@ export class RestrictionManager {
     boundary: this.checkBoundaryRestriction.bind(this),
     daterange: this.checkDateRangeRestriction.bind(this),
     allowedranges: this.checkAllowedRangesRestriction.bind(this),
+    restricted_boundary: this.checkRestrictedBoundaryRestriction.bind(this),
     weekday: this.checkWeekdayRestriction.bind(this)
   };
 

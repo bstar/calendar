@@ -1,4 +1,4 @@
-export type RestrictionType = 'daterange' | 'boundary' | 'allowedranges' | 'conditional_boundary';
+export type RestrictionType = 'daterange' | 'boundary' | 'allowedranges' | 'restricted_boundary';
 
 export interface BaseRestriction {
   type: RestrictionType;
@@ -30,8 +30,17 @@ export interface AllowedRangesRestriction extends BaseRestriction {
   }[];
 }
 
+export interface RestrictedBoundaryRestriction extends BaseRestriction {
+  type: 'restricted_boundary';
+  ranges: {
+    start: string;  // YYYY-MM-DD format
+    end: string;    // YYYY-MM-DD format
+    message: string;
+  }[];
+}
+
 // Union type for all restriction types
-export type Restriction = DateRangeRestriction | BoundaryRestriction | AllowedRangesRestriction;
+export type Restriction = DateRangeRestriction | BoundaryRestriction | AllowedRangesRestriction | RestrictedBoundaryRestriction;
 
 export interface RestrictionConfig {
   restrictions: Restriction[];
