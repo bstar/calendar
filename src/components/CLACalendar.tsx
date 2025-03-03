@@ -361,7 +361,10 @@ const MonthGrid: React.FC<MonthGridProps> = ({
       {/* Tooltip at grid level */}
       {hoveredDate && restrictionConfig?.restrictions && document.hasFocus() && (
         (() => {
+          // First check standard restriction result
           const result = restrictionManager.checkSelection(hoveredDate, hoveredDate);
+          
+          // If standard restriction shows message, display it
           if (!result.allowed && result.message) {
             return (
               <div
@@ -385,6 +388,51 @@ const MonthGrid: React.FC<MonthGridProps> = ({
               </div>
             );
           }
+          
+          // Check specifically for restricted boundary type
+          const boundaryRestriction = restrictionConfig.restrictions.find(r => 
+            r.type === 'restricted_boundary' && r.enabled
+          );
+          
+          if (boundaryRestriction && selectedRange.start) {
+            const selectionStart = parseISO(selectedRange.start);
+            
+            for (const range of boundaryRestriction.ranges) {
+              const rangeStart = parseISO(range.start);
+              const rangeEnd = parseISO(range.end);
+              
+              if (!isValid(rangeStart) || !isValid(rangeEnd)) continue;
+              
+              // If selection started within this boundary
+              if (isWithinInterval(selectionStart, { start: rangeStart, end: rangeEnd })) {
+                // If hovered date is outside boundary, show tooltip with message
+                if (!isWithinInterval(hoveredDate, { start: rangeStart, end: rangeEnd })) {
+                  return (
+                    <div
+                      style={{
+                        position: 'fixed',
+                        left: mousePosition.x,
+                        top: mousePosition.y,
+                        backgroundColor: 'rgba(220, 53, 69, 0.9)',
+                        color: 'white',
+                        padding: '8px 12px',
+                        borderRadius: '4px',
+                        fontSize: '13px',
+                        pointerEvents: 'none',
+                        zIndex: 1000,
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                        maxWidth: '250px',
+                        whiteSpace: 'pre-line'
+                      }}
+                    >
+                      {range.message || 'Selection must stay within the boundary'}
+                    </div>
+                  );
+                }
+              }
+            }
+          }
+          
           return null;
         })()
       )}
