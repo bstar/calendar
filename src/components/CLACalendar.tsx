@@ -12,7 +12,9 @@ import {
   startOfWeek,
   endOfWeek,
   isSameMonth,
-  addDays
+  addDays,
+  isWithinInterval,
+  isValid
 } from "date-fns";
 import './DateRangePicker.css';
 import {
@@ -432,9 +434,36 @@ const DayCell = ({
   );
 
   const restrictionResult = useMemo(() => {
-    const result = restrictionManager.checkSelection(date, date);
-    return result;
-  }, [date, restrictionManager]);
+    // Only check for restrictions if we have an active selection within a boundary
+    if (!selectedRange.start) return { allowed: true };
+
+    const selectionStart = parseISO(selectedRange.start);
+    const currentRestrictionConfig = restrictionConfig ?? { restrictions: [] };
+    
+    // Find if selection started in any restricted boundary
+    const boundaryRestriction = currentRestrictionConfig.restrictions.find(r => 
+      r.type === 'restricted_boundary' && r.enabled
+    );
+
+    if (boundaryRestriction) {
+      for (const range of boundaryRestriction.ranges) {
+        const rangeStart = parseISO(range.start);
+        const rangeEnd = parseISO(range.end);
+
+        if (!isValid(rangeStart) || !isValid(rangeEnd)) continue;
+
+        // If selection started in this range, show restriction pattern for dates OUTSIDE the range
+        if (isWithinInterval(selectionStart, { start: rangeStart, end: rangeEnd })) {
+          if (!isWithinInterval(date, { start: rangeStart, end: rangeEnd })) {
+            return { allowed: false, message: range.message || 'Selection must stay within the boundary' };
+          }
+          return { allowed: true };
+        }
+      }
+    }
+
+    return restrictionManager.checkSelection(date, date);
+  }, [date, restrictionManager, selectedRange, restrictionConfig]);
 
   const handleMouseEnter = (e) => {
     setIsHovered(true);
