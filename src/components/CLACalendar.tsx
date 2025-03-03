@@ -775,11 +775,13 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
 interface CLACalendarProps {
   settings: CalendarSettings;
   onSettingsChange: (settings: CalendarSettings) => void;
+  initialActiveLayer?: string;
 }
 
 export const CLACalendar: React.FC<CLACalendarProps> = ({
   settings,
-  onSettingsChange
+  onSettingsChange,
+  initialActiveLayer
 }) => {
   console.log('Calendar Settings:', settings);
   console.log('Restriction Config:', settings.restrictionConfig);
@@ -807,12 +809,23 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     [settings.layers]
   );
 
+  // Use initialActiveLayer if provided, otherwise use settings.defaultLayer
+  const [activeLayer, setActiveLayer] = useState(
+    initialActiveLayer || settings.defaultLayer
+  );
+
+  // Add a useEffect to update activeLayer when initialActiveLayer changes
+  useEffect(() => {
+    if (initialActiveLayer) {
+      setActiveLayer(initialActiveLayer);
+    }
+  }, [initialActiveLayer]);
+
   // Now we can use layerManager
   const [activeLayers, setActiveLayers] = useState<Layer[]>(
     layerManager.getLayers()
   );
 
-  const [activeLayer, setActiveLayer] = useState(settings.defaultLayer);
   const [notification, setNotification] = useState<string | null>(null);
 
   const selectionManager = useMemo(() =>

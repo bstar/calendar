@@ -538,6 +538,7 @@ function App() {
   const [settings, setSettings] = useState<CalendarSettings>(getInitialSettings());
 
   const [activeTab, setActiveTab] = useState('core');
+  const [activeLayer, setActiveLayer] = useState<string>(settings.defaultLayer || '');
   const [restrictionConfig, setRestrictionConfig] = useState<RestrictionConfig>({
     restrictions: settings.restrictionConfig?.restrictions || [],
   });
@@ -547,6 +548,11 @@ function App() {
 
   // Add state for draft changes
   const [draftRestrictionConfig, setDraftRestrictionConfig] = useState(restrictionConfig);
+
+  // Update active layer when default layer changes in settings
+  useEffect(() => {
+    setActiveLayer(settings.defaultLayer || '');
+  }, [settings.defaultLayer]);
 
   const handleChange = (prop) => (event) => {
     const value = event.target.type === 'checkbox' 
@@ -954,9 +960,41 @@ function App() {
         <div style={{ 
           marginBottom: '16px',
           display: 'flex',
-          justifyContent: 'flex-end',
+          justifyContent: 'space-between',
           alignItems: 'center'
         }}>
+          <div style={{ 
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px' 
+          }}>
+            <label style={{
+              ...styles.label,
+              marginBottom: 0,
+              whiteSpace: 'nowrap'
+            }}>
+              Default Layer:
+            </label>
+            <select
+              value={activeLayer}
+              onChange={(e) => {
+                handleDefaultLayerChange(e.target.value);
+              }}
+              style={{
+                ...styles.select,
+                minWidth: '180px'
+              }}
+            >
+              {layers.length === 0 && (
+                <option value="" disabled>No layers available</option>
+              )}
+              {layers.map(layer => (
+                <option key={layer.name} value={layer.name}>
+                  {layer.title || layer.name} {layer.required ? '(Required)' : ''}
+                </option>
+              ))}
+            </select>
+          </div>
           <button
             onClick={() => {
               const newLayer = {
@@ -1645,6 +1683,16 @@ function App() {
     }));
   };
 
+  // Update the default layer selection handler
+  const handleDefaultLayerChange = (layerName: string) => {
+    setSettings(prev => ({
+      ...prev,
+      defaultLayer: layerName
+    }));
+    // Also update the active layer so the calendar immediately reflects the change
+    setActiveLayer(layerName);
+  };
+
   return (
     <div style={{ padding: '20px', maxWidth: '1800px', margin: '0 auto' }}>
       {/* Header */}
@@ -1825,6 +1873,7 @@ function App() {
             <DateRangePickerNew
               settings={settings}
               onSettingsChange={setSettings}
+              initialActiveLayer={activeLayer}
             />
           </div>
 
