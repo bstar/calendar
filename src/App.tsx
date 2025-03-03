@@ -957,16 +957,18 @@ function App() {
   const LayerManager = ({ layers, onUpdate }: { layers: Layer[], onUpdate: (layers: Layer[]) => void }) => {
     return (
       <div style={{ marginBottom: '24px' }}>
+        {/* Layer Management */}
         <div style={{ 
-          marginBottom: '16px',
           display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          gap: '12px'
         }}>
           <div style={{ 
             display: 'flex',
             alignItems: 'center',
-            gap: '10px' 
+            gap: '10px',
+            width: '100%'
           }}>
             <label style={{
               ...styles.label,
@@ -982,6 +984,7 @@ function App() {
               }}
               style={{
                 ...styles.select,
+                flexGrow: 1,
                 minWidth: '180px'
               }}
             >
