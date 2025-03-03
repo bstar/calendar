@@ -10,7 +10,8 @@ import {
   EventData,
   BackgroundData,
   SettingControl,
-  DEFAULT_COLORS
+  DEFAULT_COLORS,
+  validateLayers
 } from './components/DateRangePicker.config';
 import { RestrictionConfig, RestrictionType } from './components/DateRangePickerNew/restrictions/types';
 import DateRangePickerNew from './components/CLACalendar';
@@ -805,7 +806,7 @@ function App() {
 
   const LayerDataEditor = ({ layer, onUpdate }) => {
     const [dataText, setDataText] = useState(
-      JSON.stringify(layer.data || [], null, 2)
+      JSON.stringify(layer.data || { events: [], background: [] }, null, 2)
     );
 
     const handleApply = () => {
@@ -1062,18 +1063,12 @@ function App() {
 
                 <div>
                   <label style={styles.label}>Layer Data</label>
-                  <textarea
-                    value={JSON.stringify(layer.data || { events: [], background: [] }, null, 2)}
-                    onChange={(e) => {
-                      try {
-                        const newData = JSON.parse(e.target.value);
-                        const updatedLayer = { ...layer, data: newData };
-                        onUpdate(layers.map(l => l.name === layer.name ? updatedLayer : l));
-                      } catch (error) {
-                        console.error('Invalid JSON:', error);
-                      }
+                  <LayerDataEditor 
+                    layer={layer}
+                    onUpdate={(newData) => {
+                      const updatedLayer = { ...layer, data: newData };
+                      onUpdate(layers.map(l => l.name === layer.name ? updatedLayer : l));
                     }}
-                    style={styles.textarea}
                   />
                 </div>
               </div>
