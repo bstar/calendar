@@ -589,11 +589,11 @@ const DayCell = ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        pointerEvents: 'none'
+        pointerEvents: 'none',
+        zIndex: 3 // Ensure date number appears above pattern and below events
       }}>
         <span style={{
           position: 'relative',
-          zIndex: 1,
           pointerEvents: 'none'
         }}>
           {format(date, "d")}
@@ -606,7 +606,8 @@ const DayCell = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          pointerEvents: 'none'
+          pointerEvents: 'none',
+          zIndex: 10 // Higher z-index to ensure events display above the restricted pattern
         }}>
           {eventContent.element}
         </div>

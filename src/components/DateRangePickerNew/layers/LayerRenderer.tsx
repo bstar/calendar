@@ -130,7 +130,9 @@ export class LayerRenderer {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              pointerEvents: 'none'
+              pointerEvents: 'none',
+              position: 'relative',
+              zIndex: 5 // Higher z-index to appear above restriction patterns
             }}
           >
             {dayEvents.length > 1 && (

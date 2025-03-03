@@ -303,4 +303,6 @@
   background-size: 7.07px 7.07px; /* 5px * √2 to ensure perfect 45° alignment */
   background-attachment: fixed; /* Make pattern relative to viewport */
   background-position: center; /* Center the pattern */
+  position: relative;
+  z-index: 1; /* Ensure this is below event elements */
 } 
