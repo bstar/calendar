@@ -434,11 +434,16 @@ const DayCell = ({
   );
 
   const restrictionResult = useMemo(() => {
-    // Only check for restrictions if we have an active selection within a boundary
-    if (!selectedRange.start) return { allowed: true };
+    const currentRestrictionConfig = restrictionConfig ?? { restrictions: [] };
+    
+    // Check restrictions even if no selection has been made yet
+    // This ensures the diagonal pattern is applied on initial load
+    if (!selectedRange.start) {
+      // Check all restrictions directly against this date
+      return restrictionManager.checkSelection(date, date);
+    }
 
     const selectionStart = parseISO(selectedRange.start);
-    const currentRestrictionConfig = restrictionConfig ?? { restrictions: [] };
     
     // Find if selection started in any restricted boundary
     const boundaryRestriction = currentRestrictionConfig.restrictions.find(r => 
@@ -487,6 +492,7 @@ const DayCell = ({
   const eventContent = renderContent?.(date);
 
   const getBackgroundColor = () => {
+    // Only get background color for non-restricted dates
     if (layer.data?.background) {
       const renderer = LayerRenderer.createBackgroundRenderer(layer.data.background);
       const result = renderer(date);
@@ -495,7 +501,7 @@ const DayCell = ({
     return 'transparent';
   };
 
-  const dayCell = (
+  const cellContent = (
     <div
       className={!restrictionResult.allowed ? 'restricted-date-pattern' : ''}
       onMouseEnter={handleMouseEnter}
@@ -509,7 +515,10 @@ const DayCell = ({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: (isSelected || isInRange) ? "#b1e4e5" : getBackgroundColor(),
+        // Only apply backgroundColor for non-restricted dates
+        ...(!restrictionResult.allowed ? {} : {
+          backgroundColor: (isSelected || isInRange) ? "#b1e4e5" : getBackgroundColor()
+        }),
         borderRadius: isSingleDay && (isSelected || isInRange) ? "50%" : (
           isRangeStart || isRangeEnd ?
             `${isRangeStart ? "15px" : "0"} ${isRangeEnd ? "15px" : "0"} ${isRangeEnd ? "15px" : "0"} ${isRangeStart ? "15px" : "0"}`
@@ -563,9 +572,9 @@ const DayCell = ({
       content={eventContent?.tooltipContent}
       show={isHovered}
     >
-      {dayCell}
+      {cellContent}
     </Tooltip>
-  ) : dayCell;
+  ) : cellContent;
 };
 
 const MonthPair = ({
