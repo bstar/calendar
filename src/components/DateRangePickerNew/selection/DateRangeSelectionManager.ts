@@ -17,7 +17,7 @@ export class DateRangeSelectionManager {
     selectionMode: 'single' | 'range' = 'range',
     showSelectionAlert: boolean = false
   ) {
-    this.restrictionManager = new RestrictionManager(restrictionConfig);
+    this.restrictionManager = new RestrictionManager(restrictionConfig ?? { restrictions: [] });
     this.selectionMode = selectionMode;
     this.showSelectionAlert = showSelectionAlert;
   }
@@ -26,27 +26,25 @@ export class DateRangeSelectionManager {
    * Check if a date can be selected
    */
   canSelectDate(date: Date): { allowed: boolean; message: string | null } {
-    return this.restrictionManager.checkSelection(date, date);
+    const result = this.restrictionManager.checkSelection(date, date);
+    return {
+      allowed: result.allowed,
+      message: result.message || null
+    };
   }
   
   /**
    * Check if a range can be selected
    */
   canSelectRange(startDate: Date, endDate: Date): { allowed: boolean; message: string | null } {
-    // Check the entire range
-    const daysInRange = eachDayOfInterval({ 
-      start: startDate < endDate ? startDate : endDate,
-      end: startDate < endDate ? endDate : startDate 
-    });
-    
-    for (const day of daysInRange) {
-      const result = this.restrictionManager.checkSelection(day, day);
-      if (!result.allowed) {
-        return result;
-      }
-    }
-    
-    return { allowed: true, message: null };
+    // For restricted boundary, we only need to check the start and end points
+    // If the start is within a restricted boundary, then the end must be within the same boundary
+    // If the start is outside any restricted boundary, then no restriction applies
+    const result = this.restrictionManager.checkSelection(startDate, endDate);
+    return {
+      allowed: result.allowed,
+      message: result.message || null
+    };
   }
   
   /**
@@ -57,13 +55,14 @@ export class DateRangeSelectionManager {
     range: DateRange; 
     message: string | null 
   } {
-    const result = this.canSelectDate(date);
+    // When starting a selection, we only check if the date itself is restricted
+    const result = this.restrictionManager.checkSelection(date, date);
     
     if (!result.allowed) {
       return {
         success: false,
         range: { start: null, end: null },
-        message: result.message
+        message: result.message || null
       };
     }
     
@@ -106,7 +105,7 @@ export class DateRangeSelectionManager {
       return this.startSelection(newDate);
     }
     
-    // For range selection, check the entire range
+    // Check if the range is allowed
     const result = this.canSelectRange(startDate, newDate);
     
     if (!result.allowed) {
@@ -131,6 +130,6 @@ export class DateRangeSelectionManager {
    * Update the restriction configuration
    */
   updateRestrictions(restrictionConfig?: RestrictionConfig): void {
-    this.restrictionManager = new RestrictionManager(restrictionConfig);
+    this.restrictionManager = new RestrictionManager(restrictionConfig ?? { restrictions: [] });
   }
 } 

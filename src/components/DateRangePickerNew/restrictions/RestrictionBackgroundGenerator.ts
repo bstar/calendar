@@ -161,8 +161,7 @@ export class RestrictionBackgroundGenerator {
   private restrictionHandlers = {
     boundary: this.handleBoundaryRestriction.bind(this),
     daterange: this.handleDateRangeRestriction.bind(this),
-    allowedranges: this.handleAllowedRangesRestriction.bind(this),
-    restricted_boundary: this.handleRestrictedBoundaryRestriction.bind(this)
+    allowedranges: this.handleAllowedRangesRestriction.bind(this)
   };
 
   /**
@@ -238,17 +237,8 @@ export class RestrictionBackgroundGenerator {
     },
 
     restricted_boundary: (restriction: any): BackgroundData[] => {
-      return restriction.ranges
-        .filter(range => {
-          const start = parseISO(range.start);
-          const end = parseISO(range.end);
-          return isValid(start) && isValid(end) && start <= end;
-        })
-        .map(range => ({
-          startDate: range.start,
-          endDate: range.end,
-          color: '#ffe6e6'
-        }));
+      // Return empty array since restricted boundary is only enforced during selection
+      return [];
     }
   };
 

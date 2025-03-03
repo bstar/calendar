@@ -133,13 +133,15 @@ export class RestrictionManager {
 
       if (!isValid(rangeStart) || !isValid(rangeEnd)) continue;
 
-      // Check if selection extends beyond the boundary range
-      const selectionStartsBeforeBoundary = start < rangeStart;
-      const selectionEndsAfterBoundary = end > rangeEnd;
+      // First check if selection STARTED within this range
+      const selectionStartedInRange = isWithinInterval(start, { start: rangeStart, end: rangeEnd });
 
-      // Only return error if selection extends beyond the boundary
-      if (selectionStartsBeforeBoundary || selectionEndsAfterBoundary) {
-        return range.message || 'Selection cannot extend beyond restricted boundary dates';
+      // If selection didn't start in this range, no restriction applies
+      if (!selectionStartedInRange) continue;
+
+      // If selection started in range, it must stay within the range bounds
+      if (end < rangeStart || end > rangeEnd) {
+        return range.message || 'When selecting from within a restricted boundary, selection must stay within the boundary';
       }
     }
     return null;
