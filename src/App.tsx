@@ -1509,12 +1509,16 @@ function App() {
   };
 
   const handleExport = () => {
+    // Ensure we're exporting the most current state of all settings
     const exportConfig = {
       ...settings,
       restrictionConfig,
       // Remove any internal or unnecessary fields
       isOpen: undefined
     };
+    
+    // Log export for debugging purposes
+    console.log('Exporting configuration:', exportConfig);
     
     const configString = JSON.stringify(exportConfig, null, 2);
     navigator.clipboard.writeText(configString).then(() => {
