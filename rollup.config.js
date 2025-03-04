@@ -39,5 +39,5 @@ export default {
       extensions: ['.css']
     })
   ],
-  external: ['react', 'react-dom', 'date-fns', 'lodash-es']
+  external: ['react', 'react-dom', 'date-fns', 'date-fns-tz', 'lodash-es']
 }; 
