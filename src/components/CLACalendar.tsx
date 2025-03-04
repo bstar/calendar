@@ -39,15 +39,8 @@ import {
   RenderResult,
   MonthGridProps,
   CalendarGridProps,
-  ValidationError,
+  ValidationError as CalendarValidationError,
 } from './DateRangePickerNew/CalendarComponents';
-import {
-  startOfMonth as UTCstartOfMonth,
-  endOfMonth as UTCendOfMonth,
-  startOfWeek as UTCstartOfWeek,
-  endOfWeek as UTCendOfWeek,
-  eachDayOfInterval as eachDayOfIntervalUTC
-} from '../utils/UTCDateUtils';
 
 // Add these interfaces after the existing ones
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -211,12 +204,12 @@ const dateValidator = (() => {
   };
 })();
 
-// Add type for validation error
-interface ValidationError {
-  message: string;
-  type: string;
-  field: string;
-}
+// Use the imported ValidationError type instead of defining our own
+// interface ValidationError {
+//   message: string;
+//   type: string;
+//   field: string;
+// }
 
 /**
  * A reliable implementation of isSameMonth that compares year and month components directly
@@ -258,7 +251,7 @@ const MonthGrid: React.FC<MonthGridProps> = ({
   
   // Use our UTC-aware version for the critical date interval calculation
   // This ensures all days are correctly included regardless of timezone
-  const calendarDays = eachDayOfIntervalUTC({
+  const calendarDays = eachDayOfInterval({
     start: weekStart,
     end: weekEnd,
   });
@@ -829,7 +822,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     endDate: null,
     currentField: null
   });
-  const [validationErrors, setValidationErrors] = useState<Record<string, ValidationError>>({});
+  const [validationErrors, setValidationErrors] = useState<Record<string, CalendarValidationError>>({});
 
   // Create layerManager before using it
   const layerManager = useMemo(() =>
