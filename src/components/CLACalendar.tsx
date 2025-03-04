@@ -11,7 +11,6 @@ import {
   parseISO,
   startOfWeek,
   endOfWeek,
-  isSameMonth,
   addDays,
   isWithinInterval,
   isValid
@@ -42,6 +41,13 @@ import {
   CalendarGridProps,
   ValidationError,
 } from './DateRangePickerNew/CalendarComponents';
+import {
+  startOfMonth as UTCstartOfMonth,
+  endOfMonth as UTCendOfMonth,
+  startOfWeek as UTCstartOfWeek,
+  endOfWeek as UTCendOfWeek,
+  eachDayOfInterval as eachDayOfIntervalUTC
+} from '../utils/UTCDateUtils';
 
 // Add these interfaces after the existing ones
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -212,6 +218,18 @@ interface ValidationError {
   field: string;
 }
 
+// Create a more reliable isSameMonth function for comparing dates
+const isSameMonth = (date1: Date, date2: Date): boolean => {
+  // Extract year and month components directly 
+  const year1 = date1.getFullYear();
+  const month1 = date1.getMonth();
+  
+  const year2 = date2.getFullYear();
+  const month2 = date2.getMonth();
+  
+  return year1 === year2 && month1 === month2;
+};
+
 // Update the MonthGrid to use proper types for weeks
 const MonthGrid: React.FC<MonthGridProps> = ({
   baseDate,
@@ -230,9 +248,17 @@ const MonthGrid: React.FC<MonthGridProps> = ({
   const monthEnd = endOfMonth(monthStart);
   const weekStart = startOfWeek(monthStart, { weekStartsOn: startWeekOnSunday ? 0 : 1 });
   const weekEnd = endOfWeek(monthEnd, { weekStartsOn: startWeekOnSunday ? 0 : 1 });
-  const calendarDays = eachDayOfInterval({
+  
+  // Use our UTC version for the critical date interval calculation
+  const calendarDays = eachDayOfIntervalUTC({
     start: weekStart,
     end: weekEnd,
+  });
+  
+  console.log(`Calendar generation: ${calendarDays.length} days`, {
+    baseDate: baseDate.toISOString(),
+    weekStart: weekStart.toISOString(),
+    weekEnd: weekEnd.toISOString()
   });
 
   const weeks: Record<number, Date[]> = calendarDays.reduce((acc, day, index) => {
