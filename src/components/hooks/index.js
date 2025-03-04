@@ -5,8 +5,9 @@ import {
   format,
   parseISO
 } from 'date-fns';
+import { now } from '../../utils/UTCDateUtils';
 
-export const useMonthNavigation = (initialMonth = new Date()) => {
+export const useMonthNavigation = (initialMonth = now()) => {
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(initialMonth));
   const [isAnimating, setIsAnimating] = useState(false);
   const monthsContainerRef = useRef(null);
