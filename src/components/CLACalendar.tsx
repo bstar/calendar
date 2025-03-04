@@ -218,7 +218,14 @@ interface ValidationError {
   field: string;
 }
 
-// Create a more reliable isSameMonth function for comparing dates
+/**
+ * A reliable implementation of isSameMonth that compares year and month components directly
+ * rather than relying on equality of Date objects which can be affected by timezone issues.
+ * 
+ * @param {Date} date1 - First date to compare
+ * @param {Date} date2 - Second date to compare
+ * @returns {boolean} True if both dates are in the same month and year
+ */
 const isSameMonth = (date1: Date, date2: Date): boolean => {
   // Extract year and month components directly 
   const year1 = date1.getFullYear();
@@ -249,18 +256,13 @@ const MonthGrid: React.FC<MonthGridProps> = ({
   const weekStart = startOfWeek(monthStart, { weekStartsOn: startWeekOnSunday ? 0 : 1 });
   const weekEnd = endOfWeek(monthEnd, { weekStartsOn: startWeekOnSunday ? 0 : 1 });
   
-  // Use our UTC version for the critical date interval calculation
+  // Use our UTC-aware version for the critical date interval calculation
+  // This ensures all days are correctly included regardless of timezone
   const calendarDays = eachDayOfIntervalUTC({
     start: weekStart,
     end: weekEnd,
   });
   
-  console.log(`Calendar generation: ${calendarDays.length} days`, {
-    baseDate: baseDate.toISOString(),
-    weekStart: weekStart.toISOString(),
-    weekEnd: weekEnd.toISOString()
-  });
-
   const weeks: Record<number, Date[]> = calendarDays.reduce((acc, day, index) => {
     const weekIndex = Math.floor(index / 7);
     return {
