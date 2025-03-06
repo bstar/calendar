@@ -268,20 +268,29 @@ export class DateRangePickerHandlers {
       setNotification(null);
     };
     
-    const handleSelectionMove = (date: Date) => {
-      if (!isSelecting) return;
+    const handleSelectionMove = (date: Date): DateRange => {
+      // If we're not in selecting mode, don't process move events
+      if (!isSelecting) {
+        return selectedRange;
+      }
+
+      // Get updated selection with boundary restrictions
+      const selectionUpdate = selectionManager.updateSelection(
+        selectedRange, 
+        date
+      );
       
-      const result = selectionManager.updateSelection(selectedRange, date);
+      // Update the selection range with the result
+      setSelectedRange(selectionUpdate.range);
       
-      if (!result.success) {
-        if (showSelectionAlert && outOfBoundsDirection) {
-          setNotification(result.message);
-        }
-        return;
+      // Show notification only if there's a message and we have showSelectionAlert enabled
+      if (selectionUpdate.message && showSelectionAlert) {
+        setNotification(selectionUpdate.message);
+      } else {
+        setNotification(null);
       }
       
-      setSelectedRange(result.range);
-      setNotification(null);
+      return selectionUpdate.range;
     };
     
     return {
