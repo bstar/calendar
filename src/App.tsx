@@ -47,7 +47,6 @@ const getInitialSettings = (): CalendarSettings => ({
   visibleMonths: 2,
   singleMonthWidth: 500,
   showMonthHeadings: true,
-  timezone: "UTC",
   selectionMode: "range",
   showTooltips: true,
   showHeader: true,

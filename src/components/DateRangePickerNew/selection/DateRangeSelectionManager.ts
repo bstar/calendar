@@ -38,13 +38,42 @@ export class DateRangeSelectionManager {
    * Check if a range can be selected
    */
   canSelectRange(startDate: Date, endDate: Date): { allowed: boolean; message: string | null } {
-    // For restricted boundary, we only need to check the start and end points
-    // If the start is within a restricted boundary, then the end must be within the same boundary
-    // If the start is outside any restricted boundary, then no restriction applies
-    const result = this.restrictionManager.checkSelection(startDate, endDate);
+    // First check the start and end dates
+    const startResult = this.restrictionManager.checkSelection(startDate, startDate);
+    if (!startResult.allowed) {
+      return {
+        allowed: false,
+        message: startResult.message || null
+      };
+    }
+
+    const endResult = this.restrictionManager.checkSelection(endDate, endDate);
+    if (!endResult.allowed) {
+      return {
+        allowed: false,
+        message: endResult.message || null
+      };
+    }
+
+    // Get all dates in the range
+    const dates = eachDayOfInterval({ start: startDate, end: endDate });
+
+    // Check each date in the range
+    for (const date of dates) {
+      const result = this.restrictionManager.checkSelection(date, date);
+      if (!result.allowed) {
+        return {
+          allowed: false,
+          message: result.message || 'Selection includes restricted dates'
+        };
+      }
+    }
+
+    // Finally check the entire range as a whole
+    const rangeResult = this.restrictionManager.checkSelection(startDate, endDate);
     return {
-      allowed: result.allowed,
-      message: result.message || null
+      allowed: rangeResult.allowed,
+      message: rangeResult.message || null
     };
   }
   
@@ -105,23 +134,65 @@ export class DateRangeSelectionManager {
     if (this.selectionMode === 'single') {
       return this.startSelection(newDate);
     }
-    
+
+    // Determine selection direction and actual start/end dates
+    const isForwardSelection = newDate >= startDate;
+    const [rangeStart, rangeEnd] = isForwardSelection 
+      ? [startDate, newDate]
+      : [newDate, startDate];
+
     // Check if the range is allowed
-    const result = this.canSelectRange(startDate, newDate);
+    const result = this.canSelectRange(rangeStart, rangeEnd);
     
     if (!result.allowed) {
-      return {
-        success: false,
-        range: currentRange,
-        message: result.message
-      };
+      // If the selection is not allowed, keep only the valid part
+      // For forward selection: keep start date, end date becomes the last valid date before restriction
+      // For backward selection: keep end date (original start), start date becomes first valid date after restriction
+      const dates = eachDayOfInterval({ start: rangeStart, end: rangeEnd });
+      
+      if (isForwardSelection) {
+        // Find the last valid date before hitting a restriction
+        let lastValidDate = startDate;
+        for (const date of dates) {
+          const checkResult = this.restrictionManager.checkSelection(date, date);
+          if (!checkResult.allowed) break;
+          lastValidDate = date;
+        }
+        
+        return {
+          success: false,
+          range: {
+            start: format(startDate, 'yyyy-MM-dd'),
+            end: format(lastValidDate, 'yyyy-MM-dd')
+          },
+          message: result.message || 'Selection includes restricted dates'
+        };
+      } else {
+        // Find the first valid date after hitting a restriction
+        let firstValidDate = startDate;
+        for (let i = dates.length - 1; i >= 0; i--) {
+          const checkResult = this.restrictionManager.checkSelection(dates[i], dates[i]);
+          if (!checkResult.allowed) break;
+          firstValidDate = dates[i];
+        }
+        
+        return {
+          success: false,
+          range: {
+            start: format(firstValidDate, 'yyyy-MM-dd'),
+            end: format(startDate, 'yyyy-MM-dd')
+          },
+          message: result.message || 'Selection includes restricted dates'
+        };
+      }
     }
     
+    // If we get here, the range is valid
     return {
       success: true,
       range: {
-        ...currentRange,
-        end: format(newDate, 'yyyy-MM-dd')
+        start: format(rangeStart, 'yyyy-MM-dd'),
+        end: format(rangeEnd, 'yyyy-MM-dd')
       },
       message: null
     };

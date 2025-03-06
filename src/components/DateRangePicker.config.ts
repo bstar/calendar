@@ -154,7 +154,6 @@ export interface CalendarSettings {
   visibleMonths: number;
   singleMonthWidth: number;
   showMonthHeadings: boolean;
-  timezone: string;
   
   // Feature Settings
   selectionMode: 'single' | 'range';
@@ -256,8 +255,7 @@ export const getDefaultSettings = (): CalendarSettings => ({
   layers: DEFAULT_LAYERS,
   showLayersNavigation: true,
   defaultLayer: '',
-  colors: DEFAULT_COLORS,
-  timezone: 'UTC'
+  colors: DEFAULT_COLORS
 });
 
 // Update layer validation to ensure at least one layer
@@ -296,21 +294,6 @@ export const SETTINGS: SettingsConfig = {
       default: 500,
       min: 200,
       max: 800
-    },
-    timezone: {
-      id: 'timezone',
-      type: 'select',
-      label: 'Timezone',
-      description: 'Select timezone for date operations',
-      default: 'UTC',
-      options: [
-        { value: 'UTC', label: 'UTC (Default)' },
-        { value: 'local', label: 'Browser Local Timezone' },
-        { value: 'America/New_York', label: 'Eastern Time (ET)' },
-        { value: 'America/Chicago', label: 'Central Time (CT)' },
-        { value: 'America/Denver', label: 'Mountain Time (MT)' },
-        { value: 'America/Los_Angeles', label: 'Pacific Time (PT)' }
-      ]
     },
     containerStyle: {
       id: 'containerStyle',

@@ -11,9 +11,6 @@
     "dev": "vite",
     "build": "rollup -c",
     "test": "jest",
-    "test:watch": "jest --watch",
-    "test:timezone": "jest DayOffBug",
-    "test:timezone:verbose": "jest DayOffBug --verbose",
     "prepare": "npm run build"
   },
   "peerDependencies": {
