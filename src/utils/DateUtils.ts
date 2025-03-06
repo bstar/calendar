@@ -14,7 +14,28 @@ import {
 } from 'date-fns';
 
 // Default timezone
-export const DEFAULT_TIMEZONE = 'UTC';
+export let DEFAULT_TIMEZONE = 'UTC';
+
+/**
+ * Sets the timezone used for date operations
+ * @param timezone The timezone to use (UTC, local, or a specific IANA timezone)
+ */
+export const setTimezone = (timezone: string): void => {
+  // If 'local' is specified, use the browser's local timezone
+  if (timezone === 'local') {
+    // Try to get the user's timezone from the browser
+    try {
+      const localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      DEFAULT_TIMEZONE = localTimezone || 'UTC';
+    } catch (e) {
+      // Fallback to UTC if we can't determine the local timezone
+      DEFAULT_TIMEZONE = 'UTC';
+    }
+  } else {
+    // Otherwise use the specified timezone
+    DEFAULT_TIMEZONE = timezone || 'UTC';
+  }
+};
 
 // ===== CORE UTILITIES =====
 

@@ -12,8 +12,9 @@ import {
   startOfWeek,
   endOfWeek,
   addDays,
-  isWithinInterval
-} from "../utils/DateUtils"; // Use our UTC-aware functions
+  isWithinInterval,
+  setTimezone
+} from "../utils/DateUtils"; // Use our UTC-aware functions and timezone-aware functions
 import './DateRangePicker.css';
 import {
   DEFAULT_LAYERS,
@@ -1177,6 +1178,12 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [settings.closeOnClickAway, settings.displayMode, isOpen]);
+
+  // Apply timezone setting
+  useEffect(() => {
+    setTimezone(settings.timezone || 'UTC');
+    console.log(`Applied timezone setting: ${settings.timezone || 'UTC'}`);
+  }, [settings.timezone]);
 
   return (
     <div className="cla-calendar" style={{ width: 'fit-content' }}>
