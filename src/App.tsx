@@ -2286,6 +2286,231 @@ const settings: CalendarSettings = {
                   </pre>
                 </div>
               </div>
+
+              {/* Restrictions Documentation */}
+              <div className="doc-section">
+                <h3 className="doc-section-heading">
+                  Date Restrictions
+                  <span className="doc-badge doc-badge-yellow">
+                    Advanced
+                  </span>
+                </h3>
+                <p className="doc-description">
+                  Control what dates can be selected by users through a flexible restriction system. Restrictions can prevent 
+                  selections of specific dates, limit selections to specified ranges, or enforce boundary conditions.
+                </p>
+                
+                <table className="doc-table">
+                  <thead>
+                    <tr>
+                      <th className="property-column">Restriction Type</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td className="property-column">
+                        <code className="doc-code">boundary</code>
+                      </td>
+                      <td>
+                        Prevents selection before or after a specific date. Useful for enforcing minimum or maximum date constraints.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="property-column">
+                        <code className="doc-code">daterange</code>
+                      </td>
+                      <td>
+                        Blocks specific date ranges from being selected. Useful for marking holidays, weekends, or other unavailable periods.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="property-column">
+                        <code className="doc-code">allowedranges</code>
+                      </td>
+                      <td>
+                        Only permits selections within specified date ranges. The opposite of <code className="doc-code">daterange</code>, allowing for whitelisting.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="property-column">
+                        <code className="doc-code">restricted_boundary</code>
+                      </td>
+                      <td>
+                        Creates boundaries that selections cannot cross when starting within a designated range. Useful for limiting the span of date ranges.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div style={{ marginTop: '16px' }}>
+                  <h4 className="doc-sub-heading">Configuration Structure</h4>
+                  <p className="doc-description">
+                    Restrictions are configured through the <code className="doc-code">restrictionConfig</code> property in <code className="doc-code">CalendarSettings</code>.
+                  </p>
+                  
+                  <div className="doc-data-card">
+                    <div className="doc-data-header">
+                      <h5 className="doc-data-title">
+                        RestrictionConfig
+                        <span className="doc-data-subtitle">
+                          Collection of date restrictions
+                        </span>
+                      </h5>
+                    </div>
+                    <div className="doc-data-content">
+                      <pre className="doc-code-block" style={{ backgroundColor: '#ffffff', border: '1px solid #e1e4e8' }}>
+{`interface RestrictionConfig {
+  restrictions: Restriction[];  // Array of restriction rules
+}`}
+                      </pre>
+                    </div>
+                  </div>
+                  
+                  <div className="doc-grid" style={{ marginTop: '16px' }}>
+                    {/* Boundary Restriction */}
+                    <div className="doc-data-card">
+                      <div className="doc-data-header">
+                        <h5 className="doc-data-title">
+                          Boundary Restriction
+                          <span className="doc-data-subtitle">
+                            Before/After date limits
+                          </span>
+                        </h5>
+                      </div>
+                      <div className="doc-data-content">
+                        <pre className="doc-code-block" style={{ backgroundColor: '#ffffff', border: '1px solid #e1e4e8' }}>
+{`{
+  type: 'boundary',
+  enabled: true,
+  date: '2023-12-31',     // ISO format date
+  direction: 'after',     // 'before' or 'after'
+  message: 'Cannot select dates after Dec 31, 2023'
+}`}
+                        </pre>
+                      </div>
+                    </div>
+
+                    {/* DateRange Restriction */}
+                    <div className="doc-data-card">
+                      <div className="doc-data-header">
+                        <h5 className="doc-data-title">
+                          DateRange Restriction
+                          <span className="doc-data-subtitle">
+                            Blocked date periods
+                          </span>
+                        </h5>
+                      </div>
+                      <div className="doc-data-content">
+                        <pre className="doc-code-block" style={{ backgroundColor: '#ffffff', border: '1px solid #e1e4e8' }}>
+{`{
+  type: 'daterange',
+  enabled: true,
+  ranges: [
+    {
+      start: '2023-12-24',   // ISO format date
+      end: '2023-12-26',     // ISO format date
+      message: 'Christmas holiday period unavailable'
+    },
+    {
+      start: '2023-12-31',
+      end: '2024-01-01',
+      message: 'New Year unavailable'
+    }
+  ]
+}`}
+                        </pre>
+                      </div>
+                    </div>
+
+                    {/* AllowedRanges Restriction */}
+                    <div className="doc-data-card">
+                      <div className="doc-data-header">
+                        <h5 className="doc-data-title">
+                          AllowedRanges Restriction
+                          <span className="doc-data-subtitle">
+                            Permitted date periods
+                          </span>
+                        </h5>
+                      </div>
+                      <div className="doc-data-content">
+                        <pre className="doc-code-block" style={{ backgroundColor: '#ffffff', border: '1px solid #e1e4e8' }}>
+{`{
+  type: 'allowedranges',
+  enabled: true,
+  ranges: [
+    {
+      start: '2023-01-01',   // ISO format date
+      end: '2023-12-31',     // ISO format date
+      message: 'Only 2023 dates are available for selection'
+    }
+  ]
+}`}
+                        </pre>
+                      </div>
+                    </div>
+
+                    {/* RestrictedBoundary Restriction */}
+                    <div className="doc-data-card">
+                      <div className="doc-data-header">
+                        <h5 className="doc-data-title">
+                          RestrictedBoundary Restriction
+                          <span className="doc-data-subtitle">
+                            Selection span limits
+                          </span>
+                        </h5>
+                      </div>
+                      <div className="doc-data-content">
+                        <pre className="doc-code-block" style={{ backgroundColor: '#ffffff', border: '1px solid #e1e4e8' }}>
+{`{
+  type: 'restricted_boundary',
+  enabled: true,
+  ranges: [
+    {
+      start: '2023-01-01',   // ISO format date
+      end: '2023-01-31',     // ISO format date
+      message: 'When selecting from January, selection must stay within January'
+    }
+  ]
+}`}
+                        </pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ marginTop: '16px' }}>
+                  <h4 className="doc-sub-heading">Implementation Example</h4>
+                  <pre className="doc-code-block">
+{`// Create a restriction configuration with multiple rules
+const restrictionConfig = {
+  restrictions: [
+    // Prevent selecting dates before today
+    {
+      type: 'boundary',
+      enabled: true,
+      date: new Date().toISOString().split('T')[0],
+      direction: 'before',
+      message: 'Cannot select dates in the past'
+    },
+    // Block weekend dates
+    {
+      type: 'daterange',
+      enabled: true,
+      ranges: getWeekendDates(), // function to generate weekend date ranges
+      message: 'Weekends are unavailable for selection'
+    }
+  ]
+};
+
+// Apply restrictions to calendar settings
+const settings = {
+  // Other settings...
+  restrictionConfig
+};`}
+                  </pre>
+                </div>
+              </div>
             </div>
           </div>
         </div>
