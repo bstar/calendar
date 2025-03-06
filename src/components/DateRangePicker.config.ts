@@ -149,6 +149,7 @@ export interface BackgroundData {
 export interface CalendarSettings {
   // Core Settings
   displayMode: 'popup' | 'embedded';
+  timezone: string;
   containerStyle?: CSSProperties;
   isOpen?: boolean;
   visibleMonths: number;
@@ -239,6 +240,7 @@ export const DEFAULT_LAYERS: Layer[] = [];
 
 export const getDefaultSettings = (): CalendarSettings => ({
   displayMode: 'embedded',
+  timezone: 'UTC',
   visibleMonths: 2,
   singleMonthWidth: 500,
   showMonthHeadings: true,
@@ -275,6 +277,25 @@ export const SETTINGS: SettingsConfig = {
       options: [
         { value: 'popup', label: 'Popup' },
         { value: 'embedded', label: 'Embedded' }
+      ]
+    },
+    timezone: {
+      id: 'timezone',
+      type: 'select',
+      label: 'Timezone',
+      description: 'Override the default timezone (UTC)',
+      default: 'UTC',
+      options: [
+        { value: 'UTC', label: 'UTC (Default)' },
+        { value: 'local', label: 'Browser Local Time' },
+        { value: 'America/New_York', label: 'Eastern Time (ET)' },
+        { value: 'America/Chicago', label: 'Central Time (CT)' },
+        { value: 'America/Denver', label: 'Mountain Time (MT)' },
+        { value: 'America/Los_Angeles', label: 'Pacific Time (PT)' },
+        { value: 'Europe/London', label: 'London (GMT)' },
+        { value: 'Europe/Paris', label: 'Central European Time (CET)' },
+        { value: 'Asia/Tokyo', label: 'Japan Standard Time (JST)' },
+        { value: 'Pacific/Auckland', label: 'New Zealand Time (NZT)' }
       ]
     },
     visibleMonths: {

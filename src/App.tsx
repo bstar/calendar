@@ -44,6 +44,7 @@ interface TableHeaderStyles {
 // Initial settings that exactly match the export structure
 const getInitialSettings = (): CalendarSettings => ({
   displayMode: "embedded",
+  timezone: "UTC",
   visibleMonths: 2,
   singleMonthWidth: 500,
   showMonthHeadings: true,
@@ -1916,6 +1917,18 @@ function App() {
                         <code style={docStyles.code}>'embedded'</code>
                       </td>
                       <td style={docStyles.tableCell}>How the calendar should be displayed</td>
+                    </tr>
+                    <tr>
+                      <td style={docStyles.tableCell}>
+                        <code style={docStyles.code}>timezone</code>
+                      </td>
+                      <td style={docStyles.tableCell}>
+                        <code style={docStyles.code}>string</code>
+                      </td>
+                      <td style={docStyles.tableCell}>
+                        <code style={docStyles.code}>'UTC'</code>
+                      </td>
+                      <td style={docStyles.tableCell}>Override the default timezone (UTC)</td>
                     </tr>
                     <tr>
                       <td style={docStyles.tableCell}>
