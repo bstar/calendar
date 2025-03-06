@@ -62,8 +62,7 @@ import {
   RenderResult,
   Layer
 } from './types';
-import { parseISO, isSameDay } from 'date-fns';
-import { isWithinInterval } from '../../../utils/DateUtils';
+import { parseISO, isSameDay, isWithinInterval } from '../../../utils/DateUtils';
 
 /**
  * LayerRenderer class provides static methods for rendering different types of layers

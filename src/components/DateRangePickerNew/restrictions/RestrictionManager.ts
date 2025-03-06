@@ -55,7 +55,8 @@
  * };
  */
 
-import { parseISO, isValid } from 'date-fns';
+import { parseISO } from '../../../utils/DateUtils';
+import { isValid } from 'date-fns';
 import { isWithinInterval } from '../../../utils/DateUtils';
 import { RestrictionConfig } from './types';
 

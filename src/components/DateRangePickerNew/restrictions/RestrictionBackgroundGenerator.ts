@@ -56,8 +56,8 @@
  * Returns: 'rgba(0, 0, 0, 0.1)' or undefined  // Grey overlay for restricted dates
  */
 
-import { parseISO, isValid } from 'date-fns';
-import { isWithinInterval } from '../../../utils/DateUtils';
+import { parseISO, isWithinInterval } from '../../../utils/DateUtils';
+import { isValid } from 'date-fns';
 import { RestrictionConfig } from './types';
 import { BackgroundData } from '../../DateRangePicker.config';
 
