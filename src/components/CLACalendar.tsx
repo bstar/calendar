@@ -1221,6 +1221,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
               months={months}
               visibleMonths={settings.visibleMonths}
               moveToMonth={moveToMonth}
+              timezone={settings.timezone}
             />
           </>
         )}

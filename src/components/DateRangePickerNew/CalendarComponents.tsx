@@ -255,6 +255,7 @@ export interface CalendarHeaderProps {
   months: Date[];
   visibleMonths: number;
   moveToMonth: (direction: 'prev' | 'next') => void;
+  timezone?: string;
 }
 
 /**
@@ -262,39 +263,57 @@ export interface CalendarHeaderProps {
  * @param months - Array of month dates to display
  * @param visibleMonths - Number of months visible at once
  * @param moveToMonth - Function to navigate between months
+ * @param timezone - Optional timezone for display
  * @returns Calendar header with navigation buttons
  */
 export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   months,
   visibleMonths,
-  moveToMonth
-}) => (
-  <div className="cla-header" style={{
-    padding: '12px 16px',
-    borderBottom: 'none' // Force remove any border
-  }}>
-    <button
-      className="cla-button-nav"
-      onClick={() => moveToMonth('prev')}
-      style={{ outline: 'none' }}
-    >
-      <ChevronLeft size={16} />
-    </button>
-    <span className="cla-header-title">
-      {visibleMonths === 1
-        ? format(months[0], "MMMM yyyy")
-        : `${format(months[0], "MMMM yyyy")} - ${format(months[months.length - 1], "MMMM yyyy")}`
-      }
-    </span>
-    <button
-      className="cla-button-nav"
-      onClick={() => moveToMonth('next')}
-      style={{ outline: 'none' }}
-    >
-      <ChevronRight size={16} />
-    </button>
-  </div>
-);
+  moveToMonth,
+  timezone = 'UTC'
+}) => {
+  // Format timezone for display
+  const formatTimezone = (tz: string) => {
+    if (tz === 'UTC') return 'UTC';
+    if (tz === 'local') return 'Browser Local Time';
+    // Convert IANA timezone to more readable format
+    return tz.split('/').pop()?.replace('_', ' ') || tz;
+  };
+
+  return (
+    <div className="cla-header" style={{
+      padding: '12px 16px',
+      borderBottom: 'none',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between'
+    }}>
+      <button
+        className="cla-button-nav"
+        onClick={() => moveToMonth('prev')}
+        style={{ outline: 'none' }}
+      >
+        <ChevronLeft size={16} />
+      </button>
+      <span 
+        className="cla-header-title"
+        title={`Current timezone: ${formatTimezone(timezone)}`}
+      >
+        {visibleMonths === 1
+          ? format(months[0], "MMMM yyyy")
+          : `${format(months[0], "MMMM yyyy")} - ${format(months[months.length - 1], "MMMM yyyy")}`
+        }
+      </span>
+      <button
+        className="cla-button-nav"
+        onClick={() => moveToMonth('next')}
+        style={{ outline: 'none' }}
+      >
+        <ChevronRight size={16} />
+      </button>
+    </div>
+  );
+};
 
 // Date Input Section component
 export interface DateInputSectionProps {
