@@ -1,8 +1,8 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import debounce from "lodash-es/debounce";
+import { parse, isValid } from "date-fns"; // Keep only what we haven't implemented yet
 import {
   format,
-  parse,
   addMonths,
   startOfMonth,
   endOfMonth,
@@ -12,9 +12,8 @@ import {
   startOfWeek,
   endOfWeek,
   addDays,
-  isWithinInterval,
-  isValid
-} from "date-fns";
+  isWithinInterval
+} from "../utils/DateUtils"; // Use our UTC-aware functions
 import './DateRangePicker.css';
 import {
   DEFAULT_LAYERS,

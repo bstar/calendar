@@ -1,4 +1,5 @@
-import { format, parseISO, isValid, eachDayOfInterval } from 'date-fns';
+import { isValid } from 'date-fns';
+import { format, parseISO, eachDayOfInterval } from '../../../utils/DateUtils';
 import { RestrictionManager } from '../restrictions/RestrictionManager';
 import { RestrictionConfig } from '../restrictions/types';
 

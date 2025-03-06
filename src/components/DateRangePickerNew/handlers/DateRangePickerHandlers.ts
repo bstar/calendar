@@ -1,5 +1,5 @@
 import { RefObject } from 'react';
-import { format, parseISO, startOfMonth, addMonths } from 'date-fns';
+import { format, parseISO, startOfMonth, addMonths } from '../../../utils/DateUtils';
 import { DateRange } from '../selection/DateRangeSelectionManager';
 
 export interface ValidationError {
