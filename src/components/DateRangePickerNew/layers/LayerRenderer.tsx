@@ -62,7 +62,8 @@ import {
   RenderResult,
   Layer
 } from './types';
-import { parseISO, isWithinInterval, isSameDay } from 'date-fns';
+import { parseISO, isSameDay } from 'date-fns';
+import { isWithinInterval } from '../../../utils/DateUtils';
 
 /**
  * LayerRenderer class provides static methods for rendering different types of layers
@@ -87,10 +88,9 @@ export class LayerRenderer {
         const start = parseISO(range.startDate);
         const end = parseISO(range.endDate);
 
-        // Check if the date falls within the range or matches range boundaries
-        if (isWithinInterval(date, { start, end }) ||
-          isSameDay(date, start) ||
-          isSameDay(date, end)) {
+        // Check if the date falls within the range
+        // Note: isWithinInterval includes start and end dates
+        if (isWithinInterval(date, { start, end })) {
           return {
             backgroundColor: range.color
           };

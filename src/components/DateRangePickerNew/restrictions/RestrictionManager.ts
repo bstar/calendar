@@ -55,7 +55,8 @@
  * };
  */
 
-import { parseISO, isValid, isWithinInterval } from 'date-fns';
+import { parseISO, isValid } from 'date-fns';
+import { isWithinInterval } from '../../../utils/DateUtils';
 import { RestrictionConfig } from './types';
 
 /**
@@ -167,8 +168,8 @@ export class RestrictionManager {
 
       if (!isValid(rangeStart) || !isValid(rangeEnd)) continue;
 
-      const startAllowed = start >= rangeStart && start <= rangeEnd;
-      const endAllowed = end >= rangeStart && end <= rangeEnd;
+      const startAllowed = isWithinInterval(start, { start: rangeStart, end: rangeEnd });
+      const endAllowed = isWithinInterval(end, { start: rangeStart, end: rangeEnd });
 
       if (startAllowed && endAllowed) {
         isAllowed = true;
