@@ -210,6 +210,16 @@ export class RestrictionManager {
   };
 
   /**
+   * Gets all restricted boundary type restrictions
+   * @returns {RestrictedBoundaryRestriction[]} Array of all restricted boundary restrictions
+   */
+  getRestrictedBoundaries(): any[] {
+    if (!this.config?.restrictions) return [];
+    
+    return this.config.restrictions.filter(r => r.type === 'restricted_boundary');
+  }
+
+  /**
    * Checks if a date range selection is allowed based on configured restrictions
    * @param {Date} start - Start date of the selection
    * @param {Date} end - End date of the selection

@@ -485,20 +485,36 @@ const DayCell = ({
 
     const startDate = parseISO(selectedRange.start);
     const endDate = selectedRange.end ? parseISO(selectedRange.end) : null;
+    
+    // Get the anchor date if available
+    const anchorDate = selectedRange.anchorDate ? parseISO(selectedRange.anchorDate) : startDate;
+    
+    // Determine if this is a backward selection (where end date is the anchor)
+    const isBackwardSelection = endDate && anchorDate && 
+      isSameDay(anchorDate, endDate) && !isSameDay(anchorDate, startDate);
 
+    // For determining if a date is in the range, always use chronological ordering
     const [chronologicalStart, chronologicalEnd] = endDate && startDate > endDate
       ? [endDate, startDate]
       : [startDate, endDate];
 
+    // For visual styling (determining which corners to round), use selection direction
+    // In a forward selection, the start date gets the left rounded corners
+    // In a backward selection, the start date gets the right rounded corners
+    const isAnchor = anchorDate && isSameDay(date, anchorDate);
+    
     return {
       isSelected: isSameDay(date, startDate) || (endDate && isSameDay(date, endDate)),
       isInRange: chronologicalEnd
         ? (date >= chronologicalStart && date <= chronologicalEnd)
         : false,
-      isRangeStart: chronologicalEnd ? isSameDay(date, chronologicalStart) : false,
-      isRangeEnd: chronologicalEnd ? isSameDay(date, chronologicalEnd) : false
+      // For start/end determination (which determines the rounded corners):
+      // In forward selection: anchor is start, moving end is end
+      // In backward selection: moving start is start, anchor is end
+      isRangeStart: isBackwardSelection ? isSameDay(date, startDate) : isAnchor,
+      isRangeEnd: isBackwardSelection ? isAnchor : (endDate && isSameDay(date, endDate))
     };
-  }, [date, selectedRange.start, selectedRange.end]);
+  }, [date, selectedRange]);
 
   const [isHovered, setIsHovered] = useState(false);
 
@@ -1093,68 +1109,32 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
 
       // Determine the potential new end of the selection
       const potentialEnd = direction === 'next' ? lastDayOfMonth : firstDayOfMonth;
-
-      // Check if the entire selection range would cross any restrictions
-      // We need to check from the earliest date to the latest date
-      const earliestDate = start < potentialEnd ? start : potentialEnd;
-      const latestDate = start < potentialEnd ? potentialEnd : start;
-
-      // Get all days in the potential selection range
-      const allDaysInRange = eachDayOfInterval({
-        start: earliestDate,
-        end: latestDate
-      });
-
-      // Find the first restricted day in the entire range, if any
-      const firstRestrictedDay = allDaysInRange.find(day =>
-        !selectionManager.canSelectDate(day).allowed
+      
+      // Use the selection manager to handle the update, which now properly checks boundaries
+      const updateResult = selectionManager.updateSelection(
+        selectedRange,
+        potentialEnd
       );
-
-      if (firstRestrictedDay) {
-        // If there's a restriction in the range, we need to stop the selection
-        // at the day before the restriction
-
-        // Calculate the valid end date based on the direction of selection
-        const validEndDate = start < firstRestrictedDay
-          ? addDays(firstRestrictedDay, -1)  // Forward selection: day before restriction
-          : addDays(firstRestrictedDay, 1);  // Backward selection: day after restriction
-
-        // Ensure the valid end date is between start and potential end
-        const finalEndDate = start < potentialEnd
-          ? Math.min(validEndDate.getTime(), potentialEnd.getTime())
-          : Math.max(validEndDate.getTime(), potentialEnd.getTime());
-
-        // Update the selection to the valid range
-        setSelectedRange((prev: DateRange) => ({
-          ...prev,
-          end: format(new Date(finalEndDate), 'yyyy-MM-dd')
-        }));
-
+      
+      // Update the selection range with the result
+      setSelectedRange(updateResult.range);
+      
+      // If there's a message or the update wasn't successful, we hit a restriction
+      if (updateResult.message || !updateResult.success) {
         // End the selection and show message
         setIsSelecting(false);
         setOutOfBoundsDirection(null);
 
         // Only show notification during out-of-bounds scrolling
         if (settings.showSelectionAlert && outOfBoundsDirection) {
-          // Get the specific restriction message
-          const restrictionResult = selectionManager.canSelectDate(firstRestrictedDay);
-          const message = restrictionResult.message ||
-            `Selection cannot include restricted date: ${format(firstRestrictedDay, 'MMM dd, yyyy')}`;
-
-          setNotification(message);
+          setNotification(updateResult.message);
         }
 
         document.removeEventListener("mousemove", handleDocumentMouseMove);
         document.removeEventListener("mouseup", handleMouseUp);
-      } else {
-        // No restrictions in the range, extend selection to include the new month
-        setSelectedRange((prev: DateRange) => ({
-          ...prev,
-          end: format(potentialEnd, 'yyyy-MM-dd')
-        }));
       }
     }
-  }, [months, selectionManager, settings.showSelectionAlert, isSelecting, outOfBoundsDirection, selectedRange.start, handleDocumentMouseMove, handleMouseUp]);
+  }, [months, selectionManager, settings.showSelectionAlert, isSelecting, outOfBoundsDirection, selectedRange, handleDocumentMouseMove, handleMouseUp]);
 
   // After the existing moveToMonth function is defined (around line 1480), add:
   useEffect(() => {
