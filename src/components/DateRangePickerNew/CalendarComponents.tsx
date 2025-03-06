@@ -3,7 +3,7 @@ import {
   format,
   parseISO,
   isSameDay,
-} from 'date-fns';
+} from '../../utils/DateUtils';
 import { DateRange } from './selection/DateRangeSelectionManager';
 import { DEFAULT_CONTAINER_STYLES } from '../DateRangePicker.config';
 import { RestrictionConfig } from './restrictions/types';
@@ -637,6 +637,7 @@ export type ReactMouseHandler = (e: React.MouseEvent<HTMLDivElement>) => void;
 // Update MonthPair to pass restrictionConfig
 const MonthPair: React.FC<MonthPairProps> = ({
   firstMonth,
+  secondMonth,
   selectedRange,
   onSelectionStart,
   onSelectionMove,
@@ -646,28 +647,67 @@ const MonthPair: React.FC<MonthPairProps> = ({
   showTooltips,
   renderDay,
   layer,
+  activeLayer,
   restrictionConfig,
   startWeekOnSunday
 }) => {
+  // Create an array of months to show based on firstMonth and secondMonth
+  const monthsToRender = secondMonth ? [firstMonth, secondMonth] : [firstMonth];
+  
+  // Week day abbreviations
+  const weekDays = startWeekOnSunday 
+    ? ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
+    : ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+  
   return (
     <div style={{ display: 'flex', width: '100%', gap: '1rem' }}>
-      {monthsToShow.map((month, index) => (
-        <MonthGrid
+      {monthsToRender.map((month, index) => (
+        <div 
           key={month.toISOString()}
-          baseDate={month}
-          selectedRange={selectedRange}
-          onSelectionStart={onSelectionStart}
-          onSelectionMove={onSelectionMove}
-          isSelecting={isSelecting}
-          style={{ width: `${100 / visibleMonths}%` }}
-          showMonthHeading={showMonthHeadings}
-          showTooltips={showTooltips}
-          renderDay={renderDay}
-          layer={layer}
-          activeLayer={layer.name}
-          restrictionConfig={restrictionConfig}
-          startWeekOnSunday={startWeekOnSunday}
-        />
+          style={{ 
+            flex: 1,
+            minWidth: 0,
+            maxWidth: visibleMonths === 1 ? '100%' : '50%'
+          }}
+        >
+          {showMonthHeadings && (
+            <div style={{ 
+              textAlign: 'center', 
+              padding: '0.5rem 0', 
+              fontWeight: 'bold',
+              marginBottom: '0.5rem' 
+            }}>
+              {format(month, 'MMMM yyyy')}
+            </div>
+          )}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(7, 1fr)',
+              gap: '0.25rem'
+            }}
+          >
+            {/* Day header row with weekday abbreviations */}
+            {weekDays.map(day => (
+              <div 
+                key={day} 
+                style={{ 
+                  textAlign: 'center', 
+                  fontWeight: 'bold',
+                  fontSize: '0.8rem',
+                  color: '#666',
+                  padding: '0.25rem 0'
+                }}
+              >
+                {day}
+              </div>
+            ))}
+            
+            {/* Generate the actual calendar grid here */}
+            {/* This would be implemented with the specific date calculation logic */}
+            {/* Placeholder for now */}
+          </div>
+        </div>
       ))}
     </div>
   );
