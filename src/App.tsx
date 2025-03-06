@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './bootstrap.min.css'
+import './docStyles.css'; // Import documentation styles
 
 import { 
   SETTINGS, 
@@ -1867,13 +1868,7 @@ function App() {
         {/* Preview and Documentation Column */}
         <div>
           {/* Calendar Preview */}
-          <div style={{ 
-            padding: '20px',
-            border: '1px solid #cfd4d9',
-            borderRadius: '8px',
-            backgroundColor: '#fff',
-            marginBottom: '24px'
-          }}>
+          <div className="doc-container-preview">
             <DateRangePickerNew
               settings={settings}
               onSettingsChange={setSettings}
@@ -1882,216 +1877,193 @@ function App() {
           </div>
 
           {/* Documentation */}
-          <div style={docStyles.container}>
-            <h2 style={docStyles.mainHeading}>Documentation</h2>
-            <div style={{ display: 'grid', gap: '24px' }}>
+          <div className="doc-container">
+            <h2 className="doc-main-heading">Documentation</h2>
+            <div className="doc-grid">
               {/* Core Settings */}
-              <div style={docStyles.section}>
-                <h3 style={docStyles.sectionHeading}>
+              <div className="doc-section">
+                <h3 className="doc-section-heading">
                   Core Settings
-                  <span style={{ ...docStyles.badge, ...docStyles.badgeVariants.blue }}>
+                  <span className="doc-badge doc-badge-blue">
                     Required
                   </span>
                 </h3>
-                <p style={docStyles.description}>
+                <p className="doc-description">
                   Essential configuration options that define the calendar's basic behavior and appearance.
                 </p>
-                <table style={docStyles.table}>
+                <table className="doc-table">
                   <thead>
                     <tr>
-                      <th style={docStyles.tableHeader}>Property</th>
-                      <th style={docStyles.tableHeader}>Type</th>
-                      <th style={docStyles.tableHeader}>Default</th>
-                      <th style={docStyles.tableHeader}>Description</th>
+                      <th className="property-column">Property</th>
+                      <th className="type-column">Type</th>
+                      <th className="default-column">Default</th>
+                      <th>Description</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>displayMode</code>
+                      <td className="property-column">
+                        <code className="doc-code">displayMode</code>
                       </td>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>'popup' | 'embedded'</code>
+                      <td className="type-column">
+                        <code className="doc-code">'popup' | 'embedded'</code>
                       </td>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>'embedded'</code>
+                      <td className="default-column">
+                        <code className="doc-code">'embedded'</code>
                       </td>
-                      <td style={docStyles.tableCell}>How the calendar should be displayed</td>
+                      <td>How the calendar should be displayed</td>
                     </tr>
                     <tr>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>timezone</code>
+                      <td className="property-column">
+                        <code className="doc-code">timezone</code>
                       </td>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>string</code>
+                      <td className="type-column">
+                        <code className="doc-code">string</code>
                       </td>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>'UTC'</code>
+                      <td className="default-column">
+                        <code className="doc-code">'UTC'</code>
                       </td>
-                      <td style={docStyles.tableCell}>Override the default timezone (UTC)</td>
+                      <td>Override the default timezone (UTC). The timezone affects date display and handling. Hover over the month range to see the current timezone.</td>
                     </tr>
                     <tr>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>visibleMonths</code>
+                      <td className="property-column">
+                        <code className="doc-code">visibleMonths</code>
                       </td>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>number</code>
+                      <td className="type-column">
+                        <code className="doc-code">number</code>
                       </td>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>2</code>
+                      <td className="default-column">
+                        <code className="doc-code">2</code>
                       </td>
-                      <td style={docStyles.tableCell}>Number of months to display</td>
+                      <td>Number of months to display</td>
                     </tr>
                     <tr>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>showMonthHeadings</code>
+                      <td className="property-column">
+                        <code className="doc-code">showMonthHeadings</code>
                       </td>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>boolean</code>
+                      <td className="type-column">
+                        <code className="doc-code">boolean</code>
                       </td>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>true</code>
+                      <td className="default-column">
+                        <code className="doc-code">true</code>
                       </td>
-                      <td style={docStyles.tableCell}>Display month names above each month</td>
+                      <td>Display month names above each month</td>
                     </tr>
                     <tr>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>singleMonthWidth</code>
+                      <td className="property-column">
+                        <code className="doc-code">singleMonthWidth</code>
                       </td>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>number</code>
+                      <td className="type-column">
+                        <code className="doc-code">number</code>
                       </td>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>500</code>
+                      <td className="default-column">
+                        <code className="doc-code">500</code>
                       </td>
-                      <td style={docStyles.tableCell}>Width of a single month in pixels</td>
+                      <td>Width of a single month in pixels</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
 
               {/* Layer Configuration */}
-              <div style={docStyles.section}>
-                <h3 style={docStyles.sectionHeading}>
+              <div className="doc-section">
+                <h3 className="doc-section-heading">
                   Layer Configuration
-                  <span style={{ ...docStyles.badge, ...docStyles.badgeVariants.purple }}>
+                  <span className="doc-badge doc-badge-purple">
                     Advanced
                   </span>
                 </h3>
-                <p style={docStyles.description}>
+                <p className="doc-description">
                   Layers provide a way to organize and display different types of calendar data.
                 </p>
-                <table style={docStyles.table}>
+                <table className="doc-table">
                   <thead>
                     <tr>
-                      <th style={docStyles.tableHeader}>Property</th>
-                      <th style={docStyles.tableHeader}>Type</th>
-                      <th style={docStyles.tableHeader}>Required</th>
-                      <th style={docStyles.tableHeader}>Description</th>
+                      <th className="property-column">Property</th>
+                      <th className="type-column">Type</th>
+                      <th>Required</th>
+                      <th>Description</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>name</code>
+                      <td className="property-column">
+                        <code className="doc-code">name</code>
                       </td>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>string</code>
+                      <td className="type-column">
+                        <code className="doc-code">string</code>
                       </td>
-                      <td style={docStyles.tableCell}>Yes</td>
-                      <td style={docStyles.tableCell}>Unique identifier for the layer</td>
+                      <td>Yes</td>
+                      <td>Unique identifier for the layer</td>
                     </tr>
                     <tr>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>title</code>
+                      <td className="property-column">
+                        <code className="doc-code">title</code>
                       </td>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>string</code>
+                      <td className="type-column">
+                        <code className="doc-code">string</code>
                       </td>
-                      <td style={docStyles.tableCell}>Yes</td>
-                      <td style={docStyles.tableCell}>Display name for the layer</td>
+                      <td>Yes</td>
+                      <td>Display name for the layer</td>
                     </tr>
                     <tr>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>description</code>
+                      <td className="property-column">
+                        <code className="doc-code">description</code>
                       </td>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>string</code>
+                      <td className="type-column">
+                        <code className="doc-code">string</code>
                       </td>
-                      <td style={docStyles.tableCell}>Yes</td>
-                      <td style={docStyles.tableCell}>Brief description of the layer's purpose</td>
+                      <td>Yes</td>
+                      <td>Brief description of the layer's purpose</td>
                     </tr>
                     <tr>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>data</code>
+                      <td className="property-column">
+                        <code className="doc-code">data</code>
                       </td>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>LayerData</code>
+                      <td className="type-column">
+                        <code className="doc-code">LayerData</code>
                       </td>
-                      <td style={docStyles.tableCell}>No</td>
-                      <td style={docStyles.tableCell}>Layer-specific data (events or background colors)</td>
+                      <td>No</td>
+                      <td>Layer-specific data (events or background colors)</td>
                     </tr>
                     <tr>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>required</code>
+                      <td className="property-column">
+                        <code className="doc-code">required</code>
                       </td>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>boolean</code>
+                      <td className="type-column">
+                        <code className="doc-code">boolean</code>
                       </td>
-                      <td style={docStyles.tableCell}>No</td>
-                      <td style={docStyles.tableCell}>Whether the layer can be removed</td>
+                      <td>No</td>
+                      <td>Whether the layer can be removed</td>
                     </tr>
                   </tbody>
                 </table>
 
                 {/* Add margin after the table */}
                 <div style={{ marginTop: '32px' }}>
-                  <h3 style={docStyles.sectionHeading}>
+                  <h3 className="doc-section-heading">
                     Layer Data Types
-                    <span style={{ ...docStyles.badge, ...docStyles.badgeVariants.purple }}>
+                    <span className="doc-badge doc-badge-purple">
                       Data Structure
                     </span>
                   </h3>
-                  <p style={docStyles.description}>
+                  <p className="doc-description">
                     Layers can contain two types of data: Events and Background Colors. These can be used independently or combined.
                   </p>
                   
-                  <div style={{ display: 'grid', gap: '24px', marginTop: '16px' }}>
+                  <div className="doc-grid" style={{ marginTop: '16px' }}>
                     {/* EventData */}
-                    <div style={{ 
-                      border: '1px solid #e1e4e8',
-                      borderRadius: '8px',
-                      overflow: 'hidden'
-                    }}>
-                      <div style={{
-                        backgroundColor: '#f6f8fa',
-                        padding: '12px 16px',
-                        borderBottom: '1px solid #e1e4e8'
-                      }}>
-                        <h5 style={{
-                          margin: 0,
-                          color: '#24292e',
-                          fontSize: '14px',
-                          fontWeight: '600'
-                        }}>
+                    <div className="doc-data-card">
+                      <div className="doc-data-header">
+                        <h5 className="doc-data-title">
                           EventData
-                          <span style={{
-                            marginLeft: '8px',
-                            fontSize: '12px',
-                            color: '#666',
-                            fontWeight: 'normal'
-                          }}>
+                          <span className="doc-data-subtitle">
                             Single-day events with details
                           </span>
                         </h5>
                       </div>
-                      <div style={{ padding: '16px' }}>
-                        <pre style={{
-                          ...docStyles.codeBlock,
-                          margin: 0,
-                          backgroundColor: '#ffffff',
-                          border: '1px solid #e1e4e8'
-                        }}>
+                      <div className="doc-data-content">
+                        <pre className="doc-code-block" style={{ backgroundColor: '#ffffff', border: '1px solid #e1e4e8' }}>
 {`interface EventData {
   date: string;        // ISO date string (e.g., "2025-02-15")
   title: string;       // Event title (e.g., "Team Meeting")
@@ -2100,17 +2072,9 @@ function App() {
   description: string; // Event details
 }`}
                         </pre>
-                        <div style={{ 
-                          marginTop: '12px',
-                          fontSize: '13px',
-                          color: '#666'
-                        }}>
-                          <p style={{ margin: '0 0 8px 0' }}>Example:</p>
-                          <pre style={{
-                            ...docStyles.codeBlock,
-                            margin: 0,
-                            backgroundColor: '#f8f9fa'
-                          }}>
+                        <div className="doc-example">
+                          <p>Example:</p>
+                          <pre className="doc-code-block" style={{ backgroundColor: '#f8f9fa' }}>
 {`{
   "date": "2025-02-15",
   "title": "Team Meeting",
@@ -2124,57 +2088,26 @@ function App() {
                     </div>
 
                     {/* BackgroundData */}
-                    <div style={{ 
-                      border: '1px solid #e1e4e8',
-                      borderRadius: '8px',
-                      overflow: 'hidden'
-                    }}>
-                      <div style={{
-                        backgroundColor: '#f6f8fa',
-                        padding: '12px 16px',
-                        borderBottom: '1px solid #e1e4e8'
-                      }}>
-                        <h5 style={{
-                          margin: 0,
-                          color: '#24292e',
-                          fontSize: '14px',
-                          fontWeight: '600'
-                        }}>
+                    <div className="doc-data-card">
+                      <div className="doc-data-header">
+                        <h5 className="doc-data-title">
                           BackgroundData
-                          <span style={{
-                            marginLeft: '8px',
-                            fontSize: '12px',
-                            color: '#666',
-                            fontWeight: 'normal'
-                          }}>
+                          <span className="doc-data-subtitle">
                             Date range highlighting
                           </span>
                         </h5>
                       </div>
-                      <div style={{ padding: '16px' }}>
-                        <pre style={{
-                          ...docStyles.codeBlock,
-                          margin: 0,
-                          backgroundColor: '#ffffff',
-                          border: '1px solid #e1e4e8'
-                        }}>
+                      <div className="doc-data-content">
+                        <pre className="doc-code-block" style={{ backgroundColor: '#ffffff', border: '1px solid #e1e4e8' }}>
 {`interface BackgroundData {
   startDate: string;  // ISO date string (e.g., "2025-02-01")
   endDate: string;    // ISO date string (e.g., "2025-02-14")
   color: string;      // CSS color value (e.g., "#e3f2fd")
 }`}
                         </pre>
-                        <div style={{ 
-                          marginTop: '12px',
-                          fontSize: '13px',
-                          color: '#666'
-                        }}>
-                          <p style={{ margin: '0 0 8px 0' }}>Example:</p>
-                          <pre style={{
-                            ...docStyles.codeBlock,
-                            margin: 0,
-                            backgroundColor: '#f8f9fa'
-                          }}>
+                        <div className="doc-example">
+                          <p>Example:</p>
+                          <pre className="doc-code-block" style={{ backgroundColor: '#f8f9fa' }}>
 {`{
   "startDate": "2025-02-01",
   "endDate": "2025-02-14",
@@ -2189,54 +2122,169 @@ function App() {
               </div>
 
               {/* Feature Settings */}
-              <div style={docStyles.section}>
-                <h3 style={docStyles.sectionHeading}>
+              <div className="doc-section">
+                <h3 className="doc-section-heading">
                   Feature Settings
-                  <span style={{ ...docStyles.badge, ...docStyles.badgeVariants.green }}>
+                  <span className="doc-badge doc-badge-green">
                     Optional
                   </span>
                 </h3>
-                <p style={docStyles.description}>
+                <p className="doc-description">
                   Additional features that can be enabled or disabled to customize the calendar's functionality.
                 </p>
-                <table style={docStyles.table}>
+                <table className="doc-table">
                   <thead>
                     <tr>
-                      <th style={docStyles.tableHeader}>Property</th>
-                      <th style={docStyles.tableHeader}>Type</th>
-                      <th style={docStyles.tableHeader}>Default</th>
-                      <th style={docStyles.tableHeader}>Description</th>
+                      <th className="property-column">Property</th>
+                      <th className="type-column">Type</th>
+                      <th className="default-column">Default</th>
+                      <th>Description</th>
                     </tr>
                   </thead>
                   <tbody>
                     {Object.entries(SETTINGS.features).map(([key, setting]) => (
                       <tr key={key}>
-                        <td style={docStyles.tableCell}>
-                          <code style={docStyles.code}>{key}</code>
+                        <td className="property-column">
+                          <code className="doc-code">{key}</code>
                         </td>
-                        <td style={docStyles.tableCell}>
-                          <code style={docStyles.code}>{setting.type}</code>
+                        <td className="type-column">
+                          <code className="doc-code">{setting.type}</code>
                         </td>
-                        <td style={docStyles.tableCell}>
-                          <code style={docStyles.code}>{String(setting.default)}</code>
+                        <td className="default-column">
+                          <code className="doc-code">{String(setting.default)}</code>
                         </td>
-                        <td style={docStyles.tableCell}>{setting.description}</td>
+                        <td>
+                          {key === 'showHeader' 
+                            ? 'Display the calendar header with month navigation and timezone info (on hover)'
+                            : setting.description}
+                        </td>
                       </tr>
                     ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Timezone Features */}
+              <div className="doc-section">
+                <h3 className="doc-section-heading">
+                  Timezone Support
+                  <span className="doc-badge doc-badge-blue">
+                    New Feature
+                  </span>
+                </h3>
+                <p className="doc-description">
+                  The calendar supports timezone-aware date handling, ensuring consistent date selection and display across different timezones.
+                </p>
+                <table className="doc-table">
+                  <thead>
                     <tr>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>showLayersNavigation</code>
+                      <th className="property-column">Feature</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td className="property-column">
+                        <code className="doc-code">Timezone Selection</code>
                       </td>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>boolean</code>
+                      <td>
+                        Configure the calendar to use specific timezones for date handling. Available options include UTC (default), browser local time, and IANA timezone identifiers.
                       </td>
-                      <td style={docStyles.tableCell}>
-                        <code style={docStyles.code}>true</code>
+                    </tr>
+                    <tr>
+                      <td className="property-column">
+                        <code className="doc-code">Timezone Display</code>
                       </td>
-                      <td style={docStyles.tableCell}>Display layers navigation panel in the calendar</td>
+                      <td>
+                        Current timezone is displayed when hovering over the month range in the calendar header, providing clear context for date selection.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="property-column">
+                        <code className="doc-code">Consistent Date Handling</code>
+                      </td>
+                      <td>
+                        Prevents the "day-off" bug where dates can shift when viewed in different timezones, ensuring selections are consistent globally.
+                      </td>
                     </tr>
                   </tbody>
                 </table>
+
+                <div style={{ marginTop: '16px' }}>
+                  <h4 className="doc-sub-heading">Available Timezone Options</h4>
+                  <table className="doc-table">
+                    <thead>
+                      <tr>
+                        <th className="property-column">Timezone</th>
+                        <th className="type-column">Value</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td className="property-column">UTC</td>
+                        <td className="type-column">
+                          <code className="doc-code">'UTC'</code>
+                        </td>
+                        <td>Coordinated Universal Time (default)</td>
+                      </tr>
+                      <tr>
+                        <td className="property-column">Browser Local</td>
+                        <td className="type-column">
+                          <code className="doc-code">'local'</code>
+                        </td>
+                        <td>User's browser local timezone</td>
+                      </tr>
+                      <tr>
+                        <td className="property-column">Eastern Time</td>
+                        <td className="type-column">
+                          <code className="doc-code">'America/New_York'</code>
+                        </td>
+                        <td>US Eastern Time (ET)</td>
+                      </tr>
+                      <tr>
+                        <td className="property-column">Central European</td>
+                        <td className="type-column">
+                          <code className="doc-code">'Europe/Paris'</code>
+                        </td>
+                        <td>Central European Time (CET)</td>
+                      </tr>
+                      <tr>
+                        <td className="property-column">Japan</td>
+                        <td className="type-column">
+                          <code className="doc-code">'Asia/Tokyo'</code>
+                        </td>
+                        <td>Japan Standard Time (JST)</td>
+                      </tr>
+                      <tr>
+                        <td className="property-column">New Zealand</td>
+                        <td className="type-column">
+                          <code className="doc-code">'Pacific/Auckland'</code>
+                        </td>
+                        <td>New Zealand Time (NZT)</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div style={{ marginTop: '16px' }}>
+                  <h4 className="doc-sub-heading">Implementation Details</h4>
+                  <pre className="doc-code-block">
+{`// Example: Setting timezone in CalendarSettings
+const settings: CalendarSettings = {
+  // Other settings...
+  timezone: 'Europe/London', // Use London timezone
+};
+
+// The timezone is available in the CalendarHeader
+<CalendarHeader 
+  months={months}
+  visibleMonths={visibleMonths}
+  moveToMonth={moveToMonth}
+  timezone={settings.timezone} 
+/>`}
+                  </pre>
+                </div>
               </div>
             </div>
           </div>
