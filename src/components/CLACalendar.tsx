@@ -241,7 +241,8 @@ const MonthGrid: React.FC<MonthGridProps> = ({
   renderDay,
   layer,
   startWeekOnSunday = false,
-  restrictionConfig
+  restrictionConfig,
+  activeLayer
 }) => {
   const monthStart = startOfMonth(baseDate);
   const monthEnd = endOfMonth(monthStart);
@@ -367,8 +368,8 @@ const MonthGrid: React.FC<MonthGridProps> = ({
               showTooltips={showTooltips}
               renderContent={renderDay}
               layer={layer}
-              activeLayer={layer.name}
               restrictionConfig={restrictionConfig}
+              activeLayer={activeLayer}
             />
           ))
         )}
@@ -417,37 +418,41 @@ const MonthGrid: React.FC<MonthGridProps> = ({
           if (boundaryRestriction && selectedRange.start) {
             const selectionStart = parseISO(selectedRange.start);
             
-            for (const range of boundaryRestriction.ranges) {
-              const rangeStart = parseISO(range.start);
-              const rangeEnd = parseISO(range.end);
-              
-              if (!isValid(rangeStart) || !isValid(rangeEnd)) continue;
-              
-              // If selection started within this boundary
-              if (isWithinInterval(selectionStart, { start: rangeStart, end: rangeEnd })) {
-                // If hovered date is outside boundary, show tooltip with message
-                if (!isWithinInterval(hoveredDate, { start: rangeStart, end: rangeEnd })) {
-                  return (
-                    <div
-                      style={{
-                        position: 'fixed',
-                        left: mousePosition.x,
-                        top: mousePosition.y,
-                        backgroundColor: 'rgba(220, 53, 69, 0.9)',
-                        color: 'white',
-                        padding: '8px 12px',
-                        borderRadius: '4px',
-                        fontSize: '13px',
-                        pointerEvents: 'none',
-                        zIndex: 1000,
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                        maxWidth: '250px',
-                        whiteSpace: 'pre-line'
-                      }}
-                    >
-                      {range.message || 'Selection must stay within the boundary'}
-                    </div>
-                  );
+            // Safe cast the boundary restriction to the correct type
+            const boundaryWithRanges = boundaryRestriction as any;
+            if (boundaryWithRanges.ranges) {
+              for (const range of boundaryWithRanges.ranges) {
+                const rangeStart = parseISO(range.start);
+                const rangeEnd = parseISO(range.end);
+                
+                if (!isValid(rangeStart) || !isValid(rangeEnd)) continue;
+                
+                // If selection started within this boundary
+                if (isWithinInterval(selectionStart, { start: rangeStart, end: rangeEnd })) {
+                  // If hovered date is outside boundary, show tooltip with message
+                  if (!isWithinInterval(hoveredDate, { start: rangeStart, end: rangeEnd })) {
+                    return (
+                      <div
+                        style={{
+                          position: 'fixed',
+                          left: mousePosition.x,
+                          top: mousePosition.y,
+                          backgroundColor: 'rgba(220, 53, 69, 0.9)',
+                          color: 'white',
+                          padding: '8px 12px',
+                          borderRadius: '4px',
+                          fontSize: '13px',
+                          pointerEvents: 'none',
+                          zIndex: 1000,
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                          maxWidth: '250px',
+                          whiteSpace: 'pre-line'
+                        }}
+                      >
+                        {range.message || 'Selection must stay within the boundary'}
+                      </div>
+                    );
+                  }
                 }
               }
             }
@@ -470,7 +475,8 @@ const DayCell = ({
   showTooltips,
   renderContent,
   layer,
-  restrictionConfig
+  restrictionConfig,
+  activeLayer
 }) => {
   const { isSelected, isInRange, isRangeStart, isRangeEnd } = useMemo(() => {
     if (!selectedRange.start) {
@@ -519,18 +525,22 @@ const DayCell = ({
     );
 
     if (boundaryRestriction) {
-      for (const range of boundaryRestriction.ranges) {
-        const rangeStart = parseISO(range.start);
-        const rangeEnd = parseISO(range.end);
+      // Safe cast the boundary restriction to the correct type
+      const boundaryWithRanges = boundaryRestriction as any;
+      if (boundaryWithRanges.ranges) {
+        for (const range of boundaryWithRanges.ranges) {
+          const rangeStart = parseISO(range.start);
+          const rangeEnd = parseISO(range.end);
 
-        if (!isValid(rangeStart) || !isValid(rangeEnd)) continue;
+          if (!isValid(rangeStart) || !isValid(rangeEnd)) continue;
 
-        // If selection started in this range, show restriction pattern for dates OUTSIDE the range
-        if (isWithinInterval(selectionStart, { start: rangeStart, end: rangeEnd })) {
-          if (!isWithinInterval(date, { start: rangeStart, end: rangeEnd })) {
-            return { allowed: false, message: range.message || 'Selection must stay within the boundary' };
+          // If selection started in this range, show restriction pattern for dates OUTSIDE the range
+          if (isWithinInterval(selectionStart, { start: rangeStart, end: rangeEnd })) {
+            if (!isWithinInterval(date, { start: rangeStart, end: rangeEnd })) {
+              return { allowed: false, message: range.message || 'Selection must stay within the boundary' };
+            }
+            return { allowed: true };
           }
-          return { allowed: true };
         }
       }
     }
@@ -648,6 +658,7 @@ const DayCell = ({
 
 const MonthPair = ({
   firstMonth,
+  secondMonth,
   selectedRange,
   onSelectionStart,
   onSelectionMove,
@@ -658,12 +669,20 @@ const MonthPair = ({
   renderDay,
   layer,
   restrictionConfig,
-  startWeekOnSunday
+  startWeekOnSunday,
+  activeLayer
 }) => {
   // Add explicit type for monthsToShow
   const monthsToShow: Date[] = [];
-  for (let i = 0; i < visibleMonths && i < 6; i++) {
-    monthsToShow.push(addMonths(firstMonth, i));
+  
+  // Use secondMonth if provided, otherwise calculate months based on firstMonth
+  if (secondMonth) {
+    monthsToShow.push(firstMonth);
+    monthsToShow.push(secondMonth);
+  } else {
+    for (let i = 0; i < visibleMonths && i < 6; i++) {
+      monthsToShow.push(addMonths(firstMonth, i));
+    }
   }
 
   return (
@@ -685,7 +704,7 @@ const MonthPair = ({
           showTooltips={showTooltips}
           renderDay={renderDay}
           layer={layer}
-          activeLayer={layer.name}
+          activeLayer={activeLayer}
           restrictionConfig={restrictionConfig}
           startWeekOnSunday={startWeekOnSunday}
         />
@@ -731,6 +750,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   showMonthHeadings,
   showTooltips,
   layer,
+  activeLayer,
   restrictionConfig,
   startWeekOnSunday
 }) => {
@@ -786,6 +806,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       showTooltips={showTooltips}
       renderDay={renderDay}
       layer={layer}
+      activeLayer={activeLayer}
       restrictionConfig={restrictionConfig}
       startWeekOnSunday={startWeekOnSunday}
     />
@@ -1019,7 +1040,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
         showMonthHeadings={settings.showMonthHeadings}
         showTooltips={shouldShowTooltips}
         layer={layer}
-        activeLayer={activeLayer}
+        activeLayer={layer.name}
         restrictionConfig={settings.restrictionConfig}
         startWeekOnSunday={settings.startWeekOnSunday}
       />
