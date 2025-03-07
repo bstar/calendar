@@ -524,66 +524,110 @@ const DayCell = ({
   );
 
   const restrictionResult = useMemo(() => {
-    const currentRestrictionConfig = restrictionConfig ?? { restrictions: [] };
-    
-    // First get the basic restriction result
+    // Get basic restriction status for this date
     const baseRestriction = restrictionManager.checkSelection(date, date);
     
-    // Check restrictions even if no selection has been made yet
-    if (!selectedRange.start) {
+    // If no selection is in progress or this isn't a restricted date, just return the base result
+    if (!selectedRange.start || (baseRestriction.allowed && !hasAnyBoundaryRestriction())) {
       return baseRestriction;
     }
-
-    // Look for boundary restrictions which need special handling
-    const boundaryRestriction = currentRestrictionConfig.restrictions.find(r => 
-      r.type === 'restricted_boundary' && r.enabled
-    );
-
-    if (!boundaryRestriction) {
-      return baseRestriction; // No boundary restriction to deal with
-    }
-
-    // Get the anchor point - the fixed point of the selection
+    
+    // From here, we're dealing with a selection in progress
+    // Get the anchor date - the fixed point of the selection
     const anchorDate = selectedRange.anchorDate 
       ? parseISO(selectedRange.anchorDate) 
       : parseISO(selectedRange.start);
+    
+    // Check if the anchor is in a boundary - this is the key to determine if we need
+    // to apply boundary restrictions
+    const anchorInBoundary = isAnchorInAnyBoundary(anchorDate);
+    const currentDateInBoundary = isDateInAnyBoundary(date);
+    
+    // If anchor is in a boundary but current date is not, show restriction
+    if (anchorInBoundary.inBoundary && !isInSameBoundary(date, anchorInBoundary.boundaryStart, anchorInBoundary.boundaryEnd)) {
+      return { allowed: false, message: anchorInBoundary.message };
+    }
+    
+    // If anchor is NOT in a boundary but current date IS, do NOT show restriction pattern
+    // This allows selections to cross into boundaries when starting outside them
+    if (!anchorInBoundary.inBoundary && currentDateInBoundary) {
+      return { allowed: true };
+    }
+    
+    // For all other cases, use the base restriction result
+    return baseRestriction;
+    
+    // Helper functions
+    function hasAnyBoundaryRestriction() {
+      const currentRestrictionConfig = restrictionConfig ?? { restrictions: [] };
+      return currentRestrictionConfig.restrictions.some(r => 
+        r.type === 'restricted_boundary' && r.enabled
+      );
+    }
+    
+    function isAnchorInAnyBoundary(anchor: Date) {
+      const currentRestrictionConfig = restrictionConfig ?? { restrictions: [] };
       
-    // Safe cast the boundary restriction
-    const boundaryWithRanges = boundaryRestriction as any;
-    
-    // Only apply boundary restrictions visually if the anchor is in a boundary
-    let anchorInBoundary = false;
-    let boundaryStart: Date | null = null;
-    let boundaryEnd: Date | null = null;
-    
-    if (boundaryWithRanges.ranges) {
-      // Check if anchor is in any boundary
-      for (const range of boundaryWithRanges.ranges) {
-        const rangeStart = parseISO(range.start);
-        const rangeEnd = parseISO(range.end);
+      // Look for boundary restrictions
+      for (const restriction of currentRestrictionConfig.restrictions) {
+        if (restriction.type !== 'restricted_boundary' || !restriction.enabled) continue;
         
-        if (!isValid(rangeStart) || !isValid(rangeEnd)) continue;
-        
-        // Is the anchor in this boundary?
-        if (anchorDate >= rangeStart && anchorDate <= rangeEnd) {
-          anchorInBoundary = true;
-          boundaryStart = rangeStart;
-          boundaryEnd = rangeEnd;
-          break;
+        // Safe cast to access ranges
+        const boundaryWithRanges = restriction as any;
+        if (boundaryWithRanges.ranges) {
+          for (const range of boundaryWithRanges.ranges) {
+            const rangeStart = parseISO(range.start);
+            const rangeEnd = parseISO(range.end);
+            
+            if (!isValid(rangeStart) || !isValid(rangeEnd)) continue;
+            
+            // Check if anchor is in this boundary
+            if (anchor >= rangeStart && anchor <= rangeEnd) {
+              return {
+                inBoundary: true,
+                boundaryStart: rangeStart,
+                boundaryEnd: rangeEnd,
+                message: range.message || 'Selection must stay within the boundary'
+              };
+            }
+          }
         }
       }
       
-      // Only if anchor is in a boundary, apply restriction pattern to dates outside that boundary
-      if (anchorInBoundary && boundaryStart && boundaryEnd) {
-        const dateInBoundary = date >= boundaryStart && date <= boundaryEnd;
-        return dateInBoundary 
-          ? { allowed: true } // Date is in the same boundary as anchor - allow it
-          : { allowed: false, message: 'Selection must stay within the boundary' }; // Outside boundary - restrict
-      }
+      return { inBoundary: false, boundaryStart: null, boundaryEnd: null, message: null };
     }
     
-    // Return the base restriction for all other cases
-    return baseRestriction;
+    function isDateInAnyBoundary(checkDate: Date) {
+      const currentRestrictionConfig = restrictionConfig ?? { restrictions: [] };
+      
+      // Look for boundary restrictions
+      for (const restriction of currentRestrictionConfig.restrictions) {
+        if (restriction.type !== 'restricted_boundary' || !restriction.enabled) continue;
+        
+        // Safe cast to access ranges
+        const boundaryWithRanges = restriction as any;
+        if (boundaryWithRanges.ranges) {
+          for (const range of boundaryWithRanges.ranges) {
+            const rangeStart = parseISO(range.start);
+            const rangeEnd = parseISO(range.end);
+            
+            if (!isValid(rangeStart) || !isValid(rangeEnd)) continue;
+            
+            // Check if date is in this boundary
+            if (checkDate >= rangeStart && checkDate <= rangeEnd) {
+              return true;
+            }
+          }
+        }
+      }
+      
+      return false;
+    }
+    
+    function isInSameBoundary(checkDate: Date, boundaryStart: Date | null, boundaryEnd: Date | null) {
+      if (!boundaryStart || !boundaryEnd) return false;
+      return checkDate >= boundaryStart && checkDate <= boundaryEnd;
+    }
   }, [date, restrictionManager, selectedRange, restrictionConfig]);
 
   const handleMouseEnter = (e) => {

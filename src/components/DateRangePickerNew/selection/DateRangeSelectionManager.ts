@@ -41,43 +41,35 @@ export class DateRangeSelectionManager {
   /**
    * Check if a range can be selected
    */
-  canSelectRange(startDate: Date, endDate: Date): { allowed: boolean; message: string | null } {
-    // First check the start and end dates
-    const startResult = this.restrictionManager.checkSelection(startDate, startDate);
-    if (!startResult.allowed) {
-      return {
-        allowed: false,
-        message: startResult.message || null
-      };
+  canSelectRange(startDate: Date, endDate: Date, anchorDate?: Date): { allowed: boolean; message: string | null } {
+    if (!isValid(startDate) || !isValid(endDate)) {
+      return { allowed: false, message: 'Invalid date range' };
     }
 
-    const endResult = this.restrictionManager.checkSelection(endDate, endDate);
-    if (!endResult.allowed) {
-      return {
-        allowed: false,
-        message: endResult.message || null
-      };
-    }
+    // For date comparison, ensure chronological order
+    const [chronologicalStart, chronologicalEnd] = startDate > endDate ? 
+      [endDate, startDate] : [startDate, endDate];
 
-    // Get all dates in the range
-    const dates = eachDayOfInterval({ start: startDate, end: endDate });
-
-    // Check each date in the range
-    for (const date of dates) {
-      const result = this.restrictionManager.checkSelection(date, date);
-      if (!result.allowed) {
-        return {
-          allowed: false,
-          message: result.message || 'Selection includes restricted dates'
-        };
+    // Handle boundary restrictions specially
+    // Only apply boundary restrictions if the anchor point is within that boundary
+    if (anchorDate) {
+      // First check if anchor is in any boundary
+      const anchorBoundary = this.isInRestrictedBoundary(anchorDate);
+      
+      // If anchor is in a boundary, check if the entire range stays within that boundary
+      if (anchorBoundary.inBoundary && anchorBoundary.boundaryStart && anchorBoundary.boundaryEnd) {
+        // If either start or end is outside the relevant boundary, it's not allowed
+        if (chronologicalStart < anchorBoundary.boundaryStart || chronologicalEnd > anchorBoundary.boundaryEnd) {
+          return { allowed: false, message: anchorBoundary.message };
+        }
       }
     }
 
-    // Finally check the entire range as a whole
-    const rangeResult = this.restrictionManager.checkSelection(startDate, endDate);
+    // For all other cases, use the standard check
+    const result = this.restrictionManager.checkSelection(chronologicalStart, chronologicalEnd);
     return {
-      allowed: rangeResult.allowed,
-      message: rangeResult.message || null
+      allowed: result.allowed,
+      message: result.allowed ? null : result.message
     };
   }
   
@@ -181,25 +173,24 @@ export class DateRangeSelectionManager {
       };
     }
 
-    // Get the current anchor date from the selection
+    // Get the anchor date (the fixed point of the selection)
     const anchorDate = currentRange.anchorDate 
       ? parseISO(currentRange.anchorDate) 
       : parseISO(currentRange.start);
     
-    // Determine if selection is backward (new date is before anchor)
+    // Determine if this is a backward selection (new date is before anchor)
     const isBackwardSelection = isBefore(newDate, anchorDate);
     
     // Check if the anchor date is in a restricted boundary
     const anchorBoundary = this.isInRestrictedBoundary(anchorDate);
     
-    // If anchor is in a boundary, selection must stay within that boundary
+    // If the anchor is in a boundary, the selection must stay within that boundary
     if (anchorBoundary.inBoundary) {
-      // If anchor is in a boundary, selection must stay within that boundary
       const boundaryStart = anchorBoundary.boundaryStart;
       const boundaryEnd = anchorBoundary.boundaryEnd;
       
       if (isBackwardSelection && boundaryStart) {
-        // Don't allow backward selection to go before boundary start
+        // For backward selection, the new date must not go before the boundary start
         if (isBefore(newDate, boundaryStart)) {
           return {
             success: true,
@@ -212,8 +203,9 @@ export class DateRangeSelectionManager {
             message: anchorBoundary.message || "Selection limited by boundary restriction"
           };
         }
-      } else if (!isBackwardSelection && boundaryEnd) {
-        // Don't allow forward selection to go beyond boundary end
+      } 
+      else if (!isBackwardSelection && boundaryEnd) {
+        // For forward selection, the new date must not go beyond the boundary end
         if (isAfter(newDate, boundaryEnd)) {
           return {
             success: true,
@@ -229,10 +221,10 @@ export class DateRangeSelectionManager {
       }
     }
     
-    // Now check for other types of restrictions
+    // For checking other types of restrictions
     if (isBackwardSelection) {
-      // For backward selection, check if the proposed range is valid
-      const rangeCheck = this.canSelectRange(newDate, anchorDate);
+      // For backward selection, check if the range is valid (passing in anchor date)
+      const rangeCheck = this.canSelectRange(newDate, anchorDate, anchorDate);
       
       if (!rangeCheck.allowed) {
         // If not allowed, find the closest valid date to the anchor
@@ -246,7 +238,7 @@ export class DateRangeSelectionManager {
         let foundMessage = rangeCheck.message;
         
         // First check if we can go back at least one day
-        const oneBackCheck = this.canSelectRange(validStart, anchorDate);
+        const oneBackCheck = this.canSelectRange(validStart, anchorDate, anchorDate);
         if (!oneBackCheck.allowed) {
           // If we can't even go back one day, return the anchor as both start and end
           return {
@@ -264,7 +256,7 @@ export class DateRangeSelectionManager {
         // Use binary search to efficiently find the last valid date
         while (differenceInCalendarDays(maxDate, minDate) > 1) {
           const midDate = new Date(minDate.getTime() + (maxDate.getTime() - minDate.getTime()) / 2);
-          const midCheck = this.canSelectRange(midDate, anchorDate);
+          const midCheck = this.canSelectRange(midDate, anchorDate, anchorDate);
           
           if (midCheck.allowed) {
             maxDate = midDate; // If mid date is valid, search between min and mid
@@ -278,7 +270,7 @@ export class DateRangeSelectionManager {
         
         // Final check to find the exact boundary
         if (!foundValidDate) {
-          const finalCheck = this.canSelectRange(minDate, anchorDate);
+          const finalCheck = this.canSelectRange(minDate, anchorDate, anchorDate);
           if (finalCheck.allowed) {
             validStart = minDate;
             foundValidDate = true;
@@ -324,8 +316,8 @@ export class DateRangeSelectionManager {
         message: null
       };
     } else {
-      // Forward selection: the anchor is the start date and we adjust the end date
-      const rangeCheck = this.canSelectRange(anchorDate, newDate);
+      // Forward selection (passing in anchor date)
+      const rangeCheck = this.canSelectRange(anchorDate, newDate, anchorDate);
       
       if (!rangeCheck.allowed) {
         // If not allowed, find the closest valid date to the anchor
@@ -339,7 +331,7 @@ export class DateRangeSelectionManager {
         let foundMessage = rangeCheck.message;
         
         // First check if we can go forward at least one day
-        const oneForwardCheck = this.canSelectRange(anchorDate, validEnd);
+        const oneForwardCheck = this.canSelectRange(anchorDate, validEnd, anchorDate);
         if (!oneForwardCheck.allowed) {
           // If we can't even go forward one day, return the anchor as both start and end
           return {
@@ -357,7 +349,7 @@ export class DateRangeSelectionManager {
         // Use binary search to efficiently find the last valid date
         while (differenceInCalendarDays(maxDate, minDate) > 1) {
           const midDate = new Date(minDate.getTime() + (maxDate.getTime() - minDate.getTime()) / 2);
-          const midCheck = this.canSelectRange(anchorDate, midDate);
+          const midCheck = this.canSelectRange(anchorDate, midDate, anchorDate);
           
           if (midCheck.allowed) {
             minDate = midDate; // If mid date is valid, search between mid and max
@@ -371,7 +363,7 @@ export class DateRangeSelectionManager {
         
         // Final check to find the exact boundary
         if (!foundValidDate) {
-          const finalCheck = this.canSelectRange(anchorDate, maxDate);
+          const finalCheck = this.canSelectRange(anchorDate, maxDate, anchorDate);
           if (finalCheck.allowed) {
             validEnd = maxDate;
             foundValidDate = true;
