@@ -189,12 +189,14 @@ export class DateRangeSelectionManager {
     // Determine if selection is backward (new date is before anchor)
     const isBackwardSelection = isBefore(newDate, anchorDate);
     
-    // For checking any boundaries that might contain the anchor date
-    const boundaryCheck = this.isInRestrictedBoundary(anchorDate);
-    if (boundaryCheck.inBoundary) {
+    // Check if the anchor date is in a restricted boundary
+    const anchorBoundary = this.isInRestrictedBoundary(anchorDate);
+    
+    // If anchor is in a boundary, selection must stay within that boundary
+    if (anchorBoundary.inBoundary) {
       // If anchor is in a boundary, selection must stay within that boundary
-      const boundaryStart = boundaryCheck.boundaryStart;
-      const boundaryEnd = boundaryCheck.boundaryEnd;
+      const boundaryStart = anchorBoundary.boundaryStart;
+      const boundaryEnd = anchorBoundary.boundaryEnd;
       
       if (isBackwardSelection && boundaryStart) {
         // Don't allow backward selection to go before boundary start
@@ -207,7 +209,7 @@ export class DateRangeSelectionManager {
               anchorDate: format(anchorDate, 'yyyy-MM-dd'),
               isBackwardSelection: true
             },
-            message: boundaryCheck.message || "Selection limited by boundary restriction"
+            message: anchorBoundary.message || "Selection limited by boundary restriction"
           };
         }
       } else if (!isBackwardSelection && boundaryEnd) {
@@ -221,74 +223,96 @@ export class DateRangeSelectionManager {
               anchorDate: format(anchorDate, 'yyyy-MM-dd'),
               isBackwardSelection: false
             },
-            message: boundaryCheck.message || "Selection limited by boundary restriction"
+            message: anchorBoundary.message || "Selection limited by boundary restriction"
           };
         }
       }
     }
     
-    // If we're moving backward (selecting earlier dates)
+    // Now check for other types of restrictions
     if (isBackwardSelection) {
-      // Check if the direct selection from newDate to anchor is valid
-      const validCheck = this.canSelectRange(newDate, anchorDate);
+      // For backward selection, check if the proposed range is valid
+      const rangeCheck = this.canSelectRange(newDate, anchorDate);
       
-      if (!validCheck.allowed) {
-        // Find the closest valid date to the anchor when moving backward
-        const startDate = addDays(anchorDate, -1); // Start checking from the day before anchor
-        let validStartDate = null;
-        let currentMessage = validCheck.message;
+      if (!rangeCheck.allowed) {
+        // If not allowed, find the closest valid date to the anchor
+        // Start walking back from the anchor to find the first valid date
+        let validStart = addDays(anchorDate, -1);
         
-        // Binary search approach to quickly find the last valid date
-        // This is more efficient than checking every date one by one
+        // Binary search to efficiently find the last valid date
         let minDate = newDate;
-        let maxDate = startDate;
+        let maxDate = anchorDate;
+        let foundValidDate = false;
+        let foundMessage = rangeCheck.message;
         
-        // First check if the day right before anchor is valid
-        // If not, there's no valid selection possible
-        const firstDayCheck = this.canSelectRange(maxDate, anchorDate);
-        if (!firstDayCheck.allowed) {
-          return { 
-            success: false, 
-            range: currentRange, 
-            message: firstDayCheck.message || "No valid selection possible" 
+        // First check if we can go back at least one day
+        const oneBackCheck = this.canSelectRange(validStart, anchorDate);
+        if (!oneBackCheck.allowed) {
+          // If we can't even go back one day, return the anchor as both start and end
+          return {
+            success: false,
+            range: {
+              start: format(anchorDate, 'yyyy-MM-dd'),
+              end: format(anchorDate, 'yyyy-MM-dd'),
+              anchorDate: format(anchorDate, 'yyyy-MM-dd'),
+              isBackwardSelection: true
+            },
+            message: oneBackCheck.message
           };
         }
         
+        // Use binary search to efficiently find the last valid date
         while (differenceInCalendarDays(maxDate, minDate) > 1) {
           const midDate = new Date(minDate.getTime() + (maxDate.getTime() - minDate.getTime()) / 2);
-          const midDateCheck = this.canSelectRange(midDate, anchorDate);
+          const midCheck = this.canSelectRange(midDate, anchorDate);
           
-          if (midDateCheck.allowed) {
-            maxDate = midDate; // The mid date is valid, search between min and mid
-            validStartDate = midDate;
+          if (midCheck.allowed) {
+            maxDate = midDate; // If mid date is valid, search between min and mid
+            foundValidDate = true;
+            validStart = midDate;
           } else {
-            minDate = midDate; // The mid date is invalid, search between mid and max
-            currentMessage = midDateCheck.message;
+            minDate = midDate; // If mid date is invalid, search between mid and max
+            foundMessage = midCheck.message;
           }
         }
         
-        // Final check to find the exact last valid date
-        const finalCheck = this.canSelectRange(minDate, anchorDate);
-        if (finalCheck.allowed) {
-          validStartDate = minDate;
-        } else if (!validStartDate) {
-          validStartDate = maxDate;
+        // Final check to find the exact boundary
+        if (!foundValidDate) {
+          const finalCheck = this.canSelectRange(minDate, anchorDate);
+          if (finalCheck.allowed) {
+            validStart = minDate;
+            foundValidDate = true;
+          }
         }
         
-        // Return the most optimal valid selection
+        // If we found a valid date, use it
+        if (foundValidDate) {
+          return {
+            success: true, 
+            range: {
+              start: format(validStart, 'yyyy-MM-dd'),
+              end: format(anchorDate, 'yyyy-MM-dd'),
+              anchorDate: format(anchorDate, 'yyyy-MM-dd'),
+              isBackwardSelection: true
+            },
+            message: foundMessage
+          };
+        }
+        
+        // If we couldn't find any valid date, return the anchor date
         return {
-          success: true,
+          success: false,
           range: {
-            start: format(validStartDate, 'yyyy-MM-dd'),
+            start: format(anchorDate, 'yyyy-MM-dd'),
             end: format(anchorDate, 'yyyy-MM-dd'),
             anchorDate: format(anchorDate, 'yyyy-MM-dd'),
             isBackwardSelection: true
           },
-          message: currentMessage
+          message: rangeCheck.message
         };
       }
       
-      // Valid backward selection
+      // If range is valid, return the selection
       return {
         success: true,
         range: {
@@ -300,65 +324,88 @@ export class DateRangeSelectionManager {
         message: null
       };
     } else {
-      // Forward selection (selecting later dates)
-      const validCheck = this.canSelectRange(anchorDate, newDate);
+      // Forward selection: the anchor is the start date and we adjust the end date
+      const rangeCheck = this.canSelectRange(anchorDate, newDate);
       
-      if (!validCheck.allowed) {
-        // Find the closest valid date to the anchor when moving forward
-        const endDate = addDays(anchorDate, 1); // Start checking from the day after anchor
-        let validEndDate = null;
-        let currentMessage = validCheck.message;
+      if (!rangeCheck.allowed) {
+        // If not allowed, find the closest valid date to the anchor
+        // Start walking forward from the anchor to find the last valid date
+        let validEnd = addDays(anchorDate, 1);
         
-        // Binary search approach to quickly find the last valid date
-        let minDate = endDate;
+        // Binary search to efficiently find the last valid date
+        let minDate = anchorDate;
         let maxDate = newDate;
+        let foundValidDate = false;
+        let foundMessage = rangeCheck.message;
         
-        // First check if the day right after anchor is valid
-        // If not, there's no valid selection possible
-        const firstDayCheck = this.canSelectRange(anchorDate, minDate);
-        if (!firstDayCheck.allowed) {
-          return { 
-            success: false, 
-            range: currentRange, 
-            message: firstDayCheck.message || "No valid selection possible" 
+        // First check if we can go forward at least one day
+        const oneForwardCheck = this.canSelectRange(anchorDate, validEnd);
+        if (!oneForwardCheck.allowed) {
+          // If we can't even go forward one day, return the anchor as both start and end
+          return {
+            success: false,
+            range: {
+              start: format(anchorDate, 'yyyy-MM-dd'),
+              end: format(anchorDate, 'yyyy-MM-dd'),
+              anchorDate: format(anchorDate, 'yyyy-MM-dd'),
+              isBackwardSelection: false
+            },
+            message: oneForwardCheck.message
           };
         }
         
+        // Use binary search to efficiently find the last valid date
         while (differenceInCalendarDays(maxDate, minDate) > 1) {
           const midDate = new Date(minDate.getTime() + (maxDate.getTime() - minDate.getTime()) / 2);
-          const midDateCheck = this.canSelectRange(anchorDate, midDate);
+          const midCheck = this.canSelectRange(anchorDate, midDate);
           
-          if (midDateCheck.allowed) {
-            minDate = midDate; // The mid date is valid, search between mid and max
-            validEndDate = midDate;
+          if (midCheck.allowed) {
+            minDate = midDate; // If mid date is valid, search between mid and max
+            foundValidDate = true;
+            validEnd = midDate;
           } else {
-            maxDate = midDate; // The mid date is invalid, search between min and mid
-            currentMessage = midDateCheck.message;
+            maxDate = midDate; // If mid date is invalid, search between min and mid
+            foundMessage = midCheck.message;
           }
         }
         
-        // Final check to find the exact last valid date
-        const finalCheck = this.canSelectRange(anchorDate, maxDate);
-        if (finalCheck.allowed) {
-          validEndDate = maxDate;
-        } else if (!validEndDate) {
-          validEndDate = minDate;
+        // Final check to find the exact boundary
+        if (!foundValidDate) {
+          const finalCheck = this.canSelectRange(anchorDate, maxDate);
+          if (finalCheck.allowed) {
+            validEnd = maxDate;
+            foundValidDate = true;
+          }
         }
         
-        // Return the most optimal valid selection
+        // If we found a valid date, use it
+        if (foundValidDate) {
+          return {
+            success: true,
+            range: {
+              start: format(anchorDate, 'yyyy-MM-dd'),
+              end: format(validEnd, 'yyyy-MM-dd'),
+              anchorDate: format(anchorDate, 'yyyy-MM-dd'),
+              isBackwardSelection: false
+            },
+            message: foundMessage
+          };
+        }
+        
+        // If we couldn't find any valid date, return the anchor date
         return {
-          success: true,
+          success: false,
           range: {
             start: format(anchorDate, 'yyyy-MM-dd'),
-            end: format(validEndDate, 'yyyy-MM-dd'),
+            end: format(anchorDate, 'yyyy-MM-dd'),
             anchorDate: format(anchorDate, 'yyyy-MM-dd'),
             isBackwardSelection: false
           },
-          message: currentMessage
+          message: rangeCheck.message
         };
       }
       
-      // Valid forward selection
+      // If range is valid, return the selection
       return {
         success: true,
         range: {
