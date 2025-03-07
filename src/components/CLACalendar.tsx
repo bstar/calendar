@@ -526,42 +526,64 @@ const DayCell = ({
   const restrictionResult = useMemo(() => {
     const currentRestrictionConfig = restrictionConfig ?? { restrictions: [] };
     
+    // First get the basic restriction result
+    const baseRestriction = restrictionManager.checkSelection(date, date);
+    
     // Check restrictions even if no selection has been made yet
-    // This ensures the diagonal pattern is applied on initial load
     if (!selectedRange.start) {
-      // Check all restrictions directly against this date
-      return restrictionManager.checkSelection(date, date);
+      return baseRestriction;
     }
 
-    const selectionStart = parseISO(selectedRange.start);
-    
-    // Find if selection started in any restricted boundary
+    // Look for boundary restrictions which need special handling
     const boundaryRestriction = currentRestrictionConfig.restrictions.find(r => 
       r.type === 'restricted_boundary' && r.enabled
     );
 
-    if (boundaryRestriction) {
-      // Safe cast the boundary restriction to the correct type
-      const boundaryWithRanges = boundaryRestriction as any;
-      if (boundaryWithRanges.ranges) {
-        for (const range of boundaryWithRanges.ranges) {
-          const rangeStart = parseISO(range.start);
-          const rangeEnd = parseISO(range.end);
-
-          if (!isValid(rangeStart) || !isValid(rangeEnd)) continue;
-
-          // If selection started in this range, show restriction pattern for dates OUTSIDE the range
-          if (isWithinInterval(selectionStart, { start: rangeStart, end: rangeEnd })) {
-            if (!isWithinInterval(date, { start: rangeStart, end: rangeEnd })) {
-              return { allowed: false, message: range.message || 'Selection must stay within the boundary' };
-            }
-            return { allowed: true };
-          }
-        }
-      }
+    if (!boundaryRestriction) {
+      return baseRestriction; // No boundary restriction to deal with
     }
 
-    return restrictionManager.checkSelection(date, date);
+    // Get the anchor point - the fixed point of the selection
+    const anchorDate = selectedRange.anchorDate 
+      ? parseISO(selectedRange.anchorDate) 
+      : parseISO(selectedRange.start);
+      
+    // Safe cast the boundary restriction
+    const boundaryWithRanges = boundaryRestriction as any;
+    
+    // Only apply boundary restrictions visually if the anchor is in a boundary
+    let anchorInBoundary = false;
+    let boundaryStart: Date | null = null;
+    let boundaryEnd: Date | null = null;
+    
+    if (boundaryWithRanges.ranges) {
+      // Check if anchor is in any boundary
+      for (const range of boundaryWithRanges.ranges) {
+        const rangeStart = parseISO(range.start);
+        const rangeEnd = parseISO(range.end);
+        
+        if (!isValid(rangeStart) || !isValid(rangeEnd)) continue;
+        
+        // Is the anchor in this boundary?
+        if (anchorDate >= rangeStart && anchorDate <= rangeEnd) {
+          anchorInBoundary = true;
+          boundaryStart = rangeStart;
+          boundaryEnd = rangeEnd;
+          break;
+        }
+      }
+      
+      // Only if anchor is in a boundary, apply restriction pattern to dates outside that boundary
+      if (anchorInBoundary && boundaryStart && boundaryEnd) {
+        const dateInBoundary = date >= boundaryStart && date <= boundaryEnd;
+        return dateInBoundary 
+          ? { allowed: true } // Date is in the same boundary as anchor - allow it
+          : { allowed: false, message: 'Selection must stay within the boundary' }; // Outside boundary - restrict
+      }
+    }
+    
+    // Return the base restriction for all other cases
+    return baseRestriction;
   }, [date, restrictionManager, selectedRange, restrictionConfig]);
 
   const handleMouseEnter = (e) => {
