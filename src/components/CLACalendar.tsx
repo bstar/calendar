@@ -486,33 +486,19 @@ const DayCell = ({
     const startDate = parseISO(selectedRange.start);
     const endDate = selectedRange.end ? parseISO(selectedRange.end) : null;
     
-    // Get the anchor date if available
-    const anchorDate = selectedRange.anchorDate ? parseISO(selectedRange.anchorDate) : startDate;
-    
-    // Determine if this is a backward selection (where end date is the anchor)
-    const isBackwardSelection = endDate && anchorDate && 
-      isSameDay(anchorDate, endDate) && !isSameDay(anchorDate, startDate);
-
-    // For determining if a date is in the range, always use chronological ordering
+    // Always use chronological ordering for visual styling
     const [chronologicalStart, chronologicalEnd] = endDate && startDate > endDate
       ? [endDate, startDate]
       : [startDate, endDate];
-
-    // For visual styling (determining which corners to round), use selection direction
-    // In a forward selection, the start date gets the left rounded corners
-    // In a backward selection, the start date gets the right rounded corners
-    const isAnchor = anchorDate && isSameDay(date, anchorDate);
     
     return {
       isSelected: isSameDay(date, startDate) || (endDate && isSameDay(date, endDate)),
       isInRange: chronologicalEnd
         ? (date >= chronologicalStart && date <= chronologicalEnd)
         : false,
-      // For start/end determination (which determines the rounded corners):
-      // In forward selection: anchor is start, moving end is end
-      // In backward selection: moving start is start, anchor is end
-      isRangeStart: isBackwardSelection ? isSameDay(date, startDate) : isAnchor,
-      isRangeEnd: isBackwardSelection ? isAnchor : (endDate && isSameDay(date, endDate))
+      // Use chronological ordering for range start/end determination
+      isRangeStart: isSameDay(date, chronologicalStart),
+      isRangeEnd: chronologicalEnd && isSameDay(date, chronologicalEnd)
     };
   }, [date, selectedRange]);
 
