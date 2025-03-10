@@ -9,6 +9,7 @@ import { DEFAULT_CONTAINER_STYLES } from '../DateRangePicker.config';
 import { RestrictionConfig } from './restrictions/types';
 import { Layer } from '../DateRangePicker.config';
 import './CalendarComponents.css';
+import './CalendarHeader.css';
 
 // Button component
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -280,24 +281,70 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     return tz.split('/').pop()?.replace('_', ' ') || tz;
   };
 
+  // Hardened inline styles with !important to prevent overrides
+  const headerStyle: React.CSSProperties = {
+    padding: '12px 16px',
+    borderBottom: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    boxSizing: 'border-box',
+    backgroundColor: '#ffffff',
+    position: 'relative',
+    zIndex: 2,
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+    margin: 0
+  };
+
+  const navButtonStyle: React.CSSProperties = {
+    width: '32px',
+    height: '32px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    background: 'transparent',
+    border: 'none',
+    borderRadius: '4px',
+    padding: '0',
+    cursor: 'pointer',
+    color: '#333',
+    outline: 'none',
+    transition: 'background-color 0.2s',
+    margin: '0 4px'
+  };
+
+  const headerTitleStyle: React.CSSProperties = {
+    fontWeight: 600,
+    fontSize: '16px',
+    lineHeight: '1.5',
+    color: '#333',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    padding: '0 8px',
+    margin: 0
+  };
+
   return (
-    <div className="cla-header" style={{
-      padding: '12px 16px',
-      borderBottom: 'none',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between'
-    }}>
+    <div 
+      className="cla-calendar-header" 
+      style={headerStyle}
+      data-testid="calendar-header"
+    >
       <button
-        className="cla-button-nav"
+        type="button"
+        className="cla-calendar-nav-prev"
         onClick={() => moveToMonth('prev')}
-        style={{ outline: 'none' }}
+        style={navButtonStyle}
+        aria-label="Previous month"
       >
         <ChevronLeft size={16} />
       </button>
       <span 
-        className="cla-header-title"
+        className="cla-calendar-header-title"
         title={`Current timezone: ${formatTimezone(timezone)}`}
+        style={headerTitleStyle}
       >
         {visibleMonths === 1
           ? format(months[0], "MMMM yyyy")
@@ -305,9 +352,11 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
         }
       </span>
       <button
-        className="cla-button-nav"
+        type="button"
+        className="cla-calendar-nav-next"
         onClick={() => moveToMonth('next')}
-        style={{ outline: 'none' }}
+        style={navButtonStyle}
+        aria-label="Next month"
       >
         <ChevronRight size={16} />
       </button>
