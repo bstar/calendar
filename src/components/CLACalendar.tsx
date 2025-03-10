@@ -903,6 +903,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
 
   const [isOpen, setIsOpen] = useState(settings.displayMode === 'embedded' || settings.isOpen);
   const [selectedRange, setSelectedRange] = useState<DateRange>({ start: null, end: null });
+  const [displayRange, setDisplayRange] = useState<DateRange>({ start: null, end: null });
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date()));
   const [isSelecting, setIsSelecting] = useState(false);
   const [outOfBoundsDirection, setOutOfBoundsDirection] = useState<'prev' | 'next' | null>(null);
@@ -1063,10 +1064,10 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
 
   const getDisplayText = useMemo(() =>
     DateRangePickerHandlers.createDisplayTextFormatter(
-      selectedRange,
+      displayRange,
       settings.selectionMode
     ),
-    [selectedRange, settings.selectionMode]
+    [displayRange, settings.selectionMode]
   );
 
   // Use the abstracted selection handlers with all required parameters
@@ -1085,7 +1086,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   );
 
   // Use the abstracted calendar action handlers
-  const { handleClear, handleSubmit, handleLayerChange } = useMemo(() =>
+  const { handleClear, handleSubmit: originalHandleSubmit, handleLayerChange } = useMemo(() =>
     DateRangePickerHandlers.createCalendarActionHandlers(
       setSelectedRange,
       setDateInputContext,
@@ -1097,6 +1098,18 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     ),
     [setSelectedRange, setDateInputContext, setIsSelecting, setValidationErrors, setCurrentMonth, setIsOpen, setActiveLayer]
   );
+
+  // Wrap the original handleSubmit to update displayRange
+  const handleSubmit = useCallback(() => {
+    setDisplayRange(selectedRange);
+    originalHandleSubmit();
+  }, [selectedRange, originalHandleSubmit]);
+
+  // Update handleClear to also clear displayRange
+  const handleClearAll = useCallback(() => {
+    handleClear();
+    setDisplayRange({ start: null, end: null });
+  }, [handleClear]);
 
   const renderLayer = (layer: Layer) => {
     return (
@@ -1202,6 +1215,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
 
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        // Only close the calendar without submitting the value
         setIsOpen(false);
       }
     };
@@ -1212,17 +1226,16 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     };
   }, [settings.closeOnClickAway, settings.displayMode, isOpen]);
 
-  // Add a useEffect to call onSubmit when selectedRange changes and isOpen becomes false
+  // Modify the useEffect that handles submission to only trigger on explicit submit
   useEffect(() => {
-    // If the calendar was just closed (isSubmitted) and we have a valid range
-    if (!isOpen && selectedRange.start && selectedRange.end && onSubmit) {
-      // Just pass the dates from the range to the callback
+    // Only submit when the calendar is closed AND it wasn't due to click-away
+    if (!isOpen && selectedRange.start && selectedRange.end && onSubmit && !settings.closeOnClickAway) {
       onSubmit(
         selectedRange.start,
         selectedRange.end
       );
     }
-  }, [isOpen, selectedRange, onSubmit]);
+  }, [isOpen, selectedRange, onSubmit, settings.closeOnClickAway]);
 
   return (
     <div 
@@ -1289,7 +1302,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
         {settings.showFooter && (
           <CalendarFooter
             showSubmitButton={settings.showSubmitButton}
-            handleClear={handleClear}
+            handleClear={handleClearAll}
             handleSubmit={handleSubmit}
           />
         )}
