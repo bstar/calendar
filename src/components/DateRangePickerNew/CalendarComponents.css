@@ -237,7 +237,13 @@
 
 /* When calendar is open, ensure it's above other elements */
 .cla-calendar-wrapper[data-open="true"] {
-  z-index: 2147483647 !important; /* Force highest z-index even when focus is lost */
+  z-index: 2147483647 !important;
+}
+
+/* Hide other calendar popups when any calendar is open */
+.cla-calendar-wrapper[data-open="true"] ~ .cla-calendar-wrapper .cla-card-popup,
+.cla-calendar-wrapper:has(~ .cla-calendar-wrapper[data-open="true"]) .cla-card-popup {
+  display: none !important;
 }
 
 /* Calendar Container styles */
