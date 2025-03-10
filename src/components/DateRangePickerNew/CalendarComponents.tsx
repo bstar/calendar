@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
+import ReactDOM from 'react-dom';
 import {
   format,
   parseISO,
@@ -281,17 +282,11 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   };
 
   return (
-    <div className="cla-header" style={{
-      padding: '12px 16px',
-      borderBottom: 'none',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between'
-    }}>
+    <div className="cla-header">
       <button
         className="cla-button-nav"
         onClick={() => moveToMonth('prev')}
-        style={{ outline: 'none' }}
+        aria-label="Previous month"
       >
         <ChevronLeft size={16} />
       </button>
@@ -307,7 +302,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
       <button
         className="cla-button-nav"
         onClick={() => moveToMonth('next')}
-        style={{ outline: 'none' }}
+        aria-label="Next month"
       >
         <ChevronRight size={16} />
       </button>
@@ -453,9 +448,6 @@ export const CalendarContainer: React.FC<CalendarContainerProps> = ({
       className={`cla-card ${displayMode === 'popup' ? 'cla-card-popup' : ''}`}
       style={{
         width: visibleMonths === 1 ? `${singleMonthWidth}px` : `${400 * Math.min(6, Math.max(1, visibleMonths))}px`,
-        position: displayMode === 'popup' ? 'relative' : 'static',
-        padding: 0,
-        zIndex: 2147483647, // Maximum possible z-index
         isolation: 'isolate', // Create new stacking context
         ...DEFAULT_CONTAINER_STYLES,
         ...containerStyle
@@ -529,57 +521,96 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, show, children }) => 
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const tooltipRef = useRef<HTMLDivElement>(null);
   const targetRef = useRef<HTMLDivElement>(null);
+  const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    // Create or get the portal container
+    let container = document.querySelector('.cla-portal-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.className = 'cla-portal-container';
+      document.body.appendChild(container);
+    }
+    setPortalContainer(container as HTMLElement);
+
+    return () => {
+      // Only remove the container if it's empty and we created it
+      if (container && container.childNodes.length === 0) {
+        document.body.removeChild(container);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const updatePosition = () => {
       if (!show || !targetRef.current || !tooltipRef.current) return;
-      
+
       const targetRect = targetRef.current.getBoundingClientRect();
       const tooltipRect = tooltipRef.current.getBoundingClientRect();
-      
-      const newPosition = {
-        top: targetRect.top - tooltipRect.height - 16,
-        left: targetRect.left + (targetRect.width - tooltipRect.width) / 2
-      };
-      
-      // Ensure tooltip stays within viewport
+
+      // Calculate initial position
+      let newTop = targetRect.top - tooltipRect.height - 8;
+      let newLeft = targetRect.left + (targetRect.width - tooltipRect.width) / 2;
+
+      // Check viewport boundaries
       const viewportWidth = window.innerWidth;
-      if (newPosition.left < 10) {
-        newPosition.left = 10;
-      } else if (newPosition.left + tooltipRect.width > viewportWidth - 10) {
-        newPosition.left = viewportWidth - tooltipRect.width - 10;
+      const viewportHeight = window.innerHeight;
+
+      // Horizontal adjustments
+      if (newLeft < 8) {
+        newLeft = 8;
+      } else if (newLeft + tooltipRect.width > viewportWidth - 8) {
+        newLeft = viewportWidth - tooltipRect.width - 8;
       }
-      
-      setPosition(newPosition);
+
+      // Vertical adjustments - if tooltip would go above viewport, show it below the target
+      if (newTop < 8) {
+        newTop = targetRect.bottom + 8;
+      }
+
+      // Update position if it has changed
+      setPosition({
+        top: Math.round(newTop),
+        left: Math.round(newLeft)
+      });
     };
 
-    // Update position immediately and after a short delay to ensure content is rendered
+    // Update position immediately and after a short delay
     updatePosition();
     const timeoutId = setTimeout(updatePosition, 0);
-    
-    return () => clearTimeout(timeoutId);
+
+    // Add event listeners
+    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', updatePosition, true);
+
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', updatePosition, true);
+    };
   }, [show, content]);
 
-  if (!show) return <>{children}</>;
-
   return (
-    <div
-      ref={targetRef}
-      className="tooltip-container"
-    >
-      {children}
-      <div
-        ref={tooltipRef}
-        className="tooltip"
-        style={{
-          top: position.top,
-          left: position.left,
-          visibility: show ? 'visible' : 'hidden'
-        }}
-      >
-        {content}
+    <>
+      <div ref={targetRef} className="tooltip-container">
+        {children}
       </div>
-    </div>
+      {portalContainer && show && ReactDOM.createPortal(
+        <div
+          ref={tooltipRef}
+          className="tooltip"
+          style={{
+            top: `${position.top}px`,
+            left: `${position.left}px`,
+            visibility: show ? 'visible' : 'hidden',
+            opacity: show ? 1 : 0
+          }}
+        >
+          {content}
+        </div>,
+        portalContainer
+      )}
+    </>
   );
 };
 
