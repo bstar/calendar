@@ -150,8 +150,10 @@ export class LayerRenderer {
         tooltipContent: (
           <div style={{
             padding: '8px',
-            backgroundColor: 'white',
-            borderRadius: '4px'
+            backgroundColor: '#1a1a1a',
+            color: '#ffffff',
+            borderRadius: '4px',
+            position: 'relative'
           }}>
             {dayEvents.map((event, index) => (
               <div key={index} style={{
@@ -160,12 +162,12 @@ export class LayerRenderer {
               }}>
                 <div style={{
                   fontWeight: 'bold',
-                  color: event.color || '#0366d6'
+                  color: event.color ? `${event.color}dd` : '#4dabf7'
                 }}>
                   {event.title}
                 </div>
-                <div style={{ fontSize: '0.9em', color: '#666' }}>{event.time}</div>
-                <div style={{ fontSize: '0.9em' }}>{event.description}</div>
+                <div style={{ fontSize: '0.9em', color: '#adb5bd' }}>{event.time}</div>
+                <div style={{ fontSize: '0.9em', color: '#e9ecef' }}>{event.description}</div>
               </div>
             ))}
           </div>

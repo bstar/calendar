@@ -527,55 +527,58 @@ export interface TooltipProps {
  */
 export const Tooltip: React.FC<TooltipProps> = ({ content, show, children }) => {
   const [position, setPosition] = useState({ top: 0, left: 0 });
-  const [isHovered, setIsHovered] = useState(false);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const targetRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (show && targetRef.current && tooltipRef.current) {
+    const updatePosition = () => {
+      if (!show || !targetRef.current || !tooltipRef.current) return;
+      
       const targetRect = targetRef.current.getBoundingClientRect();
       const tooltipRect = tooltipRef.current.getBoundingClientRect();
-
+      
       const newPosition = {
-        top: targetRect.top - tooltipRect.height - 8,
+        top: targetRect.top - tooltipRect.height - 16,
         left: targetRect.left + (targetRect.width - tooltipRect.width) / 2
       };
-
+      
+      // Ensure tooltip stays within viewport
+      const viewportWidth = window.innerWidth;
+      if (newPosition.left < 10) {
+        newPosition.left = 10;
+      } else if (newPosition.left + tooltipRect.width > viewportWidth - 10) {
+        newPosition.left = viewportWidth - tooltipRect.width - 10;
+      }
+      
       setPosition(newPosition);
-    }
+    };
+
+    // Update position immediately and after a short delay to ensure content is rendered
+    updatePosition();
+    const timeoutId = setTimeout(updatePosition, 0);
+    
+    return () => clearTimeout(timeoutId);
   }, [show, content]);
 
-  if (!show && !content) return <>{children}</>;
+  if (!show) return <>{children}</>;
 
   return (
     <div
       ref={targetRef}
-      style={{ position: 'relative', width: '100%', height: '100%' }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      className="tooltip-container"
     >
       {children}
-      {show && isHovered && (
-        <div
-          ref={tooltipRef}
-          style={{
-            position: 'fixed',
-            top: position.top,
-            left: position.left,
-            backgroundColor: 'white',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
-            borderRadius: '4px',
-            zIndex: 9999,
-            fontSize: '14px',
-            maxWidth: '300px',
-            padding: '8px',
-            pointerEvents: 'none',
-            border: '1px solid rgba(0,0,0,0.2)'
-          }}
-        >
-          {content}
-        </div>
-      )}
+      <div
+        ref={tooltipRef}
+        className="tooltip"
+        style={{
+          top: position.top,
+          left: position.left,
+          visibility: show ? 'visible' : 'hidden'
+        }}
+      >
+        {content}
+      </div>
     </div>
   );
 };
