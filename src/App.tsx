@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './bootstrap.min.css';
 import './docStyles.css';
-import CLACalendar from './components/CLACalendar';
+import { CLACalendar } from './components/CLACalendar';
 import { RestrictionType, RestrictedBoundaryRestriction, RestrictionConfig } from './components/DateRangePickerNew/restrictions/types';
 import isoWeeksData from './data/iso_weeks.json';
 
@@ -32,127 +32,70 @@ const getUniquePeriodRanges = () => {
 const uniquePeriodRanges = getUniquePeriodRanges();
 
 const App: React.FC = () => {
-  // Simple state to track selected dates
-  const [selectedDates, setSelectedDates] = useState('');
-  
-  // Create the restriction config with proper typing
-  const restrictionConfig: RestrictionConfig = {
-    restrictions: [
-      {
-        type: 'restricted_boundary',
-        enabled: true,
-        ranges: uniquePeriodRanges.map(period => ({
-          start: period.start,
-          end: period.end,
-          message: period.message
-        }))
-      } as RestrictedBoundaryRestriction
-    ]
-  };
-  
-  // Create events for the end dates of each period
-  const periodEndEvents = uniquePeriodRanges.map(period => ({
-    date: period.end,
-    title: `PERIOD END`,
-    type: "deadline",
-    time: "23:59",
-    description: `End of Period ${period.period} (ID: ${period.periodId})`,
-    color: "#f3832d",
-    important: true
-  }));
-  
-  // Hard-coded settings with only boundary ranges based on period dates
-  const settings = {
-    displayMode: "popup" as const, // Use popup mode for the internal input field
+  // Common settings for both calendar instances
+  const baseSettings = {
+    displayMode: "popup" as const,
     timezone: "UTC",
-    visibleMonths: 2,
-    singleMonthWidth: 500,
-    showMonthHeadings: true,
+  visibleMonths: 2,
+    singleMonthWidth: 400,
+  showMonthHeadings: true,
     selectionMode: "range" as const,
-    showTooltips: true,
-    showHeader: true,
+  showTooltips: true,
+  showHeader: true,
     closeOnClickAway: false,
     showSubmitButton: true,
-    showFooter: true,
-    enableOutOfBoundsScroll: true,
-    suppressTooltipsOnSelection: false,
+  showFooter: true,
+  enableOutOfBoundsScroll: true,
+  suppressTooltipsOnSelection: false,
     showSelectionAlert: true,
-    startWeekOnSunday: false,
+  startWeekOnSunday: false,
     initialMonth: new Date(),
-    isOpen: false, // Auto-open the calendar
-    // Input field styling
-    inputStyle: {
-      padding: '10px 15px',
-      height: '42px',
-      width: '300px',
-      border: '1px solid #c0c4cc',
-      borderRadius: '4px',
-      fontSize: '14px',
-      lineHeight: '1.5',
-      color: '#444',
-      backgroundColor: '#eee',
-      boxShadow: '0 1px 2px rgba(0,0,0,0.06)',
-      transition: 'border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out'
-    },
-    layers: [
-      {
-        name: "Calendar",
-        title: "Base Calendar",
-        description: "Basic calendar functionality",
-        required: true,
-        visible: true,
-        data: {
-          events: periodEndEvents,
-          background: []
-        }
+    isOpen: false,
+    showLayersNavigation: false,
+  layers: [
+    {
+      name: "Calendar",
+      title: "Base Calendar",
+      description: "Basic calendar functionality",
+      required: true,
+      visible: true,
+        data: { events: [], background: [] }
       }
     ],
-    showLayersNavigation: false,
-    defaultLayer: "Calendar",
-    colors: {
-      primary: "#0366d6",
-      success: "#28a745",
-      warning: "#f6c23e",
-      danger: "#dc3545",
-      purple: "#6f42c1",
-      teal: "#20c997", 
-      orange: "#fd7e14",
-      pink: "#e83e8c"
-    },
-    restrictionConfig
-  };
+  defaultLayer: "Calendar",
+  colors: {
+    primary: "#0366d6",
+    success: "#28a745",
+    warning: "#f6c23e",
+    danger: "#dc3545",
+    purple: "#6f42c1",
+    teal: "#20c997",
+    orange: "#fd7e14",
+    pink: "#e83e8c"
+    }
+    };
 
-  // Simple onSubmit handler to capture selected dates
-  const handleSubmit = (startDate: string, endDate: string) => {
-    // Just store the selected date range as a string
-    setSelectedDates(`${startDate} to ${endDate}`);
-    console.log('Date submitted:', startDate, endDate);
-  };
-
-  // Simple handler for settings changes (required prop)
-  const handleSettingsChange = (newSettings: any) => {
-    // This is required but we don't need to do anything with it
-  };
-
-  return (
-    <div className="container mt-5">
-      <h1>Calendar Widget Demo</h1>
-      
-      <div className="calendar-container mt-4">
+    return (
+    <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div>
+        <h3>Calendar Instance 1</h3>
         <CLACalendar
-          settings={settings}
-          onSettingsChange={handleSettingsChange}
-          onSubmit={handleSubmit}
+          settings={baseSettings}
+          onSettingsChange={(newSettings) => console.log('Calendar 1 settings:', newSettings)}
+          onSubmit={(start, end) => console.log('Calendar 1 range:', start, end)}
         />
-      </div>
-      
-      {selectedDates && (
-        <div className="mt-3">
-          <strong>Selected Dates:</strong> {selectedDates}
         </div>
-      )}
-    </div>
-  );
-};
+      
+              <div>
+        <h3>Calendar Instance 2</h3>
+        <CLACalendar
+          settings={baseSettings}
+          onSettingsChange={(newSettings) => console.log('Calendar 2 settings:', newSettings)}
+          onSubmit={(start, end) => console.log('Calendar 2 range:', start, end)}
+        />
+        </div>
+      </div>
+    );
+  };
 
 export default App;

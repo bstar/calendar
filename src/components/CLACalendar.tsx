@@ -1225,24 +1225,17 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   }, [isOpen, selectedRange, onSubmit]);
 
   return (
-    <div className="cla-calendar" style={{ width: 'fit-content' }}>
-      {settings.displayMode === 'popup' && (
-        <input
-          type="text"
-          value={getDisplayText()}
-          onClick={() => setIsOpen(true)}
-          className="cla-form-control"
-          readOnly
-          style={{
-            width: '300px',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            ...(settings.inputStyle || {})
-          }}
-        />
-      )}
-
+    <div 
+      className="cla-calendar-wrapper"
+      data-open={isOpen ? "true" : "false"}
+    >
+      <input
+        type="text"
+        className="cla-form-control"
+        readOnly
+        value={getDisplayText()}
+        onClick={() => setIsOpen(true)}
+      />
       <CalendarContainer
         isOpen={isOpen}
         displayMode={settings.displayMode}
