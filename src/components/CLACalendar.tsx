@@ -899,12 +899,14 @@ interface CLACalendarProps {
   settings: CalendarSettings;
   onSettingsChange: (settings: CalendarSettings) => void;
   initialActiveLayer?: string;
+  onSubmit?: (startDate: string, endDate: string) => void;
 }
 
 export const CLACalendar: React.FC<CLACalendarProps> = ({
   settings,
   onSettingsChange,
-  initialActiveLayer
+  initialActiveLayer,
+  onSubmit
 }) => {
   console.log('Calendar Settings:', settings);
   console.log('Restriction Config:', settings.restrictionConfig);
@@ -1224,6 +1226,18 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     };
   }, [settings.closeOnClickAway, settings.displayMode, isOpen]);
 
+  // Add a useEffect to call onSubmit when selectedRange changes and isOpen becomes false
+  useEffect(() => {
+    // If the calendar was just closed (isSubmitted) and we have a valid range
+    if (!isOpen && selectedRange.start && selectedRange.end && onSubmit) {
+      // Just pass the dates from the range to the callback
+      onSubmit(
+        selectedRange.start,
+        selectedRange.end
+      );
+    }
+  }, [isOpen, selectedRange, onSubmit]);
+
   return (
     <div className="cla-calendar" style={{ width: 'fit-content' }}>
       {settings.displayMode === 'popup' && (
@@ -1237,7 +1251,8 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
             width: '300px',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
-            textOverflow: 'ellipsis'
+            textOverflow: 'ellipsis',
+            ...(settings.inputStyle || {})
           }}
         />
       )}

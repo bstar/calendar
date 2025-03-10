@@ -1,4 +1,4 @@
-import { CSSProperties } from 'react';
+import React, { CSSProperties } from 'react';
 import { RestrictionConfig } from './DateRangePickerNew/restrictions/types';
 
 export type LAYER_TYPES = 'base' | 'overlay';
@@ -151,6 +151,7 @@ export interface CalendarSettings {
   displayMode: 'popup' | 'embedded';
   timezone: string;
   containerStyle?: CSSProperties;
+  inputStyle?: React.CSSProperties;
   isOpen?: boolean;
   visibleMonths: number;
   singleMonthWidth: number;

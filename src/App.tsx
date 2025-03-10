@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './bootstrap.min.css';
 import './docStyles.css';
 import CLACalendar from './components/CLACalendar';
@@ -32,6 +32,9 @@ const getUniquePeriodRanges = () => {
 const uniquePeriodRanges = getUniquePeriodRanges();
 
 const App: React.FC = () => {
+  // Simple state to track selected dates
+  const [selectedDates, setSelectedDates] = useState('');
+  
   // Create the restriction config with proper typing
   const restrictionConfig: RestrictionConfig = {
     restrictions: [
@@ -77,6 +80,20 @@ const App: React.FC = () => {
     startWeekOnSunday: false,
     initialMonth: new Date(),
     isOpen: false, // Auto-open the calendar
+    // Input field styling
+    inputStyle: {
+      padding: '10px 15px',
+      height: '42px',
+      width: '300px',
+      border: '1px solid #c0c4cc',
+      borderRadius: '4px',
+      fontSize: '14px',
+      lineHeight: '1.5',
+      color: '#444',
+      backgroundColor: '#eee',
+      boxShadow: '0 1px 2px rgba(0,0,0,0.06)',
+      transition: 'border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out'
+    },
     layers: [
       {
         name: "Calendar",
@@ -105,6 +122,18 @@ const App: React.FC = () => {
     restrictionConfig
   };
 
+  // Simple onSubmit handler to capture selected dates
+  const handleSubmit = (startDate: string, endDate: string) => {
+    // Just store the selected date range as a string
+    setSelectedDates(`${startDate} to ${endDate}`);
+    console.log('Date submitted:', startDate, endDate);
+  };
+
+  // Simple handler for settings changes (required prop)
+  const handleSettingsChange = (newSettings: any) => {
+    // This is required but we don't need to do anything with it
+  };
+
   return (
     <div className="container mt-5">
       <h1>Calendar Widget Demo</h1>
@@ -112,8 +141,16 @@ const App: React.FC = () => {
       <div className="calendar-container mt-4">
         <CLACalendar
           settings={settings}
+          onSettingsChange={handleSettingsChange}
+          onSubmit={handleSubmit}
         />
       </div>
+      
+      {selectedDates && (
+        <div className="mt-3">
+          <strong>Selected Dates:</strong> {selectedDates}
+        </div>
+      )}
     </div>
   );
 };
