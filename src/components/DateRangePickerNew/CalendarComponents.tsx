@@ -455,6 +455,8 @@ export const CalendarContainer: React.FC<CalendarContainerProps> = ({
         width: visibleMonths === 1 ? `${singleMonthWidth}px` : `${400 * Math.min(6, Math.max(1, visibleMonths))}px`,
         position: displayMode === 'popup' ? 'relative' : 'static',
         padding: 0,
+        zIndex: 2147483647, // Maximum possible z-index
+        isolation: 'isolate', // Create new stacking context
         ...DEFAULT_CONTAINER_STYLES,
         ...containerStyle
       }}
