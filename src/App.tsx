@@ -110,24 +110,76 @@ const App: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      <div>
+    <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '200px' }}>
+      {/* Calendar Instance 1 with fixed content underneath */}
+      <div style={{ position: 'relative' }}>
         <h3>Calendar Instance 1</h3>
         <CLACalendar
           settings={baseSettings}
           onSettingsChange={(newSettings) => console.log('Calendar 1 settings:', newSettings)}
           onSubmit={(start, end) => console.log('Calendar 1 range:', start, end)}
         />
+        
+        {/* Fixed content under Calendar 1 */}
+        <div style={{
+          position: 'fixed',
+          top: '150px',
+          left: '20px',
+          right: '20px',
+          padding: '20px',
+          background: 'white',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+          zIndex: 1000
+        }}>
+          <h4>Fixed Content Under Calendar 1</h4>
+          <button style={{ zIndex: 1001 }}>Interactive Button 1</button>
+          <div style={{ 
+            position: 'sticky', 
+            top: '200px',
+            padding: '10px',
+            background: '#f0f0f0',
+            zIndex: 1002
+          }}>
+            Sticky Element Inside Fixed Content 1
+          </div>
+        </div>
       </div>
 
-      <div>
+      {/* Calendar Instance 2 with fixed content underneath */}
+      <div style={{ position: 'relative' }}>
         <h3>Calendar Instance 2</h3>
         <CLACalendar
           settings={baseSettings}
           onSettingsChange={(newSettings) => console.log('Calendar 2 settings:', newSettings)}
           onSubmit={(start, end) => console.log('Calendar 2 range:', start, end)}
         />
+        
+        {/* Fixed content under Calendar 2 */}
+        <div style={{
+          position: 'fixed',
+          top: '400px',
+          left: '20px',
+          right: '20px',
+          padding: '20px',
+          background: '#e6f3ff',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+          zIndex: 1000
+        }}>
+          <h4>Fixed Content Under Calendar 2</h4>
+          <div style={{ 
+            position: 'sticky', 
+            top: '450px',
+            padding: '10px',
+            background: '#d1e8ff',
+            zIndex: 1001
+          }}>
+            Sticky Element Inside Fixed Content 2
+          </div>
+        </div>
       </div>
+
+      {/* Spacer to ensure scrollable content */}
+      <div style={{ height: '1000px' }} />
     </div>
   );
 };
