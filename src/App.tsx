@@ -32,6 +32,15 @@ const getUniquePeriodRanges = () => {
 const uniquePeriodRanges = getUniquePeriodRanges();
 
 const App: React.FC = () => {
+  // Generate period end events from uniquePeriodRanges
+  const periodEndEvents = uniquePeriodRanges.map(period => ({
+    date: period.end,
+    title: `Period ${period.period} End`,
+    description: `End of Period ${period.period} (ID: ${period.periodId})`,
+    type: "work" as const,
+    time: "23:59"
+  }));
+
   // Common settings for both calendar instances
   const baseSettings = {
     displayMode: "popup" as const,
@@ -52,6 +61,19 @@ const App: React.FC = () => {
     initialMonth: new Date(),
     isOpen: false,
     showLayersNavigation: false,
+    restrictionConfig: {
+      restrictions: [
+        {
+          type: 'restricted_boundary' as RestrictionType,
+          enabled: true,
+          ranges: uniquePeriodRanges.map(period => ({
+            start: period.start,
+            end: period.end,
+            message: period.message
+          }))
+        } as RestrictedBoundaryRestriction
+      ]
+    },
     layers: [
       {
         name: "Calendar",
@@ -59,7 +81,19 @@ const App: React.FC = () => {
         description: "Basic calendar functionality",
         required: true,
         visible: true,
-        data: { events: [], background: [] }
+        data: { 
+          events: [
+            ...periodEndEvents,
+            {
+              date: new Date().toISOString(),
+              title: "Today's Event",
+              description: "Sample event for testing",
+              type: "work",
+              time: "10:00"
+            }
+          ],
+          background: []
+        }
       }
     ],
     defaultLayer: "Calendar",
