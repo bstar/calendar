@@ -165,7 +165,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* Remove any border styles */
 }
 
 .cla-header-title {
