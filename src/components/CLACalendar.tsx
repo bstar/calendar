@@ -1309,7 +1309,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     }
   }, [isOpen, settings.displayMode]);
 
-  // Add an effect to handle clicks outside the portal for the direct portal implementation
+  // Effect to handle clicks outside the portal for the direct portal implementation
   useEffect(() => {
     if (!isOpen || settings.displayMode === 'embedded' || !settings.closeOnClickAway) return;
     
@@ -1339,6 +1339,22 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       document.removeEventListener('mousedown', handleOutsideClick);
     };
   }, [isOpen, settings.closeOnClickAway, settings.displayMode]);
+
+  // Simple effect to hide calendar on scroll
+  useEffect(() => {
+    if (!isOpen || settings.displayMode === 'embedded') return;
+    
+    const handleScroll = () => {
+      setIsOpen(false);
+    };
+    
+    // Add scroll event listener
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [isOpen, settings.displayMode]);
 
   // Helper function to render the calendar content to avoid duplication
   const renderCalendarContent = () => {
@@ -1446,8 +1462,8 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
             style={{
               position: 'fixed',
               zIndex: 2147483647,
-              top: inputRef.current ? inputRef.current.getBoundingClientRect().bottom + window.scrollY + 'px' : '0',
-              left: inputRef.current ? inputRef.current.getBoundingClientRect().left + window.scrollX + 'px' : '0',
+              top: inputRef.current ? inputRef.current.getBoundingClientRect().bottom + 8 + 'px' : '0px',
+              left: inputRef.current ? inputRef.current.getBoundingClientRect().left + 'px' : '0px',
               width: `${settings.visibleMonths * settings.singleMonthWidth}px`
             }}
             onClick={(e) => e.stopPropagation()} // Prevent click from closing immediately
