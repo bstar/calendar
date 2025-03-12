@@ -1,33 +1,36 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from "react";
+import ReactDOM from 'react-dom';
 import debounce from "lodash-es/debounce";
-import { parse, isValid } from "date-fns"; // Keep only what we haven't implemented yet
+import { parse, isValid, isAfter, isBefore, eachDayOfInterval } from "date-fns"; // Import from date-fns directly
 import {
   format,
-  addMonths,
   startOfMonth,
   endOfMonth,
-  eachDayOfInterval,
-  isSameDay,
-  parseISO,
   startOfWeek,
   endOfWeek,
   addDays,
-  isWithinInterval
-} from "../utils/DateUtils"; // Use our UTC-aware functions
-import './DateRangePicker.css';
+  addMonths,
+  isSameDay,
+  isWithinInterval,
+  parseISO,
+} from "../utils/DateUtils";
+
+import "./DateRangePicker.css";
+import "./DateRangePickerNew/CalendarComponents.css";
+
+import { DateRangeSelectionManager, DateRange } from "./DateRangePickerNew/selection/DateRangeSelectionManager";
+import { DateRangePickerHandlers } from "./DateRangePickerNew/handlers/DateRangePickerHandlers";
+import { RestrictionBackgroundGenerator } from "./DateRangePickerNew/restrictions/RestrictionBackgroundGenerator";
+import { LayerManager } from "./DateRangePickerNew/layers/LayerManager";
 import {
-  DEFAULT_LAYERS,
   CalendarSettings,
   Layer,
-  DEFAULT_COLORS
-} from './DateRangePicker.config';
+  DEFAULT_COLORS,
+  DEFAULT_CONTAINER_STYLES
+} from "./DateRangePicker.config";
 import { LayerRenderer } from './DateRangePickerNew/layers/LayerRenderer';
 import { RestrictionManager } from './DateRangePickerNew/restrictions/RestrictionManager';
 import { Notification } from './DateRangePickerNew/Notification';
-import { LayerManager } from './DateRangePickerNew/layers/LayerManager';
-import { RestrictionBackgroundGenerator } from './DateRangePickerNew/restrictions/RestrictionBackgroundGenerator';
-import { DateRangeSelectionManager, DateRange } from './DateRangePickerNew/selection/DateRangeSelectionManager';
-import { DateRangePickerHandlers, DateInputContext, MousePosition } from './DateRangePickerNew/handlers/DateRangePickerHandlers';
 import {
   CalendarHeader,
   DateInputSection,
@@ -40,6 +43,12 @@ import {
   CalendarGridProps,
   ValidationError as CalendarValidationError,
 } from './DateRangePickerNew/CalendarComponents';
+import { CalendarPortal } from './DateRangePickerNew/CalendarPortal';
+import { registerCalendar } from './DateRangePickerNew/CalendarCoordinator';
+import './DateRangePickerNew/CalendarPortal.css';
+
+// Generate a unique ID for each calendar instance
+let calendarCounter = 0;
 
 // Add these interfaces after the existing ones
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -1237,30 +1246,104 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     }
   }, [isOpen, selectedRange, onSubmit, settings.closeOnClickAway]);
 
-  return (
-    <div 
-      className="cla-calendar-wrapper"
-      data-open={isOpen ? "true" : "false"}
-    >
-      <input
-        type="text"
-        className="cla-form-control"
-        readOnly
-        value={getDisplayText()}
-        onClick={() => setIsOpen(true)}
-      />
-      <CalendarContainer
-        isOpen={isOpen}
-        displayMode={settings.displayMode}
-        containerRef={containerRef}
-        containerStyle={settings.containerStyle}
-        visibleMonths={settings.visibleMonths}
-        singleMonthWidth={settings.singleMonthWidth}
-        enableOutOfBoundsScroll={settings.enableOutOfBoundsScroll}
-        handleMouseDown={handleMouseDown}
-        handleMouseMove={handleMouseMove}
-        handleMouseLeave={handleMouseLeave}
-      >
+  // Add a ref for the input element
+  const inputRef = useRef<HTMLInputElement>(null);
+  
+  // Handle click outside more effectively since it'll be managed by the portal
+  const handleCloseCalendar = useCallback(() => {
+    if (settings.closeOnClickAway && settings.displayMode === 'popup') {
+      setIsOpen(false);
+    }
+  }, [settings.closeOnClickAway, settings.displayMode]);
+  
+  // Update trigger rect when input is clicked or window resizes
+  const handleInputClick = () => {
+    // Always open the calendar when input is clicked
+    // The coordinator will handle closing other calendars
+    setIsOpen(true);
+    
+    // Force the coordinator to register this calendar as active
+    if (coordinatorRef.current) {
+      coordinatorRef.current.open();
+    }
+  };
+
+  // Generate a unique ID for this calendar instance
+  const calendarIdRef = useRef<string>(`calendar-${++calendarCounter}`);
+  
+  // Reference to store coordinator controls
+  const coordinatorRef = useRef<ReturnType<typeof registerCalendar> | null>(null);
+
+  // Register with the calendar coordinator 
+  useEffect(() => {
+    // Define the state change handler
+    const handleStateChange = () => {
+      // If another calendar is activated, close this one
+      if (coordinatorRef.current && !coordinatorRef.current.isActive() && isOpen) {
+        console.log('Calendar closed by coordinator:', calendarIdRef.current);
+        setIsOpen(false);
+      }
+    };
+    
+    // Register this calendar with the coordinator
+    console.log('Registering calendar with coordinator:', calendarIdRef.current);
+    coordinatorRef.current = registerCalendar(calendarIdRef.current, handleStateChange);
+    
+    // Clean up on unmount
+    return () => {
+      console.log('Unregistering calendar:', calendarIdRef.current);
+      coordinatorRef.current?.unregister();
+    };
+  }, []); // Empty dependency array - only run once on mount
+  
+  // Sync calendar open state with coordinator
+  useEffect(() => {
+    if (!coordinatorRef.current) return;
+    
+    if (isOpen && settings.displayMode === 'popup') {
+      console.log('Opening calendar in coordinator:', calendarIdRef.current);
+      coordinatorRef.current.open();
+    } else if (coordinatorRef.current.isActive() && !isOpen) {
+      console.log('Closing calendar in coordinator:', calendarIdRef.current);
+      coordinatorRef.current.close();
+    }
+  }, [isOpen, settings.displayMode]);
+
+  // Add an effect to handle clicks outside the portal for the direct portal implementation
+  useEffect(() => {
+    if (!isOpen || settings.displayMode === 'embedded' || !settings.closeOnClickAway) return;
+    
+    const handleOutsideClick = (event: MouseEvent) => {
+      // Don't close if clicking on the input field
+      if (inputRef.current && inputRef.current.contains(event.target as Node)) {
+        return;
+      }
+      
+      // Don't close if clicking inside the calendar container
+      if (containerRef.current && containerRef.current.contains(event.target as Node)) {
+        return;
+      }
+      
+      // Close the calendar
+      console.log('Closing calendar due to outside click');
+      setIsOpen(false);
+    };
+    
+    // Add the event listener with a slight delay to prevent immediate closing
+    const timeoutId = setTimeout(() => {
+      document.addEventListener('mousedown', handleOutsideClick);
+    }, 100);
+    
+    return () => {
+      clearTimeout(timeoutId);
+      document.removeEventListener('mousedown', handleOutsideClick);
+    };
+  }, [isOpen, settings.closeOnClickAway, settings.displayMode]);
+
+  // Helper function to render the calendar content to avoid duplication
+  const renderCalendarContent = () => {
+    return (
+      <>
         {settings.showHeader && (
           <>
             <DateInputSection
@@ -1320,7 +1403,81 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
             onDismiss={() => setNotification(null)}
           />
         )}
-      </CalendarContainer>
+      </>
+    );
+  };
+
+  // Render either directly or in a portal based on display mode
+  return (
+    <div 
+      className="cla-calendar-wrapper"
+      data-open={isOpen ? "true" : "false"}
+    >
+      <input
+        ref={inputRef}
+        type="text"
+        className="cla-form-control"
+        readOnly
+        value={getDisplayText()}
+        onClick={handleInputClick}
+      />
+      
+      {settings.displayMode === 'embedded' ? (
+        // For embedded mode, render directly
+        <CalendarContainer
+          isOpen={isOpen}
+          displayMode={settings.displayMode}
+          containerRef={containerRef}
+          containerStyle={settings.containerStyle}
+          visibleMonths={settings.visibleMonths}
+          singleMonthWidth={settings.singleMonthWidth}
+          enableOutOfBoundsScroll={settings.enableOutOfBoundsScroll}
+          handleMouseDown={handleMouseDown}
+          handleMouseMove={handleMouseMove}
+          handleMouseLeave={handleMouseLeave}
+        >
+          {renderCalendarContent()}
+        </CalendarContainer>
+      ) : (
+        // For popup mode, use a direct portal
+        isOpen && ReactDOM.createPortal(
+          <div 
+            className="cla-calendar-portal"
+            style={{
+              position: 'fixed',
+              zIndex: 2147483647,
+              top: inputRef.current ? inputRef.current.getBoundingClientRect().bottom + window.scrollY + 'px' : '0',
+              left: inputRef.current ? inputRef.current.getBoundingClientRect().left + window.scrollX + 'px' : '0',
+              width: `${settings.visibleMonths * settings.singleMonthWidth}px`,
+              border: '3px solid red', // Debug styling
+              backgroundColor: 'white',
+              padding: '4px', // Add padding to see the container better
+              minHeight: '400px', // Ensure it has a minimum height
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)' // More visible shadow
+            }}
+            onClick={(e) => e.stopPropagation()} // Prevent click from closing immediately
+          >
+            <div 
+              ref={containerRef}
+              className="cla-card"
+              style={{
+                width: `${settings.visibleMonths * settings.singleMonthWidth}px`,
+                ...DEFAULT_CONTAINER_STYLES,
+                ...settings.containerStyle,
+                display: 'block', // Force display
+                visibility: 'visible', // Force visibility
+                overflow: 'visible' // Don't clip content
+              }}
+              onMouseDown={settings.enableOutOfBoundsScroll ? handleMouseDown : undefined}
+              onMouseMove={settings.enableOutOfBoundsScroll ? handleMouseMove : undefined}
+              onMouseLeave={settings.enableOutOfBoundsScroll ? handleMouseLeave : undefined}
+            >
+              {renderCalendarContent()}
+            </div>
+          </div>,
+          document.body
+        )
+      )}
     </div>
   );
 };

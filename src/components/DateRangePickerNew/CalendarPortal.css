@@ -1,0 +1,90 @@
+/* Calendar Portal Styles */
+.cla-calendar-portal {
+  position: fixed;
+  z-index: 2147483647; /* Maximum z-index */
+  opacity: 1;
+  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  isolation: isolate; /* Create new stacking context */
+  pointer-events: auto;
+  transform: translateY(0);
+  display: block !important; /* Force display */
+  visibility: visible !important; /* Force visibility */
+}
+
+/* This creates a stacking order for multiple portals */
+.cla-calendar-portal[data-priority="high"] {
+  z-index: 2147483647;
+}
+
+.cla-calendar-portal[data-priority="medium"] {
+  z-index: 2147483646;
+}
+
+.cla-calendar-portal[data-priority="low"] {
+  z-index: 2147483645;
+}
+
+/* Content inside the portal */
+.cla-calendar-portal-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: white;
+  transform: translateZ(0); /* Force hardware acceleration */
+  will-change: transform, opacity; /* Optimize for animations */
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1), 0 3px 6px rgba(0, 0, 0, 0.05);
+  animation: cla-portal-fade-in 0.15s ease-out;
+  display: block !important; /* Force display */
+}
+
+/* Add animated entrance */
+@keyframes cla-portal-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ensure the portal is visible even when overlaid on other elements */
+.cla-calendar-portal * {
+  isolation: isolate;
+}
+
+/* Fix for portal content possibly getting hidden */
+.cla-calendar-portal-content > * {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Ensure the calendar maintains its appearance when in a portal */
+.cla-calendar-portal .cla-card {
+  border: none;
+  box-shadow: none;
+  width: 100% !important; /* Ensure the card fills the portal */
+  display: block !important;
+}
+
+/* Debugging styles - can be removed in production */
+[data-debug="calendar-portal"] {
+  border: 3px solid red !important;
+  background-color: white !important;
+}
+
+/* Ensure the portal respects viewport boundaries */
+@media (max-width: 768px) {
+  .cla-calendar-portal {
+    width: calc(100vw - 32px) !important;
+    max-width: 500px;
+    left: 16px !important;
+    right: 16px !important;
+    margin: 0 auto;
+  }
+} 
