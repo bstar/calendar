@@ -293,14 +293,43 @@ const MonthGrid: React.FC<MonthGridProps> = ({
   }, [startWeekOnSunday]);
 
   const handleGridMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Store exact mouse coordinates without any offset
     setMousePosition({
-      x: e.clientX + 10,
-      y: e.clientY + 10
+      x: e.clientX,
+      y: e.clientY
     });
   };
 
   const handleGridMouseLeave = () => {
     setHoveredDate(null);
+  };
+
+  // Helper function to render tooltip using portal
+  const renderTooltip = (message: string) => {
+    return ReactDOM.createPortal(
+      <div 
+        style={{
+          position: 'fixed',
+          left: `${mousePosition.x + 10}px`,
+          top: `${mousePosition.y + 10}px`,
+          backgroundColor: 'rgba(220, 53, 69, 0.9)',
+          color: 'white',
+          padding: '8px 12px',
+          borderRadius: '4px',
+          fontSize: '13px',
+          pointerEvents: 'none',
+          zIndex: 2147483647, // Maximum possible z-index value
+          boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+          maxWidth: '250px',
+          whiteSpace: 'pre-line',
+          margin: 0,
+          transform: 'none'
+        }}
+      >
+        {message}
+      </div>,
+      document.body
+    );
   };
 
   return (
@@ -358,7 +387,7 @@ const MonthGrid: React.FC<MonthGridProps> = ({
           display: 'grid',
           gridTemplateColumns: 'repeat(7, 1fr)',
           gridAutoRows: '36px',
-          rowGap: '4px',
+          rowGap: '3px',
           paddingLeft: '2px'  // Match month heading alignment
         }}
       >
@@ -388,7 +417,7 @@ const MonthGrid: React.FC<MonthGridProps> = ({
         ))}
       </div>
 
-      {/* Tooltip at grid level */}
+      {/* Portaled tooltip to body */}
       {hoveredDate && restrictionConfig?.restrictions && document.hasFocus() && (
         (() => {
           // First check standard restriction result
@@ -396,27 +425,7 @@ const MonthGrid: React.FC<MonthGridProps> = ({
           
           // If standard restriction shows message, display it
           if (!result.allowed && result.message) {
-            return (
-              <div
-                style={{
-                  position: 'fixed',
-                  left: mousePosition.x,
-                  top: mousePosition.y,
-                  backgroundColor: 'rgba(220, 53, 69, 0.9)',
-                  color: 'white',
-                  padding: '8px 12px',
-                  borderRadius: '4px',
-                  fontSize: '13px',
-                  pointerEvents: 'none',
-                  zIndex: 1000,
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                  maxWidth: '250px',
-                  whiteSpace: 'pre-line'
-                }}
-              >
-                {result.message}
-              </div>
-            );
+            return renderTooltip(result.message);
           }
           
           // Check specifically for restricted boundary type
@@ -440,27 +449,7 @@ const MonthGrid: React.FC<MonthGridProps> = ({
                 if (isWithinInterval(selectionStart, { start: rangeStart, end: rangeEnd })) {
                   // If hovered date is outside boundary, show tooltip with message
                   if (!isWithinInterval(hoveredDate, { start: rangeStart, end: rangeEnd })) {
-                    return (
-                      <div
-                        style={{
-                          position: 'fixed',
-                          left: mousePosition.x,
-                          top: mousePosition.y,
-                          backgroundColor: 'rgba(220, 53, 69, 0.9)',
-                          color: 'white',
-                          padding: '8px 12px',
-                          borderRadius: '4px',
-                          fontSize: '13px',
-                          pointerEvents: 'none',
-                          zIndex: 1000,
-                          boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                          maxWidth: '250px',
-                          whiteSpace: 'pre-line'
-                        }}
-                      >
-                        {range.message || 'Selection must stay within the boundary'}
-                      </div>
-                    );
+                    return renderTooltip(range.message || 'Selection must stay within the boundary');
                   }
                 }
               }
