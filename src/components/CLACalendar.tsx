@@ -1340,6 +1340,39 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     };
   }, [isOpen, settings.closeOnClickAway, settings.displayMode]);
 
+  // Simple effect to anchor the calendar to the input field during scrolling
+  useEffect(() => {
+    if (!isOpen || settings.displayMode === 'embedded') return;
+    
+    const updatePosition = () => {
+      if (!inputRef.current) return;
+      
+      const portal = document.querySelector('.cla-calendar-portal');
+      if (!portal) return;
+      
+      const rect = inputRef.current.getBoundingClientRect();
+      portal.setAttribute('style', `
+        position: fixed;
+        z-index: 2147483647;
+        top: ${rect.bottom + window.scrollY}px;
+        left: ${rect.left + window.scrollX}px;
+        width: ${settings.visibleMonths * settings.singleMonthWidth}px;
+      `);
+    };
+    
+    // Handle both scroll and resize events
+    window.addEventListener('scroll', updatePosition);
+    window.addEventListener('resize', updatePosition);
+    
+    // Initial position update
+    updatePosition();
+    
+    return () => {
+      window.removeEventListener('scroll', updatePosition);
+      window.removeEventListener('resize', updatePosition);
+    };
+  }, [isOpen, settings.displayMode, settings.visibleMonths, settings.singleMonthWidth]);
+
   // Helper function to render the calendar content to avoid duplication
   const renderCalendarContent = () => {
     return (
@@ -1446,8 +1479,6 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
             style={{
               position: 'fixed',
               zIndex: 2147483647,
-              top: inputRef.current ? inputRef.current.getBoundingClientRect().bottom + window.scrollY + 'px' : '0',
-              left: inputRef.current ? inputRef.current.getBoundingClientRect().left + window.scrollX + 'px' : '0',
               width: `${settings.visibleMonths * settings.singleMonthWidth}px`
             }}
             onClick={(e) => e.stopPropagation()} // Prevent click from closing immediately
