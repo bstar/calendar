@@ -294,14 +294,13 @@
 .restricted-date-pattern {
   background-image: repeating-linear-gradient(
     45deg,
-    rgba(150, 150, 150, 0.9) 0px,
-    rgba(150, 150, 150, 0.9) 1px,
-    rgba(255, 255, 255, 0.8) 1px,
-    rgba(255, 255, 255, 0.8) 5px
+    rgba(150, 150, 150, 0.25) 0px,
+    rgba(150, 150, 150, 0.25) 2px,
+    rgba(255, 255, 255, 0.7) 2px,
+    rgba(255, 255, 255, 0.7) 6px
   );
-  background-size: 7.07px 7.07px; /* 5px * √2 to ensure perfect 45° alignment */
-  background-attachment: fixed; /* Make pattern relative to viewport */
-  background-position: center; /* Center the pattern */
+  background-size: 8.5px 8.5px; /* Precise value for clean 45° lines */
+  background-attachment: local; /* Make the pattern relative to the cell itself */
   position: relative;
   z-index: 1; /* Ensure this is below event elements */
 } 
