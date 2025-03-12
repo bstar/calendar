@@ -1448,12 +1448,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
               zIndex: 2147483647,
               top: inputRef.current ? inputRef.current.getBoundingClientRect().bottom + window.scrollY + 'px' : '0',
               left: inputRef.current ? inputRef.current.getBoundingClientRect().left + window.scrollX + 'px' : '0',
-              width: `${settings.visibleMonths * settings.singleMonthWidth}px`,
-              border: '3px solid red', // Debug styling
-              backgroundColor: 'white',
-              padding: '4px', // Add padding to see the container better
-              minHeight: '400px', // Ensure it has a minimum height
-              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)' // More visible shadow
+              width: `${settings.visibleMonths * settings.singleMonthWidth}px`
             }}
             onClick={(e) => e.stopPropagation()} // Prevent click from closing immediately
           >
@@ -1463,10 +1458,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
               style={{
                 width: `${settings.visibleMonths * settings.singleMonthWidth}px`,
                 ...DEFAULT_CONTAINER_STYLES,
-                ...settings.containerStyle,
-                display: 'block', // Force display
-                visibility: 'visible', // Force visibility
-                overflow: 'visible' // Don't clip content
+                ...settings.containerStyle
               }}
               onMouseDown={settings.enableOutOfBoundsScroll ? handleMouseDown : undefined}
               onMouseMove={settings.enableOutOfBoundsScroll ? handleMouseMove : undefined}
