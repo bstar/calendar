@@ -1354,7 +1354,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       portal.setAttribute('style', `
         position: fixed;
         z-index: 2147483647;
-        top: ${rect.bottom + window.scrollY}px;
+        top: ${rect.bottom + window.scrollY + 8}px;
         left: ${rect.left + window.scrollX}px;
         width: ${settings.visibleMonths * settings.singleMonthWidth}px;
       `);
