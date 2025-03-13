@@ -1,0 +1,116 @@
+/**
+ * Defensive CSS for Calendar Widget
+ * 
+ * This file contains defensive styles to protect the calendar widget from external style interference.
+ * These styles ensure the calendar maintains consistent appearance regardless of the host application.
+ * 
+ * Benefits:
+ * - Protects against CSS inheritance issues
+ * - Ensures proper layout and component positioning 
+ * - Maintains font sizes and text styling
+ * - Preserves proper z-index stacking for tooltips and portals
+ * 
+ * Import this file in any project where you use the calendar widget.
+ */
+
+/* Main wrapper protection */
+.cla-calendar-wrapper {
+  isolation: isolate !important;
+  position: relative !important;
+  display: inline-block !important;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+  line-height: 1.5 !important;
+  box-sizing: border-box !important;
+  max-width: 100% !important;
+}
+
+/* When calendar is open */
+.cla-calendar-wrapper[data-open="true"] {
+  z-index: 2147483647 !important;
+}
+
+/* Apply box-sizing to all child elements */
+.cla-calendar-wrapper *,
+.cla-calendar-portal * {
+  box-sizing: border-box !important;
+}
+
+/* Portal protection */
+.cla-calendar-portal {
+  position: fixed !important;
+  z-index: 2147483647 !important;
+  opacity: 1 !important;
+  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+  isolation: isolate !important;
+  pointer-events: auto !important;
+  transform: translateY(0) !important;
+  display: block !important;
+  visibility: visible !important;
+}
+
+/* Tooltip protection */
+.tooltip {
+  position: fixed !important;
+  background-color: #1a1a1a !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.35) !important;
+  border-radius: 3px !important;
+  z-index: 2147483647 !important;
+  font-size: 13px !important;
+  max-width: 300px !important;
+  padding: 3px 6px !important;
+  pointer-events: none !important;
+  border: none !important;
+  margin-top: 5px !important;
+  opacity: 1 !important;
+}
+
+/* Reset text properties on calendar */
+.cla-calendar,
+.cla-calendar * {
+  text-align: initial !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  text-decoration: none !important;
+  text-shadow: none !important;
+}
+
+/* Grid protection */
+.cla-calendar [style*="display: grid"] {
+  display: grid !important;
+}
+
+/* Restricted date pattern */
+.restricted-date-pattern {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(150, 150, 150, 0.25) 0px,
+    rgba(150, 150, 150, 0.25) 2px,
+    rgba(255, 255, 255, 0.7) 2px,
+    rgba(255, 255, 255, 0.7) 6px
+  ) !important;
+  background-size: 8.5px 8.5px !important;
+}
+
+/* Form controls */
+.cla-calendar-wrapper input,
+.cla-calendar-portal input,
+.cla-form-control {
+  font-family: inherit !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  background-color: #fff !important;
+}
+
+/* Calendar header */
+.cla-calendar .cla-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 16px !important;
+  border-bottom: 1px solid #e0e0e0 !important;
+  background-color: white !important;
+  width: 100% !important;
+  margin: 0 !important;
+} 

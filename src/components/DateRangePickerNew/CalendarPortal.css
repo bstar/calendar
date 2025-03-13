@@ -1,13 +1,13 @@
 /* Calendar Portal Styles */
 .cla-calendar-portal {
-  position: fixed;
-  z-index: 2147483647; /* Maximum z-index */
-  opacity: 1;
-  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  isolation: isolate; /* Create new stacking context */
-  pointer-events: auto;
-  transform: translateY(0);
+  position: fixed !important;
+  z-index: 2147483647 !important; /* Maximum z-index */
+  opacity: 1 !important;
+  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+  isolation: isolate !important; /* Create new stacking context */
+  pointer-events: auto !important;
+  transform: translateY(0) !important;
   display: block !important; /* Force display */
   visibility: visible !important; /* Force visibility */
 }

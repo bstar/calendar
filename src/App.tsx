@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './bootstrap.min.css';
 import './docStyles.css';
+import './App.css';
+// Import defensive styles for the calendar widget
+import './components/DateRangePickerNew/defensive-styles.css';
 import { CLACalendar } from './components/CLACalendar';
 import { RestrictionType, RestrictedBoundaryRestriction, RestrictionConfig } from './components/DateRangePickerNew/restrictions/types';
 import isoWeeksData from './data/iso_weeks.json';
@@ -32,8 +35,16 @@ const getUniquePeriodRanges = () => {
 const uniquePeriodRanges = getUniquePeriodRanges();
 
 const App: React.FC = () => {
-  // State for the font size of the second calendar
-  const [fontSize, setFontSize] = useState('1rem');
+  /**
+   * This app demonstrates a calendar widget with defensive CSS to protect
+   * it from potential style interference in various environments.
+   * 
+   * The defensive-styles.css provides a protective layer that ensures:
+   * - Proper spacing and layout
+   * - Correct font sizing and text styling 
+   * - Appropriate z-index stacking
+   * - Portal and tooltip visibility
+   */
   
   // Generate period end events from uniquePeriodRanges
   const periodEndEvents = uniquePeriodRanges.map(period => ({
@@ -48,7 +59,7 @@ const App: React.FC = () => {
   const baseSettings = {
     displayMode: "popup" as const,
     timezone: "UTC",
-    visibleMonths: 3,
+    visibleMonths: 2, // First calendar shows 2 months
     singleMonthWidth: 400,
     showMonthHeadings: true,
     baseFontSize: '1rem',
@@ -113,117 +124,42 @@ const App: React.FC = () => {
     }
   };
 
-  // Create settings for the second calendar with a different font size
+  // Create settings for the second calendar with 3 months
   const calendar2Settings = {
     ...baseSettings,
-    baseFontSize: fontSize
-  };
-  
-  // Function to change the font size
-  const handleChangeFontSize = (size: string) => {
-    setFontSize(size);
+    visibleMonths: 3 // Second calendar shows 3 months
   };
 
   return (
-    <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '200px' }}>
-      {/* Calendar Instance 1 with fixed content underneath */}
-      <div style={{ position: 'relative' }}>
-        <h3>Calendar Instance 1 (Default Font Size: 1rem)</h3>
+    <div style={{ 
+      padding: '10px', 
+      display: 'flex', 
+      flexDirection: 'column', 
+      gap: '40px',
+      textAlign: 'left' 
+    }}>
+      {/* Calendar Instance 1 */}
+      <div style={{ position: 'relative', textAlign: 'left' }} className="cla-calendar-wrapper">
+        <h3 style={{ textAlign: 'left' }}>Calendar Instance 1 (2 Months)</h3>
         <CLACalendar
           settings={baseSettings}
           onSettingsChange={(newSettings) => console.log('Calendar 1 settings:', newSettings)}
           onSubmit={(start, end) => console.log('Calendar 1 range:', start, end)}
         />
-        
-        {/* Fixed content under Calendar 1 */}
-        <div style={{
-          position: 'fixed',
-          top: '150px',
-          left: '20px',
-          right: '20px',
-          padding: '20px',
-          background: 'white',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-          zIndex: 1000
-        }}>
-          <h4>Fixed Content Under Calendar 1</h4>
-          <button style={{ zIndex: 1001 }}>Interactive Button 1</button>
-          <div style={{ 
-            position: 'sticky', 
-            top: '200px',
-            padding: '10px',
-            background: '#f0f0f0',
-            zIndex: 1002
-          }}>
-            Sticky Element Inside Fixed Content 1
-          </div>
-        </div>
       </div>
 
-      {/* Calendar Instance 2 with configurable font size */}
-      <div style={{ position: 'relative' }}>
-        <h3>Calendar Instance 2 (Font Size: {fontSize})</h3>
-        <div style={{ marginBottom: '20px' }}>
-          <button 
-            className="btn btn-primary mr-2" 
-            onClick={() => handleChangeFontSize('0.875rem')}
-            style={{ marginRight: '10px' }}
-          >
-            Small (0.875rem)
-          </button>
-          <button 
-            className="btn btn-primary mr-2" 
-            onClick={() => handleChangeFontSize('1rem')}
-            style={{ marginRight: '10px' }}
-          >
-            Medium (1rem)
-          </button>
-          <button 
-            className="btn btn-primary mr-2" 
-            onClick={() => handleChangeFontSize('1.25rem')}
-            style={{ marginRight: '10px' }}
-          >
-            Large (1.25rem)
-          </button>
-          <button 
-            className="btn btn-primary" 
-            onClick={() => handleChangeFontSize('1.5rem')}
-          >
-            Extra Large (1.5rem)
-          </button>
-        </div>
+      {/* Calendar Instance 2 with 3 months */}
+      <div style={{ position: 'relative', textAlign: 'left' }} className="cla-calendar-wrapper">
+        <h3 style={{ textAlign: 'left' }}>Calendar Instance 2 (3 Months)</h3>
         <CLACalendar
           settings={calendar2Settings}
           onSettingsChange={(newSettings) => console.log('Calendar 2 settings:', newSettings)}
           onSubmit={(start, end) => console.log('Calendar 2 range:', start, end)}
         />
-        
-        {/* Fixed content under Calendar 2 */}
-        <div style={{
-          position: 'fixed',
-          top: '400px',
-          left: '20px',
-          right: '20px',
-          padding: '20px',
-          background: '#e6f3ff',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-          zIndex: 1000
-        }}>
-          <h4>Fixed Content Under Calendar 2</h4>
-          <div style={{ 
-            position: 'sticky', 
-            top: '450px',
-            padding: '10px',
-            background: '#d1e8ff',
-            zIndex: 1001
-          }}>
-            Sticky Element Inside Fixed Content 2
-          </div>
-        </div>
       </div>
 
       {/* Spacer to ensure scrollable content */}
-      <div style={{ height: '1000px' }} />
+      <div style={{ height: '200px' }} />
     </div>
   );
 };

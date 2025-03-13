@@ -1,3 +1,58 @@
+/* Defensive CSS - Protect calendar components from external style interference */
+.cla-calendar-wrapper,
+.cla-calendar-portal {
+  /* Reset critical properties */
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+  line-height: 1.5 !important;
+  box-sizing: border-box !important;
+}
+
+/* Apply box-sizing to all child elements */
+.cla-calendar-wrapper *,
+.cla-calendar-portal * {
+  box-sizing: border-box !important;
+}
+
+/* Ensure the z-index for tooltips and popovers */
+.cla-calendar-portal[style*="position: fixed"],
+.tooltip[style*="position: fixed"],
+.cla-calendar-wrapper [style*="position: fixed"] {
+  z-index: 2147483647 !important; /* Maximum z-index */
+}
+
+/* Ensure the striped pattern for restricted dates is visible */
+.restricted-date-pattern {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(150, 150, 150, 0.25) 0px,
+    rgba(150, 150, 150, 0.25) 2px,
+    rgba(255, 255, 255, 0.7) 2px,
+    rgba(255, 255, 255, 0.7) 6px
+  ) !important;
+  background-size: 8.5px 8.5px !important; /* Precise value for clean 45° lines */
+  background-attachment: local !important; /* Make the pattern relative to the cell itself */
+  position: relative !important;
+  z-index: 1 !important; /* Ensure this is below event elements */
+}
+
+/* Reset form controls inside calendar to prevent external influence */
+.cla-calendar-wrapper input,
+.cla-calendar-portal input,
+.cla-form-control {
+  font-family: inherit !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  background-color: #fff !important;
+}
+
+/* Ensure portal visibility is preserved */
+.cla-calendar-portal-content,
+.cla-calendar-portal[data-open="true"] {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
 .cla-calendar {
   /* Base styles */
   --primary-color: #0d6efd;
@@ -291,16 +346,30 @@
   to { transform: translateY(0); }
 }
 
-.restricted-date-pattern {
-  background-image: repeating-linear-gradient(
-    45deg,
-    rgba(150, 150, 150, 0.25) 0px,
-    rgba(150, 150, 150, 0.25) 2px,
-    rgba(255, 255, 255, 0.7) 2px,
-    rgba(255, 255, 255, 0.7) 6px
-  );
-  background-size: 8.5px 8.5px; /* Precise value for clean 45° lines */
-  background-attachment: local; /* Make the pattern relative to the cell itself */
-  position: relative;
-  z-index: 1; /* Ensure this is below event elements */
+/* Additional defensive styles to protect core calendar components */
+.cla-calendar-wrapper {
+  isolation: isolate !important; /* Create stacking context */
+  position: relative !important;
+  display: inline-block !important;
+  max-width: 100% !important;
+}
+
+/* When calendar is open, ensure it's above other elements */
+.cla-calendar-wrapper[data-open="true"] {
+  z-index: 2147483647 !important; /* Maximum z-index */
+}
+
+/* Reset some critical properties on calendar container to prevent external influence */
+.cla-calendar,
+.cla-calendar * {
+  text-align: initial !important; /* Reset text alignment */
+  text-transform: none !important; /* Prevent all-caps from parent */
+  letter-spacing: normal !important; /* Reset letter spacing */
+  text-decoration: none !important; /* Remove any text decoration */
+  text-shadow: none !important; /* Remove any text shadow */
+}
+
+/* Ensure button text color remains intact */
+.cla-button {
+  color: inherit !important;
 } 
