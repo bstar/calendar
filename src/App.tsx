@@ -48,10 +48,10 @@ const App: React.FC = () => {
   const baseSettings = {
     displayMode: "popup" as const,
     timezone: "UTC",
-    visibleMonths: 1,
+    visibleMonths: 3,
     singleMonthWidth: 400,
     showMonthHeadings: true,
-    baseFontSize: '1rem', // Add base font size for the entire calendar
+    baseFontSize: '1rem',
     selectionMode: "range" as const,
     showTooltips: true,
     showHeader: true,

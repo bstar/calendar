@@ -778,20 +778,25 @@ const MonthPair = ({
   restrictionConfig,
   startWeekOnSunday,
   activeLayer,
-  settings
+  settings,
+  months
 }) => {
-  // Add explicit type for monthsToShow
-  const monthsToShow: Date[] = [];
-  
-  // Use secondMonth if provided, otherwise calculate months based on firstMonth
-  if (secondMonth) {
-    monthsToShow.push(firstMonth);
-    monthsToShow.push(secondMonth);
-  } else {
-    for (let i = 0; i < visibleMonths && i < 6; i++) {
-      monthsToShow.push(addMonths(firstMonth, i));
+  // Use the months array directly if provided, otherwise calculate months
+  const monthsToShow: Date[] = months || (() => {
+    const result: Date[] = [];
+    
+    // Use secondMonth if provided, otherwise calculate months based on firstMonth
+    if (secondMonth) {
+      result.push(firstMonth);
+      result.push(secondMonth);
+    } else {
+      for (let i = 0; i < visibleMonths && i < 6; i++) {
+        result.push(addMonths(firstMonth, i));
+      }
     }
-  }
+    
+    return result;
+  })();
 
   return (
     <div style={{
@@ -906,7 +911,7 @@ const CalendarGrid: React.FC<CalendarGridProps & { settings?: CalendarSettings }
   return (
     <MonthPair
       firstMonth={months[0]}
-      secondMonth={visibleMonths === 1 ? null : months[1]}
+      secondMonth={visibleMonths === 1 ? null : null}
       selectedRange={selectedRange}
       onSelectionStart={onSelectionStart}
       onSelectionMove={onSelectionMove}
@@ -920,6 +925,7 @@ const CalendarGrid: React.FC<CalendarGridProps & { settings?: CalendarSettings }
       restrictionConfig={restrictionConfig}
       startWeekOnSunday={startWeekOnSunday}
       settings={settings}
+      months={months}
     />
   );
 };
@@ -1499,7 +1505,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
               zIndex: 2147483647,
               top: inputRef.current ? inputRef.current.getBoundingClientRect().bottom + 8 + 'px' : '0px',
               left: inputRef.current ? inputRef.current.getBoundingClientRect().left + 'px' : '0px',
-              width: `${settings.visibleMonths * settings.singleMonthWidth}px`
+              width: `${settings.visibleMonths * settings.singleMonthWidth + ((settings.visibleMonths - 1) * 16)}px` // Include gap between months
             }}
             onClick={(e) => e.stopPropagation()} // Prevent click from closing immediately
           >
@@ -1507,7 +1513,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
               ref={containerRef}
               className="cla-card"
               style={{
-                width: `${settings.visibleMonths * settings.singleMonthWidth}px`,
+                width: `${settings.visibleMonths * settings.singleMonthWidth + ((settings.visibleMonths - 1) * 16)}px`, // Include gap between months
                 ...DEFAULT_CONTAINER_STYLES,
                 ...settings.containerStyle
               }}
