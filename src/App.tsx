@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './bootstrap.min.css';
 import './docStyles.css';
 import { CLACalendar } from './components/CLACalendar';
@@ -32,6 +32,9 @@ const getUniquePeriodRanges = () => {
 const uniquePeriodRanges = getUniquePeriodRanges();
 
 const App: React.FC = () => {
+  // State for the font size of the second calendar
+  const [fontSize, setFontSize] = useState('1rem');
+  
   // Generate period end events from uniquePeriodRanges
   const periodEndEvents = uniquePeriodRanges.map(period => ({
     date: period.end,
@@ -45,9 +48,10 @@ const App: React.FC = () => {
   const baseSettings = {
     displayMode: "popup" as const,
     timezone: "UTC",
-    visibleMonths: 2,
+    visibleMonths: 1,
     singleMonthWidth: 400,
     showMonthHeadings: true,
+    baseFontSize: '1rem', // Add base font size for the entire calendar
     selectionMode: "range" as const,
     showTooltips: true,
     showHeader: true,
@@ -109,11 +113,22 @@ const App: React.FC = () => {
     }
   };
 
+  // Create settings for the second calendar with a different font size
+  const calendar2Settings = {
+    ...baseSettings,
+    baseFontSize: fontSize
+  };
+  
+  // Function to change the font size
+  const handleChangeFontSize = (size: string) => {
+    setFontSize(size);
+  };
+
   return (
     <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '200px' }}>
       {/* Calendar Instance 1 with fixed content underneath */}
       <div style={{ position: 'relative' }}>
-        <h3>Calendar Instance 1</h3>
+        <h3>Calendar Instance 1 (Default Font Size: 1rem)</h3>
         <CLACalendar
           settings={baseSettings}
           onSettingsChange={(newSettings) => console.log('Calendar 1 settings:', newSettings)}
@@ -145,11 +160,40 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      {/* Calendar Instance 2 with fixed content underneath */}
+      {/* Calendar Instance 2 with configurable font size */}
       <div style={{ position: 'relative' }}>
-        <h3>Calendar Instance 2</h3>
+        <h3>Calendar Instance 2 (Font Size: {fontSize})</h3>
+        <div style={{ marginBottom: '20px' }}>
+          <button 
+            className="btn btn-primary mr-2" 
+            onClick={() => handleChangeFontSize('0.875rem')}
+            style={{ marginRight: '10px' }}
+          >
+            Small (0.875rem)
+          </button>
+          <button 
+            className="btn btn-primary mr-2" 
+            onClick={() => handleChangeFontSize('1rem')}
+            style={{ marginRight: '10px' }}
+          >
+            Medium (1rem)
+          </button>
+          <button 
+            className="btn btn-primary mr-2" 
+            onClick={() => handleChangeFontSize('1.25rem')}
+            style={{ marginRight: '10px' }}
+          >
+            Large (1.25rem)
+          </button>
+          <button 
+            className="btn btn-primary" 
+            onClick={() => handleChangeFontSize('1.5rem')}
+          >
+            Extra Large (1.5rem)
+          </button>
+        </div>
         <CLACalendar
-          settings={baseSettings}
+          settings={calendar2Settings}
           onSettingsChange={(newSettings) => console.log('Calendar 2 settings:', newSettings)}
           onSubmit={(start, end) => console.log('Calendar 2 range:', start, end)}
         />

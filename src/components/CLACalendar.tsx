@@ -47,6 +47,43 @@ import { CalendarPortal } from './DateRangePickerNew/CalendarPortal';
 import { registerCalendar } from './DateRangePickerNew/CalendarCoordinator';
 import './DateRangePickerNew/CalendarPortal.css';
 
+// Font size utility function
+/**
+ * Calculate a font size based on the calendar's base font size setting
+ * @param settings The calendar settings object
+ * @param sizeType The type of font size to calculate (default, large, small, etc)
+ * @returns A string with the calculated font size
+ */
+const getFontSize = (settings?: CalendarSettings, sizeType: 'base' | 'large' | 'small' | 'extraSmall' = 'base'): string => {
+  // Default base size if not specified in settings
+  const baseSize = settings?.baseFontSize || '1rem';
+  
+  // Calculate relative sizes based on the base size
+  switch(sizeType) {
+    case 'large':
+      return baseSize.includes('rem') ? 
+        `${parseFloat(baseSize) * 1.25}rem` : 
+        baseSize.includes('px') ? 
+          `${parseFloat(baseSize) * 1.25}px` : 
+          '1.25rem';
+    case 'small':
+      return baseSize.includes('rem') ? 
+        `${parseFloat(baseSize) * 0.875}rem` : 
+        baseSize.includes('px') ? 
+          `${parseFloat(baseSize) * 0.875}px` : 
+          '0.875rem';
+    case 'extraSmall':
+      return baseSize.includes('rem') ? 
+        `${parseFloat(baseSize) * 0.75}rem` : 
+        baseSize.includes('px') ? 
+          `${parseFloat(baseSize) * 0.75}px` : 
+          '0.75rem';
+    case 'base':
+    default:
+      return baseSize;
+  }
+};
+
 // Generate a unique ID for each calendar instance
 let calendarCounter = 0;
 
@@ -239,7 +276,7 @@ const isSameMonth = (date1: Date, date2: Date): boolean => {
 };
 
 // Update the MonthGrid to use proper types for weeks
-const MonthGrid: React.FC<MonthGridProps> = ({
+const MonthGrid: React.FC<MonthGridProps & { settings?: CalendarSettings }> = ({
   baseDate,
   selectedRange,
   onSelectionStart,
@@ -251,7 +288,8 @@ const MonthGrid: React.FC<MonthGridProps> = ({
   layer,
   startWeekOnSunday = false,
   restrictionConfig,
-  activeLayer
+  activeLayer,
+  settings
 }) => {
   const monthStart = startOfMonth(baseDate);
   const monthEnd = endOfMonth(monthStart);
@@ -305,7 +343,7 @@ const MonthGrid: React.FC<MonthGridProps> = ({
   };
 
   // Helper function to render tooltip using portal
-  const renderTooltip = (message: string) => {
+  const renderTooltip = (message: string, settings?: CalendarSettings) => {
     return ReactDOM.createPortal(
       <div 
         style={{
@@ -316,7 +354,7 @@ const MonthGrid: React.FC<MonthGridProps> = ({
           color: 'white',
           padding: '8px 12px',
           borderRadius: '4px',
-          fontSize: '13px',
+          fontSize: getFontSize(settings, 'small'),
           pointerEvents: 'none',
           zIndex: 2147483647, // Maximum possible z-index value
           boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
@@ -341,7 +379,7 @@ const MonthGrid: React.FC<MonthGridProps> = ({
     }}>
       {showMonthHeading && (
         <div style={{
-          fontSize: '1rem',
+          fontSize: getFontSize(settings, 'large'),
           fontWeight: '600',
           color: '#333',
           textAlign: 'left',
@@ -365,7 +403,7 @@ const MonthGrid: React.FC<MonthGridProps> = ({
           <div
             key={day}
             style={{
-              fontSize: "0.8rem",
+              fontSize: getFontSize(settings, 'small'),
               fontWeight: "600",
               color: "#6c757d",
               display: "flex",
@@ -408,6 +446,7 @@ const MonthGrid: React.FC<MonthGridProps> = ({
               layer={layer}
               restrictionConfig={restrictionConfig}
               activeLayer={activeLayer}
+              settings={settings}
             />
           ))
         )}
@@ -425,7 +464,7 @@ const MonthGrid: React.FC<MonthGridProps> = ({
           
           // If standard restriction shows message, display it
           if (!result.allowed && result.message) {
-            return renderTooltip(result.message);
+            return renderTooltip(result.message, settings);
           }
           
           // Check specifically for restricted boundary type
@@ -449,7 +488,7 @@ const MonthGrid: React.FC<MonthGridProps> = ({
                 if (isWithinInterval(selectionStart, { start: rangeStart, end: rangeEnd })) {
                   // If hovered date is outside boundary, show tooltip with message
                   if (!isWithinInterval(hoveredDate, { start: rangeStart, end: rangeEnd })) {
-                    return renderTooltip(range.message || 'Selection must stay within the boundary');
+                    return renderTooltip(range.message || 'Selection must stay within the boundary', settings);
                   }
                 }
               }
@@ -474,7 +513,8 @@ const DayCell = ({
   renderContent,
   layer,
   restrictionConfig,
-  activeLayer
+  activeLayer,
+  settings
 }) => {
   const { isSelected, isInRange, isRangeStart, isRangeEnd } = useMemo(() => {
     if (!selectedRange.start) {
@@ -690,7 +730,8 @@ const DayCell = ({
       }}>
         <span style={{
           position: 'relative',
-          pointerEvents: 'none'
+          pointerEvents: 'none',
+          fontSize: getFontSize(settings, 'base'),
         }}>
           {format(date, "d")}
         </span>
@@ -736,7 +777,8 @@ const MonthPair = ({
   layer,
   restrictionConfig,
   startWeekOnSunday,
-  activeLayer
+  activeLayer,
+  settings
 }) => {
   // Add explicit type for monthsToShow
   const monthsToShow: Date[] = [];
@@ -773,6 +815,7 @@ const MonthPair = ({
           activeLayer={activeLayer}
           restrictionConfig={restrictionConfig}
           startWeekOnSunday={startWeekOnSunday}
+          settings={settings}
         />
       ))}
     </div>
@@ -806,7 +849,7 @@ const LayerControl = ({ layers, activeLayer, onLayerChange }) => {
   );
 };
 
-const CalendarGrid: React.FC<CalendarGridProps> = ({
+const CalendarGrid: React.FC<CalendarGridProps & { settings?: CalendarSettings }> = ({
   months,
   selectedRange,
   onSelectionStart,
@@ -818,7 +861,8 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   layer,
   activeLayer,
   restrictionConfig,
-  startWeekOnSunday
+  startWeekOnSunday,
+  settings
 }) => {
   const renderers: Renderer[] = [];
 
@@ -875,6 +919,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       activeLayer={activeLayer}
       restrictionConfig={restrictionConfig}
       startWeekOnSunday={startWeekOnSunday}
+      settings={settings}
     />
   );
 };
@@ -1124,6 +1169,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
         activeLayer={layer.name}
         restrictionConfig={settings.restrictionConfig}
         startWeekOnSunday={settings.startWeekOnSunday}
+        settings={settings}
       />
     );
   };

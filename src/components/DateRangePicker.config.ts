@@ -156,6 +156,7 @@ export interface CalendarSettings {
   visibleMonths: number;
   singleMonthWidth: number;
   showMonthHeadings: boolean;
+  baseFontSize?: string; // Base font size for the calendar (e.g. '1rem', '16px')
   
   // Feature Settings
   selectionMode: 'single' | 'range';
