@@ -336,7 +336,7 @@ export const DateInputSection: React.FC<DateInputSectionProps> = ({
   dateInputContext,
   selectionMode
 }) => (
-  <div className="cla-input-container" style={{ padding: '16px' }}>
+  <div className={`cla-input-container ${selectionMode === 'single' ? 'single' : 'range'}`}>
     <div className="cla-input-wrapper">
       <DateInput
         value={selectedRange.start ? parseISO(selectedRange.start) : null}
