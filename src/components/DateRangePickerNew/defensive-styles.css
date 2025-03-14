@@ -122,15 +122,15 @@
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  background: rgba(0, 0, 0, 0.03) !important; /* Slight background for visibility */
-  border: none !important;
+  background: none !important; /* Reset to transparent background */
+  border: none !important; /* No border */
   border-radius: 4px !important;
   cursor: pointer !important;
   transition: background-color 0.2s ease !important;
 }
 
 .cla-calendar .cla-button-nav:hover {
-  background-color: rgba(0, 0, 0, 0.08) !important;
+  background-color: #f5f5f5 !important; /* Match secondary button default color */
 }
 
 /* Ensure consistent chevron styling */
@@ -139,6 +139,11 @@
   width: 10px !important;
   height: 10px !important;
   position: relative !important;
+  color: #333 !important; /* Base color */
+}
+
+.cla-calendar .cla-button-nav:hover .cla-chevron {
+  color: #666 !important; /* Lighter gray on hover */
 }
 
 .cla-calendar .cla-chevron::before {
@@ -148,7 +153,7 @@
   height: 8px !important;
   border-style: solid !important;
   border-width: 2px 2px 0 0 !important;
-  border-color: #444 !important;
+  border-color: currentColor !important; /* Uses the color from parent */
   top: 50% !important;
   left: 50% !important;
 }
