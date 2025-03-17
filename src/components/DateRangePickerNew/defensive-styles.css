@@ -139,7 +139,6 @@ html .cla-header[class],
   justify-content: space-between !important;
   align-items: center !important;
   padding: 12px 16px !important;
-  border-bottom: 1px solid #e0e0e0 !important;
   background-color: white !important;
   width: 100% !important;
   margin: 0 !important;
@@ -379,7 +378,6 @@ html body .cla-calendar .date-input-container {
   position: relative !important;
   flex-wrap: nowrap !important;
   min-width: 280px !important; /* Ensure some minimum width for small screens */
-  border-bottom: 1px solid #e0e0e0 !important;
   background-color: #f8f9fa !important;
 }
 

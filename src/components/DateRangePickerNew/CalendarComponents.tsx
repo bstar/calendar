@@ -336,7 +336,6 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
            minHeight: '56px',
            position: 'relative',
            flexWrap: 'nowrap',
-           borderBottom: '1px solid #e0e0e0',
            backgroundColor: 'white'
          }}>
       <button
