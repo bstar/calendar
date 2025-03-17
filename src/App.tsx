@@ -5,7 +5,7 @@ import './App.css';
 // Import defensive styles for the calendar widget
 import './components/DateRangePickerNew/defensive-styles.css';
 import { CLACalendar } from './components/CLACalendar';
-import { RestrictionType, RestrictedBoundaryRestriction, RestrictionConfig } from './components/DateRangePickerNew/restrictions/types';
+import { RestrictionType, RestrictedBoundaryRestriction, RestrictionConfig, BoundaryRestriction } from './components/DateRangePickerNew/restrictions/types';
 import isoWeeksData from './data/iso_weeks.json';
 
 // Extract unique period ranges from the iso_weeks.json data
@@ -127,7 +127,19 @@ const App: React.FC = () => {
   // Create settings for the second calendar with 3 months
   const calendar2Settings = {
     ...baseSettings,
-    visibleMonths: 3 // Second calendar shows 3 months
+    visibleMonths: 3, // Second calendar shows 3 months
+    restrictionConfig: {
+      restrictions: [
+        {
+          type: 'boundary' as const,
+          enabled: true,
+          direction: 'before' as const,
+          // Subtract one day from current date
+          date: new Date(new Date().setDate(new Date().getDate() - 1)).toISOString(),
+          message: "Cannot select dates before today"
+        } as BoundaryRestriction
+      ]
+    }
   };
 
   return (
