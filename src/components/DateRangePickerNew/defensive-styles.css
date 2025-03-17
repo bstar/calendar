@@ -93,7 +93,6 @@
 .cla-calendar-wrapper input:not(.cla-form-control),
 .cla-calendar-portal input:not(.cla-form-control) {
   font-family: inherit !important;
-  font-size: inherit !important;
   line-height: inherit !important;
   background-color: #fff !important;
 }
