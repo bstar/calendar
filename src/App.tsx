@@ -7,6 +7,7 @@ import './components/DateRangePickerNew/defensive-styles.css';
 import { CLACalendar } from './components/CLACalendar';
 import { RestrictionType, RestrictedBoundaryRestriction, RestrictionConfig, BoundaryRestriction } from './components/DateRangePickerNew/restrictions/types';
 import isoWeeksData from './data/iso_weeks.json';
+import { subDays, formatISO } from 'date-fns';
 
 // Extract unique period ranges from the iso_weeks.json data
 const getUniquePeriodRanges = () => {
@@ -134,8 +135,8 @@ const App: React.FC = () => {
           type: 'boundary' as const,
           enabled: true,
           direction: 'before' as const,
-          // Subtract one day from current date
-          date: new Date(new Date().setDate(new Date().getDate() - 1)).toISOString(),
+          // Subtract one day from current date using date-fns
+          date: formatISO(subDays(new Date(), 1)),
           message: "Cannot select dates before today"
         } as BoundaryRestriction
       ]
