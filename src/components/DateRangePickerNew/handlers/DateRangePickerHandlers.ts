@@ -224,19 +224,28 @@ export class DateRangePickerHandlers {
    */
   static createDisplayTextFormatter(
     selectedRange: DateRange,
-    selectionMode: 'single' | 'range'
+    selectionMode: 'single' | 'range',
+    dateFormatter?: (date: Date) => string
   ) {
     return () => {
       const { start, end } = selectedRange;
       if (!start) return "Select date";
       
+      // Format dates using custom formatter if provided, otherwise use default format
+      const formatDate = (dateString: string) => {
+        const date = parseISO(dateString);
+        return dateFormatter 
+          ? dateFormatter(date) 
+          : format(date, "MMM dd, yyyy");
+      };
+      
       if (selectionMode === 'single') {
-        return format(parseISO(start), "MMM dd, yyyy");
+        return formatDate(start);
       }
       
       return !end
-        ? format(parseISO(start), "MMM dd, yyyy")
-        : `${format(parseISO(start), "MMM dd, yyyy")} - ${format(parseISO(end), "MMM dd, yyyy")}`;
+        ? formatDate(start)
+        : `${formatDate(start)} - ${formatDate(end)}`;
     };
   }
 

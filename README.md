@@ -91,6 +91,39 @@ function App() {
 }
 ```
 
+### Custom Date Formatting
+
+You can customize how dates are displayed in the calendar input field by providing a `dateFormatter` function in the settings:
+
+```jsx
+import { CLACalendar } from 'cla-calendar';
+import { getDefaultSettings } from 'cla-calendar';
+
+function CustomFormattingExample() {
+  const [settings, setSettings] = useState({
+    ...getDefaultSettings(),
+    // Custom formatter that displays dates in YYYY-MM-DD format
+    dateFormatter: (date) => {
+      const pad = (num) => String(num).padStart(2, '0');
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+    }
+  });
+  
+  return (
+    <CLACalendar 
+      settings={settings}
+      onSettingsChange={setSettings}
+    />
+  );
+}
+```
+
+The `dateFormatter` function receives a Date object and should return a formatted string. This allows you to implement any custom date formatting logic you need, such as:
+
+- Different date formats (YYYY-MM-DD, DD/MM/YYYY, etc.)
+- Localized date formats
+- Custom date representations with additional context
+
 ## Date Functions
 
 To ensure UTC timezone handling, all date operations should use the utility functions from `src/utils/UTCDateUtils.ts` instead of directly using date-fns:

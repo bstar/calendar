@@ -1114,9 +1114,10 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   const getDisplayText = useMemo(() =>
     DateRangePickerHandlers.createDisplayTextFormatter(
       displayRange,
-      settings.selectionMode
+      settings.selectionMode,
+      settings.dateFormatter
     ),
-    [displayRange, settings.selectionMode]
+    [displayRange, settings.selectionMode, settings.dateFormatter]
   );
 
   // Use the abstracted selection handlers with all required parameters

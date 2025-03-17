@@ -7,7 +7,7 @@ import './components/DateRangePickerNew/defensive-styles.css';
 import { CLACalendar } from './components/CLACalendar';
 import { RestrictionType, RestrictedBoundaryRestriction, RestrictionConfig, BoundaryRestriction } from './components/DateRangePickerNew/restrictions/types';
 import isoWeeksData from './data/iso_weeks.json';
-import { subDays, formatISO } from 'date-fns';
+import { subDays, formatISO, format } from 'date-fns';
 
 // Extract unique period ranges from the iso_weeks.json data
 const getUniquePeriodRanges = () => {
@@ -77,6 +77,47 @@ const App: React.FC = () => {
     initialMonth: new Date(),
     isOpen: false,
     showLayersNavigation: false,
+    
+    // Optional custom date formatter - uncomment any example below to use it
+    
+    /* Example 1: Simple ISO format (YYYY-MM-DD)
+    dateFormatter: (date: Date) => {
+      return format(date, 'yyyy-MM-dd');
+    },
+    */
+    
+    /* Example 2: Localized format with full month name
+    dateFormatter: (date: Date) => {
+      return format(date, 'MMMM d, yyyy'); // Example: January 1, 2023
+    },
+    */
+    
+    /* Example 3: European format (DD/MM/YYYY)
+    dateFormatter: (date: Date) => {
+      return format(date, 'dd/MM/yyyy');
+    },
+    */
+    
+    /* Example 4: With weekday name
+    dateFormatter: (date: Date) => {
+      return format(date, 'EEE, MMM d, yyyy'); // Example: Mon, Jan 1, 2023
+    },
+    */
+    
+    /* Example 5: Compact format
+    dateFormatter: (date: Date) => {
+      return format(date, 'M/d/yy'); // Example: 1/1/23
+    },
+    */
+    
+    /* Example 6: Custom format with ordinal day
+    dateFormatter: (date: Date) => {
+      return format(date, "do 'of' MMMM, yyyy"); // Example: 1st of January, 2023
+    },
+    */
+    dateFormatter: (date: Date) => {
+      return format(date, 'M/d/yy'); // Example: 1/1/23
+    },
     restrictionConfig: {
       restrictions: [
         {

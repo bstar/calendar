@@ -104,6 +104,7 @@ interface Settings {
   core: Record<string, Setting>;
   features: Record<string, BooleanSetting>;
   layers: LayerControlSetting;
+  formatting: Record<string, Setting>;
 }
 
 // Update Event type for layer events
@@ -169,6 +170,7 @@ export interface CalendarSettings {
   suppressTooltipsOnSelection: boolean;
   showSelectionAlert: boolean;
   startWeekOnSunday: boolean;
+  dateFormatter?: (date: Date) => string; // Custom date formatter function
   
   // Layer Settings
   layers: Layer[];
@@ -215,6 +217,7 @@ export interface SettingsConfig {
       newLayerTemplate: Omit<Layer, 'features'> & { data: any[] };
     };
   };
+  formatting: Record<string, SettingControl>;
 }
 
 // Default colors that can be overridden
@@ -256,6 +259,7 @@ export const getDefaultSettings = (): CalendarSettings => ({
   suppressTooltipsOnSelection: false,
   showSelectionAlert: false,
   startWeekOnSunday: false,
+  dateFormatter: undefined,
   layers: DEFAULT_LAYERS,
   showLayersNavigation: true,
   defaultLayer: '',
@@ -415,6 +419,15 @@ export const SETTINGS: SettingsConfig = {
       label: 'Start Week on Sunday',
       description: 'Set Sunday as the first day of the week',
       default: false
+    }
+  },
+  formatting: {
+    dateFormatter: {
+      id: 'dateFormatter',
+      type: 'text',
+      label: 'Date Formatter',
+      description: 'Custom function to format dates (provide as code string, will be handled programmatically)',
+      default: undefined // Default to undefined (use built-in formatter)
     }
   },
   layers: {

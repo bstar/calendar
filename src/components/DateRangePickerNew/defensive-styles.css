@@ -89,14 +89,30 @@
   background-size: 8.5px 8.5px !important;
 }
 
-/* Form controls */
-.cla-calendar-wrapper input,
-.cla-calendar-portal input,
-.cla-form-control {
+/* Form controls - general styles except for .cla-form-control font size */
+.cla-calendar-wrapper input:not(.cla-form-control),
+.cla-calendar-portal input:not(.cla-form-control) {
   font-family: inherit !important;
   font-size: inherit !important;
   line-height: inherit !important;
   background-color: #fff !important;
+}
+
+/* Set only font-family and background for form-control, font-size will be set separately */
+.cla-form-control {
+  font-family: inherit !important;
+  line-height: inherit !important;
+  background-color: #fff !important;
+}
+
+/* Main calendar input field - with higher specificity to override the general rule */
+html body .cla-calendar-wrapper .cla-form-control,
+html body .cla-form-control {
+  width: 200px !important;
+  font-size: 0.8em !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
 /* Calendar header */

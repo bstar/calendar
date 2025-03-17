@@ -6,7 +6,7 @@
 
 .cla-form-control {
   position: relative;
-  width: 300px;
+  width: 200px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -14,7 +14,7 @@
   height: 36px;
   border: 1px solid #c0c4cc;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 0.8em;
   line-height: 1.5;
   color: #444;
   background-color: #fff !important;
