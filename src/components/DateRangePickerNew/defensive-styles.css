@@ -106,7 +106,7 @@
 html body .cla-calendar-wrapper .cla-form-control,
 html body .cla-form-control {
   width: 200px !important;
-  font-size: 0.8em !important;
+  font-size: 0.8em;
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
@@ -121,7 +121,7 @@ html body .cla-input-custom {
   padding: 8px 12px !important;
   border: 1px solid #ced4da !important;
   border-radius: 4px !important;
-  font-size: 0.9rem !important;
+  font-size: 0.8rem !important;
   color: #333333 !important;
   background-color: #ffffff !important;
   box-shadow: none !important;
