@@ -198,27 +198,39 @@ html body .cla-input-custom {
   transform: translate(-75%, -50%) rotate(45deg) !important;
 }
 
-/* Date input section fixes */
-.cla-calendar .date-input-section,
-.cla-calendar .cla-input-container {
+/* Date input section fixes - with maximum specificity and !important */
+html body .cla-calendar .date-input-section,
+html body .cla-calendar .cla-input-container {
   display: flex !important;
   flex-wrap: nowrap !important; /* Prevent wrapping */
+  flex-direction: row !important; /* Force horizontal layout */
   padding: 16px !important;
   gap: 8px !important; /* Reduced gap between inputs */
   border-bottom: 1px solid #e0e0e0 !important;
   width: 100% !important;
   background-color: #f8f9fa !important;
   box-sizing: border-box !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  min-height: 80px !important; /* Ensure min height for the section */
+  position: relative !important;
+  z-index: 1 !important; /* Ensure proper stacking context */
+  isolation: isolate !important;
 }
 
-/* Date input wrapper fixes */
-.cla-calendar .cla-input-wrapper,
-.cla-calendar .date-input-container {
+/* Date input wrapper fixes - with maximum specificity */
+html body .cla-calendar .cla-input-wrapper,
+html body .cla-calendar .date-input-container {
   flex: 1 1 0 !important; /* Equal width with min-width override below */
   min-width: 0 !important; /* Allow shrinking below content size */
+  max-width: 48% !important; /* Prevent taking more than half the space */
   position: relative !important;
   margin: 0 !important;
   isolation: isolate !important;
+  white-space: nowrap !important; /* Prevent text from wrapping */
+  overflow: hidden !important; /* Hide overflow */
+  display: block !important;
+  z-index: 2 !important;
 }
 
 /* Date input styling */
@@ -244,6 +256,10 @@ html body .cla-input-custom {
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
+  flex-shrink: 1 !important;
+  height: 38px !important; /* Fix height to prevent resizing */
+  display: block !important; /* Ensure block display */
+  position: relative !important;
 }
 
 /* Date input indicator position */
@@ -281,16 +297,58 @@ html body .cla-input-custom {
   /* No max-width needed */
 }
 
-/* Adjust width constraints based on calendar width */
+/* Add a new rule specifically for the date range separator to prevent it from disappearing */
+.cla-calendar .date-range-separator {
+  flex: 0 0 auto !important;
+  padding: 0 5px !important;
+  white-space: nowrap !important;
+  font-weight: normal !important;
+  color: #666 !important;
+}
+
+/* Handle single vs range mode input section differently */
+.cla-calendar .date-input-section.single .date-input-container {
+  flex: 1 1 100% !important;
+  max-width: 100% !important;
+}
+
+/* Add strong defensive wrapper for date inputs */
+.cla-date-inputs-wrapper {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: relative !important;
+  flex-wrap: nowrap !important;
+  min-width: 280px !important; /* Ensure some minimum width for small screens */
+  border-bottom: 1px solid #e0e0e0 !important;
+  background-color: #f8f9fa !important;
+}
+
+/* Improve mobile support with responsive tweaks */
 @media (max-width: 500px) {
-  .cla-calendar .date-input-container,
-  .cla-calendar .cla-input-wrapper {
-    flex-basis: 0 !important;
-    min-width: 0 !important;
+  .cla-calendar .cla-input-container {
+    padding: 10px !important; /* Reduce padding on small screens */
+    flex-direction: column !important; /* Stack inputs on very small screens */
+    gap: 8px !important;
+    align-items: stretch !important;
+  }
+  
+  .cla-calendar .cla-input-wrapper,
+  .cla-calendar .date-input-container {
+    max-width: 100% !important; /* Full width on small screens */
+    margin-bottom: 5px !important;
   }
   
   .cla-calendar .date-input {
     font-size: 13px !important;
-    padding: 8px 8px !important;
+    padding: 8px !important;
+  }
+  
+  /* Special case for range mode on small screens */
+  .cla-calendar .cla-input-container.range {
+    min-height: 120px !important; /* More space for stacked inputs */
   }
 } 

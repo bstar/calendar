@@ -1405,12 +1405,21 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       <>
         {settings.showHeader && (
           <>
-            <DateInputSection
-              selectedRange={selectedRange}
-              handleDateChange={handleDateChange}
-              dateInputContext={dateInputContext}
-              selectionMode={settings.selectionMode}
-            />
+            <div className="cla-date-inputs-wrapper" style={{
+              width: '100%',
+              boxSizing: 'border-box',
+              display: 'flex',
+              flexDirection: 'column',
+              margin: 0,
+              padding: 0,
+            }}>
+              <DateInputSection
+                selectedRange={selectedRange}
+                handleDateChange={handleDateChange}
+                dateInputContext={dateInputContext}
+                selectionMode={settings.selectionMode}
+              />
+            </div>
 
             <CalendarHeader
               months={months}
