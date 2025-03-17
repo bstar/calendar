@@ -225,7 +225,8 @@ export class DateRangePickerHandlers {
   static createDisplayTextFormatter(
     selectedRange: DateRange,
     selectionMode: 'single' | 'range',
-    dateFormatter?: (date: Date) => string
+    dateFormatter?: (date: Date) => string,
+    dateRangeSeparator: string = " - " // Default separator if not provided
   ) {
     return () => {
       const { start, end } = selectedRange;
@@ -245,7 +246,7 @@ export class DateRangePickerHandlers {
       
       return !end
         ? formatDate(start)
-        : `${formatDate(start)} - ${formatDate(end)}`;
+        : `${formatDate(start)}${dateRangeSeparator}${formatDate(end)}`;
     };
   }
 

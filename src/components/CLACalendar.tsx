@@ -1115,9 +1115,10 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     DateRangePickerHandlers.createDisplayTextFormatter(
       displayRange,
       settings.selectionMode,
-      settings.dateFormatter
+      settings.dateFormatter,
+      settings.dateRangeSeparator
     ),
-    [displayRange, settings.selectionMode, settings.dateFormatter]
+    [displayRange, settings.selectionMode, settings.dateFormatter, settings.dateRangeSeparator]
   );
 
   // Use the abstracted selection handlers with all required parameters
@@ -1471,10 +1472,22 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       className="cla-calendar-wrapper"
       data-open={isOpen ? "true" : "false"}
     >
+      {settings.inputStyle && (
+        <style>
+          {`
+          #${calendarIdRef.current}-input {
+            ${Object.entries(settings.inputStyle).map(([key, value]) => 
+              `${key}: ${value} !important;`
+            ).join('\n            ')}
+          }
+          `}
+        </style>
+      )}
       <input
         ref={inputRef}
+        id={`${calendarIdRef.current}-input`}
         type="text"
-        className="cla-form-control"
+        className={`cla-form-control cla-input-custom`}
         readOnly
         value={getDisplayText()}
         onClick={handleInputClick}

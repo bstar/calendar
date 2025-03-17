@@ -115,8 +115,32 @@ const App: React.FC = () => {
       return format(date, "do 'of' MMMM, yyyy"); // Example: 1st of January, 2023
     },
     */
+    
+    // MM/DD/YYYY format with padded zeros (produces "02/23/2025 to 02/23/2025" for a range)
     dateFormatter: (date: Date) => {
-      return format(date, 'M/d/yy'); // Example: 1/1/23
+      // Pad numbers with leading zeros
+      const pad = (num: number): string => String(num).padStart(2, '0');
+      
+      const month = pad(date.getMonth() + 1); // getMonth() is 0-indexed
+      const day = pad(date.getDate());
+      const year = date.getFullYear();
+      
+      return `${month}/${day}/${year}`;
+    },
+    // Custom separator for date ranges
+    dateRangeSeparator: " to ",
+    // Custom styling for the input field
+    inputStyle: {
+      // You can override any CSS properties here
+      width: '250px',
+      padding: '10px 12px',
+      border: '2px solid #0366d6',
+      borderRadius: '4px',
+      fontSize: '1rem',
+      color: '#333333',
+      backgroundColor: '#f8f9fa',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+      cursor: 'pointer',
     },
     restrictionConfig: {
       restrictions: [
@@ -170,6 +194,18 @@ const App: React.FC = () => {
   const calendar2Settings = {
     ...baseSettings,
     visibleMonths: 3, // Second calendar shows 3 months
+    // Override the input style for the second calendar
+    inputStyle: {
+      width: '300px',
+      padding: '8px 10px',
+      border: '2px solid #28a745', // Green border
+      borderRadius: '8px',
+      fontSize: '1rem',
+      color: '#333333',
+      backgroundColor: '#f0fff0', // Light green background
+      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+      cursor: 'pointer',
+    },
     restrictionConfig: {
       restrictions: [
         {

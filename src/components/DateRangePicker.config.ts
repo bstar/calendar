@@ -171,6 +171,7 @@ export interface CalendarSettings {
   showSelectionAlert: boolean;
   startWeekOnSunday: boolean;
   dateFormatter?: (date: Date) => string; // Custom date formatter function
+  dateRangeSeparator?: string; // Custom separator for date ranges (default is " - ")
   
   // Layer Settings
   layers: Layer[];
@@ -260,6 +261,7 @@ export const getDefaultSettings = (): CalendarSettings => ({
   showSelectionAlert: false,
   startWeekOnSunday: false,
   dateFormatter: undefined,
+  dateRangeSeparator: " - ",
   layers: DEFAULT_LAYERS,
   showLayersNavigation: true,
   defaultLayer: '',
@@ -428,6 +430,13 @@ export const SETTINGS: SettingsConfig = {
       label: 'Date Formatter',
       description: 'Custom function to format dates (provide as code string, will be handled programmatically)',
       default: undefined // Default to undefined (use built-in formatter)
+    },
+    dateRangeSeparator: {
+      id: 'dateRangeSeparator',
+      type: 'text',
+      label: 'Date Range Separator',
+      description: 'Text to separate start and end dates in a range (e.g., " - " or " to ")',
+      default: " - "
     }
   },
   layers: {
