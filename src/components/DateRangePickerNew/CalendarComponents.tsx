@@ -214,6 +214,14 @@ export const DateInput: React.FC<DateInputProps> = ({
       className="date-input-container"
       onClick={(e) => e.stopPropagation()}
       onMouseDown={(e) => e.stopPropagation()}
+      style={{
+        position: 'relative',
+        display: 'block',
+        width: '100%',
+        minWidth: '120px',
+        boxSizing: 'border-box',
+        whiteSpace: 'nowrap'
+      }}
     >
       <input
         type="text"
@@ -232,6 +240,20 @@ export const DateInput: React.FC<DateInputProps> = ({
         placeholder={placeholder}
         autoComplete="off"
         className="date-input"
+        style={{
+          width: '100%',
+          minWidth: '120px',
+          padding: '8px 10px',
+          boxSizing: 'border-box',
+          border: '1px solid #ccc',
+          borderRadius: '4px',
+          fontSize: '14px',
+          lineHeight: '1.4',
+          display: 'block',
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis'
+        }}
       />
       {showIndicator && (
         <div className={`date-input-indicator date-input-indicator-${showIndicator}`}>
@@ -336,8 +358,31 @@ export const DateInputSection: React.FC<DateInputSectionProps> = ({
   dateInputContext,
   selectionMode
 }) => (
-  <div className={`cla-input-container ${selectionMode === 'single' ? 'single' : 'range'}`}>
-    <div className="cla-input-wrapper">
+  <div className={`cla-input-container ${selectionMode === 'single' ? 'single' : 'range'}`}
+       style={{
+         display: 'flex',
+         flexDirection: 'row',
+         flexWrap: 'nowrap',
+         width: '100%',
+         minWidth: selectionMode === 'single' ? '200px' : '300px',
+         padding: '12px 16px',
+         justifyContent: 'space-between',
+         alignItems: 'center',
+         boxSizing: 'border-box',
+         whiteSpace: 'nowrap',
+         overflow: 'visible'
+       }}>
+    <div className="cla-input-wrapper"
+         style={{
+           flex: selectionMode === 'single' ? '1 0 auto' : '0 0 48%',
+           width: selectionMode === 'single' ? 'auto' : '48%',
+           maxWidth: selectionMode === 'single' ? 'none' : '48%',
+           minWidth: '120px',
+           display: 'block',
+           whiteSpace: 'nowrap',
+           position: 'relative',
+           boxSizing: 'border-box'
+         }}>
       <DateInput
         value={selectedRange.start ? parseISO(selectedRange.start) : null}
         onChange={handleDateChange('start')}
@@ -348,7 +393,17 @@ export const DateInputSection: React.FC<DateInputSectionProps> = ({
       />
     </div>
     {selectionMode === 'range' && (
-      <div className="cla-input-wrapper">
+      <div className="cla-input-wrapper"
+           style={{
+             flex: '0 0 48%',
+             width: '48%',
+             maxWidth: '48%',
+             minWidth: '120px',
+             display: 'block',
+             whiteSpace: 'nowrap',
+             position: 'relative',
+             boxSizing: 'border-box'
+           }}>
         <DateInput
           value={selectedRange.end ? parseISO(selectedRange.end) : null}
           onChange={handleDateChange('end')}
