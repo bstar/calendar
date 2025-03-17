@@ -48,7 +48,17 @@ interface ChevronProps {
 export const ChevronLeft: React.FC<ChevronProps> = ({ size = 16 }) => (
   <span
     className="cla-chevron cla-chevron-left"
-    style={{ width: size, height: size }}
+    style={{ 
+      width: size, 
+      height: size,
+      display: 'block',
+      position: 'relative',
+      color: '#333',
+      boxSizing: 'border-box',
+      flex: '0 0 auto',
+      margin: 0,
+      padding: 0
+    }}
   />
 );
 
@@ -60,7 +70,17 @@ export const ChevronLeft: React.FC<ChevronProps> = ({ size = 16 }) => (
 export const ChevronRight: React.FC<ChevronProps> = ({ size = 16 }) => (
   <span
     className="cla-chevron cla-chevron-right"
-    style={{ width: size, height: size }}
+    style={{ 
+      width: size, 
+      height: size,
+      display: 'block',
+      position: 'relative',
+      color: '#333',
+      boxSizing: 'border-box',
+      flex: '0 0 auto',
+      margin: 0,
+      padding: 0
+    }}
   />
 );
 
@@ -304,17 +324,63 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   };
 
   return (
-    <div className="cla-header">
+    <div className="cla-header"
+         style={{
+           display: 'flex',
+           justifyContent: 'space-between',
+           alignItems: 'center',
+           padding: '12px 16px',
+           width: '100%',
+           margin: 0,
+           boxSizing: 'border-box',
+           minHeight: '56px',
+           position: 'relative',
+           flexWrap: 'nowrap',
+           borderBottom: '1px solid #e0e0e0',
+           backgroundColor: 'white'
+         }}>
       <button
         className="cla-button-nav"
         onClick={() => moveToMonth('prev')}
         aria-label="Previous month"
+        style={{
+          width: '36px',
+          height: '36px',
+          minWidth: '36px',
+          minHeight: '36px',
+          flex: '0 0 36px',
+          padding: 0,
+          margin: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'none',
+          border: 'none',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          position: 'relative',
+          zIndex: 5,
+          boxSizing: 'border-box'
+        }}
       >
         <ChevronLeft size={16} />
       </button>
       <span 
         className="cla-header-title"
         title={`Current timezone: ${formatTimezone(timezone)}`}
+        style={{
+          margin: '0 8px',
+          padding: '0 4px',
+          flex: '1 1 auto',
+          textAlign: 'center',
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          fontWeight: 500,
+          fontSize: '16px',
+          lineHeight: 1.5,
+          color: '#333'
+        }}
       >
         {visibleMonths === 1
           ? format(months[0], "MMMM yyyy")
@@ -325,6 +391,25 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
         className="cla-button-nav"
         onClick={() => moveToMonth('next')}
         aria-label="Next month"
+        style={{
+          width: '36px',
+          height: '36px',
+          minWidth: '36px',
+          minHeight: '36px',
+          flex: '0 0 36px',
+          padding: 0,
+          margin: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'none',
+          border: 'none',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          position: 'relative',
+          zIndex: 5,
+          boxSizing: 'border-box'
+        }}
       >
         <ChevronRight size={16} />
       </button>

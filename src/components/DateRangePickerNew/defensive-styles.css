@@ -131,26 +131,39 @@ html body .cla-input-custom {
   text-overflow: ellipsis !important;
 }
 
-/* Calendar header */
-.cla-calendar .cla-header {
+/* Calendar header with bulletproof styling */
+html body .cla-calendar .cla-header,
+html .cla-header[class],
+.cla-calendar-root .cla-header {
   display: flex !important;
   justify-content: space-between !important;
   align-items: center !important;
-  padding: 16px !important;
+  padding: 12px 16px !important;
   border-bottom: 1px solid #e0e0e0 !important;
   background-color: white !important;
   width: 100% !important;
   margin: 0 !important;
+  box-sizing: border-box !important;
+  min-height: 56px !important;
+  position: relative !important;
+  flex-wrap: nowrap !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
 }
 
-/* Fix for chevron navigation buttons */
-.cla-calendar .cla-button-nav {
-  width: 32px !important;
-  height: 32px !important;
-  min-width: 32px !important; /* Ensure minimum width */
-  flex: 0 0 32px !important; /* Prevent shrinking */
-  padding: 8px !important; /* Ensure consistent padding */
-  margin: 0 4px !important; /* Add margin for better spacing */
+/* Ultra-hardened chevron navigation buttons */
+html body .cla-calendar .cla-button-nav,
+html .cla-button-nav[class],
+.cla-calendar-root .cla-button-nav {
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important; /* Ensure minimum width */
+  min-height: 36px !important; /* Ensure minimum height */
+  max-width: 36px !important; /* Enforce maximum width */
+  max-height: 36px !important; /* Enforce maximum height */
+  flex: 0 0 36px !important; /* Prevent growing/shrinking */
+  padding: 0 !important; /* Remove padding completely */
+  margin: 0 !important; /* Remove margin completely */
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -159,26 +172,62 @@ html body .cla-input-custom {
   border-radius: 4px !important;
   cursor: pointer !important;
   transition: background-color 0.2s ease !important;
+  position: relative !important;
+  z-index: 5 !important; /* Ensure above other content */
+  box-sizing: border-box !important;
 }
 
-.cla-calendar .cla-button-nav:hover {
-  background-color: #f5f5f5 !important; /* Match secondary button default color */
+/* Add spacing to title to prevent button overlap */
+html body .cla-calendar .cla-header-title,
+html .cla-header-title[class],
+.cla-calendar-root .cla-header-title {
+  margin: 0 8px !important;
+  padding: 0 4px !important;
+  flex: 1 1 auto !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  font-weight: 500 !important;
+  font-size: 16px !important;
+  line-height: 1.5 !important;
+  color: #333 !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
-/* Ensure consistent chevron styling */
-.cla-calendar .cla-chevron {
+/* Bulletproof chevron icon styling */
+html body .cla-calendar .cla-chevron,
+html .cla-chevron[class],
+.cla-calendar-root .cla-chevron {
   display: block !important;
   width: 10px !important;
   height: 10px !important;
+  min-width: 10px !important;
+  min-height: 10px !important;
   position: relative !important;
   color: #333 !important; /* Base color */
+  box-sizing: border-box !important;
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
-.cla-calendar .cla-button-nav:hover .cla-chevron {
+html body .cla-calendar .cla-button-nav:hover,
+html .cla-button-nav[class]:hover,
+.cla-calendar-root .cla-button-nav:hover {
+  background-color: #f5f5f5 !important; /* Match secondary button default color */
+}
+
+html body .cla-calendar .cla-button-nav:hover .cla-chevron,
+html .cla-button-nav[class]:hover .cla-chevron,
+.cla-calendar-root .cla-button-nav:hover .cla-chevron {
   color: #666 !important; /* Lighter gray on hover */
 }
 
-.cla-calendar .cla-chevron::before {
+html body .cla-calendar .cla-chevron::before,
+html .cla-chevron[class]::before,
+.cla-calendar-root .cla-chevron::before {
   content: '' !important;
   position: absolute !important;
   width: 8px !important;
@@ -188,13 +237,20 @@ html body .cla-input-custom {
   border-color: currentColor !important; /* Uses the color from parent */
   top: 50% !important;
   left: 50% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
 }
 
-.cla-calendar .cla-chevron-left::before {
+html body .cla-calendar .cla-chevron-left::before,
+html .cla-chevron-left[class]::before,
+.cla-calendar-root .cla-chevron-left::before {
   transform: translate(-25%, -50%) rotate(-135deg) !important;
 }
 
-.cla-calendar .cla-chevron-right::before {
+html body .cla-calendar .cla-chevron-right::before,
+html .cla-chevron-right[class]::before,
+.cla-calendar-root .cla-chevron-right::before {
   transform: translate(-75%, -50%) rotate(45deg) !important;
 }
 
