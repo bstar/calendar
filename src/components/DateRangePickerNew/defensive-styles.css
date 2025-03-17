@@ -92,14 +92,12 @@
 /* Form controls - general styles except for .cla-form-control font size */
 .cla-calendar-wrapper input:not(.cla-form-control),
 .cla-calendar-portal input:not(.cla-form-control) {
-  font-family: inherit !important;
   line-height: inherit !important;
   background-color: #fff !important;
 }
 
 /* Set only font-family and background for form-control, font-size will be set separately */
 .cla-form-control {
-  font-family: inherit !important;
   line-height: inherit !important;
   background-color: #fff !important;
 }
