@@ -948,6 +948,8 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   // This ensures we always have colors, falling back to defaults if none provided
 
   const [isOpen, setIsOpen] = useState(settings.displayMode === 'embedded' || settings.isOpen);
+  // Track whether the calendar has been initialized
+  const [hasInitialized, setHasInitialized] = useState(settings.displayMode === 'embedded' || settings.isOpen);
   const [selectedRange, setSelectedRange] = useState<DateRange>({ start: null, end: null });
   const [displayRange, setDisplayRange] = useState<DateRange>({ start: null, end: null });
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date()));
@@ -962,10 +964,10 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   });
   const [validationErrors, setValidationErrors] = useState<Record<string, CalendarValidationError>>({});
 
-  // Create layerManager before using it
+  // Create layerManager before using it, but only when needed
   const layerManager = useMemo(() =>
-    new LayerManager(settings.layers),
-    [settings.layers]
+    isOpen && hasInitialized ? new LayerManager(settings.layers) : null,
+    [isOpen, hasInitialized, settings.layers]
   );
 
   // Use initialActiveLayer if provided, otherwise use settings.defaultLayer
@@ -981,24 +983,31 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   }, [initialActiveLayer]);
 
   // Now we can use layerManager
-  const [activeLayers, setActiveLayers] = useState<Layer[]>(
-    layerManager.getLayers()
-  );
+  const [activeLayers, setActiveLayers] = useState<Layer[]>([]);
+  
+  // Update active layers when layerManager changes
+  useEffect(() => {
+    if (layerManager) {
+      setActiveLayers(layerManager.getLayers());
+    }
+  }, [layerManager]);
 
   const [notification, setNotification] = useState<string | null>(null);
 
+  // Create selection manager only when needed
   const selectionManager = useMemo(() =>
-    new DateRangeSelectionManager(
+    isOpen && hasInitialized ? new DateRangeSelectionManager(
       settings.restrictionConfig,
       settings.selectionMode,
       settings.showSelectionAlert
-    ),
-    [settings.restrictionConfig, settings.selectionMode, settings.showSelectionAlert]
+    ) : null,
+    [isOpen, hasInitialized, settings.restrictionConfig, settings.selectionMode, settings.showSelectionAlert]
   );
 
+  // Generate restriction background data only when needed
   const restrictionBackgroundData = useMemo(() =>
-    RestrictionBackgroundGenerator.generateBackgroundData(settings.restrictionConfig),
-    [settings.restrictionConfig]
+    isOpen && hasInitialized ? RestrictionBackgroundGenerator.generateBackgroundData(settings.restrictionConfig) : null,
+    [isOpen, hasInitialized, settings.restrictionConfig]
   );
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -1014,6 +1023,8 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
 
   // Add this effect to update activeLayers when initialLayers changes
   useEffect(() => {
+    if (!layerManager) return;
+    
     setActiveLayers(layerManager.getLayers());
     // Ensure we have a valid active layer
     if (!activeLayer || !settings.layers.find(l => l.name === activeLayer)) {
@@ -1021,17 +1032,20 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       const firstLayer = settings.layers[0];
       setActiveLayer(defaultLayerExists ? settings.defaultLayer : firstLayer?.name);
     }
-  }, [settings.layers, settings.defaultLayer, activeLayer]);
+  }, [settings.layers, settings.defaultLayer, activeLayer, layerManager]);
 
   // In the months memo, update the result array type
   const months = useMemo(() => {
+    // Skip expensive calculation if not initialized
+    if (!isOpen || !hasInitialized) return [];
+    
     const validVisibleMonths = Math.min(6, Math.max(1, settings.visibleMonths));
     const result: Date[] = [];
     for (let i = 0; i < validVisibleMonths; i++) {
       result.push(addMonths(currentMonth, i));
     }
     return result;
-  }, [currentMonth, settings.visibleMonths]);
+  }, [currentMonth, settings.visibleMonths, isOpen, hasInitialized]);
 
   // Keep debounced month change for out-of-bounds scrolling
   useEffect(() => {
@@ -1124,8 +1138,15 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   );
 
   // Use the abstracted selection handlers with all required parameters
-  const { handleSelectionStart, handleSelectionMove } = useMemo(() =>
-    DateRangePickerHandlers.createSelectionHandlers(
+  const { handleSelectionStart, handleSelectionMove } = useMemo(() => {
+    if (!selectionManager) {
+      return {
+        handleSelectionStart: () => {},
+        handleSelectionMove: () => {}
+      };
+    }
+    
+    return DateRangePickerHandlers.createSelectionHandlers(
       selectionManager,
       isSelecting,
       setIsSelecting,
@@ -1134,9 +1155,8 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       settings.showSelectionAlert,
       selectedRange,
       outOfBoundsDirection
-    ),
-    [selectionManager, isSelecting, setIsSelecting, setSelectedRange, setNotification, settings.showSelectionAlert, selectedRange, outOfBoundsDirection]
-  );
+    );
+  }, [selectionManager, isSelecting, setIsSelecting, setSelectedRange, setNotification, settings.showSelectionAlert, selectedRange, outOfBoundsDirection]);
 
   // Use the abstracted calendar action handlers
   const { handleClear, handleSubmit: originalHandleSubmit, handleLayerChange } = useMemo(() =>
@@ -1186,6 +1206,8 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
 
   // Update layers with restriction background
   useEffect(() => {
+    if (!layerManager) return;
+    
     const updatedLayers = [...layerManager.getLayers()];
     const calendarLayer = updatedLayers.find(layer => layer.name === 'Calendar');
 
@@ -1198,6 +1220,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
 
   // Update isDateRestricted to handle both types
   const isDateRestricted = useCallback((date: Date): boolean => {
+    if (!selectionManager) return false;
     const result = selectionManager.canSelectDate(date);
     return !result.allowed;
   }, [selectionManager]);
@@ -1212,7 +1235,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     });
 
     // Then handle selection logic only if we're in an out-of-bounds selection
-    if (isSelecting && outOfBoundsDirection) {
+    if (isSelecting && outOfBoundsDirection && selectionManager) {
       const start = selectedRange.start ? parseISO(selectedRange.start) : null;
       if (!start) return;
 
@@ -1290,15 +1313,11 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   // Add a ref for the input element
   const inputRef = useRef<HTMLInputElement>(null);
   
-  // Handle click outside more effectively since it'll be managed by the portal
-  const handleCloseCalendar = useCallback(() => {
-    if (settings.closeOnClickAway && settings.displayMode === 'popup') {
-      setIsOpen(false);
-    }
-  }, [settings.closeOnClickAway, settings.displayMode]);
-  
   // Update trigger rect when input is clicked or window resizes
   const handleInputClick = () => {
+    // Mark as initialized when first clicked
+    setHasInitialized(true);
+    
     // Always open the calendar when input is clicked
     // The coordinator will handle closing other calendars
     setIsOpen(true);
@@ -1393,6 +1412,8 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
 
   // Helper function to render the calendar content to avoid duplication
   const renderCalendarContent = () => {
+    if (!hasInitialized) return null;
+    
     return (
       <>
         {settings.showHeader && (
@@ -1494,52 +1515,55 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
         onClick={handleInputClick}
       />
       
-      {settings.displayMode === 'embedded' ? (
-        // For embedded mode, render directly
-        <CalendarContainer
-          isOpen={isOpen}
-          displayMode={settings.displayMode}
-          containerRef={containerRef}
-          containerStyle={settings.containerStyle}
-          visibleMonths={settings.visibleMonths}
-          singleMonthWidth={settings.singleMonthWidth}
-          enableOutOfBoundsScroll={settings.enableOutOfBoundsScroll}
-          handleMouseDown={handleMouseDown}
-          handleMouseMove={handleMouseMove}
-          handleMouseLeave={handleMouseLeave}
-        >
-          {renderCalendarContent()}
-        </CalendarContainer>
-      ) : (
-        // For popup mode, use a direct portal
-        isOpen && ReactDOM.createPortal(
-          <div 
-            className="cla-calendar-portal"
-            style={{
-              position: 'fixed',
-              zIndex: 2147483647,
-              top: inputRef.current ? inputRef.current.getBoundingClientRect().bottom + 8 + 'px' : '0px',
-              left: inputRef.current ? inputRef.current.getBoundingClientRect().left + 'px' : '0px',
-              width: `${settings.visibleMonths * settings.singleMonthWidth + ((settings.visibleMonths - 1) * 16)}px` // Include gap between months
-            }}
-            onClick={(e) => e.stopPropagation()} // Prevent click from closing immediately
+      {/* Only render the calendar when it's open */}
+      {isOpen && (
+        settings.displayMode === 'embedded' ? (
+          // For embedded mode, render directly
+          <CalendarContainer
+            isOpen={isOpen}
+            displayMode={settings.displayMode}
+            containerRef={containerRef}
+            containerStyle={settings.containerStyle}
+            visibleMonths={settings.visibleMonths}
+            singleMonthWidth={settings.singleMonthWidth}
+            enableOutOfBoundsScroll={settings.enableOutOfBoundsScroll}
+            handleMouseDown={handleMouseDown}
+            handleMouseMove={handleMouseMove}
+            handleMouseLeave={handleMouseLeave}
           >
+            {renderCalendarContent()}
+          </CalendarContainer>
+        ) : (
+          // For popup mode, use a direct portal
+          ReactDOM.createPortal(
             <div 
-              ref={containerRef}
-              className="cla-card"
+              className="cla-calendar-portal"
               style={{
-                width: `${settings.visibleMonths * settings.singleMonthWidth + ((settings.visibleMonths - 1) * 16)}px`, // Include gap between months
-                ...DEFAULT_CONTAINER_STYLES,
-                ...settings.containerStyle
+                position: 'fixed',
+                zIndex: 2147483647,
+                top: inputRef.current ? inputRef.current.getBoundingClientRect().bottom + 8 + 'px' : '0px',
+                left: inputRef.current ? inputRef.current.getBoundingClientRect().left + 'px' : '0px',
+                width: `${settings.visibleMonths * settings.singleMonthWidth + ((settings.visibleMonths - 1) * 16)}px` // Include gap between months
               }}
-              onMouseDown={settings.enableOutOfBoundsScroll ? handleMouseDown : undefined}
-              onMouseMove={settings.enableOutOfBoundsScroll ? handleMouseMove : undefined}
-              onMouseLeave={settings.enableOutOfBoundsScroll ? handleMouseLeave : undefined}
+              onClick={(e) => e.stopPropagation()} // Prevent click from closing immediately
             >
-              {renderCalendarContent()}
-            </div>
-          </div>,
-          document.body
+              <div 
+                ref={containerRef}
+                className="cla-card"
+                style={{
+                  width: `${settings.visibleMonths * settings.singleMonthWidth + ((settings.visibleMonths - 1) * 16)}px`, // Include gap between months
+                  ...DEFAULT_CONTAINER_STYLES,
+                  ...settings.containerStyle
+                }}
+                onMouseDown={settings.enableOutOfBoundsScroll ? handleMouseDown : undefined}
+                onMouseMove={settings.enableOutOfBoundsScroll ? handleMouseMove : undefined}
+                onMouseLeave={settings.enableOutOfBoundsScroll ? handleMouseLeave : undefined}
+              >
+                {renderCalendarContent()}
+              </div>
+            </div>,
+            document.body
+          )
         )
       )}
     </div>
