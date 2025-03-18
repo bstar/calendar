@@ -306,7 +306,8 @@ const MonthGrid: React.FC<MonthGridProps & { settings?: CalendarSettings }> = ({
   const currentWeeks = Object.keys(weeks).length;
   const emptyWeeks = totalWeeks - currentWeeks;
 
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  // Use a ref for current mouse position instead of state to avoid render loops
+  const mousePositionRef = useRef({ x: 0, y: 0 });
   const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
   const restrictionManager = useMemo(() =>
     new RestrictionManager(restrictionConfig ?? { restrictions: [] }),
@@ -322,10 +323,10 @@ const MonthGrid: React.FC<MonthGridProps & { settings?: CalendarSettings }> = ({
 
   const handleGridMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     // Store exact mouse coordinates without any offset
-    setMousePosition({
+    mousePositionRef.current = {
       x: e.clientX,
       y: e.clientY
-    });
+    };
   };
 
   const handleGridMouseLeave = () => {
@@ -334,12 +335,15 @@ const MonthGrid: React.FC<MonthGridProps & { settings?: CalendarSettings }> = ({
 
   // Helper function to render tooltip using portal
   const renderTooltip = (message: string, settings?: CalendarSettings) => {
+    // Use the ref value to avoid render loops
+    const position = mousePositionRef.current;
+    
     return ReactDOM.createPortal(
       <div 
         style={{
           position: 'fixed',
-          left: `${mousePosition.x + 10}px`,
-          top: `${mousePosition.y + 10}px`,
+          left: `${position.x + 10}px`,
+          top: `${position.y + 10}px`,
           backgroundColor: 'rgba(220, 53, 69, 0.9)',
           color: 'white',
           padding: '8px 12px',
@@ -428,8 +432,13 @@ const MonthGrid: React.FC<MonthGridProps & { settings?: CalendarSettings }> = ({
               isCurrentMonth={isSameMonth(date, baseDate)}
               onMouseDown={() => onSelectionStart(date)}
               onMouseEnter={() => {
+                // Call these separately to avoid a potential update loop
                 onSelectionMove(date);
-                setHoveredDate(date);
+                // Use requestAnimationFrame to avoid rapid re-renders
+                // that could cause infinite update loops
+                requestAnimationFrame(() => {
+                  setHoveredDate(date);
+                });
               }}
               showTooltips={showTooltips}
               renderContent={renderDay}
@@ -644,14 +653,14 @@ const DayCell = ({
     }
   }, [date, restrictionManager, selectedRange, restrictionConfig]);
 
-  const handleMouseEnter = (e) => {
+  const handleMouseEnter = useCallback((e) => {
     setIsHovered(true);
-    onMouseEnter?.(e);
-  };
+    if (onMouseEnter) onMouseEnter(e);
+  }, [onMouseEnter]);
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = useCallback(() => {
     setIsHovered(false);
-  };
+  }, []);
 
   const isSingleDay = useMemo(() => {
     if (!selectedRange.start) return false;
@@ -944,7 +953,8 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date()));
   const [isSelecting, setIsSelecting] = useState(false);
   const [outOfBoundsDirection, setOutOfBoundsDirection] = useState<'prev' | 'next' | null>(null);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 }); // TODO probably not needed
+  // Using mousePositionRef to store position to prevent render loops
+  const mousePositionRef = useRef({ x: 0, y: 0 });
   const [dateInputContext, setDateInputContext] = useState({
     startDate: null,
     endDate: null,
@@ -1067,9 +1077,11 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       containerRef,
       isSelecting,
       setOutOfBoundsDirection,
-      setMousePosition
+      (position) => {
+        mousePositionRef.current = position;
+      }
     ),
-    [containerRef, isSelecting, setOutOfBoundsDirection, setMousePosition]
+    [containerRef, isSelecting, setOutOfBoundsDirection]
   );
 
   const { handleDocumentMouseMove, handleMouseUp, handleMouseDown } = useMemo(() =>
@@ -1078,11 +1090,13 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       isSelecting,
       outOfBoundsDirection,
       setOutOfBoundsDirection,
-      setMousePosition,
+      (position) => {
+        mousePositionRef.current = position;
+      },
       moveToMonthRef,
       setIsSelecting
     ),
-    [containerRef, isSelecting, outOfBoundsDirection, setOutOfBoundsDirection, setMousePosition, moveToMonthRef, setIsSelecting]
+    [containerRef, isSelecting, outOfBoundsDirection, setOutOfBoundsDirection, moveToMonthRef, setIsSelecting]
   );
 
   const handleDateChange = useMemo(() =>
