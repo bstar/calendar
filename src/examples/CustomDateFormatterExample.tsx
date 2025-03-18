@@ -25,8 +25,9 @@ const CustomDateFormatterExample: React.FC = () => {
 
   const [settings, setSettings] = useState<CalendarSettings>(initialSettings);
 
-  const handleSubmit = (startDate: string, endDate: string) => {
-    console.log('Date range selected:', { startDate, endDate });
+  const handleSubmit = (startDate: string | null, endDate: string | null) => {
+    // No console.log, just set the selected values
+    setSelectedValues({ startDate, endDate });
   };
 
   return (

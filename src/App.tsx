@@ -233,8 +233,8 @@ const App: React.FC = () => {
         <h3 style={{ textAlign: 'left' }}>Calendar Instance 1 (2 Months)</h3>
         <CLACalendar
           settings={baseSettings}
-          onSettingsChange={(newSettings) => console.log('Calendar 1 settings:', newSettings)}
-          onSubmit={(start, end) => console.log('Calendar 1 range:', start, end)}
+          onSettingsChange={(newSettings) => {}}
+          onSubmit={(start, end) => {}}
         />
       </div>
 
@@ -243,8 +243,8 @@ const App: React.FC = () => {
         <h3 style={{ textAlign: 'left' }}>Calendar Instance 2 (3 Months)</h3>
         <CLACalendar
           settings={calendar2Settings}
-          onSettingsChange={(newSettings) => console.log('Calendar 2 settings:', newSettings)}
-          onSubmit={(start, end) => console.log('Calendar 2 range:', start, end)}
+          onSettingsChange={(newSettings) => {}}
+          onSubmit={(start, end) => {}}
         />
       </div>
 

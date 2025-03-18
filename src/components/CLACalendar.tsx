@@ -174,36 +174,26 @@ const dateValidator = (() => {
   const DATE_FORMAT = "MMMM d, yyyy";
 
   const parseDotNotation = (input) => {
-    console.log('Input:', input);
-
     // Quick test for dot notation attempt
     if (!/\d\./.test(input)) {
-      console.log('Not dot notation');
       return null;
     }
 
     // Parse the components
     const match = input.match(/(\d?\d)\.(\d?\d)\.(\d?\d?\d\d)/);
-    console.log('Regex match:', match);
 
     if (!match) {
-      console.log('No match found');
       return null;
     }
 
     const [_, month, day, year] = match;
-    console.log('Parsed components:', { month, day, year });
 
     const fullYear = year.length === 2 ? `20${year}` : year;
-    console.log('Full year:', fullYear);
 
     // Create and validate date
     const date = new Date(fullYear, parseInt(month) - 1, parseInt(day));
-    console.log('Created date:', date);
-    console.log('Month check:', date.getMonth(), parseInt(month) - 1);
 
     const isValid = date.getMonth() === parseInt(month) - 1;
-    console.log('Is valid?', isValid);
 
     return isValid ? date : null;
   };
@@ -943,8 +933,6 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   initialActiveLayer,
   onSubmit
 }) => {
-  console.log('Calendar Settings:', settings);
-  console.log('Restriction Config:', settings.restrictionConfig);
   const colors = settings.colors || DEFAULT_COLORS;
   
   // Use colors throughout the component
@@ -1189,11 +1177,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
 
     if (calendarLayer) {
       const backgrounds = RestrictionBackgroundGenerator.generateBackgroundData(settings.restrictionConfig);
-      console.log('Restriction Config:', settings.restrictionConfig);
-      console.log('Generated Backgrounds:', backgrounds);
-      
       layerManager.setBackgroundData('Calendar', backgrounds);
-      console.log('Updated Layer:', layerManager.getLayer('Calendar'));
       setActiveLayers(layerManager.getLayers());
     }
   }, [settings.restrictionConfig, layerManager]);
@@ -1323,18 +1307,15 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     const handleStateChange = () => {
       // If another calendar is activated, close this one
       if (coordinatorRef.current && !coordinatorRef.current.isActive() && isOpen) {
-        console.log('Calendar closed by coordinator:', calendarIdRef.current);
         setIsOpen(false);
       }
     };
     
     // Register this calendar with the coordinator
-    console.log('Registering calendar with coordinator:', calendarIdRef.current);
     coordinatorRef.current = registerCalendar(calendarIdRef.current, handleStateChange);
     
     // Clean up on unmount
     return () => {
-      console.log('Unregistering calendar:', calendarIdRef.current);
       coordinatorRef.current?.unregister();
     };
   }, []); // Empty dependency array - only run once on mount
@@ -1344,10 +1325,8 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     if (!coordinatorRef.current) return;
     
     if (isOpen && settings.displayMode === 'popup') {
-      console.log('Opening calendar in coordinator:', calendarIdRef.current);
       coordinatorRef.current.open();
     } else if (coordinatorRef.current.isActive() && !isOpen) {
-      console.log('Closing calendar in coordinator:', calendarIdRef.current);
       coordinatorRef.current.close();
     }
   }, [isOpen, settings.displayMode]);
@@ -1368,7 +1347,6 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       }
       
       // Close the calendar
-      console.log('Closing calendar due to outside click');
       setIsOpen(false);
     };
     

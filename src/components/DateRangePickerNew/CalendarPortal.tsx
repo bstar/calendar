@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 
 interface PortalProps {
@@ -37,139 +37,92 @@ export const CalendarPortal: React.FC<PortalProps> = ({
   useEffect(() => {
     const element = document.createElement('div');
     element.className = portalClassName;
-    element.setAttribute('data-debug', 'calendar-portal');
-    
-    // Add debug styling to make it very visible during development
-    element.style.border = '3px solid red';
-    element.style.backgroundColor = 'white';
-    
     document.body.appendChild(element);
     setPortalElement(element);
     portalRef.current = element;
     
-    console.log('Portal element created and added to DOM', element);
-    
-    // Clean up the portal element when component unmounts
     return () => {
-      if (element && element.parentNode) {
+      if (element.parentNode) {
         element.parentNode.removeChild(element);
-        console.log('Portal element removed from DOM');
       }
     };
   }, [portalClassName]);
   
   // Update portal position when it's open or the trigger ref changes
-  useEffect(() => {
-    if (!isOpen || !triggerRef.current || !portalElement) {
-      console.log('Skipping position update, conditions not met:', { 
-        isOpen, 
-        hasTriggerRef: !!triggerRef.current, 
-        hasPortalElement: !!portalElement 
-      });
+  const updatePosition = useCallback(() => {
+    if (!portalElement || !triggerRef.current) {
       return;
     }
-    
-    const updatePortalPosition = () => {
-      if (!triggerRef.current || !portalElement) return;
-      
-      const triggerRect = triggerRef.current.getBoundingClientRect();
-      console.log('Trigger element rect:', triggerRect);
-      
-      // Calculate position - default to appear below the trigger
-      portalElement.style.position = 'fixed';
-      portalElement.style.zIndex = '2147483647'; // Max z-index
-      
-      // Force visibility for debugging
-      portalElement.style.display = 'block';
-      portalElement.style.visibility = 'visible';
-      portalElement.style.opacity = '1';
-      
-      // Position below the trigger element
-      const topPosition = triggerRect.bottom + window.scrollY;
-      
-      // Check if there's enough space below, if not place it above
-      const viewportHeight = window.innerHeight;
-      const portalHeight = portalElement.offsetHeight || 300; // Default estimate if not rendered yet
-      
-      console.log('Portal dimensions:', {
-        portalHeight,
-        viewportHeight,
-        topPosition,
-        wouldOverflow: topPosition + portalHeight > viewportHeight + window.scrollY
+
+    // Only update if the portal is actually visible
+    if (!portalElement.offsetParent) {
+      return;
+    }
+
+    // Get dimensions
+    const triggerRect = triggerRef.current.getBoundingClientRect();
+    const portalHeight = portalElement.offsetHeight;
+    const portalWidth = portalElement.offsetWidth;
+
+    // Viewport dimensions
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+
+    // Determine position strategy (above or below the trigger)
+    let topPosition = 0;
+    const spaceBelow = viewportHeight - triggerRect.bottom;
+    const spaceAbove = triggerRect.top;
+
+    // Check if we have enough space below, if not try above
+    if (spaceBelow >= portalHeight || spaceBelow > spaceAbove) {
+      // Position below
+      topPosition = triggerRect.bottom + 8;
+    } else {
+      // Position above
+      topPosition = Math.max(8, triggerRect.top - portalHeight - 8);
+    }
+
+    // Calculate width and horizontal position
+    const availableWidth = viewportWidth - 16; // 8px padding on each side
+    const idealWidth = Math.max(triggerRect.width, portalWidth);
+    const actualWidth = Math.min(idealWidth, availableWidth);
+
+    // Center horizontally on the trigger element
+    let leftPosition = triggerRect.left + (triggerRect.width - actualWidth) / 2;
+
+    // Ensure the portal doesn't go off-screen horizontally
+    if (leftPosition < 8) {
+      leftPosition = 8;
+    } else if (leftPosition + actualWidth > viewportWidth - 8) {
+      leftPosition = viewportWidth - actualWidth - 8;
+    }
+
+    // Set styles
+    const styles = {
+      top: `${topPosition}px`,
+      left: `${leftPosition}px`,
+      width: `${actualWidth}px`,
+      position: 'fixed',
+      zIndex: 2147483647,
+    } as React.CSSProperties;
+
+    // Update styles
+    if (portalElement) {
+      Object.entries(styles).forEach(([key, value]) => {
+        if (key && value !== undefined) {
+          portalElement.style[key as any] = value as string;
+        }
       });
-      
-      if (topPosition + portalHeight > viewportHeight + window.scrollY && triggerRect.top > portalHeight) {
-        // Not enough space below, position above the trigger if there's room
-        console.log('Positioning portal ABOVE trigger');
-        portalElement.style.top = `${triggerRect.top + window.scrollY - portalHeight}px`;
-      } else {
-        // Position below the trigger
-        console.log('Positioning portal BELOW trigger');
-        portalElement.style.top = `${topPosition}px`;
-      }
-      
-      // Horizontal positioning - align with trigger and ensure it's within viewport
-      const viewportWidth = window.innerWidth;
-      // If no width is specified in portalStyle, use the trigger width
-      let portalWidth;
-      if (portalStyle.width && portalStyle.width !== 'auto') {
-        portalWidth = parseFloat(portalStyle.width as string);
-      } else {
-        portalWidth = portalElement.offsetWidth || triggerRect.width;
-      }
-      
-      console.log('Width calculation:', {
-        portalWidth,
-        viewportWidth,
-        triggerWidth: triggerRect.width,
-        styleWidth: portalStyle.width
-      });
-      
-      // Default left position aligned with trigger
-      let leftPosition = triggerRect.left + window.scrollX;
-      
-      // Check if the portal would extend beyond the right edge of the viewport
-      if (leftPosition + portalWidth > viewportWidth + window.scrollX) {
-        // Adjust to keep it within the viewport
-        leftPosition = Math.max(0, viewportWidth + window.scrollX - portalWidth);
-        console.log('Adjusting left position to fit viewport:', leftPosition);
-      }
-      
-      portalElement.style.left = `${leftPosition}px`;
-      portalElement.style.width = portalWidth ? `${portalWidth}px` : 'auto';
-      
-      // Add transition for smooth appearance
-      portalElement.style.transition = 'opacity 0.2s ease-in-out, transform 0.2s ease-in-out';
-      
-      console.log('Final portal position and styles:', {
-        top: portalElement.style.top,
-        left: portalElement.style.left,
-        width: portalElement.style.width,
-        display: portalElement.style.display,
-        zIndex: portalElement.style.zIndex
-      });
-    };
-    
-    // Initial position update
-    console.log('Running initial position update');
-    updatePortalPosition();
-    
-    // Update position after a short delay to account for content rendering
-    const delayedUpdate = setTimeout(() => {
-      console.log('Running delayed position update');
-      updatePortalPosition();
-    }, 50);
-    
-    // Keep position updated on window resize or scroll
-    window.addEventListener('resize', updatePortalPosition);
-    window.addEventListener('scroll', updatePortalPosition, true);
-    
-    return () => {
-      clearTimeout(delayedUpdate);
-      window.removeEventListener('resize', updatePortalPosition);
-      window.removeEventListener('scroll', updatePortalPosition, true);
-    };
-  }, [isOpen, triggerRef, portalElement, portalStyle]);
+    }
+  }, [portalElement, triggerRef]);
+  
+  // Initial and delayed position updates
+  useEffect(() => {
+    updatePosition();
+    // Also update after a short delay to account for any rendering latency
+    const timeoutId = setTimeout(updatePosition, 50);
+    return () => clearTimeout(timeoutId);
+  }, [updatePosition, isOpen]);
   
   // Handle click outside to close the portal
   useEffect(() => {
@@ -223,13 +176,10 @@ export const CalendarPortal: React.FC<PortalProps> = ({
 
   if (!portalElement || !isOpen) return null;
   
-  // Add debug logging to check what's being rendered
-  console.log('Rendering into portal:', { children, hasChildren: !!children });
-  
   return ReactDOM.createPortal(
     <div 
+      ref={portalRef}
       className="cla-calendar-portal-content" 
-      data-debug="portal-content"
       style={{
         minHeight: '300px', // Force minimum height
         background: 'white',

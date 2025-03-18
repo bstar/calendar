@@ -132,7 +132,6 @@ export const isWithinInterval = (date: Date, interval: { start: Date; end: Date 
       return cleanDate >= cleanStart && cleanDate <= cleanEnd;
     } catch (innerError) {
       // If all else fails, return false rather than breaking the application
-      console.error("Error comparing dates:", innerError);
       return false;
     }
   }
@@ -166,7 +165,6 @@ export const isWithinIntervalUTC = (date: Date, interval: { start: Date; end: Da
     // Compare only the date portion, ensuring the end date is fully inclusive
     return cleanDate >= cleanStart && cleanDate <= cleanEnd;
   } catch (error) {
-    console.error("Error comparing dates in UTC:", error);
     return false;
   }
 };
