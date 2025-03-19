@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import './bootstrap.min.css';
 import './docStyles.css';
 import './App.css';
@@ -33,8 +33,6 @@ const getUniquePeriodRanges = () => {
   return Array.from(uniquePeriods.values());
 };
 
-const uniquePeriodRanges = getUniquePeriodRanges();
-
 const App: React.FC = () => {
   /**
    * This app demonstrates a calendar widget with defensive CSS to protect
@@ -47,16 +45,7 @@ const App: React.FC = () => {
    * - Portal and tooltip visibility
    */
   
-  // Generate period end events from uniquePeriodRanges
-  const periodEndEvents = uniquePeriodRanges.map(period => ({
-    date: period.end,
-    title: `Period ${period.period} End`,
-    description: `End of Period ${period.period} (ID: ${period.periodId})`,
-    type: "work" as const,
-    time: "23:59"
-  }));
-
-  // Common settings for both calendar instances
+  // Common settings for both calendar instances - without expensive computation
   const baseSettings = {
     displayMode: "popup" as const,
     timezone: "UTC",
@@ -78,43 +67,10 @@ const App: React.FC = () => {
     isOpen: false,
     showLayersNavigation: false,
     
-    // Optional custom date formatter - uncomment any example below to use it
-    
-    /* Example 1: Simple ISO format (YYYY-MM-DD)
-    dateFormatter: (date: Date) => {
-      return format(date, 'yyyy-MM-dd');
-    },
-    */
-    
-    /* Example 2: Localized format with full month name
-    dateFormatter: (date: Date) => {
-      return format(date, 'MMMM d, yyyy'); // Example: January 1, 2023
-    },
-    */
-    
-    /* Example 3: European format (DD/MM/YYYY)
-    dateFormatter: (date: Date) => {
-      return format(date, 'dd/MM/yyyy');
-    },
-    */
-    
-    /* Example 4: With weekday name
-    dateFormatter: (date: Date) => {
-      return format(date, 'EEE, MMM d, yyyy'); // Example: Mon, Jan 1, 2023
-    },
-    */
-    
-    /* Example 5: Compact format
-    dateFormatter: (date: Date) => {
-      return format(date, 'M/d/yy'); // Example: 1/1/23
-    },
-    */
-    
-    /* Example 6: Custom format with ordinal day
-    dateFormatter: (date: Date) => {
-      return format(date, "do 'of' MMMM, yyyy"); // Example: 1st of January, 2023
-    },
-    */
+    // Add empty placeholders that will be replaced by lazy loading
+    layers: [],
+    defaultLayer: "Calendar",
+    restrictionConfig: { restrictions: [] },
     
     // MM/DD/YYYY format with padded zeros (produces "02/23/2025 to 02/23/2025" for a range)
     dateFormatter: (date: Date) => {
@@ -142,42 +98,6 @@ const App: React.FC = () => {
       boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
       cursor: 'pointer',
     },
-    restrictionConfig: {
-      restrictions: [
-        {
-          type: 'restricted_boundary' as RestrictionType,
-          enabled: true,
-          ranges: uniquePeriodRanges.map(period => ({
-            start: period.start,
-            end: period.end,
-            message: period.message
-          }))
-        } as RestrictedBoundaryRestriction
-      ]
-    },
-    layers: [
-      {
-        name: "Calendar",
-        title: "Base Calendar",
-        description: "Basic calendar functionality",
-        required: true,
-        visible: true,
-        data: { 
-          events: [
-            ...periodEndEvents,
-            {
-              date: new Date().toISOString(),
-              title: "Today's Event",
-              description: "Sample event for testing",
-              type: "work",
-              time: "10:00"
-            }
-          ],
-          background: []
-        }
-      }
-    ],
-    defaultLayer: "Calendar",
     colors: {
       primary: "#0366d6",
       success: "#28a745",
@@ -188,6 +108,93 @@ const App: React.FC = () => {
       orange: "#fd7e14",
       pink: "#e83e8c"
     }
+  };
+
+  // Create lazy factory function for layers
+  const createLayersFactory = () => {
+    return () => {
+      console.log("Lazy initializing layers data - only happens when calendar is opened!");
+      
+      // Get unique period ranges - only executed when calendar is opened
+      const uniquePeriodRanges = getUniquePeriodRanges();
+      
+      // Generate period end events from uniquePeriodRanges - only executed when calendar is opened
+      const periodEndEvents = uniquePeriodRanges.map(period => ({
+        date: period.end,
+        title: `Period ${period.period} End`,
+        description: `End of Period ${period.period} (ID: ${period.periodId})`,
+        type: "work" as const,
+        time: "23:59"
+      }));
+      
+      // Create and return the layers - important to use the same layer name ("Calendar") as defaultLayer
+      return [
+        {
+          name: "Calendar", // Must match the defaultLayer in settings
+          title: "Base Calendar",
+          description: "Basic calendar functionality",
+          required: true,
+          visible: true,
+          data: { 
+            events: [
+              ...periodEndEvents,
+              {
+                date: new Date().toISOString(),
+                title: "Today's Event",
+                description: "Sample event for testing",
+                type: "work",
+                time: "10:00"
+              }
+            ],
+            background: []
+          }
+        }
+      ];
+    };
+  };
+  
+  // Create lazy factory function for restrictions
+  const createRestrictionsFactory = () => {
+    return () => {
+      console.log("Lazy initializing restriction data - only happens when calendar is opened!");
+      
+      // Get unique period ranges - only executed when calendar is opened
+      const uniquePeriodRanges = getUniquePeriodRanges();
+      
+      return {
+        restrictions: [
+          {
+            type: 'restricted_boundary' as RestrictionType,
+            enabled: true,
+            ranges: uniquePeriodRanges.map(period => ({
+              start: period.start,
+              end: period.end,
+              message: period.message
+            }))
+          } as RestrictedBoundaryRestriction
+        ]
+      };
+    };
+  };
+  
+  // Create lazy factory function for restrictions for second calendar
+  const createRestrictions2Factory = () => {
+    return () => {
+      console.log("Lazy initializing second calendar restriction data!");
+      
+      return {
+        restrictions: [
+          {
+            type: 'boundary' as const,
+            enabled: true,
+            direction: 'before' as const,
+            // Subtract one day from current date using date-fns
+            date: formatISO(subDays(new Date(), 1)),
+            message: "Cannot select dates before today"
+          } as BoundaryRestriction
+        ]
+      };
+    };
   };
 
   // Create settings for the second calendar with 3 months
@@ -205,20 +212,13 @@ const App: React.FC = () => {
       backgroundColor: '#f0fff0', // Light green background
       boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
       cursor: 'pointer',
-    },
-    restrictionConfig: {
-      restrictions: [
-        {
-          type: 'boundary' as const,
-          enabled: true,
-          direction: 'before' as const,
-          // Subtract one day from current date using date-fns
-          date: formatISO(subDays(new Date(), 1)),
-          message: "Cannot select dates before today"
-        } as BoundaryRestriction
-      ]
     }
   };
+
+  // Memoize the factory functions to avoid recreating them on every render
+  const layersFactory = useMemo(() => createLayersFactory(), []);
+  const restrictionsFactory = useMemo(() => createRestrictionsFactory(), []);
+  const restrictions2Factory = useMemo(() => createRestrictions2Factory(), []);
 
   return (
     <div style={{ 
@@ -235,6 +235,8 @@ const App: React.FC = () => {
           settings={baseSettings}
           onSettingsChange={(newSettings) => {}}
           onSubmit={(start, end) => {}}
+          layersFactory={layersFactory}
+          restrictionConfigFactory={restrictionsFactory}
         />
       </div>
 
@@ -245,6 +247,8 @@ const App: React.FC = () => {
           settings={calendar2Settings}
           onSettingsChange={(newSettings) => {}}
           onSubmit={(start, end) => {}}
+          layersFactory={layersFactory}
+          restrictionConfigFactory={restrictions2Factory}
         />
       </div>
 

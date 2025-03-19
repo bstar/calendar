@@ -962,18 +962,29 @@ interface CLACalendarProps {
   onSettingsChange: (settings: CalendarSettings) => void;
   initialActiveLayer?: string;
   onSubmit?: (startDate: string, endDate: string) => void;
+  layersFactory?: () => Layer[];
+  restrictionConfigFactory?: () => any;
 }
 
 export const CLACalendar: React.FC<CLACalendarProps> = ({
   settings,
   onSettingsChange,
   initialActiveLayer,
-  onSubmit
+  onSubmit,
+  layersFactory,
+  restrictionConfigFactory
 }) => {
   const colors = settings.colors || DEFAULT_COLORS;
   
   // Track whether calendar has ever been initialized (opened)
   const [everInitialized, setEverInitialized] = useState(settings.displayMode === 'embedded' || settings.isOpen);
+  
+  // Track if lazy data has been loaded
+  const [lazyDataLoaded, setLazyDataLoaded] = useState(false);
+  
+  // Store lazy-loaded data
+  const [lazyLayers, setLazyLayers] = useState<Layer[] | null>(null);
+  const [lazyRestrictionConfig, setLazyRestrictionConfig] = useState<any | null>(null);
   
   // Basic state needed for input field display
   const [isOpen, setIsOpen] = useState(settings.displayMode === 'embedded' || settings.isOpen);
@@ -1003,29 +1014,80 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   // Store mouse position in a ref to avoid re-renders
   const mousePositionRef = useRef({ x: 0, y: 0 });
   
+  // Load lazy data when calendar is first opened
+  useEffect(() => {
+    if (everInitialized && !lazyDataLoaded) {
+      // Load lazy layers if factory provided
+      if (layersFactory) {
+        const layers = layersFactory();
+        setLazyLayers(layers);
+        
+        // Initialize the LayerManager immediately with the layers
+        const tempLayerManager = new LayerManager(layers);
+        setActiveLayers(tempLayerManager.getLayers());
+      }
+      
+      // Load lazy restriction config if factory provided
+      if (restrictionConfigFactory) {
+        const config = restrictionConfigFactory();
+        setLazyRestrictionConfig(config);
+      }
+      
+      setLazyDataLoaded(true);
+    }
+  }, [everInitialized, lazyDataLoaded, layersFactory, restrictionConfigFactory]);
+  
+  // Get the effective layers to use - either from lazy loading or direct settings
+  const effectiveLayers = useMemo(() => {
+    if (layersFactory && lazyLayers) {
+      return lazyLayers;
+    }
+    return settings.layers;
+  }, [settings.layers, lazyLayers, layersFactory]);
+  
+  // Get the effective restriction config to use - either from lazy loading or direct settings
+  const effectiveRestrictionConfig = useMemo(() => {
+    if (restrictionConfigFactory && lazyRestrictionConfig) {
+      return lazyRestrictionConfig;
+    }
+    return settings.restrictionConfig;
+  }, [settings.restrictionConfig, lazyRestrictionConfig, restrictionConfigFactory]);
+  
   // These expensive operations only happen when the calendar is first opened
   
-  // Create LayerManager only when calendar is first opened
-  const layerManager = useMemo(() => 
-    everInitialized ? new LayerManager(settings.layers) : null,
-    [everInitialized, settings.layers]
-  );
+  // Create LayerManager only when calendar is first opened and layers are available
+  const layerManager = useMemo(() => {
+    if (!everInitialized) return null;
+    
+    // Only create manager when we have layers (either direct or lazy-loaded)
+    if (layersFactory && !lazyLayers) return null;
+    
+    return new LayerManager(effectiveLayers);
+  }, [everInitialized, effectiveLayers, layersFactory, lazyLayers]);
   
-  // Initialize the selection manager only when first opened
-  const selectionManager = useMemo(() => 
-    everInitialized ? new DateRangeSelectionManager(
-      settings.restrictionConfig,
+  // Initialize the selection manager only when first opened and restriction config is available
+  const selectionManager = useMemo(() => {
+    if (!everInitialized) return null;
+    
+    // Only create manager when we have restriction config (either direct or lazy-loaded)
+    if (restrictionConfigFactory && !lazyRestrictionConfig) return null;
+    
+    return new DateRangeSelectionManager(
+      effectiveRestrictionConfig,
       settings.selectionMode,
       settings.showSelectionAlert
-    ) : null,
-    [everInitialized, settings.restrictionConfig, settings.selectionMode, settings.showSelectionAlert]
-  );
+    );
+  }, [everInitialized, effectiveRestrictionConfig, settings.selectionMode, settings.showSelectionAlert, restrictionConfigFactory, lazyRestrictionConfig]);
   
-  // Generate restriction background data only when first opened
-  const restrictionBackgroundData = useMemo(() => 
-    everInitialized ? RestrictionBackgroundGenerator.generateBackgroundData(settings.restrictionConfig) : null,
-    [everInitialized, settings.restrictionConfig]
-  );
+  // Generate restriction background data only when first opened and restriction config is available
+  const restrictionBackgroundData = useMemo(() => {
+    if (!everInitialized) return null;
+    
+    // Only generate data when we have restriction config (either direct or lazy-loaded)
+    if (restrictionConfigFactory && !lazyRestrictionConfig) return null;
+    
+    return RestrictionBackgroundGenerator.generateBackgroundData(effectiveRestrictionConfig);
+  }, [everInitialized, effectiveRestrictionConfig, restrictionConfigFactory, lazyRestrictionConfig]);
   
   // Use initialActiveLayer if provided, otherwise use settings.defaultLayer
   const [activeLayer, setActiveLayer] = useState(
@@ -1041,6 +1103,20 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       setActiveLayers(layerManager.getLayers());
     }
   }, [layerManager, everInitialized]);
+  
+  // Update layers with restriction background - only when initialized
+  useEffect(() => {
+    if (!layerManager || !everInitialized) return;
+    
+    const updatedLayers = [...layerManager.getLayers()];
+    const calendarLayer = updatedLayers.find(layer => layer.name === 'Calendar');
+    
+    if (calendarLayer) {
+      const backgrounds = RestrictionBackgroundGenerator.generateBackgroundData(effectiveRestrictionConfig);
+      layerManager.setBackgroundData('Calendar', backgrounds);
+      setActiveLayers(layerManager.getLayers());
+    }
+  }, [everInitialized, effectiveRestrictionConfig, layerManager]);
   
   // Helpers and refs for month navigation
   const moveToMonthRef = useRef<((direction: 'prev' | 'next') => void) | null>(null);
@@ -1098,20 +1174,6 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       setActiveLayer(initialActiveLayer);
     }
   }, [initialActiveLayer]);
-  
-  // Update layers with restriction background - only when initialized
-  useEffect(() => {
-    if (!layerManager || !everInitialized) return;
-    
-    const updatedLayers = [...layerManager.getLayers()];
-    const calendarLayer = updatedLayers.find(layer => layer.name === 'Calendar');
-    
-    if (calendarLayer) {
-      const backgrounds = RestrictionBackgroundGenerator.generateBackgroundData(settings.restrictionConfig);
-      layerManager.setBackgroundData('Calendar', backgrounds);
-      setActiveLayers(layerManager.getLayers());
-    }
-  }, [everInitialized, settings.restrictionConfig, layerManager]);
   
   // Effect for continuous month advancement - only when initialized
   useEffect(() => {
@@ -1271,12 +1333,12 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
         showTooltips={shouldShowTooltips}
         layer={layer}
         activeLayer={layer.name}
-        restrictionConfig={settings.restrictionConfig}
+        restrictionConfig={effectiveRestrictionConfig}
         startWeekOnSunday={settings.startWeekOnSunday}
         settings={settings}
       />
     );
-  }, [everInitialized, months, selectedRange, handleSelectionStart, handleSelectionMove, isSelecting, settings, shouldShowTooltips]);
+  }, [everInitialized, months, selectedRange, handleSelectionStart, handleSelectionMove, isSelecting, settings, shouldShowTooltips, effectiveRestrictionConfig]);
   
   // Register with the calendar coordinator 
   useEffect(() => {
@@ -1403,14 +1465,30 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   
   // Handle input click to open calendar and initialize if needed
   const handleInputClick = () => {
+    // Always open the calendar when input is clicked
+    setIsOpen(true);
+    
     // Ensure the calendar is initialized when first opened
     if (!everInitialized) {
       setEverInitialized(true);
       setCurrentMonth(startOfMonth(new Date()));
+      
+      // Force immediate loading of lazy data
+      if (layersFactory && !lazyLayers) {
+        const layers = layersFactory();
+        setLazyLayers(layers);
+        
+        // Initialize activeLayers right away
+        const tempLayerManager = new LayerManager(layers);
+        setActiveLayers(tempLayerManager.getLayers());
+        
+        // Make sure we have a valid activeLayer
+        if (layers.length > 0) {
+          const validLayer = layers.find(l => l.name === activeLayer) || layers[0];
+          setActiveLayer(validLayer.name);
+        }
+      }
     }
-    
-    // Always open the calendar when input is clicked
-    setIsOpen(true);
     
     // Force the coordinator to register this calendar as active
     if (coordinatorRef.current) {
@@ -1467,6 +1545,22 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   // Helper function to render the calendar content
   const renderCalendarContent = () => {
     if (!everInitialized) return null;
+    
+    // Make sure we have layers before attempting to render
+    // This is crucial to prevent empty rendering
+    if ((layersFactory && !lazyLayers) || !activeLayers || activeLayers.length === 0) {
+      return <div>Loading calendar data...</div>;
+    }
+    
+    // Make sure we have at least one active layer that matches activeLayer
+    const hasValidActiveLayer = activeLayers.some(layer => layer.name === activeLayer);
+    if (!hasValidActiveLayer) {
+      // If the activeLayer isn't valid, use the first available layer
+      if (activeLayers.length > 0) {
+        setActiveLayer(activeLayers[0].name);
+      }
+      return <div>Initializing calendar view...</div>;
+    }
     
     return (
       <>
