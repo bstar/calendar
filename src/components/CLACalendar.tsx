@@ -309,10 +309,12 @@ const MonthGrid: React.FC<MonthGridProps & { settings?: CalendarSettings }> = ({
   // Use a ref for current mouse position instead of state to avoid render loops
   const mousePositionRef = useRef({ x: 0, y: 0 });
   const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
-  const restrictionManager = useMemo(() =>
-    new RestrictionManager(restrictionConfig ?? { restrictions: [] }),
-    [restrictionConfig]
-  );
+  const restrictionManager = useMemo(() => {
+    if (!hoveredDate || !restrictionConfig || !restrictionConfig.restrictions || restrictionConfig.restrictions.length === 0) {
+      return null;
+    }
+    return new RestrictionManager(restrictionConfig ?? { restrictions: [] });
+  }, [hoveredDate, restrictionConfig]);
 
   const weekDays = useMemo(() => {
     const days = startWeekOnSunday
@@ -333,8 +335,8 @@ const MonthGrid: React.FC<MonthGridProps & { settings?: CalendarSettings }> = ({
     setHoveredDate(null);
   };
 
-  // Helper function to render tooltip using portal
-  const renderTooltip = (message: string, settings?: CalendarSettings) => {
+  // Only render tooltip when necessary
+  const renderTooltip = useCallback((message: string, settings?: CalendarSettings) => {
     // Use the ref value to avoid render loops
     const position = mousePositionRef.current;
     
@@ -362,7 +364,7 @@ const MonthGrid: React.FC<MonthGridProps & { settings?: CalendarSettings }> = ({
       </div>,
       document.body
     );
-  };
+  }, []);
 
   return (
     <div style={{
@@ -541,12 +543,18 @@ const DayCell = ({
 
   const [isHovered, setIsHovered] = useState(false);
 
-  const restrictionManager = useMemo(() =>
-    new RestrictionManager(restrictionConfig ?? { restrictions: [] }),
-    [restrictionConfig]
-  );
+  const restrictionManager = useMemo(() => {
+    if (!restrictionConfig || !restrictionConfig.restrictions || restrictionConfig.restrictions.length === 0) {
+      return null;
+    }
+    return new RestrictionManager(restrictionConfig ?? { restrictions: [] });
+  }, [restrictionConfig]);
 
   const restrictionResult = useMemo(() => {
+    if (!restrictionManager) {
+      return { allowed: true };
+    }
+    
     // Get basic restriction status for this date
     const baseRestriction = restrictionManager.checkSelection(date, date);
     
@@ -672,7 +680,19 @@ const DayCell = ({
     return <div style={{ width: "100%", height: "100%", position: "relative", backgroundColor: "white" }} />;
   }
 
-  const eventContent = renderContent?.(date);
+  const eventContent = useMemo(() => {
+    // Only compute event content when:
+    // 1. We have a render function
+    // 2. The cell is current month (to avoid computation for previous/next month dates)
+    // 3. Either we're showing tooltips or the date is in the selection range
+    if (!renderContent || !isCurrentMonth) return null;
+    
+    // Compute event content if we need to display it
+    if (showTooltips || isSelected || isInRange || isHovered) {
+      return renderContent(date);
+    }
+    return null;
+  }, [renderContent, date, isCurrentMonth, showTooltips, isSelected, isInRange, isHovered]);
 
   const getBackgroundColor = () => {
     // Only get background color for non-restricted dates
@@ -868,22 +888,30 @@ const CalendarGrid: React.FC<CalendarGridProps & { settings?: CalendarSettings }
   startWeekOnSunday,
   settings
 }) => {
-  const renderers: Renderer[] = [];
+  // Only create renderers when needed and they contain actual data
+  const renderers: Renderer[] = useMemo(() => {
+    const results: Renderer[] = [];
+    
+    if (layer.data?.background) {
+      results.push(LayerRenderer.createBackgroundRenderer(layer.data.background));
+    }
 
-  if (layer.data?.background) {
-    renderers.push(LayerRenderer.createBackgroundRenderer(layer.data.background));
-  }
+    if (layer.data?.events && layer.data.events.length > 0) {
+      results.push(LayerRenderer.createEventRenderer(
+        layer.data.events.map(event => ({
+          ...event,
+          type: event.type as 'work' | 'other'
+        }))
+      ));
+    }
+    
+    return results;
+  }, [layer.data?.background, layer.data?.events]);
 
-  if (layer.data?.events) {
-    renderers.push(LayerRenderer.createEventRenderer(
-      layer.data.events.map(event => ({
-        ...event,
-        type: event.type as 'work' | 'other'
-      }))
-    ));
-  }
+  const renderDay = useCallback((date: Date): RenderResult | null => {
+    // Quick exit if no renderers - avoids unnecessary work
+    if (renderers.length === 0) return null;
 
-  const renderDay = (date: Date): RenderResult | null => {
     const results = renderers
       .map(renderer => renderer(date))
       .filter((result): result is RenderResult => result !== null);
@@ -905,7 +933,7 @@ const CalendarGrid: React.FC<CalendarGridProps & { settings?: CalendarSettings }
         </div>
       ) : combined.tooltipContent
     }));
-  };
+  }, [renderers]);
 
   return (
     <MonthPair
@@ -944,100 +972,100 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
 }) => {
   const colors = settings.colors || DEFAULT_COLORS;
   
-  // Use colors throughout the component
-  // This ensures we always have colors, falling back to defaults if none provided
-
+  // Track whether calendar has ever been initialized (opened)
+  const [everInitialized, setEverInitialized] = useState(settings.displayMode === 'embedded' || settings.isOpen);
+  
+  // Basic state needed for input field display
   const [isOpen, setIsOpen] = useState(settings.displayMode === 'embedded' || settings.isOpen);
-  // Track whether the calendar has been initialized
-  const [hasInitialized, setHasInitialized] = useState(settings.displayMode === 'embedded' || settings.isOpen);
   const [selectedRange, setSelectedRange] = useState<DateRange>({ start: null, end: null });
   const [displayRange, setDisplayRange] = useState<DateRange>({ start: null, end: null });
-  const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date()));
-  const [isSelecting, setIsSelecting] = useState(false);
+  
+  // Reference handlers
+  const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const calendarIdRef = useRef<string>(`calendar-${++calendarCounter}`);
+  const coordinatorRef = useRef<ReturnType<typeof registerCalendar> | null>(null);
+  
+  // These states will only be initialized when calendar is first opened
+  const [currentMonth, setCurrentMonth] = useState(() => 
+    everInitialized ? startOfMonth(new Date()) : null
+  );
   const [outOfBoundsDirection, setOutOfBoundsDirection] = useState<'prev' | 'next' | null>(null);
-  // Using mousePositionRef to store position to prevent render loops
-  const mousePositionRef = useRef({ x: 0, y: 0 });
+  const [isSelecting, setIsSelecting] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<Record<string, CalendarValidationError>>({});
+  const [notification, setNotification] = useState<string | null>(null);
   const [dateInputContext, setDateInputContext] = useState({
     startDate: null,
     endDate: null,
     currentField: null
   });
-  const [validationErrors, setValidationErrors] = useState<Record<string, CalendarValidationError>>({});
-
-  // Create layerManager before using it, but only when needed
-  const layerManager = useMemo(() =>
-    isOpen && hasInitialized ? new LayerManager(settings.layers) : null,
-    [isOpen, hasInitialized, settings.layers]
-  );
-
-  // Use initialActiveLayer if provided, otherwise use settings.defaultLayer
-  const [activeLayer, setActiveLayer] = useState(
-    initialActiveLayer || settings.defaultLayer
-  );
-
-  // Add a useEffect to update activeLayer when initialActiveLayer changes
-  useEffect(() => {
-    if (initialActiveLayer) {
-      setActiveLayer(initialActiveLayer);
-    }
-  }, [initialActiveLayer]);
-
-  // Now we can use layerManager
-  const [activeLayers, setActiveLayers] = useState<Layer[]>([]);
   
-  // Update active layers when layerManager changes
-  useEffect(() => {
-    if (layerManager) {
-      setActiveLayers(layerManager.getLayers());
-    }
-  }, [layerManager]);
-
-  const [notification, setNotification] = useState<string | null>(null);
-
-  // Create selection manager only when needed
-  const selectionManager = useMemo(() =>
-    isOpen && hasInitialized ? new DateRangeSelectionManager(
+  // Store mouse position in a ref to avoid re-renders
+  const mousePositionRef = useRef({ x: 0, y: 0 });
+  
+  // These expensive operations only happen when the calendar is first opened
+  
+  // Create LayerManager only when calendar is first opened
+  const layerManager = useMemo(() => 
+    everInitialized ? new LayerManager(settings.layers) : null,
+    [everInitialized, settings.layers]
+  );
+  
+  // Initialize the selection manager only when first opened
+  const selectionManager = useMemo(() => 
+    everInitialized ? new DateRangeSelectionManager(
       settings.restrictionConfig,
       settings.selectionMode,
       settings.showSelectionAlert
     ) : null,
-    [isOpen, hasInitialized, settings.restrictionConfig, settings.selectionMode, settings.showSelectionAlert]
+    [everInitialized, settings.restrictionConfig, settings.selectionMode, settings.showSelectionAlert]
   );
-
-  // Generate restriction background data only when needed
-  const restrictionBackgroundData = useMemo(() =>
-    isOpen && hasInitialized ? RestrictionBackgroundGenerator.generateBackgroundData(settings.restrictionConfig) : null,
-    [isOpen, hasInitialized, settings.restrictionConfig]
+  
+  // Generate restriction background data only when first opened
+  const restrictionBackgroundData = useMemo(() => 
+    everInitialized ? RestrictionBackgroundGenerator.generateBackgroundData(settings.restrictionConfig) : null,
+    [everInitialized, settings.restrictionConfig]
   );
-
-  const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Use initialActiveLayer if provided, otherwise use settings.defaultLayer
+  const [activeLayer, setActiveLayer] = useState(
+    initialActiveLayer || settings.defaultLayer
+  );
+  
+  // Initialize activeLayers only when first opened
+  const [activeLayers, setActiveLayers] = useState<Layer[]>([]);
+  
+  // Update active layers when layerManager and initialization state changes
+  useEffect(() => {
+    if (layerManager && everInitialized) {
+      setActiveLayers(layerManager.getLayers());
+    }
+  }, [layerManager, everInitialized]);
+  
+  // Helpers and refs for month navigation
   const moveToMonthRef = useRef<((direction: 'prev' | 'next') => void) | null>(null);
   const debouncedMoveToMonthRef = useRef<ReturnType<typeof debounce> | null>(null);
-
-  // Calculate if tooltips should be shown based on selection state and settings
-  const shouldShowTooltips = useMemo(() => {
-    if (!settings.showTooltips) return false;
-    if (settings.suppressTooltipsOnSelection && isSelecting) return false;
-    return true;
-  }, [settings.showTooltips, settings.suppressTooltipsOnSelection, isSelecting]);
-
-  // Add this effect to update activeLayers when initialLayers changes
+  
+  // Update moveToMonth function
   useEffect(() => {
-    if (!layerManager) return;
+    if (!everInitialized) return;
     
-    setActiveLayers(layerManager.getLayers());
-    // Ensure we have a valid active layer
-    if (!activeLayer || !settings.layers.find(l => l.name === activeLayer)) {
-      const defaultLayerExists = settings.layers.find(l => l.name === settings.defaultLayer);
-      const firstLayer = settings.layers[0];
-      setActiveLayer(defaultLayerExists ? settings.defaultLayer : firstLayer?.name);
-    }
-  }, [settings.layers, settings.defaultLayer, activeLayer, layerManager]);
-
-  // In the months memo, update the result array type
+    debouncedMoveToMonthRef.current = debounce((direction) => {
+      if (moveToMonthRef.current) {
+        moveToMonthRef.current(direction);
+      }
+    }, 1000, { leading: true, trailing: false });
+    
+    return () => {
+      if (debouncedMoveToMonthRef.current) {
+        debouncedMoveToMonthRef.current.cancel();
+      }
+    };
+  }, [everInitialized]);
+  
+  // Only calculate months when initialized
   const months = useMemo(() => {
-    // Skip expensive calculation if not initialized
-    if (!isOpen || !hasInitialized) return [];
+    if (!everInitialized || !currentMonth) return [];
     
     const validVisibleMonths = Math.min(6, Math.max(1, settings.visibleMonths));
     const result: Date[] = [];
@@ -1045,61 +1073,99 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       result.push(addMonths(currentMonth, i));
     }
     return result;
-  }, [currentMonth, settings.visibleMonths, isOpen, hasInitialized]);
-
-  // Keep debounced month change for out-of-bounds scrolling
+  }, [currentMonth, settings.visibleMonths, everInitialized]);
+  
+  // Only show tooltips when initialized
+  const shouldShowTooltips = useMemo(() => {
+    if (!everInitialized) return false;
+    if (!settings.showTooltips) return false;
+    if (settings.suppressTooltipsOnSelection && isSelecting) return false;
+    return true;
+  }, [everInitialized, settings.showTooltips, settings.suppressTooltipsOnSelection, isSelecting]);
+  
+  // Initialize during first open
   useEffect(() => {
-    debouncedMoveToMonthRef.current = debounce((direction) => {
-      if (moveToMonthRef.current) {
-        moveToMonthRef.current(direction);
-      }
-    }, 1000, { leading: true, trailing: false });
-
-    return () => {
-      if (debouncedMoveToMonthRef.current) {
-        debouncedMoveToMonthRef.current.cancel();
-      }
-    };
-  }, []);
-
-  // Add back the continuous month advancement effect with enableOutOfBoundsScroll check
+    if (isOpen && !everInitialized) {
+      setEverInitialized(true);
+      // Initialize currentMonth when first opened
+      setCurrentMonth(startOfMonth(new Date()));
+    }
+  }, [isOpen, everInitialized]);
+  
+  // Add a useEffect to update activeLayer when initialActiveLayer changes
   useEffect(() => {
-    if (!settings.enableOutOfBoundsScroll) return () => { };
-
+    if (initialActiveLayer) {
+      setActiveLayer(initialActiveLayer);
+    }
+  }, [initialActiveLayer]);
+  
+  // Update layers with restriction background - only when initialized
+  useEffect(() => {
+    if (!layerManager || !everInitialized) return;
+    
+    const updatedLayers = [...layerManager.getLayers()];
+    const calendarLayer = updatedLayers.find(layer => layer.name === 'Calendar');
+    
+    if (calendarLayer) {
+      const backgrounds = RestrictionBackgroundGenerator.generateBackgroundData(settings.restrictionConfig);
+      layerManager.setBackgroundData('Calendar', backgrounds);
+      setActiveLayers(layerManager.getLayers());
+    }
+  }, [everInitialized, settings.restrictionConfig, layerManager]);
+  
+  // Effect for continuous month advancement - only when initialized
+  useEffect(() => {
+    if (!everInitialized || !settings.enableOutOfBoundsScroll) return () => {};
+    
     const shouldAdvance = Boolean(isSelecting && outOfBoundsDirection && moveToMonthRef.current);
-    if (!shouldAdvance) return () => { };
-
+    if (!shouldAdvance) return () => {};
+    
     const advanceMonth = () => {
       if (moveToMonthRef.current && outOfBoundsDirection) {
         moveToMonthRef.current(outOfBoundsDirection);
       }
     };
-
+    
     // Initial delay then continuous advancement every second
     const initialAdvance = setTimeout(advanceMonth, 1000);
     const continuousAdvance = setInterval(advanceMonth, 1000);
-
+    
     return () => {
       clearTimeout(initialAdvance);
       clearInterval(continuousAdvance);
     };
-  }, [isSelecting, outOfBoundsDirection, settings.enableOutOfBoundsScroll]);
-
-  // Use the abstracted handlers
-  const { handleMouseMove, handleMouseLeave } = useMemo(() =>
-    DateRangePickerHandlers.createMouseHandlers(
+  }, [everInitialized, isSelecting, outOfBoundsDirection, settings.enableOutOfBoundsScroll]);
+  
+  // Only create mouse handlers when initialized
+  const { handleMouseMove, handleMouseLeave } = useMemo(() => {
+    if (!everInitialized) {
+      return {
+        handleMouseMove: () => {},
+        handleMouseLeave: () => {}
+      };
+    }
+    
+    return DateRangePickerHandlers.createMouseHandlers(
       containerRef,
       isSelecting,
       setOutOfBoundsDirection,
       (position) => {
         mousePositionRef.current = position;
       }
-    ),
-    [containerRef, isSelecting, setOutOfBoundsDirection]
-  );
-
-  const { handleDocumentMouseMove, handleMouseUp, handleMouseDown } = useMemo(() =>
-    DateRangePickerHandlers.createDocumentMouseHandlers(
+    );
+  }, [everInitialized, containerRef, isSelecting, setOutOfBoundsDirection]);
+  
+  // Only create document mouse handlers when initialized
+  const { handleDocumentMouseMove, handleMouseUp, handleMouseDown } = useMemo(() => {
+    if (!everInitialized) {
+      return {
+        handleDocumentMouseMove: () => {},
+        handleMouseUp: () => {},
+        handleMouseDown: () => {}
+      };
+    }
+    
+    return DateRangePickerHandlers.createDocumentMouseHandlers(
       containerRef,
       isSelecting,
       outOfBoundsDirection,
@@ -1109,12 +1175,17 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       },
       moveToMonthRef,
       setIsSelecting
-    ),
-    [containerRef, isSelecting, outOfBoundsDirection, setOutOfBoundsDirection, moveToMonthRef, setIsSelecting]
-  );
-
-  const handleDateChange = useMemo(() =>
-    DateRangePickerHandlers.createDateChangeHandler(
+    );
+  }, [everInitialized, containerRef, isSelecting, outOfBoundsDirection, setOutOfBoundsDirection, moveToMonthRef, setIsSelecting]);
+  
+  // Only create date change handler when initialized
+  const handleDateChange = useMemo(() => {
+    if (!everInitialized) {
+      // Return a function with the same signature as the real handler
+      return (field: "end" | "start") => (date: Date, isClearingError?: boolean, validationError?: CalendarValidationError) => {};
+    }
+    
+    return DateRangePickerHandlers.createDateChangeHandler(
       selectedRange,
       dateInputContext,
       setSelectedRange,
@@ -1123,10 +1194,10 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       setCurrentMonth,
       settings.visibleMonths,
       dateValidator
-    ),
-    [selectedRange, dateInputContext, setSelectedRange, setDateInputContext, setValidationErrors, setCurrentMonth, settings.visibleMonths, dateValidator]
-  );
-
+    );
+  }, [everInitialized, selectedRange, dateInputContext, setSelectedRange, setDateInputContext, setValidationErrors, setCurrentMonth, settings.visibleMonths, dateValidator]);
+  
+  // Format display text doesn't need the whole calendar to be initialized
   const getDisplayText = useMemo(() =>
     DateRangePickerHandlers.createDisplayTextFormatter(
       displayRange,
@@ -1136,10 +1207,10 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     ),
     [displayRange, settings.selectionMode, settings.dateFormatter, settings.dateRangeSeparator]
   );
-
-  // Use the abstracted selection handlers with all required parameters
+  
+  // Only create selection handlers when initialized
   const { handleSelectionStart, handleSelectionMove } = useMemo(() => {
-    if (!selectionManager) {
+    if (!everInitialized || !selectionManager) {
       return {
         handleSelectionStart: () => {},
         handleSelectionMove: () => {}
@@ -1156,8 +1227,8 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       selectedRange,
       outOfBoundsDirection
     );
-  }, [selectionManager, isSelecting, setIsSelecting, setSelectedRange, setNotification, settings.showSelectionAlert, selectedRange, outOfBoundsDirection]);
-
+  }, [everInitialized, selectionManager, isSelecting, setIsSelecting, setSelectedRange, setNotification, settings.showSelectionAlert, selectedRange, outOfBoundsDirection]);
+  
   // Use the abstracted calendar action handlers
   const { handleClear, handleSubmit: originalHandleSubmit, handleLayerChange } = useMemo(() =>
     DateRangePickerHandlers.createCalendarActionHandlers(
@@ -1171,20 +1242,23 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     ),
     [setSelectedRange, setDateInputContext, setIsSelecting, setValidationErrors, setCurrentMonth, setIsOpen, setActiveLayer]
   );
-
+  
   // Wrap the original handleSubmit to update displayRange
   const handleSubmit = useCallback(() => {
     setDisplayRange(selectedRange);
     originalHandleSubmit();
   }, [selectedRange, originalHandleSubmit]);
-
+  
   // Update handleClear to also clear displayRange
   const handleClearAll = useCallback(() => {
     handleClear();
     setDisplayRange({ start: null, end: null });
   }, [handleClear]);
-
-  const renderLayer = (layer: Layer) => {
+  
+  // Layer rendering function - only used when calendar is initialized
+  const renderLayer = useCallback((layer: Layer) => {
+    if (!everInitialized) return null;
+    
     return (
       <CalendarGrid
         months={months}
@@ -1202,138 +1276,8 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
         settings={settings}
       />
     );
-  };
-
-  // Update layers with restriction background
-  useEffect(() => {
-    if (!layerManager) return;
-    
-    const updatedLayers = [...layerManager.getLayers()];
-    const calendarLayer = updatedLayers.find(layer => layer.name === 'Calendar');
-
-    if (calendarLayer) {
-      const backgrounds = RestrictionBackgroundGenerator.generateBackgroundData(settings.restrictionConfig);
-      layerManager.setBackgroundData('Calendar', backgrounds);
-      setActiveLayers(layerManager.getLayers());
-    }
-  }, [settings.restrictionConfig, layerManager]);
-
-  // Update isDateRestricted to handle both types
-  const isDateRestricted = useCallback((date: Date): boolean => {
-    if (!selectionManager) return false;
-    const result = selectionManager.canSelectDate(date);
-    return !result.allowed;
-  }, [selectionManager]);
-
-  // Update the moveToMonth function to only show notifications during out-of-bounds scrolling
-  const moveToMonth = useCallback((direction: 'prev' | 'next') => {
-    // First move the month - this happens regardless of selection state
-    setCurrentMonth(prev => {
-      return direction === 'next'
-        ? addMonths(prev, 1)
-        : addMonths(prev, -1);
-    });
-
-    // Then handle selection logic only if we're in an out-of-bounds selection
-    if (isSelecting && outOfBoundsDirection && selectionManager) {
-      const start = selectedRange.start ? parseISO(selectedRange.start) : null;
-      if (!start) return;
-
-      // Calculate the month we just moved to
-      const nextMonth = direction === 'next'
-        ? addMonths(months[months.length - 1], 1)
-        : addMonths(months[0], -1);
-
-      const firstDayOfMonth = startOfMonth(nextMonth);
-      const lastDayOfMonth = endOfMonth(nextMonth);
-
-      // Determine the potential new end of the selection
-      const potentialEnd = direction === 'next' ? lastDayOfMonth : firstDayOfMonth;
-      
-      // Use the selection manager to handle the update, which now properly checks boundaries
-      const updateResult = selectionManager.updateSelection(
-        selectedRange,
-        potentialEnd
-      );
-      
-      // Update the selection range with the result
-      setSelectedRange(updateResult.range);
-      
-      // If there's a message or the update wasn't successful, we hit a restriction
-      if (updateResult.message || !updateResult.success) {
-        // End the selection and show message
-        setIsSelecting(false);
-        setOutOfBoundsDirection(null);
-
-        // Only show notification during out-of-bounds scrolling
-        if (settings.showSelectionAlert && outOfBoundsDirection) {
-          setNotification(updateResult.message);
-        }
-
-        document.removeEventListener("mousemove", handleDocumentMouseMove);
-        document.removeEventListener("mouseup", handleMouseUp);
-      }
-    }
-  }, [months, selectionManager, settings.showSelectionAlert, isSelecting, outOfBoundsDirection, selectedRange, handleDocumentMouseMove, handleMouseUp]);
-
-  // After the existing moveToMonth function is defined (around line 1480), add:
-  useEffect(() => {
-    // Set the ref to the current moveToMonth function
-    moveToMonthRef.current = moveToMonth;
-  }, [moveToMonth]);
-
-  // Add this effect to handle clicks outside the calendar
-  useEffect(() => {
-    if (!settings.closeOnClickAway || settings.displayMode === 'embedded' || !isOpen) return;
-
-    const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        // Only close the calendar without submitting the value
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [settings.closeOnClickAway, settings.displayMode, isOpen]);
-
-  // Modify the useEffect that handles submission to only trigger on explicit submit
-  useEffect(() => {
-    // Only submit when the calendar is closed AND it wasn't due to click-away
-    if (!isOpen && selectedRange.start && selectedRange.end && onSubmit && !settings.closeOnClickAway) {
-      onSubmit(
-        selectedRange.start,
-        selectedRange.end
-      );
-    }
-  }, [isOpen, selectedRange, onSubmit, settings.closeOnClickAway]);
-
-  // Add a ref for the input element
-  const inputRef = useRef<HTMLInputElement>(null);
+  }, [everInitialized, months, selectedRange, handleSelectionStart, handleSelectionMove, isSelecting, settings, shouldShowTooltips]);
   
-  // Update trigger rect when input is clicked or window resizes
-  const handleInputClick = () => {
-    // Mark as initialized when first clicked
-    setHasInitialized(true);
-    
-    // Always open the calendar when input is clicked
-    // The coordinator will handle closing other calendars
-    setIsOpen(true);
-    
-    // Force the coordinator to register this calendar as active
-    if (coordinatorRef.current) {
-      coordinatorRef.current.open();
-    }
-  };
-
-  // Generate a unique ID for this calendar instance
-  const calendarIdRef = useRef<string>(`calendar-${++calendarCounter}`);
-  
-  // Reference to store coordinator controls
-  const coordinatorRef = useRef<ReturnType<typeof registerCalendar> | null>(null);
-
   // Register with the calendar coordinator 
   useEffect(() => {
     // Define the state change handler
@@ -1363,7 +1307,117 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       coordinatorRef.current.close();
     }
   }, [isOpen, settings.displayMode]);
-
+  
+  // Update isDateRestricted to handle both types - only needed when initialized
+  const isDateRestricted = useCallback((date: Date): boolean => {
+    if (!everInitialized || !selectionManager) return false;
+    const result = selectionManager.canSelectDate(date);
+    return !result.allowed;
+  }, [everInitialized, selectionManager]);
+  
+  // Update the moveToMonth function - only needed when initialized
+  const moveToMonth = useCallback((direction: 'prev' | 'next') => {
+    if (!everInitialized || !currentMonth) return;
+    
+    // First move the month - this happens regardless of selection state
+    setCurrentMonth(prev => {
+      return direction === 'next'
+        ? addMonths(prev, 1)
+        : addMonths(prev, -1);
+    });
+    
+    // Then handle selection logic only if we're in an out-of-bounds selection
+    if (isSelecting && outOfBoundsDirection && selectionManager) {
+      const start = selectedRange.start ? parseISO(selectedRange.start) : null;
+      if (!start) return;
+      
+      // Calculate the month we just moved to
+      const nextMonth = direction === 'next'
+        ? addMonths(months[months.length - 1], 1)
+        : addMonths(months[0], -1);
+      
+      const firstDayOfMonth = startOfMonth(nextMonth);
+      const lastDayOfMonth = endOfMonth(nextMonth);
+      
+      // Determine the potential new end of the selection
+      const potentialEnd = direction === 'next' ? lastDayOfMonth : firstDayOfMonth;
+      
+      // Use the selection manager to handle the update, which now properly checks boundaries
+      const updateResult = selectionManager.updateSelection(
+        selectedRange,
+        potentialEnd
+      );
+      
+      // Update the selection range with the result
+      setSelectedRange(updateResult.range);
+      
+      // If there's a message or the update wasn't successful, we hit a restriction
+      if (updateResult.message || !updateResult.success) {
+        // End the selection and show message
+        setIsSelecting(false);
+        setOutOfBoundsDirection(null);
+        
+        // Only show notification during out-of-bounds scrolling
+        if (settings.showSelectionAlert && outOfBoundsDirection) {
+          setNotification(updateResult.message);
+        }
+        
+        document.removeEventListener("mousemove", handleDocumentMouseMove);
+        document.removeEventListener("mouseup", handleMouseUp);
+      }
+    }
+  }, [everInitialized, months, selectionManager, settings.showSelectionAlert, isSelecting, outOfBoundsDirection, selectedRange, handleDocumentMouseMove, handleMouseUp, currentMonth]);
+  
+  // Update moveToMonthRef when moveToMonth changes
+  useEffect(() => {
+    moveToMonthRef.current = moveToMonth;
+  }, [moveToMonth]);
+  
+  // Add this effect to handle clicks outside the calendar
+  useEffect(() => {
+    if (!settings.closeOnClickAway || settings.displayMode === 'embedded' || !isOpen) return;
+    
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        // Only close the calendar without submitting the value
+        setIsOpen(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [settings.closeOnClickAway, settings.displayMode, isOpen]);
+  
+  // Modify the useEffect that handles submission to only trigger on explicit submit
+  useEffect(() => {
+    // Only submit when the calendar is closed AND it wasn't due to click-away
+    if (!isOpen && selectedRange.start && selectedRange.end && onSubmit && !settings.closeOnClickAway) {
+      onSubmit(
+        selectedRange.start,
+        selectedRange.end
+      );
+    }
+  }, [isOpen, selectedRange, onSubmit, settings.closeOnClickAway]);
+  
+  // Handle input click to open calendar and initialize if needed
+  const handleInputClick = () => {
+    // Ensure the calendar is initialized when first opened
+    if (!everInitialized) {
+      setEverInitialized(true);
+      setCurrentMonth(startOfMonth(new Date()));
+    }
+    
+    // Always open the calendar when input is clicked
+    setIsOpen(true);
+    
+    // Force the coordinator to register this calendar as active
+    if (coordinatorRef.current) {
+      coordinatorRef.current.open();
+    }
+  };
+  
   // Effect to handle clicks outside the portal for the direct portal implementation
   useEffect(() => {
     if (!isOpen || settings.displayMode === 'embedded' || !settings.closeOnClickAway) return;
@@ -1393,7 +1447,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       document.removeEventListener('mousedown', handleOutsideClick);
     };
   }, [isOpen, settings.closeOnClickAway, settings.displayMode]);
-
+  
   // Simple effect to hide calendar on scroll
   useEffect(() => {
     if (!isOpen || settings.displayMode === 'embedded') return;
@@ -1409,10 +1463,10 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       window.removeEventListener('scroll', handleScroll);
     };
   }, [isOpen, settings.displayMode]);
-
-  // Helper function to render the calendar content to avoid duplication
+  
+  // Helper function to render the calendar content
   const renderCalendarContent = () => {
-    if (!hasInitialized) return null;
+    if (!everInitialized) return null;
     
     return (
       <>
@@ -1433,7 +1487,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
                 selectionMode={settings.selectionMode}
               />
             </div>
-
+            
             <CalendarHeader
               months={months}
               visibleMonths={settings.visibleMonths}
@@ -1442,7 +1496,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
             />
           </>
         )}
-
+        
         {settings.showLayersNavigation && (
           <LayerControl
             layers={activeLayers}
@@ -1450,7 +1504,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
             onLayerChange={handleLayerChange}
           />
         )}
-
+        
         <div className="cla-card-body" style={{ padding: '16px' }}>
           <div style={{ display: 'flex' }}>
             {activeLayers.map(layer =>
@@ -1462,7 +1516,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
             )}
           </div>
         </div>
-
+        
         {settings.showFooter && (
           <CalendarFooter
             showSubmitButton={settings.showSubmitButton}
@@ -1470,14 +1524,14 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
             handleSubmit={handleSubmit}
           />
         )}
-
+        
         {settings.enableOutOfBoundsScroll && (
           <SideChevronIndicator
             outOfBoundsDirection={outOfBoundsDirection}
             isSelecting={isSelecting}
           />
         )}
-
+        
         {settings.showSelectionAlert && notification && (
           <Notification
             message={notification}
@@ -1487,7 +1541,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       </>
     );
   };
-
+  
   // Render either directly or in a portal based on display mode
   return (
     <div 
