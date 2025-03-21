@@ -6,10 +6,10 @@ interface NotificationProps {
   duration?: number;
 }
 
-export const Notification: React.FC<NotificationProps> = ({ 
-  message, 
-  onDismiss, 
-  duration = 3000 
+export const Notification: React.FC<NotificationProps> = ({
+  message,
+  onDismiss,
+  duration = 3000
 }) => {
   const [isFading, setIsFading] = useState(false);
 
@@ -31,8 +31,8 @@ export const Notification: React.FC<NotificationProps> = ({
   return (
     <div className={`cla-notification ${isFading ? 'fade-out' : ''}`}>
       <span className="cla-notification-message">{message}</span>
-      <button 
-        className="cla-notification-dismiss" 
+      <button
+        className="cla-notification-dismiss"
         onClick={(e) => {
           e.stopPropagation();
           setIsFading(true);

@@ -56,7 +56,7 @@ const App: React.FC = () => {
    * - Appropriate z-index stacking
    * - Portal and tooltip visibility
    */
-  
+
   // Add state for the selected date range
   const [dateRange, setDateRange] = useState<{ start: string | null; end: string | null }>({
     start: null,
@@ -84,21 +84,21 @@ const App: React.FC = () => {
     initialMonth: new Date(),
     isOpen: false,
     showLayersNavigation: false,
-    
+
     // Add empty placeholders that will be replaced by lazy loading
     layers: [],
     defaultLayer: "Calendar",
     restrictionConfig: { restrictions: [] },
-    
+
     // MM/DD/YYYY format with padded zeros (produces "02/23/2025 to 02/23/2025" for a range)
     dateFormatter: (date: Date) => {
       // Pad numbers with leading zeros
       const pad = (num: number): string => String(num).padStart(2, '0');
-      
+
       const month = pad(date.getMonth() + 1); // getMonth() is 0-indexed
       const day = pad(date.getDate());
       const year = date.getFullYear();
-      
+
       return `${month}/${day}/${year}`;
     },
     // Custom separator for date ranges
@@ -133,7 +133,7 @@ const App: React.FC = () => {
     return () => {
       // Get unique period ranges - only executed when calendar is opened
       const uniquePeriodRanges = getUniquePeriodRanges();
-      
+
       // Generate period end events from uniquePeriodRanges - only executed when calendar is opened
       const periodEndEvents = uniquePeriodRanges.map(period => ({
         date: period.end,
@@ -142,7 +142,7 @@ const App: React.FC = () => {
         type: "work" as const,
         time: "23:59"
       }));
-      
+
       // Create and return the layers - important to use the same layer name ("Calendar") as defaultLayer
       return [
         {
@@ -151,7 +151,7 @@ const App: React.FC = () => {
           description: "Basic calendar functionality",
           required: true,
           visible: true,
-          data: { 
+          data: {
             events: [
               ...periodEndEvents,
               {
@@ -168,13 +168,13 @@ const App: React.FC = () => {
       ];
     };
   };
-  
+
   // Create lazy factory function for restrictions
   const createRestrictionsFactory = () => {
     return () => {
       // Get unique period ranges - only executed when calendar is opened
       const uniquePeriodRanges = getUniquePeriodRanges();
-      
+
       return {
         restrictions: [
           {
@@ -190,7 +190,7 @@ const App: React.FC = () => {
       };
     };
   };
-  
+
   // Create lazy factory function for restrictions for second calendar
   const createRestrictions2Factory = () => {
     return () => {
@@ -233,12 +233,12 @@ const App: React.FC = () => {
   const restrictions2Factory = useMemo(() => createRestrictions2Factory(), []);
 
   return (
-    <div style={{ 
-      padding: '10px', 
-      display: 'flex', 
-      flexDirection: 'column', 
+    <div style={{
+      padding: '10px',
+      display: 'flex',
+      flexDirection: 'column',
       gap: '40px',
-      textAlign: 'left' 
+      textAlign: 'left'
     }}>
       {/* Display the selected range */}
       <div style={{
@@ -249,8 +249,8 @@ const App: React.FC = () => {
         boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
       }}>
         <h4 style={{ margin: '0 0 10px 0', color: '#333' }}>Selected Date Range</h4>
-        <div style={{ 
-          display: 'grid', 
+        <div style={{
+          display: 'grid',
           gridTemplateColumns: 'auto 1fr',
           gap: '8px 16px',
           fontSize: '14px',
@@ -268,7 +268,7 @@ const App: React.FC = () => {
         <h3 style={{ textAlign: 'left' }}>Calendar Instance 1 (2 Months)</h3>
         <CLACalendar
           settings={baseSettings}
-          _onSettingsChange={() => {}}
+          _onSettingsChange={() => { }}
           onSubmit={(start, end) => {
             setDateRange({ start, end });
           }}
@@ -282,7 +282,7 @@ const App: React.FC = () => {
         <h3 style={{ textAlign: 'left' }}>Calendar Instance 2 (3 Months)</h3>
         <CLACalendar
           settings={calendar2Settings}
-          _onSettingsChange={() => {}}
+          _onSettingsChange={() => { }}
           onSubmit={(start, end) => {
             setDateRange({ start, end });
           }}

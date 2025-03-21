@@ -14,17 +14,17 @@ const CustomDateFormatterExample: React.FC = () => {
     dateFormatter: (date: Date) => {
       // Pad numbers with leading zeros
       const pad = (num: number): string => String(num).padStart(2, '0');
-      
+
       const year = date.getFullYear();
       const month = pad(date.getMonth() + 1); // Months are 0-indexed
       const day = pad(date.getDate());
-      
+
       return `${year}-${month}-${day}`;
     }
   };
 
   const [settings, setSettings] = useState<CalendarSettings>(initialSettings);
-  const [selectedValues, setSelectedValues] = useState<{startDate: string | null, endDate: string | null}>({
+  const [selectedValues, setSelectedValues] = useState<{ startDate: string | null, endDate: string | null }>({
     startDate: null,
     endDate: null
   });
@@ -38,26 +38,26 @@ const CustomDateFormatterExample: React.FC = () => {
     <div className="example-container">
       <h2>Calendar with Custom Date Formatter</h2>
       <p>This example shows how to use a custom date formatter to display dates in YYYY-MM-DD format.</p>
-      
+
       <div className="calendar-container">
-        <CLACalendar 
+        <CLACalendar
           settings={settings}
           onSettingsChange={setSettings}
           onSubmit={handleSubmit}
         />
       </div>
-      
+
       {/* Display selected values */}
       <div className="selected-values" style={{ marginTop: '20px', padding: '10px', border: '1px solid #eee', borderRadius: '4px' }}>
         <h3>Selected Range:</h3>
         <p>Start Date: {selectedValues.startDate || 'Not selected'}</p>
         <p>End Date: {selectedValues.endDate || 'Not selected'}</p>
       </div>
-      
+
       <div className="code-example">
         <h3>Code Example:</h3>
         <pre>
-{`// Define settings with a custom date formatter
+          {`// Define settings with a custom date formatter
 const settings = {
   ...getDefaultSettings(),
   dateFormatter: (date: Date) => {

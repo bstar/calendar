@@ -235,7 +235,7 @@ export class RestrictionBackgroundGenerator {
           }
         ]).flat();
     },
-    
+
     /**
      * Handler to generate background data for boundary type restrictions
      * @param {BoundaryRestriction} restriction - Boundary restriction configuration
@@ -251,7 +251,7 @@ export class RestrictionBackgroundGenerator {
         color: '#ffe6e6'
       }];
     },
-    
+
     /**
      * Handler to generate background data for restricted boundary type restrictions
      * @param {RestrictedBoundaryRestriction} restriction - Restricted boundary configuration

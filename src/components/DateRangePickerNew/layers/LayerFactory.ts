@@ -16,13 +16,13 @@ export const createLayersFactory = () => {
         description: "Basic calendar functionality",
         required: true,
         visible: true,
-        data: { 
+        data: {
           events: [],
           background: []
         }
       }
     ];
-    
+
     return layers;
   };
 }; 

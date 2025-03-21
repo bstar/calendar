@@ -113,19 +113,19 @@ export class RestrictionManager {
       if (!isValid(rangeStart) || !isValid(rangeEnd)) continue;
 
       // Detect four scenarios that would cause a restriction violation:
-      
+
       // 1. Selection start is inside a restricted range
       const startInRange = isWithinInterval(start, { start: rangeStart, end: rangeEnd });
-      
+
       // 2. Selection end is inside a restricted range
       const endInRange = isWithinInterval(end, { start: rangeStart, end: rangeEnd });
-      
+
       // 3. Restricted range start is inside the selection
       const restrictionStartInSelection = isWithinInterval(rangeStart, { start, end });
-      
+
       // 4. Restricted range end is inside the selection
       const restrictionEndInSelection = isWithinInterval(rangeEnd, { start, end });
-      
+
       // Any of these scenarios means the selection overlaps with a restricted range
       if (startInRange || endInRange || restrictionStartInSelection || restrictionEndInSelection) {
         return range.message || 'Selection includes restricted dates';

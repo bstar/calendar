@@ -17,7 +17,7 @@ const listeners: Map<string, () => void> = new Map();
 export const registerCalendar = (id: string, onChange: () => void) => {
   registeredCalendars.add(id);
   listeners.set(id, onChange);
-  
+
   return {
     /**
      * Open this calendar instance and close any other open calendars
@@ -27,9 +27,9 @@ export const registerCalendar = (id: string, onChange: () => void) => {
       if (activeCalendarId && activeCalendarId !== id && listeners.has(activeCalendarId)) {
         listeners.get(activeCalendarId)?.();
       }
-      
+
       activeCalendarId = id;
-      
+
       // Notify listeners of the change
       listeners.forEach((callback, calendarId) => {
         if (calendarId !== id) {
@@ -37,7 +37,7 @@ export const registerCalendar = (id: string, onChange: () => void) => {
         }
       });
     },
-    
+
     /**
      * Close this calendar instance if it's currently open
      */
@@ -46,24 +46,24 @@ export const registerCalendar = (id: string, onChange: () => void) => {
         activeCalendarId = null;
       }
     },
-    
+
     /**
      * Unregister this calendar instance when it's unmounted
      */
     unregister: () => {
       registeredCalendars.delete(id);
       listeners.delete(id);
-      
+
       if (activeCalendarId === id) {
         activeCalendarId = null;
       }
     },
-    
+
     /**
      * Check if this calendar instance is currently active/open
      */
     isActive: () => activeCalendarId === id,
-    
+
     /**
      * Check if this calendar instance can be opened
      * (either it's already open or no other calendar is open)
@@ -84,12 +84,12 @@ export const useCalendarCoordination = (id: string) => {
      * @param onChange - Callback when active status changes
      */
     register: (onChange: () => void) => registerCalendar(id, onChange),
-    
+
     /**
      * Check if any calendar is currently active
      */
     isAnyCalendarActive: () => activeCalendarId !== null,
-    
+
     /**
      * Get the ID of the currently active calendar (if any)
      */

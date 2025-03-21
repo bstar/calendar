@@ -30,10 +30,10 @@ export const PortalCalendar: React.FC<PortalCalendarProps> = ({
 }) => {
   // Use provided ID or generate a simple numerical ID
   const calendarIdRef = useRef<string>(id || `calendar-${++calendarCounter}`);
-  
+
   // Reference to store coordinator controls
   const coordinatorRef = useRef<ReturnType<typeof registerCalendar> | null>(null);
-  
+
   // Handle coordination with other calendars
   useEffect(() => {
     const handleStateChange = () => {
@@ -42,37 +42,37 @@ export const PortalCalendar: React.FC<PortalCalendarProps> = ({
         onOpenChange(false);
       }
     };
-    
+
     coordinatorRef.current = registerCalendar(calendarIdRef.current, handleStateChange);
-    
+
     return () => {
       coordinatorRef.current?.unregister();
     };
   }, [isOpen, onOpenChange]);
-  
+
   // Sync calendar open state with coordinator
   useEffect(() => {
     if (!coordinatorRef.current) return;
-    
+
     if (isOpen) {
       coordinatorRef.current.open();
     } else if (coordinatorRef.current.isActive()) {
       coordinatorRef.current.close();
     }
   }, [isOpen]);
-  
+
   // Handle closing the calendar
   const handleClose = useCallback(() => {
     if (settings.closeOnClickAway) {
       onOpenChange(false);
     }
   }, [onOpenChange, settings.closeOnClickAway]);
-  
+
   // If the calendar is not supposed to be a popup, render it directly
   if (settings.displayMode === 'embedded') {
     return <>{children}</>;
   }
-  
+
   // Otherwise, render in a portal when open
   return (
     <CalendarPortal

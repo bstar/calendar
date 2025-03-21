@@ -32,7 +32,7 @@ export const CalendarPortal: React.FC<PortalProps> = ({
 }) => {
   const [portalElement, setPortalElement] = useState<HTMLDivElement | null>(null);
   const portalRef = useRef<HTMLDivElement | null>(null);
-  
+
   // Create portal element when component mounts
   useEffect(() => {
     const element = document.createElement('div');
@@ -40,14 +40,14 @@ export const CalendarPortal: React.FC<PortalProps> = ({
     document.body.appendChild(element);
     setPortalElement(element);
     portalRef.current = element;
-    
+
     return () => {
       if (element.parentNode) {
         element.parentNode.removeChild(element);
       }
     };
   }, [portalClassName]);
-  
+
   // Update portal position when it's open or the trigger ref changes
   const updatePosition = useCallback(() => {
     if (!portalElement || !triggerRef.current) {
@@ -106,7 +106,7 @@ export const CalendarPortal: React.FC<PortalProps> = ({
       portalElement.style.zIndex = '2147483647';
     }
   }, [portalElement, triggerRef]);
-  
+
   // Initial and delayed position updates
   useEffect(() => {
     updatePosition();
@@ -114,50 +114,50 @@ export const CalendarPortal: React.FC<PortalProps> = ({
     const timeoutId = setTimeout(updatePosition, 50);
     return () => clearTimeout(timeoutId);
   }, [updatePosition, isOpen]);
-  
+
   // Handle click outside to close the portal
   useEffect(() => {
     if (!isOpen || !onClose) return;
-    
+
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        portalRef.current && 
-        !portalRef.current.contains(event.target as Node) && 
-        triggerRef.current && 
+        portalRef.current &&
+        !portalRef.current.contains(event.target as Node) &&
+        triggerRef.current &&
         !triggerRef.current.contains(event.target as Node)
       ) {
         onClose();
       }
     };
-    
+
     document.addEventListener('mousedown', handleClickOutside);
-    
+
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isOpen, onClose, triggerRef]);
-  
+
   // Add keyboard support (Escape to close)
   useEffect(() => {
     if (!isOpen || !onClose) return;
-    
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         onClose();
       }
     };
-    
+
     document.addEventListener('keydown', handleKeyDown);
-    
+
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isOpen, onClose]);
-  
+
   // Apply custom styles to the portal
   useEffect(() => {
     if (!portalElement || !portalStyle) return;
-    
+
     // Apply each style individually in a type-safe way
     // This avoids any issues with trying to set read-only properties
     const applyStyle = (el: HTMLElement, styles: React.CSSProperties) => {
@@ -181,16 +181,16 @@ export const CalendarPortal: React.FC<PortalProps> = ({
       if (styles.left) el.style.left = styles.left.toString();
       if (styles.zIndex) el.style.zIndex = styles.zIndex.toString();
     };
-    
+
     applyStyle(portalElement, portalStyle);
   }, [portalElement, portalStyle]);
 
   if (!portalElement || !isOpen) return null;
-  
+
   return ReactDOM.createPortal(
-    <div 
+    <div
       ref={portalRef}
-      className="cla-calendar-portal-content" 
+      className="cla-calendar-portal-content"
       style={{
         minHeight: '300px', // Force minimum height
         background: 'white',
@@ -212,10 +212,10 @@ export const CalendarPortal: React.FC<PortalProps> = ({
 export const useCalendarCoordination = (id: string) => {
   // Store currently open calendar ID
   const [activeCalendarId, setActiveCalendarId] = useState<string | null>(null);
-  
+
   // Keep track of all calendar IDs for coordination
   const [_registeredCalendars, setRegisteredCalendars] = useState<string[]>([]);
-  
+
   // Register this calendar instance
   useEffect(() => {
     setRegisteredCalendars(prev => [...prev, id]);
@@ -226,20 +226,20 @@ export const useCalendarCoordination = (id: string) => {
       }
     };
   }, [id, activeCalendarId]);
-  
+
   const openCalendar = () => {
     setActiveCalendarId(id);
   };
-  
+
   const closeCalendar = () => {
     if (activeCalendarId === id) {
       setActiveCalendarId(null);
     }
   };
-  
+
   const isOpen = activeCalendarId === id;
   const canOpen = !activeCalendarId || activeCalendarId === id;
-  
+
   return {
     openCalendar,
     closeCalendar,

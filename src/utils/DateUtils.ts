@@ -1,4 +1,4 @@
-import { 
+import {
   parseISO as dateFnsParseISO,
   isWithinInterval as dateFnsIsWithinInterval,
   format as dateFnsFormat,
@@ -114,19 +114,19 @@ export const isWithinInterval = (date: Date, interval: { start: Date; end: Date 
         date.getMonth(),
         date.getDate()
       );
-      
+
       const cleanStart = new Date(
         interval.start.getFullYear(),
         interval.start.getMonth(),
         interval.start.getDate()
       );
-      
+
       const cleanEnd = new Date(
         interval.end.getFullYear(),
         interval.end.getMonth(),
         interval.end.getDate()
       );
-      
+
       // Compare only the date portion, ensuring the end date is fully inclusive
       return cleanDate >= cleanStart && cleanDate <= cleanEnd;
     } catch {
@@ -148,19 +148,19 @@ export const isWithinIntervalUTC = (date: Date, interval: { start: Date; end: Da
       date.getUTCMonth(),
       date.getUTCDate()
     );
-    
+
     const cleanStart = createUTCDate(
       interval.start.getUTCFullYear(),
       interval.start.getUTCMonth(),
       interval.start.getUTCDate()
     );
-    
+
     const cleanEnd = createUTCDate(
       interval.end.getUTCFullYear(),
       interval.end.getUTCMonth(),
       interval.end.getUTCDate()
     );
-    
+
     // Compare only the date portion, ensuring the end date is fully inclusive
     return cleanDate >= cleanStart && cleanDate <= cleanEnd;
   } catch {
@@ -180,8 +180,8 @@ export const isSameDay = (date1: Date, date2: Date): boolean => {
  */
 export const isSameDayUTC = (date1: Date, date2: Date): boolean => {
   return date1.getUTCFullYear() === date2.getUTCFullYear() &&
-         date1.getUTCMonth() === date2.getUTCMonth() &&
-         date1.getUTCDate() === date2.getUTCDate();
+    date1.getUTCMonth() === date2.getUTCMonth() &&
+    date1.getUTCDate() === date2.getUTCDate();
 };
 
 /**
@@ -196,7 +196,7 @@ export const isSameMonth = (date1: Date, date2: Date): boolean => {
  */
 export const isSameMonthUTC = (date1: Date, date2: Date): boolean => {
   return date1.getUTCFullYear() === date2.getUTCFullYear() &&
-         date1.getUTCMonth() === date2.getUTCMonth();
+    date1.getUTCMonth() === date2.getUTCMonth();
 };
 
 // ===== CALENDAR UTILITIES =====
@@ -228,29 +228,29 @@ export const endOfMonth = (date: Date): Date => {
 export const endOfMonthUTC = (date: Date): Date => {
   const year = date.getUTCFullYear();
   const month = date.getUTCMonth();
-  
+
   // Get the last day of the month (day 0 of next month)
   const nextMonthYear = month === 11 ? year + 1 : year;
   const nextMonth = month === 11 ? 0 : month + 1;
-  
+
   return createUTCDate(nextMonthYear, nextMonth, 0);
 };
 
 /**
  * Gets the start of the week containing the specified date
  */
-export const startOfWeek = (date: Date, options?: { weekStartsOn?: 0|1|2|3|4|5|6 }): Date => {
+export const startOfWeek = (date: Date, options?: { weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6 }): Date => {
   return dateFnsStartOfWeek(date, options);
 };
 
 /**
  * Gets the start of the week containing the specified date in UTC
  */
-export const startOfWeekUTC = (date: Date, options?: { weekStartsOn?: 0|1|2|3|4|5|6 }): Date => {
+export const startOfWeekUTC = (date: Date, options?: { weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6 }): Date => {
   const weekStartsOn = options?.weekStartsOn ?? 0;
   const dayOfWeek = date.getUTCDay();
   const diff = (dayOfWeek < weekStartsOn ? 7 : 0) + dayOfWeek - weekStartsOn;
-  
+
   return createUTCDate(
     date.getUTCFullYear(),
     date.getUTCMonth(),
@@ -261,14 +261,14 @@ export const startOfWeekUTC = (date: Date, options?: { weekStartsOn?: 0|1|2|3|4|
 /**
  * Gets the end of the week containing the specified date
  */
-export const endOfWeek = (date: Date, options?: { weekStartsOn?: 0|1|2|3|4|5|6 }): Date => {
+export const endOfWeek = (date: Date, options?: { weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6 }): Date => {
   return dateFnsEndOfWeek(date, options);
 };
 
 /**
  * Gets the end of the week containing the specified date in UTC
  */
-export const endOfWeekUTC = (date: Date, options?: { weekStartsOn?: 0|1|2|3|4|5|6 }): Date => {
+export const endOfWeekUTC = (date: Date, options?: { weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6 }): Date => {
   const start = startOfWeekUTC(date, options);
   return createUTCDate(
     start.getUTCFullYear(),
@@ -306,28 +306,28 @@ export const addMonths = (date: Date, amount: number): Date => {
 export const addMonthsUTC = (date: Date, amount: number): Date => {
   // First create a new date with the same UTC components
   const result = new Date(date.getTime());
-  
+
   // Get current UTC components
   const year = result.getUTCFullYear();
   const month = result.getUTCMonth();
   const day = result.getUTCDate();
-  
+
   // Calculate new month and year
   const newMonth = month + amount;
   const yearDelta = Math.floor(newMonth / 12);
   const adjustedMonth = ((newMonth % 12) + 12) % 12; // Ensure it's 0-11
-  
+
   // Set new date - using UTC methods
   result.setUTCFullYear(year + yearDelta);
   result.setUTCMonth(adjustedMonth);
-  
+
   // Handle potential issues with month boundaries (e.g., Jan 31 + 1 month)
   // If the day got changed (e.g., Jan 31 -> Feb 28), set it to the last day of the target month
   if (result.getUTCDate() !== day) {
     // Go back to the last day of the previous month
     result.setUTCDate(0);
   }
-  
+
   return result;
 };
 
@@ -336,16 +336,16 @@ export const addMonthsUTC = (date: Date, amount: number): Date => {
  */
 export const eachDayOfInterval = (interval: { start: Date; end: Date }): Date[] => {
   const days: Date[] = [];
-  
+
   // Manual day-by-day iteration to avoid DST issues
   const current = new Date(interval.start);
   const end = new Date(interval.end);
-  
+
   while (current <= end) {
     days.push(new Date(current));
     current.setDate(current.getDate() + 1);
   }
-  
+
   return days;
 };
 
@@ -354,27 +354,27 @@ export const eachDayOfInterval = (interval: { start: Date; end: Date }): Date[] 
  */
 export const eachDayOfIntervalUTC = (interval: { start: Date; end: Date }): Date[] => {
   const days: Date[] = [];
-  
+
   // Create clean dates for consistent UTC iteration
   const startDate = createUTCDate(
     interval.start.getUTCFullYear(),
     interval.start.getUTCMonth(),
     interval.start.getUTCDate()
   );
-  
+
   const endDate = createUTCDate(
     interval.end.getUTCFullYear(),
     interval.end.getUTCMonth(),
     interval.end.getUTCDate()
   );
-  
+
   // Manual day-by-day iteration using UTC methods to avoid DST issues
   const current = new Date(startDate);
   while (current <= endDate) {
     days.push(new Date(current));
     current.setUTCDate(current.getUTCDate() + 1);
   }
-  
+
   return days;
 };
 

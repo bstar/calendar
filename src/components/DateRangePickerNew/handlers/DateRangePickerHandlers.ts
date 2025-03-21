@@ -83,7 +83,7 @@ export class DateRangePickerHandlers {
       // Only update calendar position if we have a valid date
       if (date) {
         const validVisibleMonths = Math.min(6, Math.max(1, visibleMonths));
-        
+
         if (field === 'start') {
           // For start date, we want it in the leftmost month
           const newBaseMonth = startOfMonth(date);
@@ -127,7 +127,7 @@ export class DateRangePickerHandlers {
     const handleMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
       // Only handle out of bounds when selecting
       if (!isSelecting) return;
-      
+
       const containerRect = containerRef.current?.getBoundingClientRect();
       if (!containerRect) return;
       const { clientX: mouseX } = e;
@@ -174,19 +174,19 @@ export class DateRangePickerHandlers {
 
       if (newDirection !== outOfBoundsDirection) {
         setOutOfBoundsDirection(newDirection);
-        
+
         // If we're entering a boundary area, trigger the month change
         if (newDirection && moveToMonthRef.current) {
           // Immediately move to the next/prev month
           moveToMonthRef.current(newDirection);
-          
+
           // Set up an interval to continue moving if mouse stays in boundary
           const intervalId = setInterval(() => {
             if (moveToMonthRef.current) {
               moveToMonthRef.current(newDirection);
             }
           }, 1000);
-          
+
           // Store the interval ID in a safer way
           const mouseEvent = e as MouseEvent & { intervalId?: IntervalID };
           mouseEvent.intervalId = intervalId;
@@ -208,7 +208,7 @@ export class DateRangePickerHandlers {
       interface DocumentWithInterval extends Document {
         activeIntervalId?: IntervalID;
       }
-      
+
       const docWithInterval = document as DocumentWithInterval;
       if (docWithInterval.activeIntervalId) {
         clearInterval(docWithInterval.activeIntervalId);
@@ -253,19 +253,19 @@ export class DateRangePickerHandlers {
     return () => {
       const { start, end } = selectedRange;
       if (!start) return "Select date";
-      
+
       // Format dates using custom formatter if provided, otherwise use default format
       const formatDate = (dateString: string) => {
         const date = parseISO(dateString);
-        return dateFormatter 
-          ? dateFormatter(date) 
+        return dateFormatter
+          ? dateFormatter(date)
           : format(date, "MMM dd, yyyy");
       };
-      
+
       if (selectionMode === 'single') {
         return formatDate(start);
       }
-      
+
       return !end
         ? formatDate(start)
         : `${formatDate(start)}${dateRangeSeparator}${formatDate(end)}`;
@@ -287,19 +287,19 @@ export class DateRangePickerHandlers {
   ) {
     const handleSelectionStart = (date: Date) => {
       const result = selectionManager.startSelection(date);
-      
+
       if (!result.success) {
         if (showSelectionAlert && outOfBoundsDirection) {
           setNotification(result.message);
         }
         return;
       }
-      
+
       setIsSelecting(true);
       setSelectedRange(result.range);
       setNotification(null);
     };
-    
+
     const handleSelectionMove = (date: Date): DateRange => {
       // If we're not in selecting mode, don't process move events
       if (!isSelecting) {
@@ -308,23 +308,23 @@ export class DateRangePickerHandlers {
 
       // Get updated selection with boundary restrictions
       const selectionUpdate = selectionManager.updateSelection(
-        selectedRange, 
+        selectedRange,
         date
       );
-      
+
       // Update the selection range with the result
       setSelectedRange(selectionUpdate.range);
-      
+
       // Show notification only if there's a message and we have showSelectionAlert enabled
       if (selectionUpdate.message && showSelectionAlert) {
         setNotification(selectionUpdate.message);
       } else {
         setNotification(null);
       }
-      
+
       return selectionUpdate.range;
     };
-    
+
     return {
       handleSelectionStart,
       handleSelectionMove
@@ -367,7 +367,7 @@ export class DateRangePickerHandlers {
       if (selectedRange.start && selectedRange.end && onSubmit) {
         onSubmit(selectedRange.start, selectedRange.end);
       }
-      
+
       // Close the calendar
       setIsOpen(false);
       setIsSelecting(false);
@@ -383,7 +383,7 @@ export class DateRangePickerHandlers {
     const handleLayerChange = (layerId: string) => {
       setActiveLayer(layerId);
     };
-    
+
     return {
       handleClear,
       handleSubmit,
