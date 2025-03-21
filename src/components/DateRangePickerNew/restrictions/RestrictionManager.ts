@@ -58,7 +58,7 @@
 import { parseISO } from '../../../utils/DateUtils';
 import { isValid } from 'date-fns';
 import { isWithinInterval } from '../../../utils/DateUtils';
-import { RestrictionConfig, Restriction, BoundaryRestriction, DateRangeRestriction, RestrictedBoundaryRestriction, AllowedRangesRestriction, WeekdayRestriction } from './types';
+import { RestrictionConfig, BoundaryRestriction, DateRangeRestriction, RestrictedBoundaryRestriction, AllowedRangesRestriction, WeekdayRestriction } from './types';
 
 /**
  * Manages date selection restrictions for the calendar

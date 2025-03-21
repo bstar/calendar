@@ -10,7 +10,7 @@ import {
   endOfWeek as dateFnsEndOfWeek,
   addDays as dateFnsAddDays,
   addMonths as dateFnsAddMonths,
-  isValid
+  isValid as _isValid
 } from 'date-fns';
 
 // Default timezone
@@ -102,10 +102,9 @@ export const formatUTC = (date: Date, formatStr: string): string => {
  * This implementation ensures start and end dates are included in the check
  */
 export const isWithinInterval = (date: Date, interval: { start: Date; end: Date }): boolean => {
-  // First try the standard date-fns implementation
   try {
     return dateFnsIsWithinInterval(date, interval);
-  } catch (e) {
+  } catch {
     // If something goes wrong (like invalid dates), we'll handle it more carefully
     // Extract year/month/day for clean comparison
     try {
@@ -130,7 +129,7 @@ export const isWithinInterval = (date: Date, interval: { start: Date; end: Date 
       
       // Compare only the date portion, ensuring the end date is fully inclusive
       return cleanDate >= cleanStart && cleanDate <= cleanEnd;
-    } catch (innerError) {
+    } catch {
       // If all else fails, return false rather than breaking the application
       return false;
     }
@@ -164,7 +163,7 @@ export const isWithinIntervalUTC = (date: Date, interval: { start: Date; end: Da
     
     // Compare only the date portion, ensuring the end date is fully inclusive
     return cleanDate >= cleanStart && cleanDate <= cleanEnd;
-  } catch (error) {
+  } catch {
     return false;
   }
 };

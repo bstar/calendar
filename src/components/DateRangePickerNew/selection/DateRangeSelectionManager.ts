@@ -1,5 +1,5 @@
-import { isValid, isBefore, isAfter, addDays, differenceInCalendarDays } from 'date-fns';
-import { format, parseISO, eachDayOfInterval } from '../../../utils/DateUtils';
+import { isValid, isBefore, isAfter, addDays } from 'date-fns';
+import { format, parseISO } from '../../../utils/DateUtils';
 import { RestrictionManager } from '../restrictions/RestrictionManager';
 import { RestrictionConfig } from '../restrictions/types';
 

@@ -20,7 +20,7 @@ export interface MousePosition {
 }
 
 export interface DateValidator {
-  validate: (value: string, context?: any) => { isValid: boolean; error: ValidationError | null };
+  validate: (value: string, context?: Record<string, unknown>) => { isValid: boolean; error: ValidationError | null };
   formatValue: (date: Date) => string;
   parseValue: (value: string) => Date | null;
   DATE_FORMAT: string;
@@ -201,7 +201,7 @@ export class DateRangePickerHandlers {
       const styles: UserSelectProperty[] = ['userSelect', 'webkitUserSelect', 'mozUserSelect', 'msUserSelect'];
       styles.forEach(style => {
         // Type-safe version of setting style properties
-        document.body.style[style] = '';
+        document.body.style[style as UserSelectProperty] = '';
       });
 
       // Clear any active intervals using a safer approach
@@ -225,7 +225,7 @@ export class DateRangePickerHandlers {
 
       const setUserSelectNone = () => {
         const styles = ['userSelect', 'webkitUserSelect', 'mozUserSelect', 'msUserSelect'] as const;
-        styles.forEach(style => document.body.style[style as any] = 'none');
+        styles.forEach(style => document.body.style[style as UserSelectProperty] = 'none');
       };
 
       setUserSelectNone();

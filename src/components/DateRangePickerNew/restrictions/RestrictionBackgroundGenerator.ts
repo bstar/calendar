@@ -257,7 +257,7 @@ export class RestrictionBackgroundGenerator {
      * @param {RestrictedBoundaryRestriction} restriction - Restricted boundary configuration
      * @returns {BackgroundData[]} Array of background data for rendering
      */
-    restricted_boundary: (restriction: RestrictedBoundaryRestriction): BackgroundData[] => {
+    restricted_boundary: (_restriction: RestrictedBoundaryRestriction): BackgroundData[] => {
       // Return empty array since restricted boundary is only enforced during selection
       return [];
     }
