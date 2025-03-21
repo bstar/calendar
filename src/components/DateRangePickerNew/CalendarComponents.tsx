@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import {
   format,
@@ -214,7 +214,7 @@ export const DateInput: React.FC<DateInputProps> = ({
           field: 'format'
         });
       }
-    } catch (_e) {
+    } catch {
       showValidationError({
         message: 'Please use format: MM/DD/YY or MMM DD, YYYY',
         type: 'error',
@@ -675,11 +675,13 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, show, children }) => 
     if (!container) {
       container = document.createElement('div');
       container.className = 'cla-portal-container';
-      container.style.position = 'absolute';
-      container.style.top = '0';
-      container.style.left = '0';
-      container.style.zIndex = '9999';
-      container.style.pointerEvents = 'none';
+      // Cast to HTMLDivElement to access style properties
+      const divContainer = container as HTMLDivElement;
+      divContainer.style.position = 'absolute';
+      divContainer.style.top = '0';
+      divContainer.style.left = '0';
+      divContainer.style.zIndex = '9999';
+      divContainer.style.pointerEvents = 'none';
       document.body.appendChild(container);
     }
     setPortalContainer(container as HTMLElement);
@@ -852,8 +854,8 @@ export interface LayerControlProps {
 export type DocumentMouseHandler = (e: MouseEvent) => void;
 export type ReactMouseHandler = (e: React.MouseEvent<HTMLDivElement>) => void;
 
-// Update MonthPair to pass restrictionConfig
-const MonthPair: React.FC<MonthPairProps> = ({
+// Rename MonthPair to _MonthPair
+const _MonthPair: React.FC<MonthPairProps> = ({
   firstMonth,
   secondMonth,
   _selectedRange,
