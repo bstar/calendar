@@ -97,22 +97,13 @@ export const CalendarPortal: React.FC<PortalProps> = ({
       leftPosition = viewportWidth - actualWidth - 8;
     }
 
-    // Set styles
-    const styles = {
-      top: `${topPosition}px`,
-      left: `${leftPosition}px`,
-      width: `${actualWidth}px`,
-      position: 'fixed',
-      zIndex: 2147483647,
-    } as React.CSSProperties;
-
-    // Update styles
+    // Apply styles directly using properties that are safe to set
     if (portalElement) {
-      Object.entries(styles).forEach(([key, value]) => {
-        if (key && value !== undefined) {
-          portalElement.style[key as any] = value as string;
-        }
-      });
+      portalElement.style.top = `${topPosition}px`;
+      portalElement.style.left = `${leftPosition}px`;
+      portalElement.style.width = `${actualWidth}px`;
+      portalElement.style.position = 'fixed';
+      portalElement.style.zIndex = '2147483647';
     }
   }, [portalElement, triggerRef]);
   
@@ -165,13 +156,33 @@ export const CalendarPortal: React.FC<PortalProps> = ({
   
   // Apply custom styles to the portal
   useEffect(() => {
-    if (portalElement && portalStyle) {
-      Object.entries(portalStyle).forEach(([key, value]) => {
-        if (key && value !== undefined) {
-          portalElement.style[key as any] = value as string;
-        }
-      });
-    }
+    if (!portalElement || !portalStyle) return;
+    
+    // Apply each style individually in a type-safe way
+    // This avoids any issues with trying to set read-only properties
+    const applyStyle = (el: HTMLElement, styles: React.CSSProperties) => {
+      // Safely apply common CSS properties
+      if (styles.width) el.style.width = styles.width.toString();
+      if (styles.height) el.style.height = styles.height.toString();
+      if (styles.backgroundColor) el.style.backgroundColor = styles.backgroundColor;
+      if (styles.color) el.style.color = styles.color;
+      if (styles.padding) el.style.padding = styles.padding.toString();
+      if (styles.margin) el.style.margin = styles.margin.toString();
+      if (styles.border) el.style.border = styles.border.toString();
+      if (styles.borderRadius) el.style.borderRadius = styles.borderRadius.toString();
+      if (styles.boxShadow) el.style.boxShadow = styles.boxShadow.toString();
+      if (styles.opacity) el.style.opacity = styles.opacity.toString();
+      if (styles.transition) el.style.transition = styles.transition.toString();
+      if (styles.transform) el.style.transform = styles.transform.toString();
+      if (styles.position) el.style.position = styles.position;
+      if (styles.top) el.style.top = styles.top.toString();
+      if (styles.right) el.style.right = styles.right.toString();
+      if (styles.bottom) el.style.bottom = styles.bottom.toString();
+      if (styles.left) el.style.left = styles.left.toString();
+      if (styles.zIndex) el.style.zIndex = styles.zIndex.toString();
+    };
+    
+    applyStyle(portalElement, portalStyle);
   }, [portalElement, portalStyle]);
 
   if (!portalElement || !isOpen) return null;

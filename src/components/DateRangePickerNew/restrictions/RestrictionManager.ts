@@ -58,7 +58,7 @@
 import { parseISO } from '../../../utils/DateUtils';
 import { isValid } from 'date-fns';
 import { isWithinInterval } from '../../../utils/DateUtils';
-import { RestrictionConfig, Restriction, BoundaryRestriction, DateRangeRestriction, RestrictedBoundaryRestriction, AllowedRangesRestriction } from './types';
+import { RestrictionConfig, Restriction, BoundaryRestriction, DateRangeRestriction, RestrictedBoundaryRestriction, AllowedRangesRestriction, WeekdayRestriction } from './types';
 
 /**
  * Manages date selection restrictions for the calendar
@@ -199,11 +199,11 @@ export class RestrictionManager {
    * Checks if a selection falls on allowed weekdays
    * @param {Date} start - Start date of the selection
    * @param {Date} end - End date of the selection
-   * @param {any} restriction - Weekday restriction configuration
+   * @param {WeekdayRestriction} restriction - Weekday restriction configuration
    * @returns {string | null} Error message if restriction is violated, null otherwise
    * @private
    */
-  private checkWeekdayRestriction(start: Date, end: Date, restriction: any): string | null {
+  private checkWeekdayRestriction(start: Date, end: Date, restriction: WeekdayRestriction): string | null {
     const day = start.getDay();
     if (!restriction.days.includes(day)) {
       return restriction.message || 'Invalid weekday selected';

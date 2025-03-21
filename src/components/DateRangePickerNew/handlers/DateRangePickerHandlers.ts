@@ -1,6 +1,6 @@
 import { RefObject } from 'react';
 import { format, parseISO, startOfMonth, addMonths } from '../../../utils/DateUtils';
-import { DateRange } from '../selection/DateRangeSelectionManager';
+import { DateRange, DateRangeSelectionManager } from '../selection/DateRangeSelectionManager';
 
 export interface ValidationError {
   message: string;
@@ -19,6 +19,19 @@ export interface MousePosition {
   y: number;
 }
 
+export interface DateValidator {
+  validate: (value: string, context?: any) => { isValid: boolean; error: ValidationError | null };
+  formatValue: (date: Date) => string;
+  parseValue: (value: string) => Date | null;
+  DATE_FORMAT: string;
+}
+
+// Define a type for style properties
+type UserSelectProperty = 'userSelect' | 'webkitUserSelect' | 'mozUserSelect' | 'msUserSelect';
+
+// Use NodeJS.Timeout for setInterval return type
+type IntervalID = ReturnType<typeof setInterval>;
+
 export class DateRangePickerHandlers {
   /**
    * Handle date input changes
@@ -28,10 +41,10 @@ export class DateRangePickerHandlers {
     dateInputContext: DateInputContext,
     setSelectedRange: (range: DateRange) => void,
     setDateInputContext: (context: DateInputContext) => void,
-    setValidationErrors: (errors: Record<string, ValidationError>) => void,
+    setValidationErrors: (errors: Record<string, ValidationError> | ((prev: Record<string, ValidationError>) => Record<string, ValidationError>)) => void,
     setCurrentMonth: (month: Date) => void,
     visibleMonths: number,
-    dateValidator: any
+    dateValidator: DateValidator
   ) {
     return (field: 'start' | 'end') => (
       date: Date | null,
@@ -42,7 +55,7 @@ export class DateRangePickerHandlers {
         setValidationErrors(prev =>
           Object.entries(prev)
             .filter(([key]) => key !== field)
-            .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {})
+            .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {} as Record<string, ValidationError>)
         );
         return;
       }
@@ -174,8 +187,9 @@ export class DateRangePickerHandlers {
             }
           }, 1000);
           
-          // Store the interval ID so we can clear it later
-          (e as any).intervalId = intervalId;
+          // Store the interval ID in a safer way
+          const mouseEvent = e as MouseEvent & { intervalId?: IntervalID };
+          mouseEvent.intervalId = intervalId;
         }
       }
     };
@@ -184,13 +198,21 @@ export class DateRangePickerHandlers {
       setIsSelecting(false);
       setOutOfBoundsDirection(null);
 
-      const styles = ['userSelect', 'webkitUserSelect', 'mozUserSelect', 'msUserSelect'] as const;
-      styles.forEach(style => document.body.style[style as any] = '');
+      const styles: UserSelectProperty[] = ['userSelect', 'webkitUserSelect', 'mozUserSelect', 'msUserSelect'];
+      styles.forEach(style => {
+        // Type-safe version of setting style properties
+        document.body.style[style] = '';
+      });
 
-      // Clear any active intervals
-      if ((document as any).activeIntervalId) {
-        clearInterval((document as any).activeIntervalId);
-        (document as any).activeIntervalId = null;
+      // Clear any active intervals using a safer approach
+      interface DocumentWithInterval extends Document {
+        activeIntervalId?: IntervalID;
+      }
+      
+      const docWithInterval = document as DocumentWithInterval;
+      if (docWithInterval.activeIntervalId) {
+        clearInterval(docWithInterval.activeIntervalId);
+        docWithInterval.activeIntervalId = undefined;
       }
 
       document.removeEventListener("mousemove", handleDocumentMouseMove);
@@ -254,7 +276,7 @@ export class DateRangePickerHandlers {
    * Create handlers for selection actions
    */
   static createSelectionHandlers(
-    selectionManager: any,
+    selectionManager: DateRangeSelectionManager,
     isSelecting: boolean,
     setIsSelecting: (isSelecting: boolean) => void,
     setSelectedRange: (range: DateRange) => void,

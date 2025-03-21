@@ -1,4 +1,4 @@
-export type RestrictionType = 'daterange' | 'boundary' | 'allowedranges' | 'restricted_boundary';
+export type RestrictionType = 'daterange' | 'boundary' | 'allowedranges' | 'restricted_boundary' | 'weekday';
 
 export interface BaseRestriction {
   type: RestrictionType;
@@ -39,8 +39,14 @@ export interface RestrictedBoundaryRestriction extends BaseRestriction {
   }[];
 }
 
+export interface WeekdayRestriction extends BaseRestriction {
+  type: 'weekday';
+  days: number[];  // 0-6 for Sunday-Saturday
+  message: string;
+}
+
 // Union type for all restriction types
-export type Restriction = DateRangeRestriction | BoundaryRestriction | AllowedRangesRestriction | RestrictedBoundaryRestriction;
+export type Restriction = DateRangeRestriction | BoundaryRestriction | AllowedRangesRestriction | RestrictedBoundaryRestriction | WeekdayRestriction;
 
 export interface RestrictionConfig {
   restrictions: Restriction[];
