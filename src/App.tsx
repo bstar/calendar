@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import './bootstrap.min.css';
 import './docStyles.css';
 import './App.css';
@@ -45,6 +45,12 @@ const App: React.FC = () => {
    * - Portal and tooltip visibility
    */
   
+  // Add state for the selected date range
+  const [dateRange, setDateRange] = useState<{ start: string | null; end: string | null }>({
+    start: null,
+    end: null
+  });
+
   // Common settings for both calendar instances - without expensive computation
   const baseSettings = {
     displayMode: "popup" as const,
@@ -228,13 +234,39 @@ const App: React.FC = () => {
       gap: '40px',
       textAlign: 'left' 
     }}>
+      {/* Display the selected range */}
+      <div style={{
+        padding: '15px',
+        backgroundColor: '#f8f9fa',
+        borderRadius: '4px',
+        border: '1px solid #dee2e6',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+      }}>
+        <h4 style={{ margin: '0 0 10px 0', color: '#333' }}>Selected Date Range</h4>
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'auto 1fr',
+          gap: '8px 16px',
+          fontSize: '14px',
+          color: '#666'
+        }}>
+          <div style={{ fontWeight: 500 }}>Start Date:</div>
+          <div>{dateRange.start ? format(new Date(dateRange.start), 'MMMM d, yyyy') : 'Not selected'}</div>
+          <div style={{ fontWeight: 500 }}>End Date:</div>
+          <div>{dateRange.end ? format(new Date(dateRange.end), 'MMMM d, yyyy') : 'Not selected'}</div>
+        </div>
+      </div>
+
       {/* Calendar Instance 1 */}
       <div style={{ position: 'relative', textAlign: 'left' }} className="cla-calendar-wrapper">
         <h3 style={{ textAlign: 'left' }}>Calendar Instance 1 (2 Months)</h3>
         <CLACalendar
           settings={baseSettings}
           onSettingsChange={(newSettings) => {}}
-          onSubmit={(start, end) => {}}
+          onSubmit={(start, end) => {
+            console.log('Calendar 1 submit:', { start, end });
+            setDateRange({ start, end });
+          }}
           layersFactory={layersFactory}
           restrictionConfigFactory={restrictionsFactory}
         />
@@ -246,7 +278,10 @@ const App: React.FC = () => {
         <CLACalendar
           settings={calendar2Settings}
           onSettingsChange={(newSettings) => {}}
-          onSubmit={(start, end) => {}}
+          onSubmit={(start, end) => {
+            console.log('Calendar 2 submit:', { start, end });
+            setDateRange({ start, end });
+          }}
           layersFactory={layersFactory}
           restrictionConfigFactory={restrictions2Factory}
         />

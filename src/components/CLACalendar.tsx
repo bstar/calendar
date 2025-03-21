@@ -1292,7 +1292,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   }, [everInitialized, selectionManager, isSelecting, setIsSelecting, setSelectedRange, setNotification, settings.showSelectionAlert, selectedRange, outOfBoundsDirection]);
   
   // Use the abstracted calendar action handlers
-  const { handleClear, handleSubmit: originalHandleSubmit, handleLayerChange } = useMemo(() =>
+  const { handleClear, handleSubmit: originalHandleSubmit, handleClickOutside, handleLayerChange } = useMemo(() =>
     DateRangePickerHandlers.createCalendarActionHandlers(
       setSelectedRange,
       setDateInputContext,
@@ -1300,9 +1300,12 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       setValidationErrors,
       setCurrentMonth,
       setIsOpen,
-      setActiveLayer
+      setActiveLayer,
+      selectedRange,
+      onSubmit,
+      settings.closeOnClickAway
     ),
-    [setSelectedRange, setDateInputContext, setIsSelecting, setValidationErrors, setCurrentMonth, setIsOpen, setActiveLayer]
+    [setSelectedRange, setDateInputContext, setIsSelecting, setValidationErrors, setCurrentMonth, setIsOpen, setActiveLayer, selectedRange, onSubmit, settings.closeOnClickAway]
   );
   
   // Wrap the original handleSubmit to update displayRange
@@ -1435,33 +1438,21 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     moveToMonthRef.current = moveToMonth;
   }, [moveToMonth]);
   
-  // Add this effect to handle clicks outside the calendar
+  // Update click outside handler to use the new handler
   useEffect(() => {
     if (!settings.closeOnClickAway || settings.displayMode === 'embedded' || !isOpen) return;
     
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleOutsideClick = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        // Only close the calendar without submitting the value
-        setIsOpen(false);
+        handleClickOutside();
       }
     };
     
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('mousedown', handleOutsideClick);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('mousedown', handleOutsideClick);
     };
-  }, [settings.closeOnClickAway, settings.displayMode, isOpen]);
-  
-  // Modify the useEffect that handles submission to only trigger on explicit submit
-  useEffect(() => {
-    // Only submit when the calendar is closed AND it wasn't due to click-away
-    if (!isOpen && selectedRange.start && selectedRange.end && onSubmit && !settings.closeOnClickAway) {
-      onSubmit(
-        selectedRange.start,
-        selectedRange.end
-      );
-    }
-  }, [isOpen, selectedRange, onSubmit, settings.closeOnClickAway]);
+  }, [settings.closeOnClickAway, settings.displayMode, isOpen, handleClickOutside]);
   
   // Handle input click to open calendar and initialize if needed
   const handleInputClick = () => {

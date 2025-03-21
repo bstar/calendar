@@ -319,7 +319,10 @@ export class DateRangePickerHandlers {
     setValidationErrors: (errors: Record<string, ValidationError>) => void,
     setCurrentMonth: (month: Date) => void,
     setIsOpen: (isOpen: boolean) => void,
-    setActiveLayer: (layerId: string) => void
+    setActiveLayer: (layerId: string) => void,
+    selectedRange: DateRange,
+    onSubmit?: (startDate: string, endDate: string) => void,
+    closeOnClickAway?: boolean
   ) {
     const handleClear = () => {
       // Reset range and context
@@ -338,8 +341,21 @@ export class DateRangePickerHandlers {
     };
 
     const handleSubmit = () => {
+      // If we have a valid range and onSubmit handler, call it directly
+      if (selectedRange.start && selectedRange.end && onSubmit) {
+        onSubmit(selectedRange.start, selectedRange.end);
+      }
+      
+      // Close the calendar
       setIsOpen(false);
       setIsSelecting(false);
+    };
+
+    const handleClickOutside = () => {
+      if (closeOnClickAway) {
+        setIsOpen(false);
+        setIsSelecting(false);
+      }
     };
 
     const handleLayerChange = (layerId: string) => {
@@ -349,6 +365,7 @@ export class DateRangePickerHandlers {
     return {
       handleClear,
       handleSubmit,
+      handleClickOutside,
       handleLayerChange
     };
   }
