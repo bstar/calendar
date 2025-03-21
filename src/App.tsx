@@ -5,9 +5,13 @@ import './App.css';
 // Import defensive styles for the calendar widget
 import './components/DateRangePickerNew/defensive-styles.css';
 import { CLACalendar } from './components/CLACalendar';
+import { CalendarSettings, getDefaultSettings, Layer } from './components/DateRangePicker.config';
+import { addDays, format } from './utils/DateUtils';
+import { useRangeSelection } from './components/hooks';
+import { createLayersFactory } from './components/DateRangePickerNew/layers/LayerFactory';
 import { RestrictionType, RestrictedBoundaryRestriction, RestrictionConfig, BoundaryRestriction } from './components/DateRangePickerNew/restrictions/types';
 import isoWeeksData from './data/iso_weeks.json';
-import { subDays, formatISO, format } from 'date-fns';
+import { subDays, formatISO } from 'date-fns';
 
 // Extract unique period ranges from the iso_weeks.json data
 const getUniquePeriodRanges = () => {

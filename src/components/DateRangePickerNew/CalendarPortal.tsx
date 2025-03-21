@@ -214,7 +214,7 @@ export const useCalendarCoordination = (id: string) => {
   const [activeCalendarId, setActiveCalendarId] = useState<string | null>(null);
   
   // Keep track of all calendar IDs for coordination
-  const [registeredCalendars, setRegisteredCalendars] = useState<string[]>([]);
+  const [_registeredCalendars, setRegisteredCalendars] = useState<string[]>([]);
   
   // Register this calendar instance
   useEffect(() => {

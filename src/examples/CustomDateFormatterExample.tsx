@@ -24,6 +24,10 @@ const CustomDateFormatterExample: React.FC = () => {
   };
 
   const [settings, setSettings] = useState<CalendarSettings>(initialSettings);
+  const [selectedValues, setSelectedValues] = useState<{startDate: string | null, endDate: string | null}>({
+    startDate: null,
+    endDate: null
+  });
 
   const handleSubmit = (startDate: string | null, endDate: string | null) => {
     // No console.log, just set the selected values
@@ -41,6 +45,13 @@ const CustomDateFormatterExample: React.FC = () => {
           onSettingsChange={setSettings}
           onSubmit={handleSubmit}
         />
+      </div>
+      
+      {/* Display selected values */}
+      <div className="selected-values" style={{ marginTop: '20px', padding: '10px', border: '1px solid #eee', borderRadius: '4px' }}>
+        <h3>Selected Range:</h3>
+        <p>Start Date: {selectedValues.startDate || 'Not selected'}</p>
+        <p>End Date: {selectedValues.endDate || 'Not selected'}</p>
       </div>
       
       <div className="code-example">

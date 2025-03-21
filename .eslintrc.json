@@ -15,8 +15,9 @@
     "ecmaFeatures": {
       "jsx": true
     },
-    "ecmaVersion": 12,
-    "sourceType": "module"
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+    "project": ["./tsconfig.json"]
   },
   "plugins": [
     "react",
@@ -38,5 +39,13 @@
     "react": {
       "version": "detect"
     }
-  }
+  },
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx"],
+      "rules": {
+        // TypeScript-specific rules here
+      }
+    }
+  ]
 } 

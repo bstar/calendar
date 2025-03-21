@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 import {
   format,
@@ -214,7 +214,7 @@ export const DateInput: React.FC<DateInputProps> = ({
           field: 'format'
         });
       }
-    } catch (e) {
+    } catch (_e) {
       showValidationError({
         message: 'Please use format: MM/DD/YY or MMM DD, YYYY',
         type: 'error',
@@ -675,6 +675,11 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, show, children }) => 
     if (!container) {
       container = document.createElement('div');
       container.className = 'cla-portal-container';
+      container.style.position = 'absolute';
+      container.style.top = '0';
+      container.style.left = '0';
+      container.style.zIndex = '9999';
+      container.style.pointerEvents = 'none';
       document.body.appendChild(container);
     }
     setPortalContainer(container as HTMLElement);
@@ -688,68 +693,77 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, show, children }) => 
   }, []);
 
   useEffect(() => {
+    // Update position handling function
     const updatePosition = () => {
-      if (!show || !targetRef.current || !tooltipRef.current) return;
+      if (!targetRef.current || !tooltipRef.current) return;
 
       const targetRect = targetRef.current.getBoundingClientRect();
       const tooltipRect = tooltipRef.current.getBoundingClientRect();
 
       // Calculate initial position
-      let newTop = targetRect.top - tooltipRect.height - 8;
-      let newLeft = targetRect.left + (targetRect.width - tooltipRect.width) / 2;
+      // Position tooltip centered above the target element
+      let top = targetRect.top + window.scrollY - tooltipRect.height - 8;
+      let left = targetRect.left + window.scrollX + (targetRect.width - tooltipRect.width) / 2;
 
-      // Check viewport boundaries
-      const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
-
-      // Horizontal adjustments
-      if (newLeft < 8) {
-        newLeft = 8;
-      } else if (newLeft + tooltipRect.width > viewportWidth - 8) {
-        newLeft = viewportWidth - tooltipRect.width - 8;
+      // Check if tooltip would go off-screen
+      if (left < 8) {
+        left = 8;
+      } else if (left + tooltipRect.width > window.innerWidth - 8) {
+        left = window.innerWidth - tooltipRect.width - 8;
       }
 
-      // Vertical adjustments - if tooltip would go above viewport, show it below the target
-      if (newTop < 8) {
-        newTop = targetRect.bottom + 8;
+      // If tooltip would go above the viewport, position it below the target
+      if (top < window.scrollY + 8) {
+        top = targetRect.bottom + window.scrollY + 8;
       }
 
-      // Update position if it has changed
+      // Update position
       setPosition({
-        top: Math.round(newTop),
-        left: Math.round(newLeft)
+        top: Math.round(top),
+        left: Math.round(left)
       });
     };
 
-    // Update position immediately and after a short delay
-    updatePosition();
-    const timeoutId = setTimeout(updatePosition, 0);
-
-    // Add event listeners
-    window.addEventListener('resize', updatePosition);
-    window.addEventListener('scroll', updatePosition, true);
-
-    return () => {
-      clearTimeout(timeoutId);
-      window.removeEventListener('resize', updatePosition);
-      window.removeEventListener('scroll', updatePosition, true);
-    };
+    // Need to wait for content to render before calculating position
+    if (show) {
+      // Initial positioning - delay to ensure content is rendered
+      setTimeout(updatePosition, 0);
+      
+      // Set up event listeners for repositioning
+      window.addEventListener('resize', updatePosition);
+      window.addEventListener('scroll', updatePosition, true);
+      
+      return () => {
+        window.removeEventListener('resize', updatePosition);
+        window.removeEventListener('scroll', updatePosition, true);
+      };
+    }
   }, [show, content]);
 
   return (
     <>
-      <div ref={targetRef} className="tooltip-container">
+      <div ref={targetRef} className="tooltip-container" style={{ display: 'inline-block', position: 'relative' }}>
         {children}
       </div>
-      {portalContainer && show && ReactDOM.createPortal(
+      {show && portalContainer && ReactDOM.createPortal(
         <div
           ref={tooltipRef}
           className="tooltip"
           style={{
+            position: 'absolute',
             top: `${position.top}px`,
             left: `${position.left}px`,
-            visibility: show ? 'visible' : 'hidden',
-            opacity: show ? 1 : 0
+            background: '#333',
+            color: '#fff',
+            padding: '4px 8px',
+            borderRadius: '4px',
+            fontSize: '12px',
+            maxWidth: '200px',
+            zIndex: 9999,
+            pointerEvents: 'none',
+            boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+            opacity: 1,
+            transition: 'opacity 0.2s ease'
           }}
         >
           {content}
@@ -802,6 +816,15 @@ export interface MonthPairProps extends Omit<MonthGridProps, 'baseDate' | 'style
   visibleMonths: number;
   showMonthHeadings: boolean;
   restrictionConfig?: RestrictionConfig;
+  _selectedRange?: DateRange;
+  _onSelectionStart?: (date: Date) => void;
+  _onSelectionMove?: (date: Date) => void;
+  _isSelecting?: boolean;
+  _showTooltips?: boolean;
+  _renderDay?: (date: Date) => RenderResult | null;
+  _layer?: Layer;
+  _activeLayer?: string;
+  _restrictionConfig?: RestrictionConfig;
 }
 
 export interface CalendarGridProps {
@@ -833,17 +856,17 @@ export type ReactMouseHandler = (e: React.MouseEvent<HTMLDivElement>) => void;
 const MonthPair: React.FC<MonthPairProps> = ({
   firstMonth,
   secondMonth,
-  selectedRange,
-  onSelectionStart,
-  onSelectionMove,
-  isSelecting,
+  _selectedRange,
+  _onSelectionStart,
+  _onSelectionMove,
+  _isSelecting,
   visibleMonths,
   showMonthHeadings,
-  showTooltips,
-  renderDay,
-  layer,
-  activeLayer,
-  restrictionConfig,
+  _showTooltips,
+  _renderDay,
+  _layer,
+  _activeLayer,
+  _restrictionConfig,
   startWeekOnSunday
 }) => {
   // Create an array of months to show based on firstMonth and secondMonth
@@ -856,7 +879,7 @@ const MonthPair: React.FC<MonthPairProps> = ({
   
   return (
     <div style={{ display: 'flex', width: '100%', gap: '1rem' }}>
-      {monthsToRender.map((month, index) => (
+      {monthsToRender.map((month, _index) => (
         <div 
           key={month.toISOString()}
           style={{ 

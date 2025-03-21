@@ -686,14 +686,14 @@ const DayCell = ({
     // 1. We have a render function
     // 2. The cell is current month (to avoid computation for previous/next month dates)
     // 3. Either we're showing tooltips or the date is in the selection range
-    if (!renderContent || !isCurrentMonth) return null;
+    if (!renderContent) return null;
     
     // Compute event content if we need to display it
     if (showTooltips || isSelected || isInRange || isHovered) {
       return renderContent(date);
     }
     return null;
-  }, [renderContent, date, isCurrentMonth, showTooltips, isSelected, isInRange, isHovered]);
+  }, [renderContent, date, showTooltips, isSelected, isInRange, isHovered]);
 
   const getBackgroundColor = () => {
     // Only get background color for non-restricted dates
