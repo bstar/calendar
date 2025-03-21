@@ -147,7 +147,7 @@ interface Renderer {
 }
 
 // Renamed this to a regular function since it's not a hook
-const handleClickOutsideListener = (
+const _handleClickOutsideListener = (
   ref: React.RefObject<HTMLElement>,
   handler: (event: MouseEvent) => void
 ) => {
@@ -282,7 +282,7 @@ const MonthGrid: React.FC<MonthGridProps & { settings?: CalendarSettings }> = ({
   layer,
   startWeekOnSunday = false,
   restrictionConfig,
-  activeLayer, // Keep the original name
+  activeLayer,
   settings
 }) => {
   const monthStart = startOfMonth(baseDate);

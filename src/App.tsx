@@ -5,12 +5,12 @@ import './App.css';
 // Import defensive styles for the calendar widget
 import './components/DateRangePickerNew/defensive-styles.css';
 import { CLACalendar } from './components/CLACalendar';
-import type { CalendarSettings, Layer } from './components/DateRangePicker.config';
+import type { CalendarSettings as _CalendarSettings, Layer as _Layer } from './components/DateRangePicker.config';
 import { getDefaultSettings } from './components/DateRangePicker.config';
 import { addDays, format } from './utils/DateUtils';
 import { useRangeSelection } from './components/hooks';
 import { createLayersFactory } from './components/DateRangePickerNew/layers/LayerFactory';
-import type { RestrictionConfig } from './components/DateRangePickerNew/restrictions/types';
+import type { RestrictionConfig as _RestrictionConfig } from './components/DateRangePickerNew/restrictions/types';
 import { RestrictionType, RestrictedBoundaryRestriction, BoundaryRestriction } from './components/DateRangePickerNew/restrictions/types';
 import isoWeeksData from './data/iso_weeks.json';
 import { subDays, formatISO } from 'date-fns';
