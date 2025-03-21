@@ -119,6 +119,7 @@ const App: React.FC = () => {
   // Create lazy factory function for layers
   const createLayersFactory = () => {
     return () => {
+      // eslint-disable-next-line no-console
       console.log("Lazy initializing layers data - only happens when calendar is opened!");
       
       // Get unique period ranges - only executed when calendar is opened
@@ -162,6 +163,7 @@ const App: React.FC = () => {
   // Create lazy factory function for restrictions
   const createRestrictionsFactory = () => {
     return () => {
+      // eslint-disable-next-line no-console
       console.log("Lazy initializing restriction data - only happens when calendar is opened!");
       
       // Get unique period ranges - only executed when calendar is opened
@@ -186,6 +188,7 @@ const App: React.FC = () => {
   // Create lazy factory function for restrictions for second calendar
   const createRestrictions2Factory = () => {
     return () => {
+      // eslint-disable-next-line no-console
       console.log("Lazy initializing second calendar restriction data!");
       
       return {
@@ -262,8 +265,9 @@ const App: React.FC = () => {
         <h3 style={{ textAlign: 'left' }}>Calendar Instance 1 (2 Months)</h3>
         <CLACalendar
           settings={baseSettings}
-          onSettingsChange={(newSettings) => {}}
+          onSettingsChange={() => {}}
           onSubmit={(start, end) => {
+            // eslint-disable-next-line no-console
             console.log('Calendar 1 submit:', { start, end });
             setDateRange({ start, end });
           }}
@@ -277,8 +281,9 @@ const App: React.FC = () => {
         <h3 style={{ textAlign: 'left' }}>Calendar Instance 2 (3 Months)</h3>
         <CLACalendar
           settings={calendar2Settings}
-          onSettingsChange={(newSettings) => {}}
+          onSettingsChange={() => {}}
           onSubmit={(start, end) => {
+            // eslint-disable-next-line no-console
             console.log('Calendar 2 submit:', { start, end });
             setDateRange({ start, end });
           }}
