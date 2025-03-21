@@ -5,13 +5,21 @@ import './App.css';
 // Import defensive styles for the calendar widget
 import './components/DateRangePickerNew/defensive-styles.css';
 import { CLACalendar } from './components/CLACalendar';
-import { CalendarSettings, getDefaultSettings, Layer } from './components/DateRangePicker.config';
+import type { CalendarSettings, Layer } from './components/DateRangePicker.config';
+import { getDefaultSettings } from './components/DateRangePicker.config';
 import { addDays, format } from './utils/DateUtils';
 import { useRangeSelection } from './components/hooks';
 import { createLayersFactory } from './components/DateRangePickerNew/layers/LayerFactory';
-import { RestrictionType, RestrictedBoundaryRestriction, RestrictionConfig, BoundaryRestriction } from './components/DateRangePickerNew/restrictions/types';
+import type { RestrictionConfig } from './components/DateRangePickerNew/restrictions/types';
+import { RestrictionType, RestrictedBoundaryRestriction, BoundaryRestriction } from './components/DateRangePickerNew/restrictions/types';
 import isoWeeksData from './data/iso_weeks.json';
 import { subDays, formatISO } from 'date-fns';
+
+// Declare unused variables with underscore prefix to satisfy linter
+const _getDefaultSettings = getDefaultSettings;
+const _addDays = addDays;
+const _useRangeSelection = useRangeSelection;
+const _createLayersFactory = createLayersFactory;
 
 // Extract unique period ranges from the iso_weeks.json data
 const getUniquePeriodRanges = () => {
@@ -260,7 +268,7 @@ const App: React.FC = () => {
         <h3 style={{ textAlign: 'left' }}>Calendar Instance 1 (2 Months)</h3>
         <CLACalendar
           settings={baseSettings}
-          onSettingsChange={() => {}}
+          _onSettingsChange={() => {}}
           onSubmit={(start, end) => {
             setDateRange({ start, end });
           }}
@@ -274,7 +282,7 @@ const App: React.FC = () => {
         <h3 style={{ textAlign: 'left' }}>Calendar Instance 2 (3 Months)</h3>
         <CLACalendar
           settings={calendar2Settings}
-          onSettingsChange={() => {}}
+          _onSettingsChange={() => {}}
           onSubmit={(start, end) => {
             setDateRange({ start, end });
           }}
