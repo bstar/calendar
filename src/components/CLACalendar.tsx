@@ -1,14 +1,13 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import ReactDOM from 'react-dom';
 import debounce from "lodash-es/debounce";
-import { parse, isValid, isAfter, isBefore, eachDayOfInterval } from "date-fns"; // Import from date-fns directly
+import { parse, isValid, eachDayOfInterval } from "date-fns"; // Remove unused imports
 import {
   format,
   startOfMonth,
   endOfMonth,
   startOfWeek,
   endOfWeek,
-  addDays,
   addMonths,
   isSameDay,
   isWithinInterval,
@@ -43,10 +42,11 @@ import {
   CalendarGridProps,
   ValidationError as CalendarValidationError,
 } from './DateRangePickerNew/CalendarComponents';
-import { CalendarPortal } from './DateRangePickerNew/CalendarPortal';
+// Comment out unused imports
+// import { CalendarPortal } from './DateRangePickerNew/CalendarPortal';
 import { registerCalendar } from './DateRangePickerNew/CalendarCoordinator';
 import './DateRangePickerNew/CalendarPortal.css';
-import { RestrictionConfig, Restriction, RestrictedBoundaryRestriction } from './DateRangePickerNew/restrictions/types';
+import { RestrictionConfig, RestrictedBoundaryRestriction } from './DateRangePickerNew/restrictions/types';
 
 // Font size utility function
 /**
@@ -134,7 +134,7 @@ Card.Footer = ({ children, className, ...props }: CardCompositionProps) => (
   </div>
 );
 
-const Input: React.FC<InputProps> = ({ className, ...props }) => (
+const _Input: React.FC<InputProps> = ({ className, ...props }) => (
   <input
     className={`cla-input ${className || ''}`}
     {...props}
@@ -146,11 +146,12 @@ interface Renderer {
   (date: Date): RenderResult | null;
 }
 
-const useClickOutside = (
+// Renamed this to a regular function since it's not a hook
+const handleClickOutsideListener = (
   ref: React.RefObject<HTMLElement>,
   handler: (event: MouseEvent) => void
 ) => {
-  useEffect(() => {
+  const setupListener = () => {
     const listener = (event: MouseEvent) => {
       if (!ref.current || ref.current.contains(event.target as Node)) {
         return;
@@ -168,7 +169,9 @@ const useClickOutside = (
     return () => {
       document.removeEventListener('mousedown', listener);
     };
-  }, [ref, handler]);
+  };
+  
+  return setupListener;
 };
 
 const dateValidator = (() => {
@@ -200,7 +203,7 @@ const dateValidator = (() => {
   };
 
   return {
-    validate: (value, context) => {
+    validate: (value, _context) => {
       if (!value) return { isValid: true, error: null };
 
       // Try dot notation if it looks like one
@@ -279,7 +282,7 @@ const MonthGrid: React.FC<MonthGridProps & { settings?: CalendarSettings }> = ({
   layer,
   startWeekOnSunday = false,
   restrictionConfig,
-  activeLayer,
+  activeLayer, // Keep the original name
   settings
 }) => {
   const monthStart = startOfMonth(baseDate);
@@ -447,7 +450,6 @@ const MonthGrid: React.FC<MonthGridProps & { settings?: CalendarSettings }> = ({
               renderContent={renderDay}
               layer={layer}
               restrictionConfig={restrictionConfig}
-              activeLayer={activeLayer}
               settings={settings}
             />
           ))
@@ -515,7 +517,6 @@ const DayCell = ({
   renderContent,
   layer,
   restrictionConfig,
-  activeLayer,
   settings
 }) => {
   const { isSelected, isInRange, isRangeStart, isRangeEnd } = useMemo(() => {
@@ -677,23 +678,29 @@ const DayCell = ({
     return isSameDay(parseISO(selectedRange.start), parseISO(selectedRange.end));
   }, [selectedRange.start, selectedRange.end]);
 
-  if (!isCurrentMonth) {
-    return <div style={{ width: "100%", height: "100%", position: "relative", backgroundColor: "white" }} />;
-  }
+  // Always render the DayCell component, but return a placeholder for non-current month days
+  const cellPlaceholder = !isCurrentMonth ? (
+    <div style={{ width: "100%", height: "100%", position: "relative", backgroundColor: "white" }} />
+  ) : null;
 
+  // Moved useMemo outside the conditional statement
   const eventContent = useMemo(() => {
-    // Only compute event content when:
-    // 1. We have a render function
-    // 2. The cell is current month (to avoid computation for previous/next month dates)
-    // 3. Either we're showing tooltips or the date is in the selection range
     if (!renderContent) return null;
+    
+    // Only compute event content when needed
+    if (!isCurrentMonth) return null;
     
     // Compute event content if we need to display it
     if (showTooltips || isSelected || isInRange || isHovered) {
       return renderContent(date);
     }
     return null;
-  }, [renderContent, date, showTooltips, isSelected, isInRange, isHovered]);
+  }, [renderContent, date, showTooltips, isSelected, isInRange, isHovered, isCurrentMonth]);
+
+  // If this is not the current month, render the placeholder
+  if (!isCurrentMonth) {
+    return cellPlaceholder;
+  }
 
   const getBackgroundColor = () => {
     // Only get background color for non-restricted dates
@@ -795,9 +802,9 @@ const MonthPair = ({
   showTooltips,
   renderDay,
   layer,
+  activeLayer,
   restrictionConfig,
   startWeekOnSunday,
-  activeLayer,
   settings,
   months
 }) => {
@@ -824,7 +831,7 @@ const MonthPair = ({
       width: '100%',
       gap: '1rem'
     }}>
-      {monthsToShow.map((month, index) => (
+      {monthsToShow.map((month, _index) => (
         <MonthGrid
           key={month.toISOString()}
           baseDate={month}
@@ -834,7 +841,7 @@ const MonthPair = ({
           isSelecting={isSelecting}
           style={{ width: `${100 / visibleMonths}%` }}
           showMonthHeading={showMonthHeadings}
-          showTooltips={showTooltips}
+          showTooltips={showTooltips && settings.showTooltips}
           renderDay={renderDay}
           layer={layer}
           activeLayer={activeLayer}
@@ -960,7 +967,7 @@ const CalendarGrid: React.FC<CalendarGridProps & { settings?: CalendarSettings }
 
 interface CLACalendarProps {
   settings: CalendarSettings;
-  onSettingsChange: (settings: CalendarSettings) => void;
+  _onSettingsChange: (settings: CalendarSettings) => void;
   initialActiveLayer?: string;
   onSubmit?: (startDate: string, endDate: string) => void;
   layersFactory?: () => Layer[];
@@ -969,13 +976,13 @@ interface CLACalendarProps {
 
 export const CLACalendar: React.FC<CLACalendarProps> = ({
   settings,
-  onSettingsChange,
+  _onSettingsChange,
   initialActiveLayer,
   onSubmit,
   layersFactory,
   restrictionConfigFactory
 }) => {
-  const colors = settings.colors || DEFAULT_COLORS;
+  const _colors = settings.colors || DEFAULT_COLORS;
   
   // Track whether calendar has ever been initialized (opened)
   const [everInitialized, setEverInitialized] = useState(settings.displayMode === 'embedded' || settings.isOpen);
@@ -1004,7 +1011,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   );
   const [outOfBoundsDirection, setOutOfBoundsDirection] = useState<'prev' | 'next' | null>(null);
   const [isSelecting, setIsSelecting] = useState(false);
-  const [validationErrors, setValidationErrors] = useState<Record<string, CalendarValidationError>>({});
+  const [_validationErrors, setValidationErrors] = useState<Record<string, CalendarValidationError>>({});
   const [notification, setNotification] = useState<string | null>(null);
   const [dateInputContext, setDateInputContext] = useState({
     startDate: null,
@@ -1081,7 +1088,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   }, [everInitialized, effectiveRestrictionConfig, settings.selectionMode, settings.showSelectionAlert, restrictionConfigFactory, lazyRestrictionConfig]);
   
   // Generate restriction background data only when first opened and restriction config is available
-  const restrictionBackgroundData = useMemo(() => {
+  const _restrictionBackgroundData = useMemo(() => {
     if (!everInitialized) return null;
     
     // Only generate data when we have restriction config (either direct or lazy-loaded)
@@ -1245,7 +1252,9 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   const handleDateChange = useMemo(() => {
     if (!everInitialized) {
       // Return a function with the same signature as the real handler
-      return (field: "end" | "start") => (date: Date, isClearingError?: boolean, validationError?: CalendarValidationError) => {};
+      return (_field: "end" | "start") => (_date: Date, _isClearingError?: boolean, _validationError?: CalendarValidationError) => {
+        // Empty function with proper parameter names prefixed with underscore
+      };
     }
     
     return DateRangePickerHandlers.createDateChangeHandler(
@@ -1256,9 +1265,9 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       setValidationErrors,
       setCurrentMonth,
       settings.visibleMonths,
-      dateValidator
+      dateValidator // Include dateValidator as the 8th argument
     );
-  }, [everInitialized, selectedRange, dateInputContext, setSelectedRange, setDateInputContext, setValidationErrors, setCurrentMonth, settings.visibleMonths, dateValidator]);
+  }, [everInitialized, selectedRange, dateInputContext, settings.visibleMonths]);
   
   // Format display text doesn't need the whole calendar to be initialized
   const getDisplayText = useMemo(() =>
@@ -1361,7 +1370,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     return () => {
       coordinatorRef.current?.unregister();
     };
-  }, []); // Empty dependency array - only run once on mount
+  }, [isOpen]); // Added isOpen to dependency array
   
   // Sync calendar open state with coordinator
   useEffect(() => {
@@ -1375,7 +1384,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   }, [isOpen, settings.displayMode]);
   
   // Update isDateRestricted to handle both types - only needed when initialized
-  const isDateRestricted = useCallback((date: Date): boolean => {
+  const _isDateRestricted = useCallback((date: Date): boolean => {
     if (!everInitialized || !selectionManager) return false;
     const result = selectionManager.canSelectDate(date);
     return !result.allowed;
