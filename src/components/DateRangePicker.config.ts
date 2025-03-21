@@ -94,7 +94,7 @@ interface LayerControlSetting extends BaseSetting {
   actions: {
     canAdd: boolean;
     canRemove: boolean;
-    newLayerTemplate: Omit<Layer, 'features'> & { data: any[] };
+    newLayerTemplate: Omit<Layer, 'features'> & { data: unknown[] };
   };
 }
 

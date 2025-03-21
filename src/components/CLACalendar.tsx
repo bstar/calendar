@@ -282,6 +282,7 @@ const MonthGrid: React.FC<MonthGridProps & { settings?: CalendarSettings }> = ({
   layer,
   startWeekOnSunday = false,
   restrictionConfig,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   activeLayer,
   settings
 }) => {
