@@ -802,7 +802,7 @@ const MonthPair = ({
   showTooltips,
   renderDay,
   layer,
-  _activeLayer,
+  activeLayer,
   restrictionConfig,
   startWeekOnSunday,
   settings,
@@ -847,13 +847,14 @@ const MonthPair = ({
           restrictionConfig={restrictionConfig}
           startWeekOnSunday={startWeekOnSunday}
           settings={settings}
+          activeLayer={activeLayer}
         />
       ))}
     </div>
   );
 };
 
-const LayerControl = ({ layers, _activeLayer, onLayerChange }) => {
+const LayerControl = ({ layers, activeLayer, onLayerChange }) => {
   return (
     <div className="cla-layer-control" style={{
     }}>
@@ -863,13 +864,13 @@ const LayerControl = ({ layers, _activeLayer, onLayerChange }) => {
           <button
             key={layer.name}
             onClick={() => onLayerChange(layer.name)}
-            className={`cla-layer-button ${_activeLayer === layer.name ? 'active' : ''}`}
+            className={`cla-layer-button ${activeLayer === layer.name ? 'active' : ''}`}
             style={{
               padding: '6px 12px',
               borderRadius: '4px',
               border: '1px solid #dee2e6',
-              backgroundColor: _activeLayer === layer.name ? '#e7f3ff' : '#fff',
-              color: _activeLayer === layer.name ? '#0366d6' : '#666',
+              backgroundColor: activeLayer === layer.name ? '#e7f3ff' : '#fff',
+              color: activeLayer === layer.name ? '#0366d6' : '#666',
               cursor: 'pointer'
             }}
           >
@@ -890,7 +891,7 @@ const CalendarGrid: React.FC<CalendarGridProps & { settings?: CalendarSettings }
   showMonthHeadings,
   showTooltips,
   layer,
-  _activeLayer,
+  activeLayer,
   restrictionConfig,
   startWeekOnSunday,
   settings
@@ -959,6 +960,7 @@ const CalendarGrid: React.FC<CalendarGridProps & { settings?: CalendarSettings }
       startWeekOnSunday={startWeekOnSunday}
       settings={settings}
       months={months}
+      activeLayer={activeLayer}
     />
   );
 };
@@ -1346,9 +1348,10 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
         restrictionConfig={effectiveRestrictionConfig}
         startWeekOnSunday={settings.startWeekOnSunday}
         settings={settings}
+        activeLayer={activeLayer}
       />
     );
-  }, [everInitialized, months, selectedRange, handleSelectionStart, handleSelectionMove, isSelecting, settings, shouldShowTooltips, effectiveRestrictionConfig]);
+  }, [everInitialized, months, selectedRange, handleSelectionStart, handleSelectionMove, isSelecting, settings, shouldShowTooltips, effectiveRestrictionConfig, activeLayer]);
   
   // Register with the calendar coordinator 
   useEffect(() => {
@@ -1592,7 +1595,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
         {settings.showLayersNavigation && (
           <LayerControl
             layers={activeLayers}
-            _activeLayer={activeLayer}
+            activeLayer={activeLayer}
             onLayerChange={handleLayerChange}
           />
         )}

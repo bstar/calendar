@@ -3,7 +3,7 @@ import { RestrictionConfig } from './DateRangePickerNew/restrictions/types';
 
 export type LAYER_TYPES = 'base' | 'overlay';
 
-interface LayerFeature {
+interface _LayerFeature {
   name: string;
   description: string;
   dataSchema: null | {
@@ -100,7 +100,7 @@ interface LayerControlSetting extends BaseSetting {
 
 type Setting = SelectSetting | NumberSetting | BooleanSetting | StyleSetting | LayerControlSetting;
 
-interface Settings {
+interface _Settings {
   core: Record<string, Setting>;
   features: Record<string, BooleanSetting>;
   layers: LayerControlSetting;
@@ -198,12 +198,12 @@ export interface SettingControl {
   type: 'boolean' | 'number' | 'select' | 'style-editor' | 'text';
   label: string;
   description: string;
-  default: any;
+  default: unknown;
   options?: SettingOption[];
   min?: number;
   max?: number;
   width?: string;
-  presets?: Record<string, any>;
+  presets?: Record<string, unknown>;
   required?: boolean;
 }
 
@@ -215,7 +215,7 @@ export interface SettingsConfig {
     actions: {
       canAdd: boolean;
       canRemove: ((layer: Layer) => boolean) | boolean;
-      newLayerTemplate: Omit<Layer, 'features'> & { data: any[] };
+      newLayerTemplate: Omit<Layer, 'features'> & { data: unknown[] };
     };
   };
   formatting: Record<string, SettingControl>;
@@ -501,12 +501,12 @@ export interface ExtendedCSSProperties extends CSSProperties {
 }
 
 // Add these type definitions
-type BorderCollapse = 'collapse' | 'separate';
-type TextAlign = 'left' | 'center' | 'right';
+type _BorderCollapse = 'collapse' | 'separate';
+type _TextAlign = 'left' | 'center' | 'right';
 
 // Update the actions type to allow a function
 export interface LayerActions {
   canAdd: boolean;
   canRemove: boolean | ((layer: Layer) => boolean);
-  newLayerTemplate: Omit<Layer, 'features'> & { data: any[] };
+  newLayerTemplate: Omit<Layer, 'features'> & { data: unknown[] };
 } 
