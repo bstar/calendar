@@ -69,18 +69,15 @@ export const CalendarPortal: React.FC<PortalProps> = ({
     const viewportWidth = window.innerWidth;
 
     // Determine position strategy (above or below the trigger)
-    let topPosition = 0;
     const spaceBelow = viewportHeight - triggerRect.bottom;
     const spaceAbove = triggerRect.top;
 
-    // Check if we have enough space below, if not try above
-    if (spaceBelow >= portalHeight || spaceBelow > spaceAbove) {
+    // Calculate top position based on available space
+    const topPosition = (spaceBelow >= portalHeight || spaceBelow > spaceAbove)
       // Position below
-      topPosition = triggerRect.bottom + 8;
-    } else {
+      ? triggerRect.bottom + 8
       // Position above
-      topPosition = Math.max(8, triggerRect.top - portalHeight - 8);
-    }
+      : Math.max(8, triggerRect.top - portalHeight - 8);
 
     // Calculate width and horizontal position
     const availableWidth = viewportWidth - 16; // 8px padding on each side
@@ -88,14 +85,13 @@ export const CalendarPortal: React.FC<PortalProps> = ({
     const actualWidth = Math.min(idealWidth, availableWidth);
 
     // Center horizontally on the trigger element
-    let leftPosition = triggerRect.left + (triggerRect.width - actualWidth) / 2;
+    const initialLeftPosition = triggerRect.left + (triggerRect.width - actualWidth) / 2;
 
     // Ensure the portal doesn't go off-screen horizontally
-    if (leftPosition < 8) {
-      leftPosition = 8;
-    } else if (leftPosition + actualWidth > viewportWidth - 8) {
-      leftPosition = viewportWidth - actualWidth - 8;
-    }
+    const leftPosition = Math.min(
+      Math.max(initialLeftPosition, 8),
+      viewportWidth - actualWidth - 8
+    );
 
     // Apply styles directly using properties that are safe to set
     if (portalElement) {
