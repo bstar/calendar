@@ -46,6 +46,7 @@ import {
 import { CalendarPortal } from './DateRangePickerNew/CalendarPortal';
 import { registerCalendar } from './DateRangePickerNew/CalendarCoordinator';
 import './DateRangePickerNew/CalendarPortal.css';
+import { RestrictionConfig, Restriction, RestrictedBoundaryRestriction } from './DateRangePickerNew/restrictions/types';
 
 // Font size utility function
 /**
@@ -477,7 +478,7 @@ const MonthGrid: React.FC<MonthGridProps & { settings?: CalendarSettings }> = ({
             const selectionStart = parseISO(selectedRange.start);
             
             // Safe cast the boundary restriction to the correct type
-            const boundaryWithRanges = boundaryRestriction as any;
+            const boundaryWithRanges = boundaryRestriction as RestrictedBoundaryRestriction;
             if (boundaryWithRanges.ranges) {
               for (const range of boundaryWithRanges.ranges) {
                 const rangeStart = parseISO(range.start);
@@ -604,7 +605,7 @@ const DayCell = ({
         if (restriction.type !== 'restricted_boundary' || !restriction.enabled) continue;
         
         // Safe cast to access ranges
-        const boundaryWithRanges = restriction as any;
+        const boundaryWithRanges = restriction as RestrictedBoundaryRestriction;
         if (boundaryWithRanges.ranges) {
           for (const range of boundaryWithRanges.ranges) {
             const rangeStart = parseISO(range.start);
@@ -636,7 +637,7 @@ const DayCell = ({
         if (restriction.type !== 'restricted_boundary' || !restriction.enabled) continue;
         
         // Safe cast to access ranges
-        const boundaryWithRanges = restriction as any;
+        const boundaryWithRanges = restriction as RestrictedBoundaryRestriction;
         if (boundaryWithRanges.ranges) {
           for (const range of boundaryWithRanges.ranges) {
             const rangeStart = parseISO(range.start);
@@ -963,7 +964,7 @@ interface CLACalendarProps {
   initialActiveLayer?: string;
   onSubmit?: (startDate: string, endDate: string) => void;
   layersFactory?: () => Layer[];
-  restrictionConfigFactory?: () => any;
+  restrictionConfigFactory?: () => RestrictionConfig;
 }
 
 export const CLACalendar: React.FC<CLACalendarProps> = ({
@@ -984,7 +985,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   
   // Store lazy-loaded data
   const [lazyLayers, setLazyLayers] = useState<Layer[] | null>(null);
-  const [lazyRestrictionConfig, setLazyRestrictionConfig] = useState<any | null>(null);
+  const [lazyRestrictionConfig, setLazyRestrictionConfig] = useState<RestrictionConfig | null>(null);
   
   // Basic state needed for input field display
   const [isOpen, setIsOpen] = useState(settings.displayMode === 'embedded' || settings.isOpen);

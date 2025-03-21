@@ -84,10 +84,17 @@ export const ChevronRight: React.FC<ChevronProps> = ({ size = 16 }) => (
   />
 );
 
+// Define ValidationError type
+export interface ValidationError {
+  message: string;
+  type: string;
+  field: string;
+}
+
 // DateInput component - copied exactly from CLACalendar.tsx
 export interface DateInputProps {
   value: Date | null;
-  onChange: (date: Date | null, isClearingError?: boolean, validationError?: any) => void;
+  onChange: (date: Date | null, isClearingError?: boolean, validationError?: ValidationError) => void;
   field: 'start' | 'end';
   placeholder: string;
   context: {
@@ -115,7 +122,7 @@ export const DateInput: React.FC<DateInputProps> = ({
   selectedRange
 }) => {
   const [inputValue, setInputValue] = useState('');
-  const [error, setError] = useState<any | null>(null);
+  const [error, setError] = useState<ValidationError | null>(null);
   const [showError, setShowError] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showIndicator, setShowIndicator] = useState<'success' | 'error' | null>(null);
@@ -216,7 +223,7 @@ export const DateInput: React.FC<DateInputProps> = ({
     }
   };
 
-  const showValidationError = (error: any) => {
+  const showValidationError = (error: ValidationError) => {
     setError(error);
     setShowError(true);
     setShowIndicator('error');
@@ -419,7 +426,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 // Date Input Section component
 export interface DateInputSectionProps {
   selectedRange: DateRange;
-  handleDateChange: (field: 'start' | 'end') => (date: Date | null, isClearingError?: boolean, validationError?: any) => void;
+  handleDateChange: (field: 'start' | 'end') => (date: Date | null, isClearingError?: boolean, validationError?: ValidationError) => void;
   dateInputContext: {
     startDate: string | null;
     endDate: string | null;
@@ -810,12 +817,6 @@ export interface CalendarGridProps {
   activeLayer: string;
   restrictionConfig?: RestrictionConfig;
   startWeekOnSunday: boolean;
-}
-
-export interface ValidationError {
-  message: string;
-  type: string;
-  field: string;
 }
 
 export interface LayerControlProps {

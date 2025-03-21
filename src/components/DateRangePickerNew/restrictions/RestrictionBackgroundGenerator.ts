@@ -58,7 +58,7 @@
 
 import { parseISO, isWithinInterval } from '../../../utils/DateUtils';
 import { isValid } from 'date-fns';
-import { RestrictionConfig } from './types';
+import { RestrictionConfig, BoundaryRestriction, DateRangeRestriction, RestrictedBoundaryRestriction, AllowedRangesRestriction } from './types';
 import { BackgroundData } from '../../DateRangePicker.config';
 
 export class RestrictionBackgroundGenerator {
@@ -71,11 +71,11 @@ export class RestrictionBackgroundGenerator {
   /**
    * Handler for boundary type restrictions
    * @param {Date} date - Date to check
-   * @param {any} restriction - Boundary restriction configuration
+   * @param {BoundaryRestriction} restriction - Boundary restriction configuration
    * @returns {string | undefined} Background color if restricted, undefined if allowed
    * @private
    */
-  private handleBoundaryRestriction(date: Date, restriction: any): string | undefined {
+  private handleBoundaryRestriction(date: Date, restriction: BoundaryRestriction): string | undefined {
     const boundaryDate = parseISO(restriction.date);
     if (!isValid(boundaryDate)) return undefined;
 
@@ -94,11 +94,11 @@ export class RestrictionBackgroundGenerator {
   /**
    * Handler for daterange type restrictions
    * @param {Date} date - Date to check
-   * @param {any} restriction - Date range restriction configuration
+   * @param {DateRangeRestriction} restriction - Date range restriction configuration
    * @returns {string | undefined} Background color if restricted, undefined if allowed
    * @private
    */
-  private handleDateRangeRestriction(date: Date, restriction: any): string | undefined {
+  private handleDateRangeRestriction(date: Date, restriction: DateRangeRestriction): string | undefined {
     for (const range of restriction.ranges) {
       const rangeStart = parseISO(range.start);
       const rangeEnd = parseISO(range.end);
@@ -115,11 +115,11 @@ export class RestrictionBackgroundGenerator {
   /**
    * Handler for restricted boundary type restrictions
    * @param {Date} date - Date to check
-   * @param {any} restriction - Restricted boundary configuration
+   * @param {RestrictedBoundaryRestriction} restriction - Restricted boundary configuration
    * @returns {string | undefined} Background color if restricted, undefined if allowed
    * @private
    */
-  private handleRestrictedBoundaryRestriction(date: Date, restriction: any): string | undefined {
+  private handleRestrictedBoundaryRestriction(date: Date, restriction: RestrictedBoundaryRestriction): string | undefined {
     for (const range of restriction.ranges) {
       const rangeStart = parseISO(range.start);
       const rangeEnd = parseISO(range.end);
@@ -134,13 +134,13 @@ export class RestrictionBackgroundGenerator {
   }
 
   /**
-   * Handler for allowedranges type restrictions
+   * Handler for allowed ranges type restrictions
    * @param {Date} date - Date to check
-   * @param {any} restriction - Allowed ranges restriction configuration
+   * @param {AllowedRangesRestriction} restriction - Allowed ranges restriction configuration
    * @returns {string | undefined} Background color if restricted, undefined if allowed
    * @private
    */
-  private handleAllowedRangesRestriction(date: Date, restriction: any): string | undefined {
+  private handleAllowedRangesRestriction(date: Date, restriction: AllowedRangesRestriction): string | undefined {
     if (!restriction.ranges.length) return undefined;
 
     const isAllowed = restriction.ranges.some(range => {
@@ -191,7 +191,12 @@ export class RestrictionBackgroundGenerator {
    * @private
    */
   private static backgroundDataHandlers = {
-    daterange: (restriction: any): BackgroundData[] => {
+    /**
+     * Handler to generate background data for daterange type restrictions
+     * @param {DateRangeRestriction} restriction - Date range restriction configuration
+     * @returns {BackgroundData[]} Array of background data for rendering
+     */
+    daterange: (restriction: DateRangeRestriction): BackgroundData[] => {
       return restriction.ranges
         .filter(range => {
           const start = parseISO(range.start);
@@ -205,7 +210,12 @@ export class RestrictionBackgroundGenerator {
         }));
     },
 
-    allowedranges: (restriction: any): BackgroundData[] => {
+    /**
+     * Handler to generate background data for allowed ranges type restrictions
+     * @param {AllowedRangesRestriction} restriction - Allowed ranges restriction configuration
+     * @returns {BackgroundData[]} Array of background data for rendering
+     */
+    allowedranges: (restriction: AllowedRangesRestriction): BackgroundData[] => {
       return restriction.ranges
         .filter(range => {
           const start = parseISO(range.start);
@@ -225,8 +235,13 @@ export class RestrictionBackgroundGenerator {
           }
         ]).flat();
     },
-
-    boundary: (restriction: any): BackgroundData[] => {
+    
+    /**
+     * Handler to generate background data for boundary type restrictions
+     * @param {BoundaryRestriction} restriction - Boundary restriction configuration
+     * @returns {BackgroundData[]} Array of background data for rendering
+     */
+    boundary: (restriction: BoundaryRestriction): BackgroundData[] => {
       const boundaryDate = parseISO(restriction.date);
       if (!isValid(boundaryDate)) return [];
 
@@ -236,8 +251,13 @@ export class RestrictionBackgroundGenerator {
         color: '#ffe6e6'
       }];
     },
-
-    restricted_boundary: (restriction: any): BackgroundData[] => {
+    
+    /**
+     * Handler to generate background data for restricted boundary type restrictions
+     * @param {RestrictedBoundaryRestriction} restriction - Restricted boundary configuration
+     * @returns {BackgroundData[]} Array of background data for rendering
+     */
+    restricted_boundary: (restriction: RestrictedBoundaryRestriction): BackgroundData[] => {
       // Return empty array since restricted boundary is only enforced during selection
       return [];
     }
@@ -255,8 +275,19 @@ export class RestrictionBackgroundGenerator {
     return restrictionConfig.restrictions.flatMap(restriction => {
       if (!restriction.enabled) return [];
 
-      const handler = RestrictionBackgroundGenerator.backgroundDataHandlers[restriction.type];
-      return handler ? handler(restriction) : [];
+      // Type-safe handler selection based on restriction type
+      switch (restriction.type) {
+        case 'daterange':
+          return RestrictionBackgroundGenerator.backgroundDataHandlers.daterange(restriction);
+        case 'allowedranges':
+          return RestrictionBackgroundGenerator.backgroundDataHandlers.allowedranges(restriction);
+        case 'boundary':
+          return RestrictionBackgroundGenerator.backgroundDataHandlers.boundary(restriction);
+        case 'restricted_boundary':
+          return RestrictionBackgroundGenerator.backgroundDataHandlers.restricted_boundary(restriction);
+        default:
+          return [];
+      }
     });
   }
 } 

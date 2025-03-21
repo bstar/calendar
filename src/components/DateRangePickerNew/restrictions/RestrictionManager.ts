@@ -58,7 +58,7 @@
 import { parseISO } from '../../../utils/DateUtils';
 import { isValid } from 'date-fns';
 import { isWithinInterval } from '../../../utils/DateUtils';
-import { RestrictionConfig } from './types';
+import { RestrictionConfig, Restriction, BoundaryRestriction, DateRangeRestriction, RestrictedBoundaryRestriction, AllowedRangesRestriction } from './types';
 
 /**
  * Manages date selection restrictions for the calendar
@@ -75,11 +75,11 @@ export class RestrictionManager {
    * Checks if a selection violates boundary date restrictions
    * @param {Date} start - Start date of the selection
    * @param {Date} end - End date of the selection
-   * @param {any} restriction - Boundary restriction configuration
+   * @param {BoundaryRestriction} restriction - Boundary restriction configuration
    * @returns {string | null} Error message if restriction is violated, null otherwise
    * @private
    */
-  private checkBoundaryRestriction(start: Date, end: Date, restriction: any): string | null {
+  private checkBoundaryRestriction(start: Date, end: Date, restriction: BoundaryRestriction): string | null {
     const boundaryDate = parseISO(restriction.date);
     if (!isValid(boundaryDate)) return null;
 
@@ -101,11 +101,11 @@ export class RestrictionManager {
    * Checks if a selection overlaps with restricted date ranges
    * @param {Date} start - Start date of the selection
    * @param {Date} end - End date of the selection
-   * @param {any} restriction - Date range restriction configuration
+   * @param {DateRangeRestriction} restriction - Date range restriction configuration
    * @returns {string | null} Error message if restriction is violated, null otherwise
    * @private
    */
-  private checkDateRangeRestriction(start: Date, end: Date, restriction: any): string | null {
+  private checkDateRangeRestriction(start: Date, end: Date, restriction: DateRangeRestriction): string | null {
     for (const range of restriction.ranges) {
       const rangeStart = parseISO(range.start);
       const rangeEnd = parseISO(range.end);
@@ -138,11 +138,11 @@ export class RestrictionManager {
    * Checks if a selection overlaps with restricted boundary ranges
    * @param {Date} start - Start date of the selection
    * @param {Date} end - End date of the selection
-   * @param {any} restriction - Restricted boundary configuration
+   * @param {RestrictedBoundaryRestriction} restriction - Restricted boundary configuration
    * @returns {string | null} Error message if restriction is violated, null otherwise
    * @private
    */
-  private checkRestrictedBoundaryRestriction(start: Date, end: Date, restriction: any): string | null {
+  private checkRestrictedBoundaryRestriction(start: Date, end: Date, restriction: RestrictedBoundaryRestriction): string | null {
     for (const range of restriction.ranges) {
       const rangeStart = parseISO(range.start);
       const rangeEnd = parseISO(range.end);
@@ -164,14 +164,14 @@ export class RestrictionManager {
   }
 
   /**
-   * Checks if a selection falls within allowed ranges
+   * Checks if a selection is outside allowed date ranges
    * @param {Date} start - Start date of the selection
    * @param {Date} end - End date of the selection
-   * @param {any} restriction - Allowed ranges restriction configuration
+   * @param {AllowedRangesRestriction} restriction - Allowed ranges restriction configuration
    * @returns {string | null} Error message if restriction is violated, null otherwise
    * @private
    */
-  private checkAllowedRangesRestriction(start: Date, end: Date, restriction: any): string | null {
+  private checkAllowedRangesRestriction(start: Date, end: Date, restriction: AllowedRangesRestriction): string | null {
     if (!restriction.ranges.length) return null;
 
     let isAllowed = false;
@@ -224,13 +224,13 @@ export class RestrictionManager {
   };
 
   /**
-   * Gets all restricted boundary type restrictions
-   * @returns {RestrictedBoundaryRestriction[]} Array of all restricted boundary restrictions
+   * Returns an array of restricted boundary restrictions
+   * @returns {RestrictedBoundaryRestriction[]} Array of restricted boundary configurations
    */
-  getRestrictedBoundaries(): any[] {
-    if (!this.config?.restrictions) return [];
-    
-    return this.config.restrictions.filter(r => r.type === 'restricted_boundary');
+  getRestrictedBoundaries(): RestrictedBoundaryRestriction[] {
+    return this.config.restrictions.filter(
+      r => r.type === 'restricted_boundary' && r.enabled
+    ) as RestrictedBoundaryRestriction[];
   }
 
   /**
