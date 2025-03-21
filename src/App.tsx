@@ -119,9 +119,6 @@ const App: React.FC = () => {
   // Create lazy factory function for layers
   const createLayersFactory = () => {
     return () => {
-      // eslint-disable-next-line no-console
-      console.log("Lazy initializing layers data - only happens when calendar is opened!");
-      
       // Get unique period ranges - only executed when calendar is opened
       const uniquePeriodRanges = getUniquePeriodRanges();
       
@@ -163,9 +160,6 @@ const App: React.FC = () => {
   // Create lazy factory function for restrictions
   const createRestrictionsFactory = () => {
     return () => {
-      // eslint-disable-next-line no-console
-      console.log("Lazy initializing restriction data - only happens when calendar is opened!");
-      
       // Get unique period ranges - only executed when calendar is opened
       const uniquePeriodRanges = getUniquePeriodRanges();
       
@@ -188,9 +182,6 @@ const App: React.FC = () => {
   // Create lazy factory function for restrictions for second calendar
   const createRestrictions2Factory = () => {
     return () => {
-      // eslint-disable-next-line no-console
-      console.log("Lazy initializing second calendar restriction data!");
-      
       return {
         restrictions: [
           {
@@ -267,8 +258,6 @@ const App: React.FC = () => {
           settings={baseSettings}
           onSettingsChange={() => {}}
           onSubmit={(start, end) => {
-            // eslint-disable-next-line no-console
-            console.log('Calendar 1 submit:', { start, end });
             setDateRange({ start, end });
           }}
           layersFactory={layersFactory}
@@ -283,8 +272,6 @@ const App: React.FC = () => {
           settings={calendar2Settings}
           onSettingsChange={() => {}}
           onSubmit={(start, end) => {
-            // eslint-disable-next-line no-console
-            console.log('Calendar 2 submit:', { start, end });
             setDateRange({ start, end });
           }}
           layersFactory={layersFactory}
