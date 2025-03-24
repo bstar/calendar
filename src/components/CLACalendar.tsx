@@ -1025,10 +1025,14 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   const coordinatorRef = useRef<ReturnType<typeof registerCalendar> | null>(null);
   
   // These states will only be initialized when calendar is first opened
-  const [currentMonth, setCurrentMonth] = useState(() => 
-    settings.defaultRange ? startOfMonth(parseISO(settings.defaultRange.start)) : 
-    everInitialized ? startOfMonth(new Date()) : null
-  );
+  const [currentMonth, setCurrentMonth] = useState<Date | null>(() => {
+    // If defaultRange is provided, use its start date directly
+    if (settings.defaultRange) {
+      return new Date(settings.defaultRange.start);
+    }
+    // Otherwise use current date if we need to initialize now
+    return everInitialized ? new Date() : null;
+  });
   const [outOfBoundsDirection, setOutOfBoundsDirection] = useState<'prev' | 'next' | null>(null);
   const [isSelecting, setIsSelecting] = useState(false);
   const [_validationErrors, setValidationErrors] = useState<Record<string, CalendarValidationError>>({});
@@ -1213,8 +1217,8 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       setEverInitialized(true);
       // Initialize currentMonth when first opened
       setCurrentMonth(settings.defaultRange 
-        ? startOfMonth(parseISO(settings.defaultRange.start)) 
-        : startOfMonth(new Date()));
+        ? new Date(settings.defaultRange.start) 
+        : new Date());
         
       // If defaultRange is provided, make sure it's properly loaded
       if (settings.defaultRange) {
@@ -1551,7 +1555,13 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     // Ensure the calendar is initialized when first opened
     if (!everInitialized) {
       setEverInitialized(true);
-      setCurrentMonth(startOfMonth(new Date()));
+      
+      // If settings has a defaultRange, use it; otherwise use current date
+      if (settings.defaultRange) {
+        setCurrentMonth(new Date(settings.defaultRange.start));
+      } else {
+        setCurrentMonth(new Date());
+      }
       
       // Force immediate loading of lazy data
       if (layersFactory && !lazyLayers) {

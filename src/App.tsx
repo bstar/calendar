@@ -230,7 +230,9 @@ const App: React.FC = () => {
   // Create settings for the third calendar with default date range
   const calendar3Settings = {
     ...baseSettings,
+    displayMode: "popup" as const,
     visibleMonths: 2, // Third calendar shows 2 months
+    isOpen: false,
     // Set a default date range
     defaultRange: {
       start: '2024-01-01',
@@ -316,7 +318,7 @@ const App: React.FC = () => {
 
       {/* Calendar Instance 3 with default date range */}
       <div style={{ position: 'relative', textAlign: 'left' }} className="cla-calendar-wrapper">
-        <h3 style={{ textAlign: 'left' }}>Calendar Instance 3 (2 Months)</h3>
+        <h3 style={{ textAlign: 'left' }}>Calendar with Default Range in January 2024</h3>
         <CLACalendar
           settings={calendar3Settings}
           _onSettingsChange={() => { }}
