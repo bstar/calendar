@@ -227,6 +227,29 @@ const App: React.FC = () => {
     }
   };
 
+  // Create settings for the third calendar with default date range
+  const calendar3Settings = {
+    ...baseSettings,
+    visibleMonths: 2, // Third calendar shows 2 months
+    // Set a default date range
+    defaultRange: {
+      start: '2024-01-01',
+      end: '2024-01-07'
+    },
+    // Override the input style for the third calendar
+    inputStyle: {
+      width: '300px',
+      padding: '8px 10px',
+      border: '2px solid #6f42c1', // Purple border
+      borderRadius: '8px',
+      fontSize: '1rem',
+      color: '#333333',
+      backgroundColor: '#f8f0ff', // Light purple background
+      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+      cursor: 'pointer',
+    }
+  };
+
   // Memoize the factory functions to avoid recreating them on every render
   const layersFactory = useMemo(() => createLayersFactory(), []);
   const restrictionsFactory = useMemo(() => createRestrictionsFactory(), []);
@@ -288,6 +311,20 @@ const App: React.FC = () => {
           }}
           layersFactory={layersFactory}
           restrictionConfigFactory={restrictions2Factory}
+        />
+      </div>
+
+      {/* Calendar Instance 3 with default date range */}
+      <div style={{ position: 'relative', textAlign: 'left' }} className="cla-calendar-wrapper">
+        <h3 style={{ textAlign: 'left' }}>Calendar Instance 3 (2 Months)</h3>
+        <CLACalendar
+          settings={calendar3Settings}
+          _onSettingsChange={() => { }}
+          onSubmit={(start, end) => {
+            setDateRange({ start, end });
+          }}
+          layersFactory={layersFactory}
+          restrictionConfigFactory={restrictionsFactory}
         />
       </div>
 

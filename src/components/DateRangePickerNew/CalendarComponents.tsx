@@ -103,6 +103,7 @@ export interface DateInputProps {
     currentField: string | null;
   };
   selectedRange: DateRange;
+  defaultValue?: string;
 }
 
 /**
@@ -112,6 +113,7 @@ export interface DateInputProps {
  * @param field - Which field this input represents (start or end date)
  * @param placeholder - Placeholder text when no date is selected
  * @param selectedRange - The currently selected date range
+ * @param defaultValue - Default value to initialize the input with
  * @returns Date input field with validation
  */
 export const DateInput: React.FC<DateInputProps> = ({
@@ -119,25 +121,45 @@ export const DateInput: React.FC<DateInputProps> = ({
   onChange,
   field,
   placeholder,
-  selectedRange
+  selectedRange,
+  defaultValue
 }) => {
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState<string>(defaultValue || '');
   const [error, setError] = useState<ValidationError | null>(null);
   const [showError, setShowError] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showIndicator, setShowIndicator] = useState<'success' | 'error' | null>(null);
-  const previousInputRef = useRef('');
+  const previousInputRef = useRef(defaultValue || '');
 
+  // Initialize with defaultValue when component first mounts
+  useEffect(() => {
+    if (defaultValue && !value && !inputValue) {
+      setInputValue(defaultValue);
+      previousInputRef.current = defaultValue;
+      
+      // Try to parse defaultValue as a date and trigger onChange
+      try {
+        const date = new Date(defaultValue);
+        if (!isNaN(date.getTime())) {
+          onChange(date);
+        }
+      } catch (e) {
+        // Ignore parsing errors for defaultValue
+      }
+    }
+  }, [defaultValue, value, onChange, inputValue]);
+
+  // Update input value when value changes
   useEffect(() => {
     if (!isEditing && value) {
       const formattedValue = format(value, "MMM dd, yyyy");
       setInputValue(formattedValue);
       previousInputRef.current = formattedValue;
-    } else if (!isEditing && !value) {
+    } else if (!isEditing && !value && !defaultValue) {
       setInputValue('');
       previousInputRef.current = '';
     }
-  }, [value, isEditing]);
+  }, [value, isEditing, defaultValue]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
@@ -281,6 +303,7 @@ export const DateInput: React.FC<DateInputProps> = ({
           overflow: 'hidden',
           textOverflow: 'ellipsis'
         }}
+        defaultValue={defaultValue}
       />
       {showIndicator && (
         <div className={`date-input-indicator date-input-indicator-${showIndicator}`}>
@@ -433,6 +456,7 @@ export interface DateInputSectionProps {
     currentField: string | null;
   };
   selectionMode: 'single' | 'range';
+  defaultRange?: { start: string; end: string };
 }
 
 /**
@@ -441,13 +465,15 @@ export interface DateInputSectionProps {
  * @param handleDateChange - Function to handle date changes
  * @param dateInputContext - Context for date input fields
  * @param selectionMode - Mode of selection (single or range)
+ * @param defaultRange - Default date range to initialize inputs with
  * @returns Section with date input fields
  */
 export const DateInputSection: React.FC<DateInputSectionProps> = ({
   selectedRange,
   handleDateChange,
   dateInputContext,
-  selectionMode
+  selectionMode,
+  defaultRange
 }) => (
   <div className={`cla-input-container ${selectionMode === 'single' ? 'single' : 'range'}`}
        style={{
@@ -481,6 +507,7 @@ export const DateInputSection: React.FC<DateInputSectionProps> = ({
         placeholder={selectionMode === 'single' ? "Select date" : "Start date"}
         context={dateInputContext}
         selectedRange={selectedRange}
+        defaultValue={defaultRange?.start ? format(new Date(defaultRange.start), "MMM dd, yyyy") : undefined}
       />
     </div>
     {selectionMode === 'range' && (
@@ -502,6 +529,7 @@ export const DateInputSection: React.FC<DateInputSectionProps> = ({
           placeholder="End date"
           context={dateInputContext}
           selectedRange={selectedRange}
+          defaultValue={defaultRange?.end ? format(new Date(defaultRange.end), "MMM dd, yyyy") : undefined}
         />
       </div>
     )}

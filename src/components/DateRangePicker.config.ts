@@ -172,6 +172,7 @@ export interface CalendarSettings {
   startWeekOnSunday: boolean;
   dateFormatter?: (date: Date) => string; // Custom date formatter function
   dateRangeSeparator?: string; // Custom separator for date ranges (default is " - ")
+  defaultRange?: { start: string; end: string }; // Default date range to initialize with
   
   // Layer Settings
   layers: Layer[];
@@ -262,6 +263,7 @@ export const getDefaultSettings = (): CalendarSettings => ({
   startWeekOnSunday: false,
   dateFormatter: undefined,
   dateRangeSeparator: " - ",
+  defaultRange: undefined,
   layers: DEFAULT_LAYERS,
   showLayersNavigation: true,
   defaultLayer: '',

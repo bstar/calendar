@@ -960,8 +960,8 @@ const CalendarGrid: React.FC<CalendarGridProps & { settings?: CalendarSettings }
       restrictionConfig={restrictionConfig}
       startWeekOnSunday={startWeekOnSunday}
       settings={settings}
-      months={months}
       activeLayer={activeLayer}
+      months={months}
     />
   );
 };
@@ -997,8 +997,26 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   
   // Basic state needed for input field display
   const [isOpen, setIsOpen] = useState(settings.displayMode === 'embedded' || settings.isOpen);
-  const [selectedRange, setSelectedRange] = useState<DateRange>({ start: null, end: null });
-  const [displayRange, setDisplayRange] = useState<DateRange>({ start: null, end: null });
+  const [selectedRange, setSelectedRange] = useState<DateRange>(() => {
+    if (settings.defaultRange) {
+      return {
+        start: settings.defaultRange.start,
+        end: settings.defaultRange.end,
+        anchorDate: settings.defaultRange.start
+      };
+    }
+    return { start: null, end: null, anchorDate: null };
+  });
+  const [displayRange, setDisplayRange] = useState<DateRange>(() => {
+    if (settings.defaultRange) {
+      return {
+        start: settings.defaultRange.start,
+        end: settings.defaultRange.end,
+        anchorDate: settings.defaultRange.start
+      };
+    }
+    return { start: null, end: null, anchorDate: null };
+  });
   
   // Reference handlers
   const inputRef = useRef<HTMLInputElement>(null);
@@ -1008,16 +1026,37 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   
   // These states will only be initialized when calendar is first opened
   const [currentMonth, setCurrentMonth] = useState(() => 
+    settings.defaultRange ? startOfMonth(parseISO(settings.defaultRange.start)) : 
     everInitialized ? startOfMonth(new Date()) : null
   );
   const [outOfBoundsDirection, setOutOfBoundsDirection] = useState<'prev' | 'next' | null>(null);
   const [isSelecting, setIsSelecting] = useState(false);
   const [_validationErrors, setValidationErrors] = useState<Record<string, CalendarValidationError>>({});
   const [notification, setNotification] = useState<string | null>(null);
-  const [dateInputContext, setDateInputContext] = useState({
-    startDate: null,
-    endDate: null,
-    currentField: null
+  const [dateInputContext, setDateInputContext] = useState(() => {
+    if (settings.defaultRange) {
+      const formatDateString = (dateString: string) => {
+        try {
+          const date = parseISO(dateString);
+          return settings.dateFormatter 
+            ? settings.dateFormatter(date)
+            : format(date, "MMM dd, yyyy");
+        } catch (e) {
+          return null;
+        }
+      };
+      
+      return {
+        startDate: formatDateString(settings.defaultRange.start),
+        endDate: formatDateString(settings.defaultRange.end),
+        currentField: null
+      };
+    }
+    return {
+      startDate: null,
+      endDate: null,
+      currentField: null
+    };
   });
   
   // Store mouse position in a ref to avoid re-renders
@@ -1173,9 +1212,48 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     if (isOpen && !everInitialized) {
       setEverInitialized(true);
       // Initialize currentMonth when first opened
-      setCurrentMonth(startOfMonth(new Date()));
+      setCurrentMonth(settings.defaultRange 
+        ? startOfMonth(parseISO(settings.defaultRange.start)) 
+        : startOfMonth(new Date()));
+        
+      // If defaultRange is provided, make sure it's properly loaded
+      if (settings.defaultRange) {
+        const { start, end } = settings.defaultRange;
+        
+        // Set selected range and display range
+        setSelectedRange({
+          start,
+          end,
+          anchorDate: start
+        });
+        
+        setDisplayRange({
+          start,
+          end,
+          anchorDate: start
+        });
+        
+        // Format dates for input context
+        const formatDateString = (dateString: string) => {
+          try {
+            const date = parseISO(dateString);
+            return settings.dateFormatter 
+              ? settings.dateFormatter(date)
+              : format(date, "MMM dd, yyyy");
+          } catch (e) {
+            return null;
+          }
+        };
+        
+        // Update date input context
+        setDateInputContext({
+          startDate: formatDateString(start),
+          endDate: formatDateString(end),
+          currentField: null
+        });
+      }
     }
-  }, [isOpen, everInitialized]);
+  }, [isOpen, everInitialized, settings.defaultRange, settings.dateFormatter]);
   
   // Add a useEffect to update activeLayer when initialActiveLayer changes
   useEffect(() => {
@@ -1581,6 +1659,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
                 handleDateChange={handleDateChange}
                 dateInputContext={dateInputContext}
                 selectionMode={settings.selectionMode}
+                defaultRange={settings.defaultRange}
               />
             </div>
             
