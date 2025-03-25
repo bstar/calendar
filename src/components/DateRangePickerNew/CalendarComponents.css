@@ -231,7 +231,7 @@
 
 /* CalendarFooter styles */
 .calendar-footer {
-  padding: 0 16px 16px 16px;
+  padding: 10px 10px 10px 10px;
   border-top: none;
   display: flex;
   justify-content: space-between;

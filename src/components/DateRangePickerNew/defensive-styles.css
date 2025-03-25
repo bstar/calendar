@@ -88,7 +88,7 @@
   ) !important;
   background-size: 8.5px 8.5px !important; /* Precise value for clean 45° lines */
   background-position: calc(36px * var(--col-index, 0)) calc(36px * var(--row-index, 0)) !important; /* Offset based on grid position */
-  background-attachment: local !important; /* Make the pattern relative to the cell itself */
+  background-attachment: local !important; /* Make the pattern relative to the cell itself *2
 }
 
 /* Form controls - general styles except for .cla-form-control font size */

@@ -834,7 +834,7 @@ const MonthPair = ({
     <div style={{
       display: 'flex',
       width: '100%',
-      gap: '1rem'
+      gap: '0px'
     }}>
       {monthsToShow.map((month, _index) => (
         <MonthGrid
@@ -1729,7 +1729,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
           />
         )}
 
-        <div className="cla-card-body" style={{ padding: '0px 16px' }}>
+        <div className="cla-card-body" style={{ padding: '0px 0px' }}>
           <div style={{ display: 'flex' }}>
             {activeLayers.map(layer =>
               layer.name === activeLayer && (
