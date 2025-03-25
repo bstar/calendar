@@ -83,8 +83,8 @@
   .cla-calendar-portal {
     width: calc(100vw - 32px) !important;
     max-width: 500px;
-    left: 16px !important;
-    right: 16px !important;
+    left: 10px !important;
+    right: 10px !important;
     margin: 0 auto;
   }
 } 
