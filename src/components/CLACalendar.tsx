@@ -1632,72 +1632,6 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     };
   }, [isOpen, settings.displayMode]);
   
-  // Add calendarRef to track dimensions
-  const calendarRef = useRef<HTMLDivElement>(null);
-  const [calendarPosition, setCalendarPosition] = useState({ top: '0px', left: '0px' });
-
-  // Update getCalendarPosition to return the calculated position
-  const getCalendarPosition = useCallback((inputElement: HTMLElement | null) => {
-    if (!inputElement || !calendarRef.current) return { top: '0px', left: '0px' };
-
-    const rect = inputElement.getBoundingClientRect();
-    const calendarHeight = calendarRef.current.offsetHeight;
-    const calendarWidth = settings.visibleMonths * settings.singleMonthWidth + ((settings.visibleMonths - 1) * 16);
-    const PADDING = 8;
-    
-    const position = settings.position || 'bottom-right';
-    
-    switch (position) {
-      case 'bottom-left':
-        return {
-          top: `${rect.bottom + PADDING}px`,
-          left: `${rect.left}px`
-        };
-      case 'top-right':
-        return {
-          top: `${rect.top - calendarHeight - PADDING}px`,
-          left: `${rect.right - calendarWidth}px`
-        };
-      case 'top-left':
-        return {
-          top: `${rect.top - calendarHeight - PADDING}px`,
-          left: `${rect.left}px`
-        };
-      case 'bottom-right':
-      default:
-        return {
-          top: `${rect.bottom + PADDING}px`,
-          left: `${rect.right - calendarWidth}px`
-        };
-    }
-  }, [settings.visibleMonths, settings.position, settings.singleMonthWidth]);
-
-  // Update position when calendar opens, when position changes, or when switching calendars
-  useEffect(() => {
-    if (isOpen && inputRef.current && calendarRef.current) {
-      // Use requestAnimationFrame to ensure DOM has updated
-      requestAnimationFrame(() => {
-        const newPosition = getCalendarPosition(inputRef.current);
-        setCalendarPosition(newPosition);
-      });
-    }
-  }, [isOpen, settings.position, getCalendarPosition]);
-
-  // Add resize observer to handle any size changes
-  useEffect(() => {
-    if (!calendarRef.current) return;
-
-    const observer = new ResizeObserver(() => {
-      if (isOpen && inputRef.current) {
-        const newPosition = getCalendarPosition(inputRef.current);
-        setCalendarPosition(newPosition);
-      }
-    });
-
-    observer.observe(calendarRef.current);
-    return () => observer.disconnect();
-  }, [isOpen, getCalendarPosition]);
-  
   // Helper function to render the calendar content
   const renderCalendarContent = () => {
     if (!everInitialized) return null;
@@ -1793,6 +1727,83 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     );
   };
   
+  const calendarRef = useRef<HTMLDivElement>(null);
+  const [calendarPosition, setCalendarPosition] = useState({ top: '0px', left: '0px' });
+  const [isPositioned, setIsPositioned] = useState(false);
+
+  // Update getCalendarPosition to return the calculated position
+  const getCalendarPosition = useCallback((inputElement: HTMLElement | null) => {
+    if (!inputElement || !calendarRef.current) return { top: '0px', left: '0px' };
+
+    const rect = inputElement.getBoundingClientRect();
+    const calendarHeight = calendarRef.current.offsetHeight;
+    const calendarWidth = settings.visibleMonths * settings.singleMonthWidth + ((settings.visibleMonths - 1) * 16);
+    const PADDING = 8;
+    
+    const position = settings.position || 'bottom-right';
+    
+    switch (position) {
+      case 'bottom-left':
+        return {
+          top: `${rect.bottom + PADDING}px`,
+          left: `${rect.left}px`
+        };
+      case 'top-right':
+        return {
+          top: `${rect.top - calendarHeight - PADDING}px`,
+          left: `${rect.right - calendarWidth}px`
+        };
+      case 'top-left':
+        return {
+          top: `${rect.top - calendarHeight - PADDING}px`,
+          left: `${rect.left}px`
+        };
+      case 'bottom-right':
+      default:
+        return {
+          top: `${rect.bottom + PADDING}px`,
+          left: `${rect.right - calendarWidth}px`
+        };
+    }
+  }, [settings.visibleMonths, settings.position, settings.singleMonthWidth]);
+
+  // Reset positioning state when calendar closes
+  useEffect(() => {
+    if (!isOpen) {
+      setIsPositioned(false);
+    }
+  }, [isOpen]);
+
+  // Update position when calendar opens, when position changes, or when switching calendars
+  useEffect(() => {
+    if (isOpen && inputRef.current && calendarRef.current) {
+      setIsPositioned(false); // Hide calendar while calculating position
+      // Use requestAnimationFrame to ensure DOM has updated
+      requestAnimationFrame(() => {
+        const newPosition = getCalendarPosition(inputRef.current);
+        setCalendarPosition(newPosition);
+        setIsPositioned(true); // Show calendar after position is set
+      });
+    }
+  }, [isOpen, settings.position, getCalendarPosition]);
+
+  // Add resize observer to handle any size changes
+  useEffect(() => {
+    if (!calendarRef.current) return;
+
+    const observer = new ResizeObserver(() => {
+      if (isOpen && inputRef.current) {
+        setIsPositioned(false); // Hide calendar while recalculating position
+        const newPosition = getCalendarPosition(inputRef.current);
+        setCalendarPosition(newPosition);
+        setIsPositioned(true); // Show calendar after position is set
+      }
+    });
+
+    observer.observe(calendarRef.current);
+    return () => observer.disconnect();
+  }, [isOpen, getCalendarPosition]);
+
   // Render either directly or in a portal based on display mode
   return (
     <div 
@@ -1823,6 +1834,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       {/* Only render the calendar when it's open */}
       {isOpen && (
         settings.displayMode === 'embedded' ? (
+          // For embedded mode, render directly
           <CalendarContainer
             isOpen={isOpen}
             displayMode={settings.displayMode}
@@ -1838,6 +1850,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
             {renderCalendarContent()}
           </CalendarContainer>
         ) : (
+          // For popup mode, use a direct portal
           ReactDOM.createPortal(
             <div 
               className="cla-calendar-portal"
@@ -1845,9 +1858,10 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
                 position: 'fixed',
                 zIndex: 2147483647,
                 ...calendarPosition,
-                width: `${settings.visibleMonths * settings.singleMonthWidth + ((settings.visibleMonths - 1) * 16)}px`
+                width: `${settings.visibleMonths * settings.singleMonthWidth + ((settings.visibleMonths - 1) * 16)}px`,
+                visibility: isPositioned ? 'visible' : 'hidden'
               }}
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()} // Prevent click from closing immediately
             >
               <div 
                 ref={calendarRef}
@@ -1873,3 +1887,4 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
 };
 
 export default CLACalendar;
+
