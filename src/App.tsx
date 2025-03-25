@@ -63,6 +63,9 @@ const App: React.FC = () => {
     end: null
   });
 
+  // Add state for dynamic positioning
+  const [useDynamicPosition, setUseDynamicPosition] = useState(true);
+
   // Add state for base settings
   const [baseSettings, setBaseSettings] = useState<CalendarSettings>({
     displayMode: "popup" as const,
@@ -84,6 +87,7 @@ const App: React.FC = () => {
     isOpen: false,
     showLayersNavigation: false,
     position: 'bottom-right',
+    useDynamicPosition: true,
 
     // Add empty placeholders that will be replaced by lazy loading
     layers: [],
@@ -229,27 +233,71 @@ const App: React.FC = () => {
       gap: '40px',
       textAlign: 'left'
     }}>
-      {/* Add position selector at the top */}
-      <div style={{ marginBottom: '20px', padding: '10px' }}>
-        <select 
-          onChange={(e) => {
-            const newSettings = {
-              ...baseSettings,
-              position: e.target.value as 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left'
-            };
-            setBaseSettings(newSettings);
-          }}
-          style={{
-            padding: '8px',
-            borderRadius: '4px',
-            border: '1px solid #ccc'
-          }}
-        >
-          <option value="bottom-right">Bottom Right</option>
-          <option value="bottom-left">Bottom Left</option>
-          <option value="top-right">Top Right</option>
-          <option value="top-left">Top Left</option>
-        </select>
+      {/* Add dynamic positioning controls at the top */}
+      <div style={{ 
+        marginBottom: '20px', 
+        padding: '16px', 
+        display: 'flex', 
+        gap: '20px', 
+        alignItems: 'center',
+        backgroundColor: '#f8f9fa',
+        borderRadius: '4px',
+        border: '1px solid #dee2e6'
+      }}>
+        <label style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '8px', 
+          cursor: 'pointer',
+          userSelect: 'none'
+        }}>
+          <input
+            type="checkbox"
+            checked={useDynamicPosition}
+            onChange={(e) => {
+              const newSettings = {
+                ...baseSettings,
+                useDynamicPosition: e.target.checked
+              };
+              setBaseSettings(newSettings);
+              setUseDynamicPosition(e.target.checked);
+            }}
+            style={{ cursor: 'pointer' }}
+          />
+          Use Dynamic Positioning
+        </label>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ 
+            color: useDynamicPosition ? '#6c757d' : '#212529',
+            fontSize: '14px'
+          }}>
+            Fallback Position:
+          </span>
+          <select 
+            onChange={(e) => {
+              const newSettings = {
+                ...baseSettings,
+                position: e.target.value as 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left'
+              };
+              setBaseSettings(newSettings);
+            }}
+            style={{
+              padding: '8px',
+              borderRadius: '4px',
+              border: '1px solid #ccc',
+              color: useDynamicPosition ? '#6c757d' : '#212529',
+              backgroundColor: useDynamicPosition ? '#f8f9fa' : '#ffffff',
+              cursor: 'pointer'
+            }}
+            value={baseSettings.position}
+          >
+            <option value="bottom-right">Bottom Right</option>
+            <option value="bottom-left">Bottom Left</option>
+            <option value="top-right">Top Right</option>
+            <option value="top-left">Top Left</option>
+          </select>
+        </div>
       </div>
 
       {/* Display the selected range */}
@@ -279,7 +327,11 @@ const App: React.FC = () => {
       <div style={{ position: 'relative', textAlign: 'left' }} className="cla-calendar-wrapper">
         <h3 style={{ textAlign: 'left' }}>Calendar Instance 1 (2 Months)</h3>
         <CLACalendar
-          settings={baseSettings}
+          settings={{
+            ...baseSettings,
+            useDynamicPosition,
+            position: baseSettings.position
+          }}
           _onSettingsChange={() => { }}
           onSubmit={(start, end) => {
             setDateRange({ start, end });
@@ -293,7 +345,11 @@ const App: React.FC = () => {
       <div style={{ position: 'relative', textAlign: 'left' }} className="cla-calendar-wrapper">
         <h3 style={{ textAlign: 'left' }}>Calendar Instance 2 (3 Months)</h3>
         <CLACalendar
-          settings={calendar2Settings}
+          settings={{
+            ...calendar2Settings,
+            useDynamicPosition,
+            position: baseSettings.position
+          }}
           _onSettingsChange={() => { }}
           onSubmit={(start, end) => {
             setDateRange({ start, end });
@@ -307,7 +363,11 @@ const App: React.FC = () => {
       <div style={{ position: 'relative', textAlign: 'left' }} className="cla-calendar-wrapper">
         <h3 style={{ textAlign: 'left' }}>Calendar with Default Range in January 2024</h3>
         <CLACalendar
-          settings={calendar3Settings}
+          settings={{
+            ...calendar3Settings,
+            useDynamicPosition,
+            position: baseSettings.position
+          }}
           _onSettingsChange={() => { }}
           onSubmit={(start, end) => {
             setDateRange({ start, end });

@@ -159,6 +159,7 @@ export interface CalendarSettings {
   showMonthHeadings: boolean;
   baseFontSize?: string; // Base font size for the calendar (e.g. '1rem', '16px')
   position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left'; // Position of the calendar relative to input
+  useDynamicPosition?: boolean; // Whether to use dynamic positioning with fallback to position
   
   // Feature Settings
   selectionMode: 'single' | 'range';

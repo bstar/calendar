@@ -1804,6 +1804,49 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     });
   }, [isOpen, settings.visibleMonths, settings.showHeader, settings.showFooter, settings.showLayersNavigation]);
 
+  // Function to determine best position based on window boundaries
+  const getBestPosition = useCallback((rect: DOMRect, calendarHeight: number, calendarWidth: number) => {
+    const PADDING = 8;
+    const windowHeight = window.innerHeight;
+    const windowWidth = window.innerWidth;
+    
+    // Check if calendar would fit below
+    const fitsBelow = rect.bottom + PADDING + calendarHeight <= windowHeight;
+    
+    // Check if calendar would fit above
+    const fitsAbove = rect.top - PADDING - calendarHeight >= 0;
+    
+    // Check left alignment
+    const fitsFromLeft = rect.left + calendarWidth <= windowWidth;
+    
+    // Check right alignment
+    const fitsFromRight = rect.right - calendarWidth >= 0;
+
+    // Determine best vertical position
+    let verticalPosition: 'top' | 'bottom';
+    if (fitsBelow) {
+      verticalPosition = 'bottom';
+    } else if (fitsAbove) {
+      verticalPosition = 'top';
+    } else {
+      // If it doesn't fit either way, prefer bottom if there's more space below
+      verticalPosition = (windowHeight - rect.bottom) > rect.top ? 'bottom' : 'top';
+    }
+
+    // Determine best horizontal position
+    let horizontalPosition: 'left' | 'right';
+    if (fitsFromLeft) {
+      horizontalPosition = 'left';
+    } else if (fitsFromRight) {
+      horizontalPosition = 'right';
+    } else {
+      // If it doesn't fit either way, prefer left if there's more space from left
+      horizontalPosition = rect.left > (windowWidth - rect.right) ? 'right' : 'left';
+    }
+
+    return `${verticalPosition}-${horizontalPosition}` as const;
+  }, []);
+
   // Calculate and set position only after we have the height
   useEffect(() => {
     if (!isOpen || !inputRef.current || !measuredHeight) return;
@@ -1812,47 +1855,162 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     const calendarWidth = settings.visibleMonths * settings.singleMonthWidth + ((settings.visibleMonths - 1) * 16);
     const PADDING = 8;
     
-    const position = settings.position || 'bottom-right';
-    let newPosition;
-    
-    switch (position) {
-      case 'bottom-left':
-        newPosition = {
-          top: `${rect.bottom + PADDING}px`,
-          left: `${rect.left}px`
-        };
-        break;
-      case 'top-right':
-        newPosition = {
-          top: `${rect.top - measuredHeight - PADDING}px`,
-          left: `${rect.right - calendarWidth}px`
-        };
-        break;
-      case 'top-left':
-        newPosition = {
-          top: `${rect.top - measuredHeight - PADDING}px`,
-          left: `${rect.left}px`
-        };
-        break;
-      case 'bottom-right':
-      default:
-        newPosition = {
-          top: `${rect.bottom + PADDING}px`,
-          left: `${rect.right - calendarWidth}px`
-        };
+    // If dynamic positioning is disabled, use the fixed position from settings
+    if (settings.useDynamicPosition === false && settings.position) {
+      let newPosition;
+      switch (settings.position) {
+        case 'bottom-left':
+          newPosition = {
+            top: `${rect.bottom + PADDING}px`,
+            left: `${rect.left}px`
+          };
+          break;
+        case 'top-right':
+          newPosition = {
+            top: `${rect.top - measuredHeight - PADDING}px`,
+            left: `${rect.right - calendarWidth}px`
+          };
+          break;
+        case 'top-left':
+          newPosition = {
+            top: `${rect.top - measuredHeight - PADDING}px`,
+            left: `${rect.left}px`
+          };
+          break;
+        case 'bottom-right':
+        default:
+          newPosition = {
+            top: `${rect.bottom + PADDING}px`,
+            left: `${rect.right - calendarWidth}px`
+          };
+          break;
+      }
+      setCalendarPosition(newPosition);
+    } else {
+      // Use dynamic positioning
+      const bestPosition = getBestPosition(rect, measuredHeight, calendarWidth);
+      
+      let newPosition;
+      switch (bestPosition) {
+        case 'bottom-left':
+          newPosition = {
+            top: `${rect.bottom + PADDING}px`,
+            left: `${rect.left}px`
+          };
+          break;
+        case 'top-right':
+          newPosition = {
+            top: `${rect.top - measuredHeight - PADDING}px`,
+            left: `${rect.right - calendarWidth}px`
+          };
+          break;
+        case 'top-left':
+          newPosition = {
+            top: `${rect.top - measuredHeight - PADDING}px`,
+            left: `${rect.left}px`
+          };
+          break;
+        case 'bottom-right':
+          newPosition = {
+            top: `${rect.bottom + PADDING}px`,
+            left: `${rect.right - calendarWidth}px`
+          };
+          break;
+      }
+      setCalendarPosition(newPosition);
     }
-
-    setCalendarPosition(newPosition);
     
     // Wait for position to be applied before showing
     requestAnimationFrame(() => {
       setIsPositioned(true);
-      // Wait one more frame before marking as ready
       requestAnimationFrame(() => {
         setIsReady(true);
       });
     });
-  }, [isOpen, measuredHeight, settings.position, settings.visibleMonths, settings.singleMonthWidth]);
+  }, [isOpen, measuredHeight, settings.visibleMonths, settings.singleMonthWidth, getBestPosition, settings.position, settings.useDynamicPosition]);
+
+  // Add window resize handler to reposition if needed
+  useEffect(() => {
+    if (!isOpen || !inputRef.current || !measuredHeight) return;
+
+    const handleResize = debounce(() => {
+      const rect = inputRef.current?.getBoundingClientRect();
+      if (!rect) return;
+
+      const calendarWidth = settings.visibleMonths * settings.singleMonthWidth + ((settings.visibleMonths - 1) * 16);
+      
+      // If dynamic positioning is disabled, use the fixed position from settings
+      if (settings.useDynamicPosition === false && settings.position) {
+        let newPosition;
+        switch (settings.position) {
+          case 'bottom-left':
+            newPosition = {
+              top: `${rect.bottom + 8}px`,
+              left: `${rect.left}px`
+            };
+            break;
+          case 'top-right':
+            newPosition = {
+              top: `${rect.top - measuredHeight - 8}px`,
+              left: `${rect.right - calendarWidth}px`
+            };
+            break;
+          case 'top-left':
+            newPosition = {
+              top: `${rect.top - measuredHeight - 8}px`,
+              left: `${rect.left}px`
+            };
+            break;
+          case 'bottom-right':
+          default:
+            newPosition = {
+              top: `${rect.bottom + 8}px`,
+              left: `${rect.right - calendarWidth}px`
+            };
+            break;
+        }
+        setCalendarPosition(newPosition);
+      } else {
+        // Use dynamic positioning
+        const bestPosition = getBestPosition(rect, measuredHeight, calendarWidth);
+        
+        let newPosition;
+        switch (bestPosition) {
+          case 'bottom-left':
+            newPosition = {
+              top: `${rect.bottom + 8}px`,
+              left: `${rect.left}px`
+            };
+            break;
+          case 'top-right':
+            newPosition = {
+              top: `${rect.top - measuredHeight - 8}px`,
+              left: `${rect.right - calendarWidth}px`
+            };
+            break;
+          case 'top-left':
+            newPosition = {
+              top: `${rect.top - measuredHeight - 8}px`,
+              left: `${rect.left}px`
+            };
+            break;
+          case 'bottom-right':
+            newPosition = {
+              top: `${rect.bottom + 8}px`,
+              left: `${rect.right - calendarWidth}px`
+            };
+            break;
+        }
+        setCalendarPosition(newPosition);
+      }
+    }, 100);
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      handleResize.cancel();
+    };
+  }, [isOpen, measuredHeight, settings.visibleMonths, settings.singleMonthWidth, getBestPosition, settings.position, settings.useDynamicPosition]);
 
   return (
     <div 
