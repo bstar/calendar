@@ -30,6 +30,7 @@
     rgba(255, 255, 255, 0.7) 6px
   ) !important;
   background-size: 8.5px 8.5px !important; /* Precise value for clean 45° lines */
+  background-position: calc(30px * var(--col-index, 0)) calc(36px * var(--row-index, 0)) !important; /* Offset based on grid position */
   background-attachment: local !important; /* Make the pattern relative to the cell itself */
   position: relative !important;
   z-index: 1 !important; /* Ensure this is below event elements */

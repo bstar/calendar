@@ -430,8 +430,8 @@ const MonthGrid: React.FC<MonthGridProps & { settings?: CalendarSettings }> = ({
           paddingLeft: '2px'  // Match month heading alignment
         }}
       >
-        {Object.values(weeks).flatMap(week =>
-          week.map(date => (
+        {Object.values(weeks).flatMap((week, weekIndex) =>
+          week.map((date, dayIndex) => (
             <DayCell
               key={date.toISOString()}
               date={date}
@@ -439,10 +439,7 @@ const MonthGrid: React.FC<MonthGridProps & { settings?: CalendarSettings }> = ({
               isCurrentMonth={isSameMonth(date, baseDate)}
               onMouseDown={() => onSelectionStart(date)}
               onMouseEnter={() => {
-                // Call these separately to avoid a potential update loop
                 onSelectionMove(date);
-                // Use requestAnimationFrame to avoid rapid re-renders
-                // that could cause infinite update loops
                 requestAnimationFrame(() => {
                   setHoveredDate(date);
                 });
@@ -452,6 +449,8 @@ const MonthGrid: React.FC<MonthGridProps & { settings?: CalendarSettings }> = ({
               layer={layer}
               restrictionConfig={restrictionConfig}
               settings={settings}
+              rowIndex={weekIndex}
+              colIndex={dayIndex}
             />
           ))
         )}
@@ -518,7 +517,9 @@ const DayCell = ({
   renderContent,
   layer,
   restrictionConfig,
-  settings
+  settings,
+  rowIndex,
+  colIndex
 }) => {
   const { isSelected, isInRange, isRangeStart, isRangeEnd } = useMemo(() => {
     if (!selectedRange.start) {
@@ -728,7 +729,10 @@ const DayCell = ({
         alignItems: "center",
         justifyContent: "center",
         // Only apply backgroundColor for non-restricted dates
-        ...(!restrictionResult.allowed ? {} : {
+        ...(!restrictionResult.allowed ? {
+          '--row-index': rowIndex,
+          '--col-index': colIndex
+        } : {
           backgroundColor: (isSelected || isInRange) ? "#b1e4e5" : getBackgroundColor()
         }),
         borderRadius: isSingleDay && (isSelected || isInRange) ? "50%" : (
