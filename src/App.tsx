@@ -5,12 +5,12 @@ import './App.css';
 // Import defensive styles for the calendar widget
 import './components/DateRangePickerNew/defensive-styles.css';
 import { CLACalendar } from './components/CLACalendar';
-import type { CalendarSettings as _CalendarSettings, Layer as _Layer } from './components/DateRangePicker.config';
-import { getDefaultSettings } from './components/DateRangePicker.config';
+import type { CalendarSettings, Layer } from './components/DateRangePicker.config';
+import { getDefaultSettings, DEFAULT_COLORS } from './components/DateRangePicker.config';
 import { addDays, format } from './utils/DateUtils';
 import { useRangeSelection } from './components/hooks';
 import { createLayersFactory } from './components/DateRangePickerNew/layers/LayerFactory';
-import type { RestrictionConfig as _RestrictionConfig } from './components/DateRangePickerNew/restrictions/types';
+import type { RestrictionConfig } from './components/DateRangePickerNew/restrictions/types';
 import { RestrictionType, RestrictedBoundaryRestriction, BoundaryRestriction } from './components/DateRangePickerNew/restrictions/types';
 import isoWeeksData from './data/iso_weeks.json';
 import { subDays, formatISO } from 'date-fns';
@@ -63,11 +63,11 @@ const App: React.FC = () => {
     end: null
   });
 
-  // Common settings for both calendar instances - without expensive computation
-  const baseSettings = {
+  // Add state for base settings
+  const [baseSettings, setBaseSettings] = useState<CalendarSettings>({
     displayMode: "popup" as const,
     timezone: "UTC",
-    visibleMonths: 2, // First calendar shows 2 months
+    visibleMonths: 2,
     singleMonthWidth: 400,
     showMonthHeadings: true,
     baseFontSize: '1rem',
@@ -81,52 +81,16 @@ const App: React.FC = () => {
     suppressTooltipsOnSelection: false,
     showSelectionAlert: true,
     startWeekOnSunday: false,
-    initialMonth: new Date(),
     isOpen: false,
     showLayersNavigation: false,
+    position: 'bottom-right',
 
     // Add empty placeholders that will be replaced by lazy loading
     layers: [],
     defaultLayer: "Calendar",
     restrictionConfig: { restrictions: [] },
-
-    // MM/DD/YYYY format with padded zeros (produces "02/23/2025 to 02/23/2025" for a range)
-    dateFormatter: (date: Date) => {
-      // Pad numbers with leading zeros
-      const pad = (num: number): string => String(num).padStart(2, '0');
-
-      const month = pad(date.getMonth() + 1); // getMonth() is 0-indexed
-      const day = pad(date.getDate());
-      const year = date.getFullYear();
-
-      return `${month}/${day}/${year}`;
-    },
-    // Custom separator for date ranges
-    dateRangeSeparator: " to ",
-    // Custom styling for the input field
-    inputStyle: {
-      // You can override any CSS properties here
-      width: '250px',
-      padding: '10px 12px',
-      border: '2px solid #0366d6',
-      borderRadius: '4px',
-      fontSize: '1rem',
-      color: '#333333',
-      backgroundColor: '#f8f9fa',
-      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-      cursor: 'pointer',
-    },
-    colors: {
-      primary: "#0366d6",
-      success: "#28a745",
-      warning: "#f6c23e",
-      danger: "#dc3545",
-      purple: "#6f42c1",
-      teal: "#20c997",
-      orange: "#fd7e14",
-      pink: "#e83e8c"
-    }
-  };
+    colors: DEFAULT_COLORS
+  });
 
   // Create lazy factory function for layers
   const createLayersFactory = () => {
@@ -265,6 +229,29 @@ const App: React.FC = () => {
       gap: '40px',
       textAlign: 'left'
     }}>
+      {/* Add position selector at the top */}
+      <div style={{ marginBottom: '20px', padding: '10px' }}>
+        <select 
+          onChange={(e) => {
+            const newSettings = {
+              ...baseSettings,
+              position: e.target.value as 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left'
+            };
+            setBaseSettings(newSettings);
+          }}
+          style={{
+            padding: '8px',
+            borderRadius: '4px',
+            border: '1px solid #ccc'
+          }}
+        >
+          <option value="bottom-right">Bottom Right</option>
+          <option value="bottom-left">Bottom Left</option>
+          <option value="top-right">Top Right</option>
+          <option value="top-left">Top Left</option>
+        </select>
+      </div>
+
       {/* Display the selected range */}
       <div style={{
         padding: '15px',
