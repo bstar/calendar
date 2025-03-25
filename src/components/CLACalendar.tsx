@@ -1576,22 +1576,6 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     moveToMonthRef.current = moveToMonth;
   }, [moveToMonth]);
   
-  // Update click outside handler to use the new handler
-  useEffect(() => {
-    if (!settings.closeOnClickAway || settings.displayMode === 'embedded' || !isOpen) return;
-    
-    const handleOutsideClick = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        handleClickOutside();
-      }
-    };
-    
-    document.addEventListener('mousedown', handleOutsideClick);
-    return () => {
-      document.removeEventListener('mousedown', handleOutsideClick);
-    };
-  }, [settings.closeOnClickAway, settings.displayMode, isOpen, handleClickOutside]);
-  
   // Handle input click to open calendar and initialize if needed
   const handleInputClick = () => {
     // Always open the calendar when input is clicked
@@ -1643,6 +1627,12 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       
       // Don't close if clicking inside the calendar container
       if (containerRef.current && containerRef.current.contains(event.target as Node)) {
+        return;
+      }
+
+      // Don't close if clicking inside the calendar portal
+      const portalElement = document.querySelector('.cla-calendar-portal');
+      if (portalElement && portalElement.contains(event.target as Node)) {
         return;
       }
       
@@ -1852,7 +1842,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     if (!isOpen || !inputRef.current || !measuredHeight) return;
 
     const rect = inputRef.current.getBoundingClientRect();
-    const calendarWidth = settings.visibleMonths * settings.singleMonthWidth + ((settings.visibleMonths - 1) * 16);
+    const calendarWidth = settings.visibleMonths * settings.monthWidth + ((settings.visibleMonths - 1) * 16);
     const PADDING = 8;
     
     // If dynamic positioning is disabled, use the fixed position from settings
@@ -1927,7 +1917,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
         setIsReady(true);
       });
     });
-  }, [isOpen, measuredHeight, settings.visibleMonths, settings.singleMonthWidth, getBestPosition, settings.position, settings.useDynamicPosition]);
+  }, [isOpen, measuredHeight, settings.visibleMonths, settings.monthWidth, getBestPosition, settings.position, settings.useDynamicPosition]);
 
   // Add window resize handler to reposition if needed
   useEffect(() => {
@@ -1937,7 +1927,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       const rect = inputRef.current?.getBoundingClientRect();
       if (!rect) return;
 
-      const calendarWidth = settings.visibleMonths * settings.singleMonthWidth + ((settings.visibleMonths - 1) * 16);
+      const calendarWidth = settings.visibleMonths * settings.monthWidth + ((settings.visibleMonths - 1) * 16);
       
       // If dynamic positioning is disabled, use the fixed position from settings
       if (settings.useDynamicPosition === false && settings.position) {
@@ -2010,7 +2000,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       window.removeEventListener('resize', handleResize);
       handleResize.cancel();
     };
-  }, [isOpen, measuredHeight, settings.visibleMonths, settings.singleMonthWidth, getBestPosition, settings.position, settings.useDynamicPosition]);
+  }, [isOpen, measuredHeight, settings.visibleMonths, settings.monthWidth, getBestPosition, settings.position, settings.useDynamicPosition]);
 
   return (
     <div 
@@ -2047,7 +2037,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
             containerRef={containerRef}
             containerStyle={settings.containerStyle}
             visibleMonths={settings.visibleMonths}
-            singleMonthWidth={settings.singleMonthWidth}
+            monthWidth={settings.monthWidth}
             enableOutOfBoundsScroll={settings.enableOutOfBoundsScroll}
             handleMouseDown={handleMouseDown}
             handleMouseMove={handleMouseMove}
@@ -2063,9 +2053,15 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
                 position: 'fixed',
                 zIndex: 2147483647,
                 ...calendarPosition,
-                width: `${settings.visibleMonths * settings.singleMonthWidth + ((settings.visibleMonths - 1) * 16)}px`,
+                width: `${settings.visibleMonths * settings.monthWidth + ((settings.visibleMonths - 1) * 16)}px`,
                 display: isReady ? 'block' : 'none',
                 pointerEvents: isReady ? 'auto' : 'none'
+              }}
+              onMouseDown={(e) => {
+                e.stopPropagation();
+                if (settings.enableOutOfBoundsScroll) {
+                  handleMouseDown(e);
+                }
               }}
               onClick={(e) => e.stopPropagation()}
             >
@@ -2073,12 +2069,17 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
                 ref={calendarRef}
                 className="cla-card"
                 style={{
-                  width: `${settings.visibleMonths * settings.singleMonthWidth + ((settings.visibleMonths - 1) * 16)}px`,
+                  width: `${settings.visibleMonths * settings.monthWidth + ((settings.visibleMonths - 1) * 16)}px`,
                   ...DEFAULT_CONTAINER_STYLES,
                   ...settings.containerStyle,
                   visibility: isReady ? 'visible' : 'hidden'
                 }}
-                onMouseDown={settings.enableOutOfBoundsScroll ? handleMouseDown : undefined}
+                onMouseDown={(e) => {
+                  e.stopPropagation();
+                  if (settings.enableOutOfBoundsScroll) {
+                    handleMouseDown(e);
+                  }
+                }}
                 onMouseMove={settings.enableOutOfBoundsScroll ? handleMouseMove : undefined}
                 onMouseLeave={settings.enableOutOfBoundsScroll ? handleMouseLeave : undefined}
               >

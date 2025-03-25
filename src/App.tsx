@@ -71,7 +71,7 @@ const App: React.FC = () => {
     displayMode: "popup" as const,
     timezone: "UTC",
     visibleMonths: 2,
-    singleMonthWidth: 400,
+    monthWidth: 300,
     showMonthHeadings: true,
     baseFontSize: '1rem',
     selectionMode: "range" as const,

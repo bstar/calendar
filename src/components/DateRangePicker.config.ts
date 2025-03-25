@@ -155,7 +155,7 @@ export interface CalendarSettings {
   inputStyle?: React.CSSProperties;
   isOpen?: boolean;
   visibleMonths: number;
-  singleMonthWidth: number;
+  monthWidth: number; // Width of each month in pixels
   showMonthHeadings: boolean;
   baseFontSize?: string; // Base font size for the calendar (e.g. '1rem', '16px')
   position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left'; // Position of the calendar relative to input
@@ -251,7 +251,7 @@ export const getDefaultSettings = (): CalendarSettings => ({
   displayMode: 'embedded',
   timezone: 'UTC',
   visibleMonths: 2,
-  singleMonthWidth: 500,
+  monthWidth: 500,
   showMonthHeadings: true,
   selectionMode: 'range',
   showTooltips: true,
@@ -319,8 +319,8 @@ export const SETTINGS: SettingsConfig = {
       min: 1,
       max: 6
     },
-    singleMonthWidth: {
-      id: 'singleMonthWidth',
+    monthWidth: {
+      id: 'monthWidth',
       type: 'number',
       label: 'Month Width',
       description: 'Width of a single month in pixels',

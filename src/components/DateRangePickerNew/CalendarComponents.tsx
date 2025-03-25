@@ -581,7 +581,7 @@ export interface CalendarContainerProps {
   containerRef: React.RefObject<HTMLDivElement>;
   containerStyle: React.CSSProperties | null;
   visibleMonths: number;
-  singleMonthWidth: number;
+  monthWidth: number;
   enableOutOfBoundsScroll: boolean;
   handleMouseDown: (e: React.MouseEvent) => void;
   handleMouseMove: (e: React.MouseEvent) => void;
@@ -596,7 +596,7 @@ export interface CalendarContainerProps {
  * @param containerRef - Reference to the container element
  * @param containerStyle - Additional container styles
  * @param visibleMonths - Number of months visible at once
- * @param singleMonthWidth - Width of a single month view
+ * @param monthWidth - Width of a single month view
  * @param enableOutOfBoundsScroll - Whether to enable scrolling when mouse is out of bounds
  * @param handleMouseDown - Mouse down event handler
  * @param handleMouseMove - Mouse move event handler
@@ -610,7 +610,7 @@ export const CalendarContainer: React.FC<CalendarContainerProps> = ({
   containerRef,
   containerStyle,
   visibleMonths,
-  singleMonthWidth,
+  monthWidth,
   enableOutOfBoundsScroll,
   handleMouseDown,
   handleMouseMove,
@@ -621,7 +621,7 @@ export const CalendarContainer: React.FC<CalendarContainerProps> = ({
       ref={containerRef}
       className={`cla-card ${displayMode === 'popup' ? 'cla-card-popup' : ''}`}
       style={{
-        width: visibleMonths === 1 ? `${singleMonthWidth}px` : `${400 * Math.min(6, Math.max(1, visibleMonths))}px`,
+        width: visibleMonths === 1 ? `${monthWidth}px` : `${monthWidth * Math.min(6, Math.max(1, visibleMonths))}px`,
         isolation: 'isolate', // Create new stacking context
         ...DEFAULT_CONTAINER_STYLES,
         ...containerStyle
