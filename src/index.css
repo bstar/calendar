@@ -13,68 +13,22 @@
 }
 
 /* Base range cell styling */
-.range-cell {
-  position: relative;
-  z-index: 1;
-}
 
 /* Background element for the range */
-.range-cell::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: #e9ecef;
-  z-index: -1;
-}
 
 /* Range start styling */
-.range-start::before {
-  left: 50%;
-  border-radius: 4px 0 0 4px;
-}
 
 /* Range end styling */
-.range-end::before {
-  right: 50%;
-  border-radius: 0 4px 4px 0;
-}
 
 /* Middle range cells extend fully */
-.range-middle::before {
-  left: -1px;
-  right: -1px;
-}
 
 /* Selected state (start and end dates) */
-.range-selected::before {
-  background-color: #0d6efd;
-}
 
 /* Adjust text color for selected cells */
-.range-selected {
-  color: white;
-}
 
 /* Ensure the range doesn't extend into padding */
-.range-start.range-cell::before {
-  left: 2px;
-  right: -1px;
-}
-
-.range-end.range-cell::before {
-  right: 2px;
-  left: -1px;
-}
 
 /* Handle single-day selection */
-.range-start.range-end::before {
-  left: 2px;
-  right: 2px;
-  border-radius: 4px;
-}
 
 /* Card styles */
 .cla-card {
@@ -100,32 +54,6 @@
 }
 
 /* Button styles */
-.cla-btn {
-  display: inline-block;
-  font-weight: 400;
-  line-height: 1.5;
-  text-align: center;
-  text-decoration: none;
-  vertical-align: middle;
-  cursor: pointer;
-  user-select: none;
-  padding: 0.375rem 0.75rem;
-  font-size: 1rem;
-  border-radius: 0.375rem;
-  transition: color 0.15s ease-in-out, 
-              background-color 0.15s ease-in-out,
-              border-color 0.15s ease-in-out;
-}
-
-.cla-btn-light {
-  color: var(--text-color);
-  background-color: #fff;
-  border: 1px solid var(--border-color);
-}
-
-.cla-btn-light:hover {
-  background-color: var(--bg-hover);
-}
 
 /* Form control styles */
 .cla-form-control {
@@ -150,41 +78,10 @@
 }
 
 /* Utility classes */
-.cla-d-flex {
-  display: flex !important;
-}
-
-.cla-justify-content-between {
-  justify-content: space-between !important;
-}
-
-.cla-align-items-center {
-  align-items: center !important;
-}
-
-.cla-position-relative {
-  position: relative !important;
-}
-
-.cla-position-absolute {
-  position: absolute !important;
-}
 
 /* Additional calendar-specific styles */
-.cla-calendar-container {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  color: var(--text-color);
-}
 
 /* Calendar specific styles */
-.cla-calendar {
-  position: relative;
-  width: fit-content;
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-}
 
 .cla-card-popup {
   position: absolute;
@@ -223,67 +120,10 @@
 }
 
 /* Day cell styles */
-.cla-day-cell {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  border-radius: 0;
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-}
-
-.cla-day-selected {
-  background-color: var(--calendar-selected);
-  font-weight: 600;
-}
-
-.cla-day-in-range {
-  background-color: var(--calendar-selected);
-}
-
-.cla-day-single {
-  border-radius: 50%;
-}
 
 /* Add these calendar styles */
-.cla-weekday-header {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #6c757d;
-  text-align: center;
-  padding: 4px 0;
-}
-
-.cla-month-container {
-  width: 100%;
-  padding: 0 8px;
-}
 
 /* Month grid layout */
-.cla-month-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  grid-auto-rows: 36px;
-  gap: 4px 0;
-  margin-bottom: 8px;
-}
-
-.cla-month-heading {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text-color);
-  margin-bottom: 8px;
-  padding-left: 2px;
-}
-
-.cla-day-other-month {
-  color: #6c757d;
-}
 
 /* Input container styles */
 .cla-input-container {

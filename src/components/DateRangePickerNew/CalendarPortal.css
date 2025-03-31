@@ -13,17 +13,6 @@
 }
 
 /* This creates a stacking order for multiple portals */
-.cla-calendar-portal[data-priority="high"] {
-  z-index: 2147483647;
-}
-
-.cla-calendar-portal[data-priority="medium"] {
-  z-index: 2147483646;
-}
-
-.cla-calendar-portal[data-priority="low"] {
-  z-index: 2147483645;
-}
 
 /* Content inside the portal */
 .cla-calendar-portal-content {
@@ -73,10 +62,6 @@
 }
 
 /* Debugging styles - can be removed in production */
-[data-debug="calendar-portal"] {
-  border: 3px solid red !important;
-  background-color: white !important;
-}
 
 /* Ensure the portal respects viewport boundaries */
 @media (max-width: 768px) {

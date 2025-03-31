@@ -1,8 +1,4 @@
 /* General styles */
-.cla-calendar {
-  width: fit-content;
-  position: relative;
-}
 
 .cla-form-control {
   position: relative;
@@ -30,26 +26,6 @@
   cursor: pointer;
   font-weight: 500;
   transition: background-color 0.2s ease;
-}
-
-.cla-button-primary {
-  background-color: #1976d2;
-  color: white;
-  border: none;
-}
-
-.cla-button-primary:hover {
-  background-color: #1565c0;
-}
-
-.cla-button-secondary {
-  background-color: #f5f5f5;
-  color: #333;
-  border: 1px solid #ddd;
-}
-
-.cla-button-secondary:hover {
-  background-color: #e0e0e0;
 }
 
 /* DateInput styles */
@@ -97,14 +73,6 @@
   pointer-events: none;
 }
 
-.date-input-indicator-success {
-  color: #28a745;
-}
-
-.date-input-indicator-error {
-  color: #dc3545;
-}
-
 .date-input-error {
   font-size: 0.875rem;
   color: #dc3545;
@@ -113,113 +81,8 @@
 }
 
 /* Calendar header styles */
-.cla-calendar .cla-header {
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  padding: 16px !important;
-  border-bottom: 1px solid #e0e0e0 !important;
-  background-color: white !important;
-  isolation: isolate !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  margin: 0 !important;
-  height: auto !important;
-  min-height: 0 !important;
-  max-height: none !important;
-  position: relative !important;
-}
-
-.cla-calendar .cla-header-title {
-  font-weight: 600 !important;
-  color: #333333 !important;
-  font-size: 1rem !important;
-  line-height: 1.5 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  text-align: center !important;
-  flex: 1 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  font-family: inherit !important;
-}
-
-.cla-calendar .cla-button-nav {
-  width: 32px !important;
-  height: 32px !important;
-  padding: 8px !important;
-  margin: 0 4px !important; 
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  background: none !important; /* Reset to transparent */
-  border: none !important; /* No border */
-  cursor: pointer !important;
-  color: #333333 !important;
-  font-size: inherit !important;
-  line-height: 1 !important;
-  position: relative !important;
-  isolation: isolate !important;
-  flex: 0 0 32px !important; /* Fixed width, don't grow or shrink */
-  min-width: 32px !important;
-  min-height: 32px !important;
-  border-radius: 4px !important;
-}
-
-.cla-calendar .cla-button-nav:hover {
-  background-color: #f5f5f5 !important; /* Match secondary button default color */
-}
-
-.cla-calendar .cla-button-nav:focus {
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-.cla-calendar .cla-chevron {
-  display: inline-block !important;
-  width: 10px !important;
-  height: 10px !important;
-  position: relative !important;
-  color: #333333 !important;
-}
-
-.cla-calendar .cla-button-nav:hover .cla-chevron {
-  color: #666 !important; /* Lighter gray on hover */
-}
-
-.cla-calendar .cla-chevron::before {
-  content: '' !important;
-  display: block !important;
-  width: 8px !important;
-  height: 8px !important;
-  border-style: solid !important;
-  border-width: 2px 2px 0 0 !important;
-  border-color: currentColor !important;
-  position: absolute !important;
-  top: 50% !important;
-  left: 50% !important;
-}
-
-.cla-calendar .cla-chevron-left::before {
-  transform: translate(-25%, -50%) rotate(-135deg) !important;
-}
-
-.cla-calendar .cla-chevron-right::before {
-  transform: translate(-75%, -50%) rotate(45deg) !important;
-}
 
 /* DateInputSection styles */
-.date-input-section {
-  display: flex !important;
-  flex-wrap: nowrap !important;
-  padding: 16px !important;
-  gap: 8px !important; /* Reduced gap for more space */
-  border-bottom: 1px solid #e0e0e0 !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  background-color: #f8f9fa !important;
-}
 
 .cla-input-wrapper {
   display: flex !important;
@@ -286,9 +149,7 @@
 
 /* Remove ALL focus-based z-index changes */
 .cla-calendar-wrapper:focus-within,
-.cla-calendar:focus-within,
 .cla-calendar-wrapper:focus,
-.cla-calendar:focus,
 .cla-form-control:focus,
 .cla-input-wrapper:focus {
   z-index: auto;
@@ -302,27 +163,6 @@
 }
 
 /* SideChevronIndicator styles */
-.side-chevron-indicator {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(227, 242, 253, 0.9);
-  z-index: 9999;
-  border: 1px solid var(--border-color);
-  cursor: pointer;
-}
-
-.side-chevron-indicator-prev {
-  left: 0;
-}
-
-.side-chevron-indicator-next {
-  right: 0;
-}
 
 /* Tooltip container styles */
 .tooltip-container {
@@ -391,25 +231,6 @@
 }
 
 /* Event styling within tooltip */
-.tooltip .event-title {
-  font-weight: bold !important;
-  margin-bottom: 1px !important;
-  line-height: 1.2 !important;
-  color: #ffffff !important;
-}
-
-.tooltip .event-time {
-  font-size: 0.85em !important;
-  color: #adb5bd !important;
-  margin-bottom: 1px !important;
-  line-height: 1.2 !important;
-}
-
-.tooltip .event-description {
-  font-size: 0.85em !important;
-  color: #e9ecef !important;
-  line-height: 1.2 !important;
-}
 
 /* Ensure text inside tooltip is readable */
 .tooltip * {
@@ -418,11 +239,6 @@
 
 .tooltip a {
   color: #4dabf7 !important;
-}
-
-.tooltip strong, 
-.tooltip b {
-  color: #ffffff !important;
 }
 
 /* Portal container styles */
@@ -439,16 +255,3 @@
 .cla-portal-container > * {
   pointer-events: auto !important;
 }
-
-/* Protect grid layouts from being broken by parent styles */
-[style*="display: grid"] {
-  display: grid !important;
-}
-
-[style*="grid-template-columns"] {
-  grid-template-columns: attr(style grid-template-columns) !important;
-}
-
-[style*="grid-auto-rows"] {
-  grid-auto-rows: attr(style grid-auto-rows) !important;
-} 
