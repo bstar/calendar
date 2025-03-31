@@ -2070,7 +2070,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
               onClick={(e) => e.stopPropagation()}
             >
               <div
-                ref={containerRef}
+                ref={calendarRef}
                 className="cla-card"
                 style={{
                   width: `${settings.visibleMonths * settings.monthWidth + ((settings.visibleMonths - 1) * 16)}px`,
@@ -2078,16 +2078,21 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
                   ...settings.containerStyle,
                   visibility: isReady ? 'visible' : 'hidden'
                 }}
-                onMouseDown={(e) => {
-                  e.stopPropagation();
-                  if (settings.enableOutOfBoundsScroll) {
-                    handleMouseDown(e);
-                  }
-                }}
-                onMouseMove={settings.enableOutOfBoundsScroll ? handleMouseMove : undefined}
-                onMouseLeave={settings.enableOutOfBoundsScroll ? handleMouseLeave : undefined}
               >
-                {renderCalendarContent()}
+                <div
+                  ref={containerRef}
+                  style={{ width: '100%', height: '100%' }}
+                  onMouseDown={(e) => {
+                    e.stopPropagation();
+                    if (settings.enableOutOfBoundsScroll) {
+                      handleMouseDown(e);
+                    }
+                  }}
+                  onMouseMove={settings.enableOutOfBoundsScroll ? handleMouseMove : undefined}
+                  onMouseLeave={settings.enableOutOfBoundsScroll ? handleMouseLeave : undefined}
+                >
+                  {renderCalendarContent()}
+                </div>
               </div>
             </div>,
             document.body
