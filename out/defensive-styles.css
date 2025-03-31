@@ -1,0 +1,148 @@
+/**
+ * Defensive CSS for Calendar Widget
+ * 
+ * This file contains defensive styles to protect the calendar widget from external style interference.
+ * These styles ensure the calendar maintains consistent appearance regardless of the host application.
+ * 
+ * Benefits:
+ * - Protects against CSS inheritance issues
+ * - Ensures proper layout and component positioning 
+ * - Maintains font sizes and text styling
+ * - Preserves proper z-index stacking for tooltips and portals
+ * 
+ * Import this file in any project where you use the calendar widget.
+ */
+
+/* Main wrapper protection */
+.cla-calendar-wrapper,
+.cla-calendar-portal {
+  isolation: isolate !important;
+  position: relative !important;
+  display: inline-block !important;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+  line-height: 1.5 !important;
+  box-sizing: border-box !important;
+  max-width: 100% !important;
+}
+
+/* When calendar is open, ensure high z-index */
+.cla-calendar-wrapper[data-open="true"] {
+  z-index: 2147483647 !important;
+}
+
+/* Apply box-sizing to all child elements */
+.cla-calendar-wrapper *,
+.cla-calendar-portal * {
+  box-sizing: border-box !important;
+}
+
+/* Calendar portal for popup styles */
+.cla-calendar-portal {
+  position: fixed !important;
+  z-index: 2147483647 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+}
+
+/* Tooltip container and styles */
+.tooltip {
+  position: fixed !important;
+  background-color: #1a1a1a !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important;
+  border-radius: 3px !important;
+  z-index: 2147483647 !important;
+  font-size: 13px !important;
+  max-width: 300px !important;
+  padding: 3px 6px !important;
+  pointer-events: none !important;
+  border: none !important;
+  margin-top: 5px !important;
+  opacity: 1 !important;
+}
+
+/* Reset text properties on calendar */
+
+/* Grid protection */
+
+/* Restricted date pattern */
+.restricted-date-pattern {
+  background-image: repeating-linear-gradient(45deg,
+      rgba(150, 150, 150, 0.25) 0px,
+      rgba(150, 150, 150, 0.25) 2px,
+      rgba(255, 255, 255, 0.7) 2px,
+      rgba(255, 255, 255, 0.7) 6px) !important;
+  background-size: 8.5px 8.5px !important;
+  /* Precise value for clean 45° lines */
+  background-position: calc(36px * var(--col-index, 0)) calc(36px * var(--row-index, 0)) !important;
+  /* Offset based on grid position */
+  background-attachment: local !important;
+
+  /* Make the pattern relative to the cell itself *2
+}
+
+/* Form controls - general styles except for .cla-form-control font size */
+  .cla-calendar-wrapper input:not(.cla-form-control),
+  .cla-calendar-portal input:not(.cla-form-control) {
+    line-height: inherit !important;
+    background-color: #fff !important;
+  }
+
+  /* Set only font-family and background for form-control, font-size will be set separately */
+  .cla-form-control {
+    line-height: inherit !important;
+    background-color: #fff !important;
+  }
+
+  /* Main calendar input field - with higher specificity to override the general rule */
+
+  /* Custom input style class for user-defined styling with highest specificity */
+
+  /* Calendar header with bulletproof styling */
+
+  /* Ultra-hardened chevron navigation buttons */
+
+  /* Add spacing to title to prevent button overlap */
+
+  /* Bulletproof chevron icon styling */
+
+  /* Date input section fixes - with maximum specificity and !important */
+
+  /* Date input wrapper fixes - with maximum specificity */
+
+  /* Date input styling */
+
+  /* Date input indicator position */
+
+  /* Input container additional styles */
+
+  /* Force single-mode to respect width constraints */
+
+  /* Handle single vs range mode input section differently */
+
+  /* Add a new rule specifically for the date range separator to prevent it from disappearing */
+
+  /* Handle single vs range mode input section differently */
+
+  /* Add strong defensive wrapper for date inputs */
+  .cla-date-inputs-wrapper {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    position: relative !important;
+    flex-wrap: nowrap !important;
+    min-width: 280px !important;
+    /* Ensure some minimum width for small screens */
+    background-color: #f8f9fa !important;
+  }
+
+  /* Improve mobile support with responsive tweaks */
+  @media (max-width: 500px) {
+
+    /* Special case for range mode on small screens */
+  }
+}

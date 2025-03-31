@@ -2070,7 +2070,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
               onClick={(e) => e.stopPropagation()}
             >
               <div
-                ref={calendarRef}
+                ref={containerRef}
                 className="cla-card"
                 style={{
                   width: `${settings.visibleMonths * settings.monthWidth + ((settings.visibleMonths - 1) * 16)}px`,

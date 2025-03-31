@@ -1,0 +1,14 @@
+/* Original App.css styles */
+#root {
+  padding: 1rem;
+  text-align: left;
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

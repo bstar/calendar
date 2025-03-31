@@ -1,0 +1,259 @@
+/* General styles */
+
+.cla-form-control {
+  position: relative;
+  width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 6px 10px;
+  height: 36px;
+  border: 1px solid #c0c4cc;
+  border-radius: 4px;
+  font-size: 0.8em;
+  line-height: 1.5;
+  color: #444;
+  background-color: #fff !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  z-index: 1;
+}
+
+/* Button styles */
+.cla-button {
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+/* DateInput styles */
+.date-input-container {
+  position: relative;
+  flex: 1 1 0; /* Equal width distribution, flex-basis 0 */
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* Allow shrinking below content size */
+  width: 100%;
+  isolation: isolate;
+}
+
+.date-input {
+  width: 100%;
+  min-width: 0;
+  padding: 8px 12px;
+  border-radius: 4px;
+  background-color: white;
+  color: #000;
+  transition: border-color 0.15s ease;
+  cursor: text;
+  user-select: text;
+  border: 1px solid #979797;
+  text-align: left; /* Left align text */
+  margin: 0;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  appearance: none;
+  -webkit-appearance: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.date-input-indicator {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  font-weight: bold;
+  pointer-events: none;
+}
+
+.date-input-error {
+  font-size: 0.875rem;
+  color: #dc3545;
+  overflow: hidden;
+  transition: height 0.2s ease-in-out, margin-top 0.2s ease-in-out;
+}
+
+/* Calendar header styles */
+
+/* DateInputSection styles */
+
+.cla-input-wrapper {
+  display: flex !important;
+  flex: 1 1 0 !important; /* Equal width distribution */
+  min-width: 0 !important;
+  position: relative !important;
+  isolation: isolate !important;
+}
+
+/* CalendarFooter styles */
+.calendar-footer {
+  padding: 10px 10px 10px 10px;
+  border-top: none;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Calendar wrapper to handle positioning */
+.cla-calendar-wrapper {
+  position: relative;
+  display: inline-block;
+  isolation: isolate;
+}
+
+/* When calendar is open, ensure it's above other elements */
+.cla-calendar-wrapper[data-open="true"] {
+  z-index: 2147483647 !important;
+}
+
+/* Hide other calendar popups when any calendar is open */
+.cla-calendar-wrapper[data-open="true"] ~ .cla-calendar-wrapper .cla-card-popup,
+.cla-calendar-wrapper:has(~ .cla-calendar-wrapper[data-open="true"]) .cla-card-popup {
+  display: none !important;
+}
+
+/* Calendar Container styles */
+.cla-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  position: absolute;
+  isolation: isolate;
+}
+
+.cla-card-popup {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  background: white;
+  width: 100%;
+}
+
+/* Form control styles */
+.cla-form-control {
+  position: relative;
+  z-index: 1;
+}
+
+/* Add margin between stacked instances */
+.cla-calendar-wrapper + .cla-calendar-wrapper {
+  margin-top: 16px;
+}
+
+/* Remove ALL focus-based z-index changes */
+.cla-calendar-wrapper:focus-within,
+.cla-calendar-wrapper:focus,
+.cla-form-control:focus,
+.cla-input-wrapper:focus {
+  z-index: auto;
+}
+
+/* Ensure the calendar maintains its z-index when open */
+.cla-calendar-wrapper[data-open="true"] *,
+.cla-calendar-wrapper[data-open="true"] .cla-card,
+.cla-calendar-wrapper[data-open="true"] .cla-card-popup {
+  z-index: auto;
+}
+
+/* SideChevronIndicator styles */
+
+/* Tooltip container styles */
+.tooltip-container {
+  position: relative !important;
+  display: inline-block !important;
+  width: 100% !important;
+  height: 100% !important;
+  isolation: isolate !important;
+}
+
+/* Tooltip styles - use !important to ensure they can't be overridden */
+.tooltip {
+  position: fixed !important;
+  background-color: #1a1a1a !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.35) !important;
+  border-radius: 3px !important;
+  z-index: 2147483647 !important;  /* Maximum z-index */
+  font-size: 13px !important;
+  max-width: 300px !important;
+  padding: 3px 6px !important;
+  pointer-events: none !important;
+  border: none !important;
+  margin-top: 5px !important;
+  opacity: 1 !important;
+  transition: opacity 0.15s ease-in-out !important;
+  isolation: isolate !important;
+  transform: translateZ(0) !important;
+  will-change: transform !important;
+}
+
+.tooltip[style*="hidden"] {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Add arrow/triangle to tooltip - ensure it's visible */
+.tooltip::before {
+  content: '' !important;
+  position: absolute !important;
+  bottom: -5px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 0 !important;
+  height: 0 !important;
+  border-left: 5px solid transparent !important;
+  border-right: 5px solid transparent !important;
+  border-top: 5px solid #1a1a1a !important;
+  z-index: 1 !important;
+}
+
+/* Add a subtle shadow effect for the arrow */
+.tooltip::after {
+  content: '' !important;
+  position: absolute !important;
+  bottom: -6px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 0 !important;
+  height: 0 !important;
+  border-left: 6px solid transparent !important;
+  border-right: 6px solid transparent !important;
+  border-top: 6px solid rgba(0,0,0,0.1) !important;
+  z-index: -1 !important;
+}
+
+/* Event styling within tooltip */
+
+/* Ensure text inside tooltip is readable */
+.tooltip * {
+  color: inherit !important;
+}
+
+.tooltip a {
+  color: #4dabf7 !important;
+}
+
+/* Portal container styles */
+.cla-portal-container {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none !important;
+  z-index: 2147483647 !important;
+}
+
+.cla-portal-container > * {
+  pointer-events: auto !important;
+}
+
+/* Protect grid layouts from being broken by parent styles */ 

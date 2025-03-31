@@ -649,6 +649,20 @@ export const SideChevronIndicator: React.FC<SideChevronIndicatorProps> = ({
   outOfBoundsDirection,
   isSelecting
 }) => {
+  useEffect(() => {
+    console.log('[SideChevronIndicator] Props changed:', {
+      outOfBoundsDirection,
+      isSelecting,
+      timestamp: new Date().toISOString()
+    });
+  }, [outOfBoundsDirection, isSelecting]);
+
+  console.log('[SideChevronIndicator] Render attempt:', {
+    outOfBoundsDirection,
+    isSelecting,
+    willRender: !!(outOfBoundsDirection && isSelecting)
+  });
+
   if (!outOfBoundsDirection || !isSelecting) return null;
 
   return (
