@@ -239,7 +239,7 @@ export const DEFAULT_COLORS = {
 // Default container styles
 export const DEFAULT_CONTAINER_STYLES: CSSProperties = {
   backgroundColor: '#fff',
-  border: '1px solid #dee2e6',
+  border: '1px solid #7dd2d3',
   borderRadius: '6px',
   boxShadow: '0 0.5rem 1rem rgba(0, 0, 0, 0.15)'
 };

@@ -380,7 +380,7 @@ const MonthGrid: React.FC<MonthGridProps & { settings?: CalendarSettings }> = ({
     }}>
       {showMonthHeading && (
         <div style={{
-          fontSize: getFontSize(settings, 'large'),
+          fontSize: getFontSize(settings, 'small'),
           fontWeight: '600',
           color: '#333',
           textAlign: 'left',
@@ -389,7 +389,7 @@ const MonthGrid: React.FC<MonthGridProps & { settings?: CalendarSettings }> = ({
           paddingTop: 0,  // Ensure no top padding
           paddingLeft: '6px'
         }}>
-          {format(monthStart, 'MMMM')}
+          {format(monthStart, 'MMM yyyy')}
         </div>
       )}
 
