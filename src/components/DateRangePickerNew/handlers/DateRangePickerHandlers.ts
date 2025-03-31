@@ -106,11 +106,8 @@ export class DateRangePickerHandlers {
     setOutOfBoundsDirection: (direction: 'prev' | 'next' | null) => void,
     setMousePosition: (position: MousePosition) => void
   ) {
-    console.log('[MouseHandlers] Initializing with isSelecting:', isSelecting);
-    
     const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
       e.preventDefault();
-      console.log('[MouseHandlers] Mouse Move - isSelecting:', isSelecting, 'containerRef exists:', !!containerRef.current);
       if (!isSelecting || !containerRef.current) return;
 
       const containerRect = containerRef.current.getBoundingClientRect();
@@ -124,33 +121,16 @@ export class DateRangePickerHandlers {
         : mouseX > containerRect.right - BOUNDARY_THRESHOLD ? 'next'
           : null;
 
-      console.log('[MouseHandlers] Boundary Check:', {
-        mouseX,
-        containerLeft: containerRect.left,
-        containerRight: containerRect.right,
-        threshold: BOUNDARY_THRESHOLD,
-        newDirection,
-        isSelecting // Add isSelecting to this log
-      });
-
       setOutOfBoundsDirection(newDirection);
     };
 
     const handleMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
-      console.log('[MouseHandlers] Mouse Leave - isSelecting:', isSelecting, 'containerRef exists:', !!containerRef.current);
       // Only handle out of bounds when selecting
       if (!isSelecting) return;
 
       const containerRect = containerRef.current?.getBoundingClientRect();
       if (!containerRect) return;
       const { clientX: mouseX } = e;
-
-      console.log('[MouseHandlers] Mouse Leave Position:', {
-        mouseX,
-        containerLeft: containerRect.left,
-        containerRight: containerRect.right,
-        isSelecting // Add isSelecting to this log
-      });
 
       if (mouseX < containerRect.left) {
         setOutOfBoundsDirection('prev');
@@ -177,20 +157,9 @@ export class DateRangePickerHandlers {
     moveToMonthRef: RefObject<((direction: 'prev' | 'next') => void) | null>,
     setIsSelecting: (isSelecting: boolean) => void
   ) {
-    console.log('[DocumentHandlers] Initializing with isSelecting:', isSelecting);
-
     const handleDocumentMouseMove = (e: MouseEvent) => {
       e.preventDefault();
-      console.log('[DocumentHandlers] Document Mouse Move - START', {
-        isSelecting,
-        containerExists: !!containerRef.current,
-        hasMoveFn: !!moveToMonthRef.current
-      });
-      
-      if (!isSelecting || !containerRef.current) {
-        console.log('[DocumentHandlers] Early return - isSelecting or container missing');
-        return;
-      }
+      if (!isSelecting || !containerRef.current) return;
 
       const containerRect = containerRef.current.getBoundingClientRect();
       const { clientX: mouseX, clientY: mouseY } = e;
@@ -203,39 +172,17 @@ export class DateRangePickerHandlers {
         : mouseX > containerRect.right - BOUNDARY_THRESHOLD ? 'next'
           : null;
 
-      console.log('[DocumentHandlers] Document Boundary Check:', {
-        mouseX,
-        containerLeft: containerRect.left,
-        containerRight: containerRect.right,
-        threshold: BOUNDARY_THRESHOLD,
-        newDirection,
-        currentOutOfBoundsDirection: outOfBoundsDirection,
-        isSelecting
-      });
-
       if (newDirection !== outOfBoundsDirection) {
-        console.log('[DocumentHandlers] Direction change detected:', {
-          newDirection,
-          oldDirection: outOfBoundsDirection,
-          hasMoveFn: !!moveToMonthRef.current
-        });
-        
         setOutOfBoundsDirection(newDirection);
 
         // If we're entering a boundary area, trigger the month change
         if (newDirection && moveToMonthRef.current) {
-          console.log('[DocumentHandlers] Triggering month change:', newDirection);
           // Immediately move to the next/prev month
           moveToMonthRef.current(newDirection);
 
           // Set up an interval to continue moving if mouse stays in boundary
           const intervalId = setInterval(() => {
             if (moveToMonthRef.current) {
-              console.log('[DocumentHandlers] Interval triggered month change:', {
-                direction: newDirection,
-                isSelecting,
-                hasMoveFn: !!moveToMonthRef.current
-              });
               moveToMonthRef.current(newDirection);
             }
           }, 1000);
@@ -248,15 +195,7 @@ export class DateRangePickerHandlers {
     };
 
     const handleMouseDown = (e: React.MouseEvent) => {
-      console.log('[DocumentHandlers] Mouse Down - Pre-check:', {
-        currentIsSelecting: isSelecting,
-        hasContainer: !!containerRef.current
-      });
-      
-      if (isSelecting) {
-        console.log('[DocumentHandlers] Mouse Down blocked - already selecting');
-        return;
-      }
+      if (isSelecting) return;
       e.preventDefault();
 
       const setUserSelectNone = () => {
@@ -265,18 +204,11 @@ export class DateRangePickerHandlers {
       };
 
       setUserSelectNone();
-      console.log('[DocumentHandlers] Adding document event listeners');
       document.addEventListener("mousemove", handleDocumentMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
     };
 
     const handleMouseUp = () => {
-      console.log('[DocumentHandlers] Mouse Up - Cleaning up selection. Current state:', {
-        isSelecting,
-        outOfBoundsDirection,
-        hasContainer: !!containerRef.current
-      });
-      
       setIsSelecting(false);
       setOutOfBoundsDirection(null);
 
@@ -292,7 +224,6 @@ export class DateRangePickerHandlers {
 
       const docWithInterval = document as DocumentWithInterval;
       if (docWithInterval.activeIntervalId) {
-        console.log('[DocumentHandlers] Clearing active interval');
         clearInterval(docWithInterval.activeIntervalId);
         docWithInterval.activeIntervalId = undefined;
       }
