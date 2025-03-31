@@ -44,6 +44,7 @@
 .cla-card-body {
   position: relative;
   overflow: hidden;
+  padding: 0px 5px 0px 5px !important;
 }
 
 .cla-card-header {
@@ -103,22 +104,6 @@
   color: var(--text-color);
 }
 
-.cla-button-nav {
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-.cla-button-nav:hover {
-  background-color: var(--calendar-hover);
-}
-
 /* Day cell styles */
 
 /* Add these calendar styles */
@@ -129,7 +114,6 @@
 .cla-input-container {
   display: flex;
   gap: 20px;
-  padding: 16px;
   background-color: rgba(226, 228, 238, 0.5);
   border-bottom: 1px solid var(--border-color);
 }

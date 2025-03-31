@@ -387,7 +387,7 @@ const MonthGrid: React.FC<MonthGridProps & { settings?: CalendarSettings }> = ({
           marginTop: 0,  // Ensure no top margin
           marginBottom: '8px',
           paddingTop: 0,  // Ensure no top padding
-          paddingLeft: '2px'
+          paddingLeft: '6px'
         }}>
           {format(monthStart, 'MMMM')}
         </div>

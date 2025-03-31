@@ -21,11 +21,19 @@
 
 /* Button styles */
 .cla-button {
-  padding: 5px 10px;
+  background-color: #2e334e;
+  color: #fff !important;
+  border-radius: 4px;
+  font-size: 12px;
+  padding: 10px 20px;
   border-radius: 4px;
   cursor: pointer;
   font-weight: 500;
   transition: background-color 0.2s ease;
+}
+
+.cla-button:hover {
+  background-color: #434552;
 }
 
 /* DateInput styles */
@@ -94,7 +102,7 @@
 
 /* CalendarFooter styles */
 .calendar-footer {
-  padding: 10px 10px 10px 10px;
+  padding: 12px 15px 12px 15px;
   border-top: none;
   display: flex;
   justify-content: space-between;

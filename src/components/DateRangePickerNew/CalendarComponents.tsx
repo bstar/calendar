@@ -292,7 +292,7 @@ export const DateInput: React.FC<DateInputProps> = ({
         style={{
           width: '100%',
           minWidth: '120px',
-          padding: '4px 10px',
+          padding: '8px 10px',
           boxSizing: 'border-box',
           border: '1px solid #ccc',
           borderRadius: '4px',
@@ -512,8 +512,7 @@ export const DateInputSection: React.FC<DateInputSectionProps> = ({
       <div className="cla-input-wrapper"
            style={{
              flex: '0 0 48%',
-             width: '48%',
-             maxWidth: '48%',
+             width: '50%',
              minWidth: '120px',
              display: 'block',
              whiteSpace: 'nowrap',
@@ -651,6 +650,8 @@ export const SideChevronIndicator: React.FC<SideChevronIndicatorProps> = ({
 }) => {
   if (!outOfBoundsDirection || !isSelecting) return null;
 
+  const direction = { next: '0px 6px 6px 0px', prev: '6px 0px 0px 6px' }
+
   return (
     <div style={{
       position: 'absolute',
@@ -661,10 +662,10 @@ export const SideChevronIndicator: React.FC<SideChevronIndicatorProps> = ({
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: 'rgba(227, 242, 253, 0.9)',
+      backgroundColor: '#2e334e',
       zIndex: 9999,
-      border: '1px solid var(--border-color)',
       cursor: "pointer",
+      borderRadius: direction[outOfBoundsDirection],
     } as React.CSSProperties}>
       {outOfBoundsDirection === 'prev' ? (
         <ChevronLeft size={24} />
