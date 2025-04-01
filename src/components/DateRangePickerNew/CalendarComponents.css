@@ -1,91 +1,90 @@
 /* General styles */
 
 .cla-form-control {
-  position: relative;
-  width: 200px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  padding: 6px 10px;
-  height: 36px;
-  border: 1px solid #c0c4cc;
-  border-radius: 4px;
-  font-size: 0.8em;
-  line-height: 1.5;
-  color: #444;
+  position: relative !important;
+  width: 200px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  padding: 6px 10px !important;
+  height: 36px !important;
+  border: 1px solid #c0c4cc !important;
+  border-radius: 4px !important;
+  font-size: 0.8em !important;
+  line-height: 1.5 !important;
+  color: #444 !important;
   background-color: #fff !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
-  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-  z-index: 1;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out !important;
+  z-index: 1 !important;
 }
 
 /* Button styles */
 .cla-button {
-  background-color: #2e334e;
+  background-color: #2e334e !important;
   color: #fff !important;
-  border-radius: 4px;
-  font-size: 12px;
-  padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.2s ease;
+  border-radius: 4px !important;
+  font-size: 12px !important;
+  padding: 10px 20px !important;
+  cursor: pointer !important;
+  font-weight: 500 !important;
+  transition: background-color 0.2s ease !important;
 }
 
 .cla-button:hover {
-  background-color: #434552;
+  background-color: #434552 !important;
 }
 
 /* DateInput styles */
 .date-input-container {
-  position: relative;
-  flex: 1 1 0; /* Equal width distribution, flex-basis 0 */
-  display: flex;
-  flex-direction: column;
-  min-width: 0; /* Allow shrinking below content size */
-  width: 100%;
-  isolation: isolate;
+  position: relative !important;
+  flex: 1 1 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  isolation: isolate !important;
 }
 
 .date-input {
-  width: 100%;
-  min-width: 0;
-  padding: 8px 12px;
-  border-radius: 4px;
-  background-color: white;
-  color: #000;
-  transition: border-color 0.15s ease;
-  cursor: text;
-  user-select: text;
-  border: 1px solid #979797;
-  text-align: left; /* Left align text */
-  margin: 0;
-  box-sizing: border-box;
-  font-family: inherit;
-  font-size: 14px;
-  line-height: 1.5;
-  appearance: none;
-  -webkit-appearance: none;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  width: 100% !important;
+  min-width: 0 !important;
+  padding: 8px 12px !important;
+  border-radius: 4px !important;
+  background-color: white !important;
+  color: #000 !important;
+  transition: border-color 0.15s ease !important;
+  cursor: text !important;
+  user-select: text !important;
+  border: 1px solid #979797 !important;
+  text-align: left !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  font-family: inherit !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
 .date-input-indicator {
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 14px;
-  font-weight: bold;
-  pointer-events: none;
+  position: absolute !important;
+  right: 8px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  font-size: 14px !important;
+  font-weight: bold !important;
+  pointer-events: none !important;
 }
 
 .date-input-error {
-  font-size: 0.875rem;
-  color: #dc3545;
-  overflow: hidden;
-  transition: height 0.2s ease-in-out, margin-top 0.2s ease-in-out;
+  font-size: 0.875rem !important;
+  color: #dc3545 !important;
+  overflow: hidden !important;
+  transition: height 0.2s ease-in-out, margin-top 0.2s ease-in-out !important;
 }
 
 /* Calendar header styles */
@@ -94,7 +93,7 @@
 
 .cla-input-wrapper {
   display: flex !important;
-  flex: 1 1 0 !important; /* Equal width distribution */
+  flex: 1 1 0 !important;
   min-width: 0 !important;
   position: relative !important;
   isolation: isolate !important;
@@ -102,17 +101,17 @@
 
 /* CalendarFooter styles */
 .calendar-footer {
-  padding: 12px 15px 12px 15px;
-  border-top: none;
-  display: flex;
-  justify-content: space-between;
+  padding: 12px 15px 12px 15px !important;
+  border-top: none !important;
+  display: flex !important;
+  justify-content: space-between !important;
 }
 
 /* Calendar wrapper to handle positioning */
 .cla-calendar-wrapper {
-  position: relative;
-  display: inline-block;
-  isolation: isolate;
+  position: relative !important;
+  display: inline-block !important;
+  isolation: isolate !important;
 }
 
 /* When calendar is open, ensure it's above other elements */
@@ -128,31 +127,31 @@
 
 /* Calendar Container styles */
 .cla-card {
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  position: absolute;
-  isolation: isolate;
+  background-color: white !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+  position: absolute !important;
+  isolation: isolate !important;
 }
 
 .cla-card-popup {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  margin-top: 4px;
-  background: white;
-  width: 100%;
+  position: absolute !important;
+  top: 100% !important;
+  left: 0 !important;
+  margin-top: 4px !important;
+  background: white !important;
+  width: 100% !important;
 }
 
 /* Form control styles */
 .cla-form-control {
-  position: relative;
-  z-index: 1;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 /* Add margin between stacked instances */
 .cla-calendar-wrapper + .cla-calendar-wrapper {
-  margin-top: 16px;
+  margin-top: 16px !important;
 }
 
 /* Remove ALL focus-based z-index changes */
@@ -160,14 +159,14 @@
 .cla-calendar-wrapper:focus,
 .cla-form-control:focus,
 .cla-input-wrapper:focus {
-  z-index: auto;
+  z-index: auto !important;
 }
 
 /* Ensure the calendar maintains its z-index when open */
 .cla-calendar-wrapper[data-open="true"] *,
 .cla-calendar-wrapper[data-open="true"] .cla-card,
 .cla-calendar-wrapper[data-open="true"] .cla-card-popup {
-  z-index: auto;
+  z-index: auto !important;
 }
 
 /* SideChevronIndicator styles */

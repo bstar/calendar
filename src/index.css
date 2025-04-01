@@ -1,15 +1,15 @@
 :root {
-  --primary-color: #0d6efd;
-  --border-color: #dee2e6;
-  --text-color: #212529;
-  --bg-hover: #f8f9fa;
-  --error-color: #dc3545;
-  --calendar-bg: #fff;
-  --calendar-selected: #b1e4e5;
-  --calendar-button: #f5f5f5;
-  --calendar-button-border: #ddd;
-  --calendar-hover: #e0e0e0;
-  --calendar-active: #cccccc;
+  --primary-color: #0d6efd !important;
+  --border-color: #dee2e6 !important;
+  --text-color: #212529 !important;
+  --bg-hover: #f8f9fa !important;
+  --error-color: #dc3545 !important;
+  --calendar-bg: #fff !important;
+  --calendar-selected: #b1e4e5 !important;
+  --calendar-button: #f5f5f5 !important;
+  --calendar-button-border: #ddd !important;
+  --calendar-hover: #e0e0e0 !important;
+  --calendar-active: #cccccc !important;
 }
 
 /* Base range cell styling */
@@ -32,50 +32,49 @@
 
 /* Card styles */
 .cla-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  background: var(--calendar-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  background: var(--calendar-bg) !important;
+  border-radius: 4px !important;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
 }
 
 .cla-card-body {
-  position: relative;
-  overflow: hidden;
+  position: relative !important;
+  overflow: hidden !important;
   padding: 0px 5px 0px 5px !important;
 }
 
 .cla-card-header {
-  padding: 0.5rem 1rem;
-  margin-bottom: 0;
-  background-color: #fff;
-  border-bottom: 1px solid var(--border-color);
+  padding: 0.5rem 1rem !important;
+  margin-bottom: 0 !important;
+  background-color: #fff !important;
+  border-bottom: 1px solid var(--border-color) !important;
 }
 
 /* Button styles */
 
 /* Form control styles */
 .cla-form-control {
-  display: block;
-  width: 100%;
-  padding: 0.375rem 0.75rem;
-  font-size: 1rem;
-  font-weight: 400;
-  line-height: 1.5;
-  color: var(--text-color);
-  background-color: #fff;
-  background-clip: padding-box;
-  border: 1px solid var(--border-color);
-  border-radius: 0.375rem;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  display: block !important;
+  width: 100% !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 1rem !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+  color: var(--text-color) !important;
+  background-color: #fff !important;
+  background-clip: padding-box !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 0.375rem !important;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
 }
 
 .cla-form-control:focus {
-  border-color: #86b7fe;
-  outline: 0;
-  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+  border-color: #86b7fe !important;
+  outline: 0 !important;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
 }
 
 /* Utility classes */
@@ -85,23 +84,23 @@
 /* Calendar specific styles */
 
 .cla-card-popup {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  margin-top: 0.5rem;
-  z-index: 1000;
+  position: absolute !important;
+  top: 100% !important;
+  left: 0 !important;
+  margin-top: 0.5rem !important;
+  z-index: 1000 !important;
 }
 
 .cla-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0.5rem !important;
 }
 
 .cla-header-title {
-  font-weight: 600;
-  color: var(--text-color);
+  font-weight: 600 !important;
+  color: var(--text-color) !important;
 }
 
 /* Day cell styles */
@@ -112,48 +111,48 @@
 
 /* Input container styles */
 .cla-input-container {
-  display: flex;
-  gap: 20px;
-  background-color: rgba(226, 228, 238, 0.5);
-  border-bottom: 1px solid var(--border-color);
+  display: flex !important;
+  gap: 20px !important;
+  background-color: rgba(226, 228, 238, 0.5) !important;
+  border-bottom: 1px solid var(--border-color) !important;
 }
 
 .cla-input-wrapper {
-  position: relative;
-  flex: 1;
+  position: relative !important;
+  flex: 1 !important;
 }
 
 .cla-input {
-  width: 100%;
-  padding: 8px 12px;
-  font-size: 14px;
-  line-height: 1.5;
-  color: var(--text-color);
-  background-color: #fff;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  transition: border-color 0.15s ease-in-out;
+  width: 100% !important;
+  padding: 8px 12px !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  color: var(--text-color) !important;
+  background-color: #fff !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 4px !important;
+  transition: border-color 0.15s ease-in-out !important;
 }
 
 .cla-input:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.25);
+  outline: none !important;
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.25) !important;
 }
 
 .cla-input.error {
-  border-color: var(--error-color);
+  border-color: var(--error-color) !important;
 }
 
 .cla-input::placeholder {
-  color: #6c757d;
+  color: #6c757d !important;
 }
 
 /* Single mode adjustments */
 .cla-input-container.single {
-  justify-content: center;
+  justify-content: center !important;
 }
 
 .cla-input-container.single .cla-input-wrapper {
-  max-width: 200px;
+  max-width: 200px !important;
 }
