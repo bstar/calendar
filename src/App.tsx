@@ -2,8 +2,6 @@ import React, { useMemo, useState } from 'react';
 import './bootstrap.min.css';
 import './docStyles.css';
 import './App.css';
-// Import defensive styles for the calendar widget
-import './components/DateRangePickerNew/defensive-styles.css';
 import { CLACalendar } from './components/CLACalendar';
 import type { CalendarSettings, Layer } from './components/DateRangePicker.config';
 import { getDefaultSettings, DEFAULT_COLORS } from './components/DateRangePicker.config';

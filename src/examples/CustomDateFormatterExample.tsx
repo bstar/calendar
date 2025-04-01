@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { CLACalendar } from '../components/CLACalendar';
 import { CalendarSettings, getDefaultSettings } from '../components/DateRangePicker.config';
-import '../components/DateRangePickerNew/defensive-styles.css';
 
 const CustomDateFormatterExample: React.FC = () => {
   // Create initial settings with a custom date formatter
