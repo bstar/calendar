@@ -43,6 +43,41 @@ const getUniquePeriodRanges = () => {
   return Array.from(uniquePeriods.values());
 };
 
+type MonthWidthControlProps = {
+  value: number;
+  onChange: (width: number) => void;
+};
+
+const MonthWidthControl: React.FC<MonthWidthControlProps> = ({ value, onChange }) => (
+  <div style={{ 
+    padding: '16px',
+    backgroundColor: '#f8f9fa',
+    borderRadius: '4px',
+    border: '1px solid #dee2e6'
+  }}>
+    <label 
+      htmlFor="monthWidth"
+      style={{ marginRight: '8px' }}
+    >
+      Month Width (px):
+    </label>
+    <input
+      id="monthWidth"
+      type="number"
+      defaultValue={300}
+      value={value}
+      onChange={(e) => onChange(parseInt(e.target.value) || 300)}
+      aria-label="Month width in pixels"
+      style={{
+        width: '80px',
+        padding: '4px 8px',
+        border: '1px solid #ced4da',
+        borderRadius: '4px'
+      }}
+    />
+  </div>
+);
+
 const App: React.FC = () => {
   /**
    * This app demonstrates a calendar widget with defensive CSS to protect
@@ -54,6 +89,9 @@ const App: React.FC = () => {
    * - Appropriate z-index stacking
    * - Portal and tooltip visibility
    */
+
+  // Add month width state
+  const [monthWidth, setMonthWidth] = useState<number>(300);
 
   // Add state for the selected date range
   const [dateRange, setDateRange] = useState<{ start: string | null; end: string | null }>({
@@ -69,7 +107,7 @@ const App: React.FC = () => {
     displayMode: "popup" as const,
     timezone: "UTC",
     visibleMonths: 2,
-    monthWidth: 300,
+    monthWidth,
     showMonthHeadings: true,
     baseFontSize: '1rem',
     selectionMode: "range" as const,
@@ -175,53 +213,56 @@ const App: React.FC = () => {
     };
   };
 
-  // Create settings for the second calendar with 3 months
-  const calendar2Settings = {
-    ...baseSettings,
-    visibleMonths: 3, // Second calendar shows 3 months
-    // Override the input style for the second calendar
-    inputStyle: {
-      width: '300px',
-      padding: '8px 10px',
-      border: '2px solid #28a745', // Green border
-      borderRadius: '8px',
-      fontSize: '1rem',
-      color: '#333333',
-      backgroundColor: '#f0fff0', // Light green background
-      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-      cursor: 'pointer',
-    }
-  };
-
-  // Create settings for the third calendar with default date range
-  const calendar3Settings = {
-    ...baseSettings,
-    displayMode: "popup" as const,
-    visibleMonths: 2, // Third calendar shows 2 months
-    isOpen: false,
-    // Set a default date range
-    defaultRange: {
-      start: '2024-01-01',
-      end: '2024-01-07'
-    },
-    // Override the input style for the third calendar
-    inputStyle: {
-      width: '300px',
-      padding: '8px 10px',
-      border: '2px solid #6f42c1', // Purple border
-      borderRadius: '8px',
-      fontSize: '1rem',
-      color: '#333333',
-      backgroundColor: '#f8f0ff', // Light purple background
-      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-      cursor: 'pointer',
-    }
+  // Update settings when month width changes
+  const handleMonthWidthChange = (width: number): void => {
+    setMonthWidth(width);
+    setBaseSettings(prev => ({
+      ...prev,
+      monthWidth: width
+    }));
   };
 
   // Memoize the factory functions to avoid recreating them on every render
   const layersFactory = useMemo(() => createLayersFactory(), []);
   const restrictionsFactory = useMemo(() => createRestrictionsFactory(), []);
   const restrictions2Factory = useMemo(() => createRestrictions2Factory(), []);
+
+  // Memoize calendar settings
+  const calendar2Settings = useMemo(() => ({
+    ...baseSettings,
+    visibleMonths: 3,
+    inputStyle: {
+      width: '300px',
+      padding: '8px 10px',
+      border: '2px solid #28a745',
+      borderRadius: '8px',
+      fontSize: '1rem',
+      color: '#333333',
+      backgroundColor: '#f0fff0',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+      cursor: 'pointer',
+    }
+  }), [baseSettings]);
+
+  const calendar3Settings = useMemo(() => ({
+    ...baseSettings,
+    visibleMonths: 2,
+    defaultRange: {
+      start: '2024-01-01',
+      end: '2024-01-07'
+    },
+    inputStyle: {
+      width: '300px',
+      padding: '8px 10px',
+      border: '2px solid #6f42c1',
+      borderRadius: '8px',
+      fontSize: '1rem',
+      color: '#333333',
+      backgroundColor: '#f8f0ff',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+      cursor: 'pointer',
+    }
+  }), [baseSettings]);
 
   return (
     <div style={{
@@ -231,6 +272,12 @@ const App: React.FC = () => {
       gap: '40px',
       textAlign: 'left'
     }}>
+      {/* Add month width control before dynamic positioning controls */}
+      <MonthWidthControl 
+        value={monthWidth}
+        onChange={handleMonthWidthChange}
+      />
+
       {/* Add dynamic positioning controls at the top */}
       <div style={{ 
         marginBottom: '20px', 
