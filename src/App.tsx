@@ -230,12 +230,11 @@ const App: React.FC = () => {
       showHeader: false,
       useDynamicPosition: false,
       startWeekOnSunday: true,
-      // Set a default date range
-      defaultRange: {
-        start: '2024-01-01',
-        end: '2024-01-07'
+      containerStyle: {
+        padding: '12px 0px 12px 0px',
+        boxShadow: 'none',
+        borderRadius: '0px',
       },
-      // Override the input style for the third calendar
     };
 
   // Memoize the factory functions to avoid recreating them on every render
