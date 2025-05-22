@@ -461,7 +461,7 @@ const MonthGrid: React.FC<MonthGridProps & { settings?: CalendarSettings }> = ({
       </div>
 
       {/* Portaled tooltip to body */}
-      {hoveredDate && restrictionConfig?.restrictions && document.hasFocus() && (
+      {hoveredDate && restrictionConfig?.restrictions && restrictionManager && document.hasFocus() && (
         (() => {
           // First check standard restriction result
           const result = restrictionManager.checkSelection(hoveredDate, hoveredDate);

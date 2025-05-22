@@ -227,14 +227,50 @@ const App: React.FC = () => {
       visibleMonths: 3, // Third calendar shows 2 months
       isOpen: true,
       showFooter: false,
-      showHeader: false,
+      showHeader: true,
       useDynamicPosition: false,
       startWeekOnSunday: true,
+      showLayersNavigation: false,
+      restrictionConfig: { restrictions: [] },
       containerStyle: {
         padding: '12px 0px 12px 0px',
         boxShadow: 'none',
         borderRadius: '0px',
       },
+      layers: [
+        {
+          name: 'Calendar',
+          title: 'Base Calendar',
+          description: 'Default calendar layer',
+          required: true,
+          visible: true,
+          data: {
+            background: []
+          }
+        },
+        {
+          name: 'January2025Highlight',
+          title: 'January 2025 Highlight',
+          description: 'Highlight January 2025',
+          required: false,
+          visible: true,
+          data: {
+            background: [
+              {
+                startDate: '2025-01-01',
+                endDate: '2025-03-03',
+                color: '#dfe3a3' // Light blue for January 2025
+              },
+              {
+                startDate: '2025-03-04',
+                endDate: '2025-04-04',
+                color: '#ccd727' // Light blue for January 2025
+              }
+            ]
+          }
+        }
+      ],
+      defaultLayer: 'Calendar',
     };
 
   // Memoize the factory functions to avoid recreating them on every render
@@ -404,8 +440,6 @@ const App: React.FC = () => {
             position: baseSettings.position
           }}
           _onSettingsChange={() => { }}
-          layersFactory={layersFactory}
-          restrictionConfigFactory={restrictionsFactory}
         />
       </div>
 
