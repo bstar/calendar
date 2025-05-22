@@ -220,6 +220,24 @@ const App: React.FC = () => {
     }
   };
 
+    // Create settings for the third calendar with default date range
+    const calendar4Settings = {
+      ...baseSettings,
+      displayMode: "embedded" as const,
+      visibleMonths: 3, // Third calendar shows 2 months
+      isOpen: true,
+      showFooter: false,
+      showHeader: false,
+      useDynamicPosition: false,
+      startWeekOnSunday: true,
+      // Set a default date range
+      defaultRange: {
+        start: '2024-01-01',
+        end: '2024-01-07'
+      },
+      // Override the input style for the third calendar
+    };
+
   // Memoize the factory functions to avoid recreating them on every render
   const layersFactory = useMemo(() => createLayersFactory(), []);
   const restrictionsFactory = useMemo(() => createRestrictionsFactory(), []);
@@ -372,6 +390,21 @@ const App: React.FC = () => {
           onSubmit={(start, end) => {
             setDateRange({ start, end });
           }}
+          layersFactory={layersFactory}
+          restrictionConfigFactory={restrictionsFactory}
+        />
+      </div>
+
+      {/* Calendar Instance 3 with default date range */}
+      <div style={{ position: 'relative', textAlign: 'left' }} className="cla-calendar-wrapper">
+        <h3 style={{ textAlign: 'left' }}>Embedded Calendar</h3>
+        <CLACalendar
+          settings={{
+            ...calendar4Settings,
+            useDynamicPosition,
+            position: baseSettings.position
+          }}
+          _onSettingsChange={() => { }}
           layersFactory={layersFactory}
           restrictionConfigFactory={restrictionsFactory}
         />

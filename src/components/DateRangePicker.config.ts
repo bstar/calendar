@@ -193,6 +193,16 @@ export interface CalendarSettings {
     orange?: string;
     pink?: string;
   };
+
+  /**
+   * Optional: custom className for the calendar input field (the field that toggles the calendar)
+   */
+  inputClassName?: string;
+
+  /**
+   * Optional: onChange handler for the calendar input field
+   */
+  inputOnChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 // Control Types for App.tsx

@@ -2022,15 +2022,18 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
           `}
         </style>
       )}
-      <input
-        ref={inputRef}
-        id={`${calendarIdRef.current}-input`}
-        type="text"
-        className={`cla-form-control cla-input-custom`}
-        readOnly
-        value={getDisplayText()}
-        onClick={handleInputClick}
-      />
+      {settings.displayMode !== 'embedded' && (
+        <input
+          ref={inputRef}
+          id={`${calendarIdRef.current}-input`}
+          type="text"
+          className={`cla-form-control cla-input-custom${settings.inputClassName ? ` ${settings.inputClassName}` : ''}`}
+          readOnly
+          value={getDisplayText()}
+          onClick={handleInputClick}
+          onChange={settings.inputOnChange}
+        />
+      )}
 
       {/* Only render the calendar when it's open */}
       {isOpen && (
