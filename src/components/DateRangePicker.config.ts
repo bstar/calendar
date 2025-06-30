@@ -203,6 +203,11 @@ export interface CalendarSettings {
    * Optional: onChange handler for the calendar input field
    */
   inputOnChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+
+  /**
+   * Whether to show the Start/End Date input fields in the header. Defaults to true.
+   */
+  showDateInputs?: boolean;
 }
 
 // Control Types for App.tsx

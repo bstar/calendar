@@ -1703,13 +1703,15 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
               margin: 0,
               padding: 0,
             }}>
-              <DateInputSection
-                selectedRange={selectedRange}
-                handleDateChange={handleDateChange}
-                dateInputContext={dateInputContext}
-                selectionMode={settings.selectionMode}
-                defaultRange={settings.defaultRange}
-              />
+              {settings.showDateInputs !== false && (
+                <DateInputSection
+                  selectedRange={selectedRange}
+                  handleDateChange={handleDateChange}
+                  dateInputContext={dateInputContext}
+                  selectionMode={settings.selectionMode}
+                  defaultRange={settings.defaultRange}
+                />
+              )}
             </div>
 
             <CalendarHeader

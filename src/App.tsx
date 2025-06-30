@@ -232,6 +232,7 @@ const App: React.FC = () => {
       startWeekOnSunday: true,
       showLayersNavigation: false,
       restrictionConfig: { restrictions: [] },
+      showDateInputs: false,
       containerStyle: {
         padding: '12px 0px 12px 0px',
         boxShadow: 'none',
@@ -255,6 +256,15 @@ const App: React.FC = () => {
           required: false,
           visible: true,
           data: {
+            events: [
+              {
+                date: new Date('2025-01-10').toISOString(),
+                title: "Custom Event",
+                description: "Custom text for this particular event",
+                type: "Notification",
+                time: ""
+              }
+            ],
             background: [
               {
                 startDate: '2025-01-01',
