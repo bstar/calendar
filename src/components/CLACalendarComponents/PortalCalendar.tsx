@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 import { CalendarPortal } from './CalendarPortal';
 import { registerCalendar } from './CalendarCoordinator';
-import { CalendarSettings } from '../DateRangePicker.config';
+import { CalendarSettings } from '../CLACalendar.config';
 import './CalendarPortal.css';
 
 // Simple counter for generating unique IDs
@@ -80,7 +80,7 @@ export const PortalCalendar: React.FC<PortalCalendarProps> = ({
       triggerRef={triggerRef}
       onClose={handleClose}
       portalStyle={{
-        maxWidth: `${settings.visibleMonths * settings.singleMonthWidth}px`,
+        maxWidth: `${settings.visibleMonths * settings.monthWidth}px`,
         width: 'auto'
       }}
     >

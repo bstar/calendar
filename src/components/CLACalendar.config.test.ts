@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { getDefaultSettings, DEFAULT_COLORS } from './DateRangePicker.config';
+import { getDefaultSettings, DEFAULT_COLORS } from './CLACalendar.config';
 
-describe('DateRangePicker Configuration', () => {
+describe('CLACalendar Configuration', () => {
   describe('getDefaultSettings', () => {
     it('should return default settings with correct structure', () => {
       const settings = getDefaultSettings();

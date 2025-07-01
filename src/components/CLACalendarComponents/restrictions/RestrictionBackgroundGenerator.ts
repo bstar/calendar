@@ -59,7 +59,7 @@
 import { parseISO, isWithinInterval } from '../../../utils/DateUtils';
 import { isValid } from 'date-fns';
 import { RestrictionConfig, BoundaryRestriction, DateRangeRestriction, RestrictedBoundaryRestriction, AllowedRangesRestriction } from './types';
-import { BackgroundData } from '../../DateRangePicker.config';
+import { BackgroundData } from '../../CLACalendar.config';
 
 export class RestrictionBackgroundGenerator {
   /**

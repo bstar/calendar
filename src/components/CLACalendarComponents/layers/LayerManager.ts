@@ -1,4 +1,4 @@
-import { Layer, LayerData, BackgroundData, EventData } from '../../DateRangePicker.config';
+import { Layer, LayerData, BackgroundData, EventData } from '../../CLACalendar.config';
 
 export class LayerManager {
   private layers: Layer[];

@@ -1,4 +1,4 @@
-import { Layer } from '../../DateRangePicker.config';
+import { Layer } from '../../CLACalendar.config';
 
 /**
  * Factory function to create calendar layers

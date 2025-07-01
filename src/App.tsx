@@ -3,15 +3,15 @@ import './bootstrap.min.css';
 import './docStyles.css';
 import './App.css';
 // Import defensive styles for the calendar widget
-import './components/DateRangePickerNew/defensive-styles.css';
+import './components/CLACalendarComponents/defensive-styles.css';
 import { CLACalendar } from './components/CLACalendar';
-import type { CalendarSettings, Layer } from './components/DateRangePicker.config';
-import { getDefaultSettings, DEFAULT_COLORS } from './components/DateRangePicker.config';
+import type { CalendarSettings, Layer } from './components/CLACalendar.config';
+import { getDefaultSettings, DEFAULT_COLORS } from './components/CLACalendar.config';
 import { addDays, format } from './utils/DateUtils';
 import { useRangeSelection } from './components/hooks';
-import { createLayersFactory } from './components/DateRangePickerNew/layers/LayerFactory';
-import type { RestrictionConfig } from './components/DateRangePickerNew/restrictions/types';
-import { RestrictionType, RestrictedBoundaryRestriction, BoundaryRestriction } from './components/DateRangePickerNew/restrictions/types';
+import { createLayersFactory } from './components/CLACalendarComponents/layers/LayerFactory';
+import type { RestrictionConfig } from './components/CLACalendarComponents/restrictions/types';
+import { RestrictionType, RestrictedBoundaryRestriction, BoundaryRestriction } from './components/CLACalendarComponents/restrictions/types';
 import isoWeeksData from './data/iso_weeks.json';
 import { subDays, formatISO } from 'date-fns';
 

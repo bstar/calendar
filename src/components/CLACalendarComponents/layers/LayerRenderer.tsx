@@ -33,7 +33,7 @@
  * Integration Points:
  * - Works with RestrictionManager for date validation
  * - Uses RestrictionBackgroundGenerator for visual styles
- * - Coordinates with DateRangePickerHandlers for user interactions
+ * - Coordinates with CLACalendarHandlers for user interactions
  * - Manages LayerControl for layer switching
  * 
  * Usage:

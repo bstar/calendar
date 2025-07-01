@@ -32,7 +32,7 @@ type UserSelectProperty = 'userSelect' | 'webkitUserSelect' | 'mozUserSelect' | 
 // Use NodeJS.Timeout for setInterval return type
 type IntervalID = ReturnType<typeof setInterval>;
 
-export class DateRangePickerHandlers {
+export class CLACalendarHandlers {
   /**
    * Handle date input changes
    */

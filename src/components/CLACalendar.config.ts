@@ -1,5 +1,8 @@
 import React, { CSSProperties } from 'react';
-import { RestrictionConfig } from './DateRangePickerNew/restrictions/types';
+import { RestrictionConfig } from './CLACalendarComponents/restrictions/types';
+
+// Re-export RestrictionConfig for external use
+export type { RestrictionConfig };
 
 export type LAYER_TYPES = 'base' | 'overlay';
 

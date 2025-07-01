@@ -77,13 +77,13 @@ export const eachDayOfInterval = (interval: { start: Date; end: Date }): Date[] 
 ## Usage
 
 ```jsx
-import { DateRangePicker } from 'cla-calendar';
+import { CLACalendar } from 'cla-calendar';
 
 function App() {
   const [dateRange, setDateRange] = useState({ start: null, end: null });
   
   return (
-    <DateRangePicker 
+    <CLACalendar 
       onChange={setDateRange} 
       value={dateRange}
     />

@@ -15,22 +15,22 @@ import {
 } from "../utils/DateUtils";
 import { CalendarErrorBoundary } from "./ErrorBoundary";
 
-import "./DateRangePicker.css";
-import "./DateRangePickerNew/CalendarComponents.css";
+import "./CLACalendar.css";
+import "./CLACalendarComponents/CalendarComponents.css";
 
-import { DateRangeSelectionManager, DateRange } from "./DateRangePickerNew/selection/DateRangeSelectionManager";
-import { DateRangePickerHandlers } from "./DateRangePickerNew/handlers/DateRangePickerHandlers";
-import { RestrictionBackgroundGenerator } from "./DateRangePickerNew/restrictions/RestrictionBackgroundGenerator";
-import { LayerManager } from "./DateRangePickerNew/layers/LayerManager";
+import { DateRangeSelectionManager, DateRange } from "./CLACalendarComponents/selection/DateRangeSelectionManager";
+import { CLACalendarHandlers } from "./CLACalendarComponents/handlers/CLACalendarHandlers";
+import { RestrictionBackgroundGenerator } from "./CLACalendarComponents/restrictions/RestrictionBackgroundGenerator";
+import { LayerManager } from "./CLACalendarComponents/layers/LayerManager";
 import {
   CalendarSettings,
   Layer,
   DEFAULT_COLORS,
   DEFAULT_CONTAINER_STYLES
-} from "./DateRangePicker.config";
-import { LayerRenderer } from './DateRangePickerNew/layers/LayerRenderer';
-import { RestrictionManager } from './DateRangePickerNew/restrictions/RestrictionManager';
-import { Notification } from './DateRangePickerNew/Notification';
+} from "./CLACalendar.config";
+import { LayerRenderer } from './CLACalendarComponents/layers/LayerRenderer';
+import { RestrictionManager } from './CLACalendarComponents/restrictions/RestrictionManager';
+import { Notification } from './CLACalendarComponents/Notification';
 import {
   CalendarHeader,
   DateInputSection,
@@ -42,12 +42,12 @@ import {
   MonthGridProps,
   CalendarGridProps,
   ValidationError as CalendarValidationError,
-} from './DateRangePickerNew/CalendarComponents';
+} from './CLACalendarComponents/CalendarComponents';
 // Comment out unused imports
 // import { CalendarPortal } from './DateRangePickerNew/CalendarPortal';
-import { registerCalendar } from './DateRangePickerNew/CalendarCoordinator';
-import './DateRangePickerNew/CalendarPortal.css';
-import { RestrictionConfig, RestrictedBoundaryRestriction } from './DateRangePickerNew/restrictions/types';
+import { registerCalendar } from './CLACalendarComponents/CalendarCoordinator';
+import './CLACalendarComponents/CalendarPortal.css';
+import { RestrictionConfig, RestrictedBoundaryRestriction } from './CLACalendarComponents/restrictions/types';
 
 // Font size utility function
 /**
@@ -1348,7 +1348,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       };
     }
 
-    return DateRangePickerHandlers.createMouseHandlers(
+    return CLACalendarHandlers.createMouseHandlers(
       containerRef,
       isSelecting,
       setOutOfBoundsDirection,
@@ -1368,7 +1368,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       };
     }
 
-    return DateRangePickerHandlers.createDocumentMouseHandlers(
+    return CLACalendarHandlers.createDocumentMouseHandlers(
       containerRef,
       isSelecting,
       outOfBoundsDirection,
@@ -1390,7 +1390,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       };
     }
 
-    return DateRangePickerHandlers.createDateChangeHandler(
+    return CLACalendarHandlers.createDateChangeHandler(
       selectedRange,
       dateInputContext,
       setSelectedRange,
@@ -1404,7 +1404,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
 
   // Format display text doesn't need the whole calendar to be initialized
   const getDisplayText = useMemo(() =>
-    DateRangePickerHandlers.createDisplayTextFormatter(
+    CLACalendarHandlers.createDisplayTextFormatter(
       displayRange,
       settings.selectionMode,
       settings.dateFormatter,
@@ -1422,7 +1422,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       };
     }
 
-    return DateRangePickerHandlers.createSelectionHandlers(
+    return CLACalendarHandlers.createSelectionHandlers(
       selectionManager,
       isSelecting,
       setIsSelecting,
@@ -1436,7 +1436,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
 
   // Use the abstracted calendar action handlers
   const { handleClear, handleSubmit: originalHandleSubmit, handleClickOutside, handleLayerChange } = useMemo(() =>
-    DateRangePickerHandlers.createCalendarActionHandlers(
+    CLACalendarHandlers.createCalendarActionHandlers(
       setSelectedRange,
       setDateInputContext,
       setIsSelecting,

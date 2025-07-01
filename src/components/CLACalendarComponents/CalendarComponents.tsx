@@ -6,9 +6,9 @@ import {
   isSameDay,
 } from '../../utils/DateUtils';
 import { DateRange } from './selection/DateRangeSelectionManager';
-import { DEFAULT_CONTAINER_STYLES } from '../DateRangePicker.config';
+import { DEFAULT_CONTAINER_STYLES } from '../CLACalendar.config';
 import { RestrictionConfig } from './restrictions/types';
-import { Layer } from '../DateRangePicker.config';
+import { Layer } from '../CLACalendar.config';
 import './CalendarComponents.css';
 
 // Button component

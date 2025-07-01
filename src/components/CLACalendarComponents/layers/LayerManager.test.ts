@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { LayerManager } from './LayerManager';
-import type { Layer, LayerData, EventData, BackgroundData } from '../../DateRangePicker.config';
+import type { Layer, LayerData, EventData, BackgroundData } from '../../CLACalendar.config';
 
 describe('LayerManager', () => {
   const createTestSetup = (initialLayers: Layer[] = []) => {

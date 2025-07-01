@@ -2,8 +2,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CLACalendar } from './CLACalendar';
-import { getDefaultSettings } from './DateRangePicker.config';
-import type { CalendarSettings, Layer, RestrictionConfig } from './DateRangePicker.config';
+import { getDefaultSettings } from './CLACalendar.config';
+import type { CalendarSettings, Layer, RestrictionConfig } from './CLACalendar.config';
 
 // Mock portal to avoid DOM complications in tests
 vi.mock('react-dom', async () => {
