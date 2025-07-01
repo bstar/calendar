@@ -2,26 +2,27 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 
 // We need to reset module state between tests by reimporting fresh instances
-let registerCalendar: any;
-let useCalendarCoordination: any;
 
 describe('CalendarCoordinator', () => {
-  beforeEach(async () => {
+  const createTestSetup = async () => {
     vi.clearAllMocks();
     vi.resetModules();
     
     // Fresh import to reset module state
     const module = await import('./CalendarCoordinator');
-    registerCalendar = module.registerCalendar;
-    useCalendarCoordination = module.useCalendarCoordination;
-  });
+    const registerCalendar = module.registerCalendar;
+    const useCalendarCoordination = module.useCalendarCoordination;
+    
+    return { registerCalendar, useCalendarCoordination };
+  };
 
   afterEach(() => {
     vi.clearAllMocks();
   });
 
   describe('registerCalendar Function', () => {
-    it('should register a calendar and return control methods', () => {
+    it('should register a calendar and return control methods', async () => {
+      const { registerCalendar } = await createTestSetup();
       const mockCallback = vi.fn();
       const calendar = registerCalendar('test-calendar', mockCallback);
       
@@ -32,7 +33,8 @@ describe('CalendarCoordinator', () => {
       expect(calendar.canOpen).toBeDefined();
     });
 
-    it('should initially allow calendar to open', () => {
+    it('should initially allow calendar to open', async () => {
+      const { registerCalendar } = await createTestSetup();
       const mockCallback = vi.fn();
       const calendar = registerCalendar('test-calendar', mockCallback);
       
@@ -40,7 +42,8 @@ describe('CalendarCoordinator', () => {
       expect(calendar.isActive()).toBe(false);
     });
 
-    it('should activate calendar when opened', () => {
+    it('should activate calendar when opened', async () => {
+      const { registerCalendar } = await createTestSetup();
       const mockCallback = vi.fn();
       const calendar = registerCalendar('test-calendar', mockCallback);
       
@@ -50,7 +53,8 @@ describe('CalendarCoordinator', () => {
       expect(calendar.canOpen()).toBe(true);
     });
 
-    it('should close calendar when close is called', () => {
+    it('should close calendar when close is called', async () => {
+      const { registerCalendar } = await createTestSetup();
       const mockCallback = vi.fn();
       const calendar = registerCalendar('test-calendar', mockCallback);
       
@@ -61,7 +65,8 @@ describe('CalendarCoordinator', () => {
       expect(calendar.isActive()).toBe(false);
     });
 
-    it('should close other calendars when opening a new one', () => {
+    it('should close other calendars when opening a new one', async () => {
+      const { registerCalendar } = await createTestSetup();
       const mockCallback1 = vi.fn();
       const mockCallback2 = vi.fn();
       
@@ -82,7 +87,8 @@ describe('CalendarCoordinator', () => {
       expect(mockCallback1).toHaveBeenCalled();
     });
 
-    it('should handle unregistration correctly', () => {
+    it('should handle unregistration correctly', async () => {
+      const { registerCalendar } = await createTestSetup();
       const mockCallback = vi.fn();
       const calendar = registerCalendar('test-calendar', mockCallback);
       
@@ -93,7 +99,8 @@ describe('CalendarCoordinator', () => {
       expect(calendar.isActive()).toBe(false);
     });
 
-    it('should prevent opening when another calendar is active', () => {
+    it('should prevent opening when another calendar is active', async () => {
+      const { registerCalendar } = await createTestSetup();
       const mockCallback1 = vi.fn();
       const mockCallback2 = vi.fn();
       
@@ -106,7 +113,8 @@ describe('CalendarCoordinator', () => {
       expect(calendar2.canOpen()).toBe(false);
     });
 
-    it('should handle multiple calendars coordination', () => {
+    it('should handle multiple calendars coordination', async () => {
+      const { registerCalendar } = await createTestSetup();
       const calendars = [];
       const callbacks = [];
       
@@ -134,7 +142,8 @@ describe('CalendarCoordinator', () => {
       expect(calendars[2].isActive()).toBe(false);
     });
 
-    it('should handle rapid switching between calendars', () => {
+    it('should handle rapid switching between calendars', async () => {
+      const { registerCalendar } = await createTestSetup();
       const mockCallback1 = vi.fn();
       const mockCallback2 = vi.fn();
       const mockCallback3 = vi.fn();
@@ -162,7 +171,8 @@ describe('CalendarCoordinator', () => {
   });
 
   describe('useCalendarCoordination Hook', () => {
-    it('should provide coordination functions', () => {
+    it('should provide coordination functions', async () => {
+      const { useCalendarCoordination } = await createTestSetup();
       const { result } = renderHook(() => useCalendarCoordination('test-calendar'));
       
       expect(result.current.register).toBeDefined();
@@ -170,7 +180,8 @@ describe('CalendarCoordinator', () => {
       expect(result.current.getActiveCalendarId).toBeDefined();
     });
 
-    it('should register calendar and track state', () => {
+    it('should register calendar and track state', async () => {
+      const { useCalendarCoordination } = await createTestSetup();
       const { result } = renderHook(() => useCalendarCoordination('test-calendar'));
       
       // Initially no calendar should be active
@@ -188,7 +199,8 @@ describe('CalendarCoordinator', () => {
       expect(result.current.getActiveCalendarId()).toBe('test-calendar');
     });
 
-    it('should track state across multiple hook instances', () => {
+    it('should track state across multiple hook instances', async () => {
+      const { useCalendarCoordination } = await createTestSetup();
       const { result: result1 } = renderHook(() => useCalendarCoordination('calendar-1'));
       const { result: result2 } = renderHook(() => useCalendarCoordination('calendar-2'));
       
@@ -217,7 +229,8 @@ describe('CalendarCoordinator', () => {
       expect(result2.current.getActiveCalendarId()).toBe('calendar-2');
     });
 
-    it('should provide consistent function behavior', () => {
+    it('should provide consistent function behavior', async () => {
+      const { useCalendarCoordination } = await createTestSetup();
       const { result, rerender } = renderHook(() => useCalendarCoordination('test-calendar'));
       
       // Functions should be defined and work consistently
@@ -235,7 +248,8 @@ describe('CalendarCoordinator', () => {
   });
 
   describe('Integration Tests', () => {
-    it('should coordinate between function and hook usage', () => {
+    it('should coordinate between function and hook usage', async () => {
+      const { registerCalendar, useCalendarCoordination } = await createTestSetup();
       // Use function-based registration
       const directCallback = vi.fn();
       const directCalendar = registerCalendar('direct-calendar', directCallback);
@@ -261,7 +275,8 @@ describe('CalendarCoordinator', () => {
       expect(directCallback).toHaveBeenCalled();
     });
 
-    it('should handle calendar lifecycle properly', () => {
+    it('should handle calendar lifecycle properly', async () => {
+      const { registerCalendar } = await createTestSetup();
       const mockCallback1 = vi.fn();
       const mockCallback2 = vi.fn();
       
@@ -284,7 +299,8 @@ describe('CalendarCoordinator', () => {
   });
 
   describe('Edge Cases', () => {
-    it('should handle opening already active calendar', () => {
+    it('should handle opening already active calendar', async () => {
+      const { registerCalendar } = await createTestSetup();
       const mockCallback = vi.fn();
       const calendar = registerCalendar('test-calendar', mockCallback);
       
@@ -296,7 +312,8 @@ describe('CalendarCoordinator', () => {
       expect(calendar.isActive()).toBe(true);
     });
 
-    it('should handle closing inactive calendar', () => {
+    it('should handle closing inactive calendar', async () => {
+      const { registerCalendar } = await createTestSetup();
       const mockCallback = vi.fn();
       const calendar = registerCalendar('test-calendar', mockCallback);
       
@@ -309,7 +326,8 @@ describe('CalendarCoordinator', () => {
       expect(calendar.isActive()).toBe(false);
     });
 
-    it('should handle unregistering inactive calendar', () => {
+    it('should handle unregistering inactive calendar', async () => {
+      const { registerCalendar } = await createTestSetup();
       const mockCallback = vi.fn();
       const calendar = registerCalendar('test-calendar', mockCallback);
       
@@ -320,7 +338,8 @@ describe('CalendarCoordinator', () => {
       expect(calendar.isActive()).toBe(false);
     });
 
-    it('should handle callback errors by propagating them', () => {
+    it('should handle callback errors by propagating them', async () => {
+      const { registerCalendar } = await createTestSetup();
       const faultyCallback = vi.fn(() => {
         throw new Error('Callback error');
       });
@@ -339,7 +358,8 @@ describe('CalendarCoordinator', () => {
       }).toThrow('Callback error');
     });
 
-    it('should handle same ID registration multiple times', () => {
+    it('should handle same ID registration multiple times', async () => {
+      const { registerCalendar } = await createTestSetup();
       const callback1 = vi.fn();
       const callback2 = vi.fn();
       
@@ -357,7 +377,8 @@ describe('CalendarCoordinator', () => {
   });
 
   describe('Performance', () => {
-    it('should handle many calendar registrations efficiently', () => {
+    it('should handle many calendar registrations efficiently', async () => {
+      const { registerCalendar } = await createTestSetup();
       const calendars = [];
       const startTime = performance.now();
       

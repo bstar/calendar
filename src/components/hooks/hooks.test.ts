@@ -321,17 +321,16 @@ describe('Custom Calendar Hooks', () => {
   });
 
   describe('useMouseTracking', () => {
-    let mockContainerRef: { current: HTMLElement | null };
-    let mockCanChangeMonth: ReturnType<typeof vi.fn>;
-    let mockMoveToMonth: ReturnType<typeof vi.fn>;
-
-    beforeEach(() => {
-      mockContainerRef = { current: document.createElement('div') };
-      mockCanChangeMonth = vi.fn(() => true);
-      mockMoveToMonth = vi.fn();
-    });
+    const createMouseTrackingSetup = () => {
+      const mockContainerRef = { current: document.createElement('div') };
+      const mockCanChangeMonth = vi.fn(() => true);
+      const mockMoveToMonth = vi.fn();
+      
+      return { mockContainerRef, mockCanChangeMonth, mockMoveToMonth };
+    };
 
     it('should initialize with proper handlers', () => {
+      const { mockContainerRef, mockCanChangeMonth, mockMoveToMonth } = createMouseTrackingSetup();
       const { result } = renderHook(() => 
         useMouseTracking(mockContainerRef, false, mockCanChangeMonth, mockMoveToMonth)
       );
@@ -342,6 +341,7 @@ describe('Custom Calendar Hooks', () => {
     });
 
     it('should not track mouse when not selecting', () => {
+      const { mockContainerRef, mockCanChangeMonth, mockMoveToMonth } = createMouseTrackingSetup();
       const { result } = renderHook(() => 
         useMouseTracking(mockContainerRef, false, mockCanChangeMonth, mockMoveToMonth)
       );
@@ -360,6 +360,7 @@ describe('Custom Calendar Hooks', () => {
     });
 
     it('should handle mouse down by preventing text selection', () => {
+      const { mockContainerRef, mockCanChangeMonth, mockMoveToMonth } = createMouseTrackingSetup();
       const { result } = renderHook(() => 
         useMouseTracking(mockContainerRef, false, mockCanChangeMonth, mockMoveToMonth)
       );
@@ -376,6 +377,7 @@ describe('Custom Calendar Hooks', () => {
     });
 
     it('should handle mouse up by restoring text selection', () => {
+      const { mockContainerRef, mockCanChangeMonth, mockMoveToMonth } = createMouseTrackingSetup();
       const { result } = renderHook(() => 
         useMouseTracking(mockContainerRef, true, mockCanChangeMonth, mockMoveToMonth)
       );
@@ -394,6 +396,7 @@ describe('Custom Calendar Hooks', () => {
     });
 
     it('should handle missing container ref gracefully', () => {
+      const { mockCanChangeMonth, mockMoveToMonth } = createMouseTrackingSetup();
       const emptyRef = { current: null };
       
       const { result } = renderHook(() => 
@@ -415,6 +418,7 @@ describe('Custom Calendar Hooks', () => {
     });
 
     it('should provide stable callback functions', () => {
+      const { mockContainerRef, mockCanChangeMonth, mockMoveToMonth } = createMouseTrackingSetup();
       const { result, rerender } = renderHook(() => 
         useMouseTracking(mockContainerRef, false, mockCanChangeMonth, mockMoveToMonth)
       );

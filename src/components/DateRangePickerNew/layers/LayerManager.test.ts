@@ -3,7 +3,10 @@ import { LayerManager } from './LayerManager';
 import type { Layer, LayerData, EventData, BackgroundData } from '../../DateRangePicker.config';
 
 describe('LayerManager', () => {
-  let manager: LayerManager;
+  const createTestSetup = (initialLayers: Layer[] = []) => {
+    const manager = new LayerManager(initialLayers);
+    return { manager };
+  };
 
   const sampleLayers: Layer[] = [
     {
@@ -71,17 +74,14 @@ describe('LayerManager', () => {
     }
   ];
 
-  beforeEach(() => {
-    manager = new LayerManager([]);
-  });
-
   describe('Initialization', () => {
     it('should initialize with empty layers', () => {
+      const { manager } = createTestSetup();
       expect(manager.getLayers()).toHaveLength(0);
     });
 
     it('should initialize with provided layers', () => {
-      manager = new LayerManager(sampleLayers);
+      const { manager } = createTestSetup(sampleLayers);
       expect(manager.getLayers()).toHaveLength(3);
       expect(manager.getLayers()).toEqual(sampleLayers);
     });
@@ -89,6 +89,7 @@ describe('LayerManager', () => {
 
   describe('Layer Management', () => {
     it('should add a new layer', () => {
+      const { manager } = createTestSetup();
       const newLayer: Layer = {
         name: 'reminders',
         title: 'Reminders',
@@ -103,7 +104,7 @@ describe('LayerManager', () => {
     });
 
     it('should add layer even with duplicate names', () => {
-      manager = new LayerManager(sampleLayers);
+      const { manager } = createTestSetup(sampleLayers);
       
       const duplicateLayer: Layer = {
         name: 'holidays',
@@ -118,7 +119,7 @@ describe('LayerManager', () => {
     });
 
     it('should remove a layer', () => {
-      manager = new LayerManager(sampleLayers);
+      const { manager } = createTestSetup(sampleLayers);
       
       const result = manager.removeLayer('meetings');
       expect(result).toBe(true);
@@ -127,7 +128,7 @@ describe('LayerManager', () => {
     });
 
     it('should not remove required layers', () => {
-      manager = new LayerManager(sampleLayers);
+      const { manager } = createTestSetup(sampleLayers);
       
       const result = manager.removeLayer('holidays');
       expect(result).toBe(false);
@@ -136,7 +137,7 @@ describe('LayerManager', () => {
     });
 
     it('should handle removal of non-existent layer', () => {
-      manager = new LayerManager(sampleLayers);
+      const { manager } = createTestSetup(sampleLayers);
       
       const result = manager.removeLayer('nonexistent');
       expect(result).toBe(false);
@@ -144,7 +145,7 @@ describe('LayerManager', () => {
     });
 
     it('should update layer properties', () => {
-      manager = new LayerManager(sampleLayers);
+      const { manager } = createTestSetup(sampleLayers);
       
       const updates = {
         title: 'Updated Meetings',
@@ -163,12 +164,13 @@ describe('LayerManager', () => {
     });
 
     it('should handle updating non-existent layer', () => {
+      const { manager } = createTestSetup();
       const result = manager.updateLayer('nonexistent', { title: 'New Title' });
       expect(result).toBe(false);
     });
 
     it('should get layer by name', () => {
-      manager = new LayerManager(sampleLayers);
+      const { manager } = createTestSetup(sampleLayers);
       
       const layer = manager.getLayer('holidays');
       expect(layer).toBeDefined();
@@ -177,17 +179,15 @@ describe('LayerManager', () => {
     });
 
     it('should return undefined for non-existent layer', () => {
+      const { manager } = createTestSetup();
       const layer = manager.getLayer('nonexistent');
       expect(layer).toBeUndefined();
     });
   });
 
   describe('Layer Data Management', () => {
-    beforeEach(() => {
-      manager = new LayerManager(sampleLayers);
-    });
-
     it('should update layer data', () => {
+      const { manager } = createTestSetup(sampleLayers);
       const newData: LayerData = {
         events: [
           {
@@ -208,12 +208,14 @@ describe('LayerManager', () => {
     });
 
     it('should handle updating data for non-existent layer', () => {
+      const { manager } = createTestSetup(sampleLayers);
       const newData: LayerData = { events: [] };
       const result = manager.updateLayerData('nonexistent', newData);
       expect(result).toBe(false);
     });
 
     it('should add background data to existing layer', () => {
+      const { manager } = createTestSetup(sampleLayers);
       const newBackgroundData: BackgroundData[] = [
         {
           startDate: '2025-06-01',
@@ -230,6 +232,7 @@ describe('LayerManager', () => {
     });
 
     it('should set background data replacing existing', () => {
+      const { manager } = createTestSetup(sampleLayers);
       const newBackgroundData: BackgroundData[] = [
         {
           startDate: '2025-06-01',
@@ -247,6 +250,7 @@ describe('LayerManager', () => {
     });
 
     it('should add event data to existing layer', () => {
+      const { manager } = createTestSetup(sampleLayers);
       const newEventData: EventData[] = [
         {
           date: '2025-07-04',
@@ -265,6 +269,7 @@ describe('LayerManager', () => {
     });
 
     it('should handle adding data to layer without existing data', () => {
+      const { manager } = createTestSetup(sampleLayers);
       const eventData: EventData[] = [
         {
           date: '2025-06-20',
@@ -283,6 +288,7 @@ describe('LayerManager', () => {
     });
 
     it('should handle adding data to non-existent layer', () => {
+      const { manager } = createTestSetup(sampleLayers);
       const eventData: EventData[] = [
         {
           date: '2025-06-20',
@@ -300,6 +306,7 @@ describe('LayerManager', () => {
 
   describe('Edge Cases', () => {
     it('should handle layers without data', () => {
+      const { manager } = createTestSetup();
       const layerWithoutData: Layer = {
         name: 'empty',
         title: 'Empty Layer',
@@ -314,6 +321,7 @@ describe('LayerManager', () => {
     });
 
     it('should handle layers with empty data arrays', () => {
+      const { manager } = createTestSetup();
       const layerWithEmptyData: Layer = {
         name: 'empty-data',
         title: 'Empty Data Layer',
@@ -334,7 +342,7 @@ describe('LayerManager', () => {
     });
 
     it('should handle partial data updates', () => {
-      manager = new LayerManager(sampleLayers);
+      const { manager } = createTestSetup(sampleLayers);
       
       const partialData: Partial<LayerData> = {
         events: [
@@ -385,7 +393,7 @@ describe('LayerManager', () => {
 
       const startTime = performance.now();
       
-      manager = new LayerManager(largeLayers);
+      const { manager } = createTestSetup(largeLayers);
       const layers = manager.getLayers();
       const specificLayer = manager.getLayer('layer-50');
       

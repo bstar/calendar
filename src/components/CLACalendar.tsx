@@ -13,6 +13,7 @@ import {
   isWithinInterval,
   parseISO,
 } from "../utils/DateUtils";
+import { CalendarErrorBoundary } from "./ErrorBoundary";
 
 import "./DateRangePicker.css";
 import "./DateRangePickerNew/CalendarComponents.css";
@@ -2009,102 +2010,121 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   }, [isOpen, measuredHeight, settings.visibleMonths, settings.monthWidth, getBestPosition, settings.position, settings.useDynamicPosition]);
 
   return (
-    <div
-      className="cla-calendar-wrapper"
-      data-open={isOpen ? "true" : "false"}
+    <CalendarErrorBoundary
+      componentName="CLACalendar"
+      onError={(error, errorInfo, errorId) => {
+        // Custom error handling - you can send to your error tracking service
+        console.error(`Calendar Error [${errorId}]:`, error, errorInfo);
+        
+        // Optional: Report to external service
+        // Example: Sentry, LogRocket, Bugsnag, etc.
+        /*
+        if (window.Sentry) {
+          window.Sentry.captureException(error, {
+            tags: { component: 'CLACalendar', errorId },
+            extra: { errorInfo, settings }
+          });
+        }
+        */
+      }}
     >
-      {settings.inputStyle && (
-        <style>
-          {`
-          #${calendarIdRef.current}-input {
-            ${Object.entries(settings.inputStyle).map(([key, value]) =>
-            `${key}: ${value} !important;`
-          ).join('\n            ')}
-          }
-          `}
-        </style>
-      )}
-      {settings.displayMode !== 'embedded' && (
-        <input
-          ref={inputRef}
-          id={`${calendarIdRef.current}-input`}
-          type="text"
-          className={`cla-form-control cla-input-custom${settings.inputClassName ? ` ${settings.inputClassName}` : ''}`}
-          readOnly
-          value={getDisplayText()}
-          onClick={handleInputClick}
-          onChange={settings.inputOnChange}
-        />
-      )}
+      <div
+        className="cla-calendar-wrapper"
+        data-open={isOpen ? "true" : "false"}
+      >
+        {settings.inputStyle && (
+          <style>
+            {`
+            #${calendarIdRef.current}-input {
+              ${Object.entries(settings.inputStyle).map(([key, value]) =>
+              `${key}: ${value} !important;`
+            ).join('\n            ')}
+            }
+            `}
+          </style>
+        )}
+        {settings.displayMode !== 'embedded' && (
+          <input
+            ref={inputRef}
+            id={`${calendarIdRef.current}-input`}
+            type="text"
+            className={`cla-form-control cla-input-custom${settings.inputClassName ? ` ${settings.inputClassName}` : ''}`}
+            readOnly
+            value={getDisplayText()}
+            onClick={handleInputClick}
+            onChange={settings.inputOnChange}
+          />
+        )}
 
-      {/* Only render the calendar when it's open */}
-      {isOpen && (
-        settings.displayMode === 'embedded' ? (
-          <CalendarContainer
-            isOpen={isOpen}
-            displayMode={settings.displayMode}
-            containerRef={containerRef}
-            containerStyle={settings.containerStyle}
-            visibleMonths={settings.visibleMonths}
-            monthWidth={settings.monthWidth}
-            enableOutOfBoundsScroll={settings.enableOutOfBoundsScroll}
-            handleMouseDown={handleMouseDown}
-            handleMouseMove={handleMouseMove}
-            handleMouseLeave={handleMouseLeave}
-          >
-            {renderCalendarContent()}
-          </CalendarContainer>
-        ) : (
-          ReactDOM.createPortal(
-            <div
-              className="cla-calendar-portal"
-              style={{
-                position: 'fixed',
-                zIndex: 2147483647,
-                ...calendarPosition,
-                width: `${settings.visibleMonths * settings.monthWidth + ((settings.visibleMonths - 1) * 10)}px`,
-                display: isReady ? 'block' : 'none',
-                pointerEvents: isReady ? 'auto' : 'none'
-              }}
-              onMouseDown={(e) => {
-                e.stopPropagation();
-                if (settings.enableOutOfBoundsScroll) {
-                  handleMouseDown(e);
-                }
-              }}
-              onClick={(e) => e.stopPropagation()}
+        {/* Only render the calendar when it's open */}
+        {isOpen && (
+          settings.displayMode === 'embedded' ? (
+            <CalendarContainer
+              isOpen={isOpen}
+              displayMode={settings.displayMode}
+              containerRef={containerRef}
+              containerStyle={settings.containerStyle}
+              visibleMonths={settings.visibleMonths}
+              monthWidth={settings.monthWidth}
+              enableOutOfBoundsScroll={settings.enableOutOfBoundsScroll}
+              handleMouseDown={handleMouseDown}
+              handleMouseMove={handleMouseMove}
+              handleMouseLeave={handleMouseLeave}
             >
+              {renderCalendarContent()}
+            </CalendarContainer>
+          ) : (
+            ReactDOM.createPortal(
               <div
-                ref={calendarRef}
-                className="cla-card"
+                className="cla-calendar-portal"
                 style={{
-                  width: `${settings.visibleMonths * settings.monthWidth + ((settings.visibleMonths - 1) * 16)}px`,
-                  ...DEFAULT_CONTAINER_STYLES,
-                  ...settings.containerStyle,
-                  visibility: isReady ? 'visible' : 'hidden'
+                  position: 'fixed',
+                  zIndex: 2147483647,
+                  ...calendarPosition,
+                  width: `${settings.visibleMonths * settings.monthWidth + ((settings.visibleMonths - 1) * 10)}px`,
+                  display: isReady ? 'block' : 'none',
+                  pointerEvents: isReady ? 'auto' : 'none'
                 }}
+                onMouseDown={(e) => {
+                  e.stopPropagation();
+                  if (settings.enableOutOfBoundsScroll) {
+                    handleMouseDown(e);
+                  }
+                }}
+                onClick={(e) => e.stopPropagation()}
               >
                 <div
-                  ref={containerRef}
-                  style={{ width: '100%', height: '100%' }}
-                  onMouseDown={(e) => {
-                    e.stopPropagation();
-                    if (settings.enableOutOfBoundsScroll) {
-                      handleMouseDown(e);
-                    }
+                  ref={calendarRef}
+                  className="cla-card"
+                  style={{
+                    width: `${settings.visibleMonths * settings.monthWidth + ((settings.visibleMonths - 1) * 16)}px`,
+                    ...DEFAULT_CONTAINER_STYLES,
+                    ...settings.containerStyle,
+                    visibility: isReady ? 'visible' : 'hidden'
                   }}
-                  onMouseMove={settings.enableOutOfBoundsScroll ? handleMouseMove : undefined}
-                  onMouseLeave={settings.enableOutOfBoundsScroll ? handleMouseLeave : undefined}
                 >
-                  {renderCalendarContent()}
+                  <div
+                    ref={containerRef}
+                    style={{ width: '100%', height: '100%' }}
+                    onMouseDown={(e) => {
+                      e.stopPropagation();
+                      if (settings.enableOutOfBoundsScroll) {
+                        handleMouseDown(e);
+                      }
+                    }}
+                    onMouseMove={settings.enableOutOfBoundsScroll ? handleMouseMove : undefined}
+                    onMouseLeave={settings.enableOutOfBoundsScroll ? handleMouseLeave : undefined}
+                  >
+                    {renderCalendarContent()}
+                  </div>
                 </div>
-              </div>
-            </div>,
-            document.body
+              </div>,
+              document.body
+            )
           )
-        )
-      )}
-    </div>
+        )}
+      </div>
+    </CalendarErrorBoundary>
   );
 };
 
