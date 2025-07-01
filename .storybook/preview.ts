@@ -1,0 +1,62 @@
+import type { Preview } from '@storybook/react';
+import '../src/index.css';
+import '../src/components/CLACalendar.css';
+import '../src/components/CLACalendarComponents/CalendarComponents.css';
+import '../src/components/CLACalendarComponents/defensive-styles.css';
+
+const preview: Preview = {
+  parameters: {
+    layout: 'padded',
+    actions: { argTypesRegex: '^on[A-Z].*' },
+    controls: {
+      matchers: {
+        color: /(background|color)$/i,
+        date: /Date$/,
+      },
+    },
+    docs: {
+      description: {
+        component: 'CLACalendar is a flexible date range picker component for React with drag selection support.',
+      },
+    },
+  },
+  argTypes: {
+    // Common calendar settings
+    displayMode: {
+      control: { type: 'select' },
+      options: ['embedded', 'popup'],
+      description: 'How the calendar should be displayed',
+    },
+    visibleMonths: {
+      control: { type: 'range', min: 1, max: 6 },
+      description: 'Number of months to display',
+    },
+    selectionMode: {
+      control: { type: 'select' },
+      options: ['single', 'range'],
+      description: 'Calendar selection mode',
+    },
+    startWeekOnSunday: {
+      control: 'boolean',
+      description: 'Whether to start the week on Sunday (vs Monday)',
+    },
+    showSubmitButton: {
+      control: 'boolean',
+      description: 'Whether to show the submit button',
+    },
+    showTooltips: {
+      control: 'boolean',
+      description: 'Whether to show tooltips on calendar items',
+    },
+    showHeader: {
+      control: 'boolean',
+      description: 'Whether to show the calendar header',
+    },
+    showFooter: {
+      control: 'boolean',
+      description: 'Whether to show the calendar footer',
+    },
+  },
+};
+
+export default preview;

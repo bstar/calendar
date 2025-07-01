@@ -4,6 +4,60 @@ import { RestrictionConfig } from './CLACalendarComponents/restrictions/types';
 // Re-export RestrictionConfig for external use
 export type { RestrictionConfig };
 
+// Simple configuration interface for basic use cases
+export interface SimpleCalendarSettings {
+  /** How the calendar should be displayed */
+  displayMode?: 'popup' | 'embedded';
+  
+  /** Number of months to show (1-6) */
+  visibleMonths?: number;
+  
+  /** Calendar selection mode */
+  selectionMode?: 'single' | 'range';
+  
+  /** Default date range to initialize with */
+  defaultRange?: { start?: string; end?: string };
+  
+  /** Callback when user submits a date selection */
+  onSubmit?: (startDate: string | null, endDate: string | null) => void;
+  
+  /** Custom date formatter function */
+  dateFormatter?: (date: Date) => string;
+  
+  /** Whether to show the submit button */
+  showSubmitButton?: boolean;
+  
+  /** Whether to start the week on Sunday (vs Monday) */
+  startWeekOnSunday?: boolean;
+  
+  /** Custom CSS class for the input field */
+  inputClassName?: string;
+  
+  /** Custom styles for the calendar container */
+  containerStyle?: React.CSSProperties;
+  
+  /** Custom styles for the input field */
+  inputStyle?: React.CSSProperties;
+  
+  /** Color theme overrides */
+  colors?: Partial<{
+    primary: string;
+    success: string;
+    warning: string;
+    danger: string;
+    purple: string;
+    teal: string;
+    orange: string;
+    pink: string;
+  }>;
+  
+  /** Event layers to display on the calendar */
+  layers?: Layer[];
+  
+  /** Date restrictions configuration */
+  restrictions?: RestrictionConfig;
+}
+
 export type LAYER_TYPES = 'base' | 'overlay';
 
 interface _LayerFeature {
@@ -149,40 +203,40 @@ export interface BackgroundData {
   color: string;
 }
 
-// Calendar Settings Types
+// Full calendar settings interface (advanced use cases)
 export interface CalendarSettings {
-  // Core Settings
-  displayMode: 'popup' | 'embedded';
-  timezone: string;
+  // Core Settings - now mostly optional with smart defaults
+  displayMode?: 'popup' | 'embedded';
+  timezone?: string;
   containerStyle?: CSSProperties;
   inputStyle?: React.CSSProperties;
   isOpen?: boolean;
-  visibleMonths: number;
-  monthWidth: number; // Width of each month in pixels
-  showMonthHeadings: boolean;
+  visibleMonths?: number;
+  monthWidth?: number; // Width of each month in pixels
+  showMonthHeadings?: boolean;
   baseFontSize?: string; // Base font size for the calendar (e.g. '1rem', '16px')
   position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left'; // Position of the calendar relative to input
   useDynamicPosition?: boolean; // Whether to use dynamic positioning with fallback to position
   
-  // Feature Settings
-  selectionMode: 'single' | 'range';
-  showTooltips: boolean;
-  showHeader: boolean;
-  closeOnClickAway: boolean;
-  showSubmitButton: boolean;
-  showFooter: boolean;
-  enableOutOfBoundsScroll: boolean;
-  suppressTooltipsOnSelection: boolean;
-  showSelectionAlert: boolean;
-  startWeekOnSunday: boolean;
+  // Feature Settings - now optional with smart defaults
+  selectionMode?: 'single' | 'range';
+  showTooltips?: boolean;
+  showHeader?: boolean;
+  closeOnClickAway?: boolean;
+  showSubmitButton?: boolean;
+  showFooter?: boolean;
+  enableOutOfBoundsScroll?: boolean;
+  suppressTooltipsOnSelection?: boolean;
+  showSelectionAlert?: boolean;
+  startWeekOnSunday?: boolean;
   dateFormatter?: (date: Date) => string; // Custom date formatter function
   dateRangeSeparator?: string; // Custom separator for date ranges (default is " - ")
   defaultRange?: { start: string; end: string }; // Default date range to initialize with
   
-  // Layer Settings
-  layers: Layer[];
-  showLayersNavigation: boolean;
-  defaultLayer: string;
+  // Layer Settings - now optional with smart defaults
+  layers?: Layer[];
+  showLayersNavigation?: boolean;
+  defaultLayer?: string;
   restrictionConfig?: RestrictionConfig;
   
   // Color Settings
@@ -265,13 +319,14 @@ export const DEFAULT_CONTAINER_STYLES: CSSProperties = {
 // Empty default layers - actual data should be provided by the implementing application
 export const DEFAULT_LAYERS: Layer[] = [];
 
-export const getDefaultSettings = (): CalendarSettings => ({
-  displayMode: 'embedded',
+// Core default values that are always safe
+const CORE_DEFAULTS = {
+  displayMode: 'embedded' as const,
   timezone: 'UTC',
   visibleMonths: 2,
   monthWidth: 500,
   showMonthHeadings: true,
-  selectionMode: 'range',
+  selectionMode: 'range' as const,
   showTooltips: true,
   showHeader: true,
   closeOnClickAway: true,
@@ -281,21 +336,194 @@ export const getDefaultSettings = (): CalendarSettings => ({
   suppressTooltipsOnSelection: false,
   showSelectionAlert: false,
   startWeekOnSunday: false,
-  dateFormatter: undefined,
   dateRangeSeparator: " - ",
-  defaultRange: undefined,
   layers: DEFAULT_LAYERS,
-  showLayersNavigation: true,
+  showLayersNavigation: false, // Changed to false for simpler default
   defaultLayer: '',
   colors: DEFAULT_COLORS
-});
-
-// Update layer validation to ensure at least one layer
-export const validateLayers = (layers: Layer[]): boolean => {
-  return layers.length >= 1 && layers.some(layer => layer.required);
 };
 
-// Update SETTINGS to remove type distinction
+/**
+ * Get legacy default settings (for backward compatibility)
+ * @deprecated Use createCalendarSettings() for new implementations
+ */
+export const getDefaultSettings = (): CalendarSettings => ({ ...CORE_DEFAULTS });
+
+/**
+ * Create a safe, complete CalendarSettings object from partial settings
+ * Handles null/undefined values gracefully with intelligent defaults
+ */
+export function createCalendarSettings(userSettings: Partial<CalendarSettings> = {}): CalendarSettings {
+  // Handle null/undefined userSettings
+  const safeUserSettings = userSettings || {};
+  
+  // Create base settings with null-safe merging
+  const settings: CalendarSettings = {
+    ...CORE_DEFAULTS,
+    // Safely merge user settings, filtering out null/undefined values
+    ...Object.fromEntries(
+      Object.entries(safeUserSettings).filter(([_, value]) => value !== null && value !== undefined)
+    ),
+  };
+  
+  // Ensure arrays are never null/undefined and provide default layer if empty
+  if (!Array.isArray(settings.layers) || settings.layers.length === 0) {
+    settings.layers = [{
+      name: 'Calendar',
+      title: 'Base Calendar',
+      description: 'Default calendar layer',
+      required: true,
+      visible: true,
+      data: {
+        events: [],
+        background: []
+      }
+    }];
+  }
+  
+  // Ensure defaultLayer is set if not provided
+  if (!settings.defaultLayer && settings.layers.length > 0) {
+    settings.defaultLayer = settings.layers[0].name;
+  }
+  
+  // Ensure colors object exists
+  settings.colors = {
+    ...DEFAULT_COLORS,
+    ...(settings.colors || {})
+  };
+  
+  // Validate and sanitize numeric values
+  if (typeof settings.visibleMonths !== 'number' || settings.visibleMonths < 1 || settings.visibleMonths > 6) {
+    settings.visibleMonths = 2;
+  }
+  
+  if (typeof settings.monthWidth !== 'number' || settings.monthWidth < 200 || settings.monthWidth > 800) {
+    settings.monthWidth = 500;
+  }
+  
+  return settings;
+}
+
+/**
+ * Convert SimpleCalendarSettings to full CalendarSettings
+ * This provides a simple API while maintaining full functionality
+ */
+export function createSimpleCalendarSettings(simpleSettings: SimpleCalendarSettings = {}): CalendarSettings {
+  const safeSettings = simpleSettings || {};
+  
+  // Ensure we always have at least a basic Calendar layer
+  const defaultCalendarLayer: Layer = {
+    name: 'Calendar',
+    title: 'Base Calendar',
+    description: 'Default calendar layer',
+    required: true,
+    visible: true,
+    data: {
+      events: [],
+      background: []
+    }
+  };
+  
+  // Use provided layers or default to basic calendar layer
+  const layers = Array.isArray(safeSettings.layers) && safeSettings.layers.length > 0 
+    ? safeSettings.layers 
+    : [defaultCalendarLayer];
+  
+  // Map simple settings to full settings
+  const fullSettings: Partial<CalendarSettings> = {
+    displayMode: safeSettings.displayMode,
+    visibleMonths: safeSettings.visibleMonths,
+    selectionMode: safeSettings.selectionMode,
+    defaultRange: safeSettings.defaultRange,
+    dateFormatter: safeSettings.dateFormatter,
+    showSubmitButton: safeSettings.showSubmitButton,
+    startWeekOnSunday: safeSettings.startWeekOnSunday,
+    inputClassName: safeSettings.inputClassName,
+    containerStyle: safeSettings.containerStyle,
+    inputStyle: safeSettings.inputStyle,
+    colors: safeSettings.colors,
+    layers: layers,
+    restrictionConfig: safeSettings.restrictions,
+    defaultLayer: 'Calendar' // Ensure we have a default layer
+  };
+  
+  return createCalendarSettings(fullSettings);
+}
+
+/**
+ * Validate and sanitize calendar settings
+ * Returns an object with validation results and sanitized settings
+ */
+export function validateCalendarSettings(settings: Partial<CalendarSettings>) {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  
+  // Check for common issues
+  if (settings.layers && !Array.isArray(settings.layers)) {
+    errors.push('layers must be an array');
+  }
+  
+  if (settings.visibleMonths && (settings.visibleMonths < 1 || settings.visibleMonths > 6)) {
+    warnings.push('visibleMonths should be between 1 and 6');
+  }
+  
+  if (settings.defaultRange) {
+    const { start, end } = settings.defaultRange;
+    if (start && end && new Date(start) > new Date(end)) {
+      errors.push('defaultRange start date must be before end date');
+    }
+  }
+  
+  return {
+    isValid: errors.length === 0,
+    errors,
+    warnings,
+    sanitizedSettings: createCalendarSettings(settings)
+  };
+}
+
+// Update layer validation to handle null/empty gracefully
+export const validateLayers = (layers: Layer[] | null | undefined): boolean => {
+  if (!Array.isArray(layers) || layers.length === 0) {
+    return true; // Empty layers are valid (calendar works without layers)
+  }
+  return layers.length >= 1;
+};
+
+/**
+ * Safe layer access helpers
+ */
+export const getActiveLayers = (layers: Layer[] | null | undefined): Layer[] => {
+  if (!Array.isArray(layers)) return [];
+  return layers.filter(layer => layer && layer.visible !== false);
+};
+
+export const findLayerByName = (layers: Layer[] | null | undefined, name: string): Layer | undefined => {
+  if (!Array.isArray(layers) || !name) return undefined;
+  return layers.find(layer => layer && layer.name === name);
+};
+
+/**
+ * Helper function to create a minimal calendar configuration
+ * Perfect for simple use cases where you just need basic functionality
+ */
+export function createMinimalCalendar(config: {
+  onSubmit?: (start: string | null, end: string | null) => void;
+  defaultRange?: { start?: string; end?: string };
+  displayMode?: 'popup' | 'embedded';
+} = {}): CalendarSettings {
+  return createSimpleCalendarSettings({
+    displayMode: config.displayMode || 'embedded',
+    showSubmitButton: !!config.onSubmit,
+    defaultRange: config.defaultRange,
+    visibleMonths: 1, // Minimal setup uses 1 month
+    showLayersNavigation: false,
+    showHeader: true,
+    showFooter: !!config.onSubmit,
+  });
+}
+
+// Legacy SETTINGS configuration (maintained for backward compatibility)
 export const SETTINGS: SettingsConfig = {
   core: {
     displayMode: {

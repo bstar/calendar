@@ -1,5 +1,15 @@
 import { describe, it, expect } from 'vitest';
-import { getDefaultSettings, DEFAULT_COLORS } from './CLACalendar.config';
+import { 
+  getDefaultSettings, 
+  DEFAULT_COLORS,
+  createCalendarSettings,
+  createSimpleCalendarSettings,
+  createMinimalCalendar,
+  validateCalendarSettings,
+  validateLayers,
+  getActiveLayers,
+  findLayerByName
+} from './CLACalendar.config';
 
 describe('CLACalendar Configuration', () => {
   describe('getDefaultSettings', () => {
@@ -30,7 +40,7 @@ describe('CLACalendar Configuration', () => {
       
       // Layer settings
       expect(settings.layers).toEqual([]);
-      expect(settings.showLayersNavigation).toBe(true);
+      expect(settings.showLayersNavigation).toBe(false);
       expect(settings.defaultLayer).toBe('');
       
       // Color settings
@@ -205,6 +215,258 @@ describe('CLACalendar Configuration', () => {
       validPositions.forEach(position => {
         const positionSettings = { ...settings, position };
         expect(positionSettings.position).toBe(position);
+      });
+    });
+  });
+
+  describe('Null/Empty Data Handling', () => {
+    describe('createCalendarSettings', () => {
+      it('should handle undefined input gracefully', () => {
+        const settings = createCalendarSettings(undefined);
+        expect(settings).toBeDefined();
+        expect(settings.displayMode).toBe('embedded');
+        expect(settings.layers).toHaveLength(1);
+        expect(settings.layers[0].name).toBe('Calendar');
+        expect(settings.colors).toEqual(DEFAULT_COLORS);
+      });
+
+      it('should handle null input gracefully', () => {
+        const settings = createCalendarSettings(null as any);
+        expect(settings).toBeDefined();
+        expect(settings.displayMode).toBe('embedded');
+        expect(settings.visibleMonths).toBe(2);
+      });
+
+      it('should handle empty object', () => {
+        const settings = createCalendarSettings({});
+        expect(settings.displayMode).toBe('embedded');
+        expect(settings.visibleMonths).toBe(2);
+        expect(settings.layers).toHaveLength(1);
+        expect(settings.layers[0].name).toBe('Calendar');
+      });
+
+      it('should filter out null values', () => {
+        const settings = createCalendarSettings({
+          displayMode: 'popup',
+          visibleMonths: null as any,
+          showHeader: undefined as any,
+          layers: []
+        });
+        expect(settings.displayMode).toBe('popup');
+        expect(settings.visibleMonths).toBe(2); // Should use default
+        expect(settings.showHeader).toBe(true); // Should use default
+        expect(settings.layers).toHaveLength(1); // Should provide default Calendar layer
+        expect(settings.layers[0].name).toBe('Calendar');
+      });
+
+      it('should sanitize invalid numeric values', () => {
+        const settings = createCalendarSettings({
+          visibleMonths: -1,
+          monthWidth: 50
+        });
+        expect(settings.visibleMonths).toBe(2); // Should reset to default
+        expect(settings.monthWidth).toBe(500); // Should reset to default
+      });
+
+      it('should handle null layers safely', () => {
+        const settings = createCalendarSettings({
+          layers: null as any
+        });
+        expect(settings.layers).toHaveLength(1);
+        expect(settings.layers[0].name).toBe('Calendar');
+      });
+
+      it('should merge colors safely', () => {
+        const settings = createCalendarSettings({
+          colors: {
+            primary: '#ff0000',
+            invalid: 'not-a-color' as any
+          }
+        });
+        expect(settings.colors.primary).toBe('#ff0000');
+        expect(settings.colors.success).toBe(DEFAULT_COLORS.success);
+      });
+    });
+
+    describe('createSimpleCalendarSettings', () => {
+      it('should handle undefined input', () => {
+        const settings = createSimpleCalendarSettings(undefined);
+        expect(settings).toBeDefined();
+        expect(settings.displayMode).toBe('embedded');
+      });
+
+      it('should handle null input', () => {
+        const settings = createSimpleCalendarSettings(null as any);
+        expect(settings).toBeDefined();
+        expect(settings.displayMode).toBe('embedded');
+      });
+
+      it('should convert simple settings correctly', () => {
+        const settings = createSimpleCalendarSettings({
+          displayMode: 'popup',
+          visibleMonths: 3,
+          showSubmitButton: true,
+          colors: { primary: '#ff0000' }
+        });
+        expect(settings.displayMode).toBe('popup');
+        expect(settings.visibleMonths).toBe(3);
+        expect(settings.showSubmitButton).toBe(true);
+        expect(settings.colors.primary).toBe('#ff0000');
+      });
+    });
+
+    describe('createMinimalCalendar', () => {
+      it('should create minimal configuration', () => {
+        const config = createMinimalCalendar();
+        expect(config.displayMode).toBe('embedded');
+        expect(config.visibleMonths).toBe(1);
+        expect(config.showLayersNavigation).toBe(false);
+        expect(config.showSubmitButton).toBe(false);
+      });
+
+      it('should handle onSubmit callback', () => {
+        const onSubmit = () => {};
+        const config = createMinimalCalendar({ onSubmit });
+        expect(config.showSubmitButton).toBe(true);
+        expect(config.showFooter).toBe(true);
+      });
+    });
+
+    describe('validateCalendarSettings', () => {
+      it('should validate valid settings', () => {
+        const result = validateCalendarSettings({
+          displayMode: 'popup',
+          visibleMonths: 2,
+          layers: []
+        });
+        expect(result.isValid).toBe(true);
+        expect(result.errors).toHaveLength(0);
+      });
+
+      it('should catch invalid layers', () => {
+        const result = validateCalendarSettings({
+          layers: 'not-an-array' as any
+        });
+        expect(result.isValid).toBe(false);
+        expect(result.errors).toContain('layers must be an array');
+      });
+
+      it('should warn about invalid visibleMonths', () => {
+        const result = validateCalendarSettings({
+          visibleMonths: 10
+        });
+        expect(result.warnings).toContain('visibleMonths should be between 1 and 6');
+      });
+
+      it('should catch invalid date ranges', () => {
+        const result = validateCalendarSettings({
+          defaultRange: {
+            start: '2025-01-31',
+            end: '2025-01-01'
+          }
+        });
+        expect(result.isValid).toBe(false);
+        expect(result.errors).toContain('defaultRange start date must be before end date');
+      });
+    });
+
+    describe('Layer helpers', () => {
+      const testLayers = [
+        { name: 'layer1', title: 'Layer 1', description: 'Test', visible: true },
+        { name: 'layer2', title: 'Layer 2', description: 'Test', visible: false },
+        { name: 'layer3', title: 'Layer 3', description: 'Test' }
+      ];
+
+      describe('validateLayers', () => {
+        it('should handle null layers', () => {
+          expect(validateLayers(null)).toBe(true);
+          expect(validateLayers(undefined)).toBe(true);
+        });
+
+        it('should handle empty arrays', () => {
+          expect(validateLayers([])).toBe(true);
+        });
+
+        it('should validate non-empty arrays', () => {
+          expect(validateLayers(testLayers)).toBe(true);
+        });
+      });
+
+      describe('getActiveLayers', () => {
+        it('should handle null input', () => {
+          expect(getActiveLayers(null)).toEqual([]);
+          expect(getActiveLayers(undefined)).toEqual([]);
+        });
+
+        it('should filter visible layers', () => {
+          const active = getActiveLayers(testLayers);
+          expect(active).toHaveLength(2); // layer1 (visible: true) and layer3 (no visible prop = default visible)
+          expect(active.map(l => l.name)).toEqual(['layer1', 'layer3']);
+        });
+      });
+
+      describe('findLayerByName', () => {
+        it('should handle null input', () => {
+          expect(findLayerByName(null, 'layer1')).toBeUndefined();
+          expect(findLayerByName(undefined, 'layer1')).toBeUndefined();
+        });
+
+        it('should handle empty name', () => {
+          expect(findLayerByName(testLayers, '')).toBeUndefined();
+          expect(findLayerByName(testLayers, null as any)).toBeUndefined();
+        });
+
+        it('should find existing layer', () => {
+          const layer = findLayerByName(testLayers, 'layer2');
+          expect(layer).toBeDefined();
+          expect(layer?.title).toBe('Layer 2');
+        });
+
+        it('should return undefined for non-existing layer', () => {
+          expect(findLayerByName(testLayers, 'nonexistent')).toBeUndefined();
+        });
+      });
+    });
+
+    describe('Edge Cases', () => {
+      it('should handle circular references in colors', () => {
+        const circularColors: any = { primary: '#ff0000' };
+        circularColors.self = circularColors;
+        
+        const settings = createCalendarSettings({
+          colors: circularColors
+        });
+        expect(settings.colors.primary).toBe('#ff0000');
+      });
+
+      it('should handle very large numeric values', () => {
+        const settings = createCalendarSettings({
+          visibleMonths: Number.MAX_SAFE_INTEGER,
+          monthWidth: Number.MAX_SAFE_INTEGER
+        });
+        expect(settings.visibleMonths).toBe(2); // Should reset to default
+        expect(settings.monthWidth).toBe(500); // Should reset to default
+      });
+
+      it('should handle string numbers', () => {
+        const settings = createCalendarSettings({
+          visibleMonths: '3' as any,
+          monthWidth: '400' as any
+        });
+        // Should use defaults since they're not proper numbers
+        expect(settings.visibleMonths).toBe(2);
+        expect(settings.monthWidth).toBe(500);
+      });
+
+      it('should handle malformed default range', () => {
+        const settings = createCalendarSettings({
+          defaultRange: {
+            start: 'invalid-date',
+            end: 'also-invalid'
+          }
+        });
+        expect(settings.defaultRange).toBeDefined();
+        // Should allow the malformed range through (validation happens elsewhere)
       });
     });
   });

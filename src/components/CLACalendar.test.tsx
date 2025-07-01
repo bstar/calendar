@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { CLACalendar } from './CLACalendar';
+import { CLACalendar, SimpleCalendar } from './CLACalendar';
 import { getDefaultSettings } from './CLACalendar.config';
 import type { CalendarSettings, Layer, RestrictionConfig } from './CLACalendar.config';
 
@@ -845,6 +845,144 @@ describe('CLACalendar', () => {
         />
       );
 
+      expect(screen.getByText('Base Calendar')).toBeInTheDocument();
+    });
+  });
+
+  describe('Null/Empty Data Handling', () => {
+    it('should handle undefined settings', () => {
+      render(
+        <CLACalendar
+          settings={undefined}
+          _onSettingsChange={() => {}}
+        />
+      );
+      
+      expect(screen.getByText('Base Calendar')).toBeInTheDocument();
+    });
+
+    it('should handle empty settings object', () => {
+      render(
+        <CLACalendar
+          settings={{}}
+          _onSettingsChange={() => {}}
+        />
+      );
+      
+      expect(screen.getByText('Base Calendar')).toBeInTheDocument();
+    });
+
+    it('should handle null layers', () => {
+      render(
+        <CLACalendar
+          settings={{ layers: null as any }}
+          _onSettingsChange={() => {}}
+        />
+      );
+      
+      expect(screen.getByText('Base Calendar')).toBeInTheDocument();
+    });
+
+    it('should handle missing onSettingsChange', () => {
+      const { defaultSettings } = createTestSetup();
+      
+      render(
+        <CLACalendar
+          settings={defaultSettings}
+        />
+      );
+      
+      expect(screen.getByText('Base Calendar')).toBeInTheDocument();
+    });
+
+    it('should handle malformed default range', () => {
+      render(
+        <CLACalendar
+          settings={{
+            defaultRange: {
+              start: 'invalid-date',
+              end: 'also-invalid'
+            }
+          }}
+          _onSettingsChange={() => {}}
+        />
+      );
+      
+      expect(screen.getByText('Base Calendar')).toBeInTheDocument();
+    });
+
+    it('should handle null default range properties', () => {
+      render(
+        <CLACalendar
+          settings={{
+            defaultRange: {
+              start: null as any,
+              end: undefined as any
+            }
+          }}
+          _onSettingsChange={() => {}}
+        />
+      );
+      
+      expect(screen.getByText('Base Calendar')).toBeInTheDocument();
+    });
+  });
+
+  describe('SimpleCalendar Component', () => {
+    it('should render with minimal config', () => {
+      render(
+        <SimpleCalendar />
+      );
+      
+      expect(screen.getByText('Base Calendar')).toBeInTheDocument();
+    });
+
+    it('should render with basic config', () => {
+      render(
+        <SimpleCalendar
+          config={{
+            displayMode: 'embedded',
+            visibleMonths: 2,
+            showSubmitButton: true
+          }}
+        />
+      );
+      
+      expect(screen.getByText('Base Calendar')).toBeInTheDocument();
+    });
+
+    it('should handle onSubmit callback', () => {
+      const mockOnSubmit = vi.fn();
+      
+      render(
+        <SimpleCalendar
+          config={{
+            showSubmitButton: true
+          }}
+          onSubmit={mockOnSubmit}
+        />
+      );
+      
+      expect(screen.getByText('Base Calendar')).toBeInTheDocument();
+    });
+
+    it('should handle null config', () => {
+      render(
+        <SimpleCalendar
+          config={null as any}
+        />
+      );
+      
+      expect(screen.getByText('Base Calendar')).toBeInTheDocument();
+    });
+
+    it('should handle undefined config', () => {
+      render(
+        <SimpleCalendar
+          config={undefined}
+        />
+      );
+      
       expect(screen.getByText('Base Calendar')).toBeInTheDocument();
     });
   });

@@ -24,9 +24,14 @@ import { RestrictionBackgroundGenerator } from "./CLACalendarComponents/restrict
 import { LayerManager } from "./CLACalendarComponents/layers/LayerManager";
 import {
   CalendarSettings,
+  SimpleCalendarSettings,
   Layer,
   DEFAULT_COLORS,
-  DEFAULT_CONTAINER_STYLES
+  DEFAULT_CONTAINER_STYLES,
+  createCalendarSettings,
+  createSimpleCalendarSettings,
+  getActiveLayers,
+  findLayerByName
 } from "./CLACalendar.config";
 import { LayerRenderer } from './CLACalendarComponents/layers/LayerRenderer';
 import { RestrictionManager } from './CLACalendarComponents/restrictions/RestrictionManager';
@@ -1017,22 +1022,31 @@ const measurementCache = {
 };
 
 interface CLACalendarProps {
-  settings: CalendarSettings;
-  _onSettingsChange: (settings: CalendarSettings) => void;
+  settings?: Partial<CalendarSettings>;
+  _onSettingsChange?: (settings: CalendarSettings) => void;
   initialActiveLayer?: string;
-  onSubmit?: (startDate: string, endDate: string) => void;
+  onSubmit?: (startDate: string | null, endDate: string | null) => void;
   layersFactory?: () => Layer[];
   restrictionConfigFactory?: () => RestrictionConfig;
 }
 
+// Simple calendar props for basic use cases
+interface SimpleCalendarProps {
+  config?: SimpleCalendarSettings;
+  onSubmit?: (startDate: string | null, endDate: string | null) => void;
+  initialActiveLayer?: string;
+}
+
 export const CLACalendar: React.FC<CLACalendarProps> = ({
-  settings,
-  _onSettingsChange,
+  settings: userSettings = {},
+  _onSettingsChange = () => {},
   initialActiveLayer,
   onSubmit,
   layersFactory,
   restrictionConfigFactory
 }) => {
+  // Create safe, complete settings with null handling
+  const settings = useMemo(() => createCalendarSettings(userSettings), [userSettings]);
   const _colors = settings.colors || DEFAULT_COLORS;
 
   // Track whether calendar has ever been initialized (opened)
@@ -1077,8 +1091,14 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   // These states will only be initialized when calendar is first opened
   const [currentMonth, setCurrentMonth] = useState<Date | null>(() => {
     // If defaultRange is provided, use its start date directly
-    if (settings.defaultRange) {
-      return new Date(settings.defaultRange.start);
+    const defaultRange = settings.defaultRange;
+    if (defaultRange?.start) {
+      try {
+        const date = new Date(defaultRange.start);
+        return isValid(date) ? date : (everInitialized ? new Date() : null);
+      } catch {
+        return everInitialized ? new Date() : null;
+      }
     }
     // Otherwise use current date if we need to initialize now
     return everInitialized ? new Date() : null;
@@ -1088,7 +1108,8 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   const [_validationErrors, setValidationErrors] = useState<Record<string, CalendarValidationError>>({});
   const [notification, setNotification] = useState<string | null>(null);
   const [dateInputContext, setDateInputContext] = useState(() => {
-    if (settings.defaultRange) {
+    const defaultRange = settings.defaultRange;
+    if (defaultRange?.start && defaultRange?.end) {
       const formatDateString = (dateString: string) => {
         try {
           const date = parseISO(dateString);
@@ -1101,8 +1122,8 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       };
 
       return {
-        startDate: formatDateString(settings.defaultRange.start),
-        endDate: formatDateString(settings.defaultRange.end),
+        startDate: formatDateString(defaultRange.start),
+        endDate: formatDateString(defaultRange.end),
         currentField: null
       };
     }
@@ -1142,9 +1163,9 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   // Get the effective layers to use - either from lazy loading or direct settings
   const effectiveLayers = useMemo(() => {
     if (layersFactory && lazyLayers) {
-      return lazyLayers;
+      return Array.isArray(lazyLayers) ? lazyLayers : [];
     }
-    return settings.layers;
+    return Array.isArray(settings.layers) ? settings.layers : [];
   }, [settings.layers, lazyLayers, layersFactory]);
 
   // Get the effective restriction config to use - either from lazy loading or direct settings
@@ -1152,7 +1173,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     if (restrictionConfigFactory && lazyRestrictionConfig) {
       return lazyRestrictionConfig;
     }
-    return settings.restrictionConfig;
+    return settings.restrictionConfig || null;
   }, [settings.restrictionConfig, lazyRestrictionConfig, restrictionConfigFactory]);
 
   // These expensive operations only happen when the calendar is first opened
@@ -2125,6 +2146,23 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
         )}
       </div>
     </CalendarErrorBoundary>
+  );
+};
+
+// Simple calendar component for basic use cases
+export const SimpleCalendar: React.FC<SimpleCalendarProps> = ({
+  config = {},
+  onSubmit,
+  initialActiveLayer
+}) => {
+  const settings = useMemo(() => createSimpleCalendarSettings(config), [config]);
+  
+  return (
+    <CLACalendar
+      settings={settings}
+      onSubmit={onSubmit}
+      initialActiveLayer={initialActiveLayer}
+    />
   );
 };
 

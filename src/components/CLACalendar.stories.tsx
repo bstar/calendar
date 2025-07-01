@@ -1,0 +1,373 @@
+import type { Meta, StoryObj } from '@storybook/react';
+import { CLACalendar, SimpleCalendar } from './CLACalendar';
+import { CalendarSettings, SimpleCalendarSettings } from './CLACalendar.config';
+
+const meta = {
+  title: 'Calendar/CLACalendar',
+  component: CLACalendar,
+  parameters: {
+    layout: 'padded',
+    docs: {
+      description: {
+        component: 'CLACalendar is a flexible date range picker component for React with drag selection support.',
+      },
+    },
+  },
+  argTypes: {
+    displayMode: {
+      control: { type: 'select' },
+      options: ['embedded', 'popup'],
+      description: 'How the calendar should be displayed',
+    },
+    isOpen: {
+      control: 'boolean',
+      description: 'Whether the calendar is open (for popup mode)',
+    },
+    visibleMonths: {
+      control: { type: 'range', min: 1, max: 6 },
+      description: 'Number of months to display',
+    },
+    selectionMode: {
+      control: { type: 'select' },
+      options: ['single', 'range'],
+      description: 'Calendar selection mode',
+    },
+    startWeekOnSunday: {
+      control: 'boolean',
+      description: 'Whether to start the week on Sunday (vs Monday)',
+    },
+    showSubmitButton: {
+      control: 'boolean',
+      description: 'Whether to show the submit button',
+    },
+    showTooltips: {
+      control: 'boolean',
+      description: 'Whether to show tooltips on calendar items',
+    },
+    showHeader: {
+      control: 'boolean',
+      description: 'Whether to show the calendar header',
+    },
+    showFooter: {
+      control: 'boolean',
+      description: 'Whether to show the calendar footer',
+    },
+  },
+} satisfies Meta<typeof CLACalendar>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+// Default story
+export const Default: Story = {
+  render: (args) => (
+    <CLACalendar 
+      settings={{
+        displayMode: args.displayMode || 'popup',
+        isOpen: args.isOpen ?? true,
+        visibleMonths: args.visibleMonths || 2,
+        selectionMode: args.selectionMode || 'range',
+        showSubmitButton: args.showSubmitButton ?? true,
+        showHeader: args.showHeader ?? true,
+        showFooter: args.showFooter ?? true,
+        showTooltips: args.showTooltips ?? true,
+        startWeekOnSunday: args.startWeekOnSunday || false,
+      }}
+    />
+  ),
+  args: {
+    displayMode: 'popup',
+    isOpen: true,
+    visibleMonths: 2,
+    selectionMode: 'range',
+    showSubmitButton: true,
+    showHeader: true,
+    showFooter: true,
+    showTooltips: true,
+    startWeekOnSunday: false,
+  },
+};
+
+// Simple Calendar story
+export const Simple: Story = {
+  render: (args) => (
+    <CLACalendar 
+      settings={{
+        displayMode: args.displayMode || 'popup',
+        isOpen: args.isOpen ?? true,
+        visibleMonths: args.visibleMonths || 1,
+        selectionMode: args.selectionMode || 'range',
+        showSubmitButton: args.showSubmitButton ?? true,
+        startWeekOnSunday: args.startWeekOnSunday || false,
+        showHeader: args.showHeader ?? true,
+        showFooter: args.showFooter ?? true,
+        showTooltips: args.showTooltips ?? true,
+      }}
+      onSubmit={(start, end) => {
+        console.log('Date range selected:', { start, end });
+      }}
+    />
+  ),
+  args: {
+    displayMode: 'popup',
+    isOpen: true,
+    visibleMonths: 1,
+    selectionMode: 'range',
+    showSubmitButton: true,
+    startWeekOnSunday: false,
+    showHeader: true,
+    showFooter: true,
+    showTooltips: true,
+  },
+};
+
+// Single date selection
+export const SingleSelection: Story = {
+  render: (args) => (
+    <CLACalendar 
+      settings={{
+        displayMode: args.displayMode || 'popup',
+        isOpen: args.isOpen ?? true,
+        visibleMonths: args.visibleMonths || 1,
+        selectionMode: args.selectionMode || 'single',
+        showSubmitButton: args.showSubmitButton ?? true,
+        showHeader: args.showHeader ?? true,
+        showFooter: args.showFooter ?? true,
+        showTooltips: args.showTooltips ?? true,
+        startWeekOnSunday: args.startWeekOnSunday || false,
+      }}
+    />
+  ),
+  args: {
+    displayMode: 'popup',
+    isOpen: true,
+    visibleMonths: 1,
+    selectionMode: 'single',
+    showSubmitButton: true,
+    showHeader: true,
+    showFooter: true,
+    showTooltips: true,
+    startWeekOnSunday: false,
+  },
+};
+
+// Multiple months
+export const MultipleMonths: Story = {
+  render: (args) => (
+    <CLACalendar 
+      settings={{
+        displayMode: args.displayMode || 'popup',
+        isOpen: args.isOpen ?? true,
+        visibleMonths: args.visibleMonths || 3,
+        selectionMode: args.selectionMode || 'range',
+        showHeader: args.showHeader ?? true,
+        showFooter: args.showFooter ?? true,
+        showTooltips: args.showTooltips ?? true,
+        startWeekOnSunday: args.startWeekOnSunday || false,
+        showSubmitButton: args.showSubmitButton ?? true,
+      }}
+    />
+  ),
+  args: {
+    displayMode: 'popup',
+    isOpen: true,
+    visibleMonths: 3,
+    selectionMode: 'range',
+    showHeader: true,
+    showFooter: true,
+    showTooltips: true,
+    startWeekOnSunday: false,
+    showSubmitButton: true,
+  },
+};
+
+// With custom colors
+export const CustomColors: Story = {
+  render: (args) => (
+    <CLACalendar 
+      settings={{
+        displayMode: args.displayMode || 'popup',
+        isOpen: args.isOpen ?? true,
+        visibleMonths: args.visibleMonths || 2,
+        selectionMode: args.selectionMode || 'range',
+        showHeader: args.showHeader ?? true,
+        showFooter: args.showFooter ?? true,
+        showTooltips: args.showTooltips ?? true,
+        startWeekOnSunday: args.startWeekOnSunday || false,
+        showSubmitButton: args.showSubmitButton ?? true,
+        colors: {
+          primary: '#8B5CF6',
+          success: '#10B981',
+          warning: '#F59E0B',
+          danger: '#EF4444',
+        },
+      }}
+    />
+  ),
+  args: {
+    displayMode: 'popup',
+    isOpen: true,
+    visibleMonths: 2,
+    selectionMode: 'range',
+    showHeader: true,
+    showFooter: true,
+    showTooltips: true,
+    startWeekOnSunday: false,
+    showSubmitButton: true,
+  },
+};
+
+// Week starting on Sunday
+export const WeekStartSunday: Story = {
+  render: (args) => (
+    <CLACalendar 
+      settings={{
+        displayMode: args.displayMode || 'popup',
+        isOpen: args.isOpen ?? true,
+        visibleMonths: args.visibleMonths || 1,
+        selectionMode: args.selectionMode || 'range',
+        startWeekOnSunday: args.startWeekOnSunday ?? true,
+        showHeader: args.showHeader ?? true,
+        showFooter: args.showFooter ?? true,
+        showTooltips: args.showTooltips ?? true,
+        showSubmitButton: args.showSubmitButton ?? true,
+      }}
+    />
+  ),
+  args: {
+    displayMode: 'popup',
+    isOpen: true,
+    visibleMonths: 1,
+    selectionMode: 'range',
+    startWeekOnSunday: true,
+    showHeader: true,
+    showFooter: true,
+    showTooltips: true,
+    showSubmitButton: true,
+  },
+};
+
+// With sample events
+export const WithEvents: Story = {
+  render: (args) => (
+    <CLACalendar 
+      settings={{
+        displayMode: args.displayMode || 'popup',
+        isOpen: args.isOpen ?? true,
+        visibleMonths: args.visibleMonths || 2,
+        selectionMode: args.selectionMode || 'range',
+        showHeader: args.showHeader ?? true,
+        showFooter: args.showFooter ?? true,
+        showTooltips: args.showTooltips ?? true,
+        startWeekOnSunday: args.startWeekOnSunday || false,
+        showSubmitButton: args.showSubmitButton ?? true,
+        layers: [
+          {
+            name: 'Events',
+            title: 'Sample Events',
+            description: 'Example events layer',
+            visible: true,
+            data: {
+              events: [
+                {
+                  date: '2024-01-15',
+                  title: 'Team Meeting',
+                  type: 'meeting',
+                  time: '10:00 AM',
+                  description: 'Weekly team sync',
+                  color: '#3B82F6',
+                },
+                {
+                  date: '2024-01-20',
+                  title: 'Project Deadline',
+                  type: 'deadline',
+                  time: '5:00 PM',
+                  description: 'Sprint deadline',
+                  color: '#EF4444',
+                },
+              ],
+              background: [
+                {
+                  startDate: '2024-01-10',
+                  endDate: '2024-01-12',
+                  color: '#FEF3C7',
+                },
+              ],
+            },
+          },
+        ],
+      }}
+    />
+  ),
+  args: {
+    displayMode: 'popup',
+    isOpen: true,
+    visibleMonths: 2,
+    selectionMode: 'range',
+    showHeader: true,
+    showFooter: true,
+    showTooltips: true,
+    startWeekOnSunday: false,
+    showSubmitButton: true,
+  },
+};
+
+// Minimal configuration
+export const Minimal: Story = {
+  render: (args) => (
+    <CLACalendar 
+      settings={{
+        displayMode: args.displayMode || 'popup',
+        isOpen: args.isOpen ?? true,
+        visibleMonths: args.visibleMonths || 1,
+        selectionMode: args.selectionMode || 'range',
+        showHeader: args.showHeader ?? true,
+        showFooter: args.showFooter ?? true,
+        showTooltips: args.showTooltips ?? true,
+        startWeekOnSunday: args.startWeekOnSunday || false,
+        showSubmitButton: args.showSubmitButton ?? true,
+      }}
+    />
+  ),
+  args: {
+    displayMode: 'popup',
+    isOpen: true,
+    visibleMonths: 1,
+    selectionMode: 'range',
+    showHeader: true,
+    showFooter: true,
+    showTooltips: true,
+    startWeekOnSunday: false,
+    showSubmitButton: true,
+  },
+};
+
+// Test case: Submit button disabled
+export const NoSubmitButton: Story = {
+  render: (args) => (
+    <CLACalendar 
+      settings={{
+        displayMode: args.displayMode || 'popup',
+        isOpen: args.isOpen ?? true,
+        visibleMonths: args.visibleMonths || 1,
+        selectionMode: args.selectionMode || 'range',
+        showHeader: args.showHeader ?? true,
+        showFooter: args.showFooter ?? true,
+        showTooltips: args.showTooltips ?? true,
+        startWeekOnSunday: args.startWeekOnSunday || false,
+        showSubmitButton: false, // Explicitly testing submit OFF
+      }}
+    />
+  ),
+  args: {
+    displayMode: 'popup',
+    isOpen: true,
+    visibleMonths: 1,
+    selectionMode: 'range',
+    showHeader: true,
+    showFooter: true,
+    showTooltips: true,
+    startWeekOnSunday: false,
+    showSubmitButton: false,
+  },
+};
