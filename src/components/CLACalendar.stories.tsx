@@ -52,6 +52,10 @@ const meta = {
       control: 'boolean',
       description: 'Whether to show the calendar footer',
     },
+    showLayersNavigation: {
+      control: 'boolean',
+      description: 'Whether to show layer navigation tabs',
+    },
   },
 } satisfies Meta<typeof CLACalendar>;
 
@@ -62,6 +66,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   render: (args) => (
     <CLACalendar 
+      key="default-story"
       settings={{
         displayMode: args.displayMode || 'popup',
         isOpen: args.isOpen ?? true,
@@ -92,6 +97,7 @@ export const Default: Story = {
 export const Simple: Story = {
   render: (args) => (
     <CLACalendar 
+      key="simple-story"
       settings={{
         displayMode: args.displayMode || 'popup',
         isOpen: args.isOpen ?? true,
@@ -125,6 +131,7 @@ export const Simple: Story = {
 export const SingleSelection: Story = {
   render: (args) => (
     <CLACalendar 
+      key="single-selection-story"
       settings={{
         displayMode: args.displayMode || 'popup',
         isOpen: args.isOpen ?? true,
@@ -155,6 +162,7 @@ export const SingleSelection: Story = {
 export const MultipleMonths: Story = {
   render: (args) => (
     <CLACalendar 
+      key="multiple-months-story"
       settings={{
         displayMode: args.displayMode || 'popup',
         isOpen: args.isOpen ?? true,
@@ -185,6 +193,7 @@ export const MultipleMonths: Story = {
 export const CustomColors: Story = {
   render: (args) => (
     <CLACalendar 
+      key="custom-colors-story"
       settings={{
         displayMode: args.displayMode || 'popup',
         isOpen: args.isOpen ?? true,
@@ -221,6 +230,7 @@ export const CustomColors: Story = {
 export const WeekStartSunday: Story = {
   render: (args) => (
     <CLACalendar 
+      key="week-start-sunday-story"
       settings={{
         displayMode: args.displayMode || 'popup',
         isOpen: args.isOpen ?? true,
@@ -251,6 +261,7 @@ export const WeekStartSunday: Story = {
 export const WithEvents: Story = {
   render: (args) => (
     <CLACalendar 
+      key="with-events-story"
       settings={{
         displayMode: args.displayMode || 'popup',
         isOpen: args.isOpen ?? true,
@@ -261,6 +272,12 @@ export const WithEvents: Story = {
         showTooltips: args.showTooltips ?? true,
         startWeekOnSunday: args.startWeekOnSunday || false,
         showSubmitButton: args.showSubmitButton ?? true,
+        showLayersNavigation: args.showLayersNavigation ?? true,
+        defaultLayer: 'Events',
+        defaultRange: {
+          start: '2024-01-01',
+          end: '2024-01-31',
+        },
         layers: [
           {
             name: 'Events',
@@ -309,6 +326,7 @@ export const WithEvents: Story = {
     showTooltips: true,
     startWeekOnSunday: false,
     showSubmitButton: true,
+    showLayersNavigation: true,
   },
 };
 
@@ -316,6 +334,7 @@ export const WithEvents: Story = {
 export const Minimal: Story = {
   render: (args) => (
     <CLACalendar 
+      key="minimal-story"
       settings={{
         displayMode: args.displayMode || 'popup',
         isOpen: args.isOpen ?? true,
@@ -326,6 +345,7 @@ export const Minimal: Story = {
         showTooltips: args.showTooltips ?? true,
         startWeekOnSunday: args.startWeekOnSunday || false,
         showSubmitButton: args.showSubmitButton ?? true,
+        defaultLayer: 'Calendar',
       }}
     />
   ),
@@ -346,6 +366,7 @@ export const Minimal: Story = {
 export const NoSubmitButton: Story = {
   render: (args) => (
     <CLACalendar 
+      key="no-submit-button-story"
       settings={{
         displayMode: args.displayMode || 'popup',
         isOpen: args.isOpen ?? true,

@@ -691,6 +691,11 @@ export interface TooltipProps {
  * @returns Tooltip with content
  */
 export const Tooltip: React.FC<TooltipProps> = ({ content, show, children }) => {
+  // Don't render if content is invalid
+  if (!content) {
+    return <>{children}</>;
+  }
+
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const tooltipRef = useRef<HTMLDivElement>(null);
   const targetRef = useRef<HTMLDivElement>(null);
@@ -715,8 +720,13 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, show, children }) => 
 
     return () => {
       // Only remove the container if it's empty and we created it
-      if (container && container.childNodes.length === 0) {
-        document.body.removeChild(container);
+      try {
+        if (container && container.parentNode && container.childNodes.length === 0) {
+          document.body.removeChild(container);
+        }
+      } catch (error) {
+        // Ignore cleanup errors during unmount/story transitions
+        console.debug('Tooltip cleanup error (safe to ignore):', error);
       }
     };
   }, []);
@@ -726,8 +736,9 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, show, children }) => 
     const updatePosition = () => {
       if (!targetRef.current || !tooltipRef.current) return;
 
-      const targetRect = targetRef.current.getBoundingClientRect();
-      const tooltipRect = tooltipRef.current.getBoundingClientRect();
+      try {
+        const targetRect = targetRef.current.getBoundingClientRect();
+        const tooltipRect = tooltipRef.current.getBoundingClientRect();
 
       // Calculate initial position
       // Position tooltip centered above the target element
@@ -746,11 +757,15 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, show, children }) => 
         top = targetRect.bottom + window.scrollY + 8;
       }
 
-      // Update position
-      setPosition({
-        top: Math.round(top),
-        left: Math.round(left)
-      });
+        // Update position
+        setPosition({
+          top: Math.round(top),
+          left: Math.round(left)
+        });
+      } catch (error) {
+        // Ignore positioning errors during unmount/story transitions
+        console.debug('Tooltip positioning error (safe to ignore):', error);
+      }
     };
 
     // Need to wait for content to render before calculating position

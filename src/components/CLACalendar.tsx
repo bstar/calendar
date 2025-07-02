@@ -791,9 +791,10 @@ const DayCell = ({
   );
 
   // Only show tooltips if showTooltips is true and we have tooltip content
-  return (showTooltips && eventContent?.tooltipContent) ? (
+  const tooltipContent = eventContent?.tooltipContent;
+  return (showTooltips && tooltipContent) ? (
     <Tooltip
-      content={eventContent?.tooltipContent}
+      content={tooltipContent}
       show={isHovered}
     >
       {cellContent}
