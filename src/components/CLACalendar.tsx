@@ -1027,6 +1027,7 @@ interface CLACalendarProps {
   _onSettingsChange?: (settings: CalendarSettings) => void;
   initialActiveLayer?: string;
   onSubmit?: (startDate: string | null, endDate: string | null) => void;
+  onMonthChange?: (visibleMonths: Date[]) => void;
   layersFactory?: () => Layer[];
   restrictionConfigFactory?: () => RestrictionConfig;
 }
@@ -1043,6 +1044,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   _onSettingsChange = () => {},
   initialActiveLayer,
   onSubmit,
+  onMonthChange,
   layersFactory,
   restrictionConfigFactory
 }) => {
@@ -1274,6 +1276,13 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     }
     return result;
   }, [currentMonth, settings.visibleMonths, everInitialized]);
+
+  // Call onMonthChange callback when months change
+  useEffect(() => {
+    if (onMonthChange && months.length > 0) {
+      onMonthChange(months);
+    }
+  }, [months, onMonthChange]);
 
   // Only show tooltips when initialized
   const shouldShowTooltips = useMemo(() => {
