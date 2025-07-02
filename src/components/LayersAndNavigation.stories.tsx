@@ -50,7 +50,7 @@ export const MultipleLayers: Story = {
         defaultLayer: 'Events',
         defaultRange: {
           start: '2024-01-01',
-          end: '2024-01-31',
+          end: '2024-01-03',
         },
         layers: [
           {
@@ -174,7 +174,7 @@ export const BackgroundColors: Story = {
         defaultLayer: 'Vacations',
         defaultRange: {
           start: '2024-01-01',
-          end: '2024-02-29',
+          end: '2024-01-03',
         },
         layers: [
           {
@@ -294,8 +294,8 @@ export const MixedContent: Story = {
         showSubmitButton: true,
         defaultLayer: 'WorkSchedule',
         defaultRange: {
-          start: '2024-01-01',
-          end: '2024-02-29',
+          start: '2024-02-01',
+          end: '2024-02-03',
         },
         layers: [
           {
@@ -433,7 +433,7 @@ export const LayerToggleDemo: Story = {
         defaultLayer: 'AlwaysVisible',
         defaultRange: {
           start: '2024-01-01',
-          end: '2024-01-31',
+          end: '2024-01-03',
         },
         layers: [
           {

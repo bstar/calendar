@@ -276,7 +276,7 @@ export const WithEvents: Story = {
         defaultLayer: 'Events',
         defaultRange: {
           start: '2024-01-01',
-          end: '2024-01-31',
+          end: '2024-01-05',
         },
         layers: [
           {

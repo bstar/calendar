@@ -49,7 +49,7 @@ export const DateRangeRestrictions: Story = {
         showSelectionAlert: args.showSelectionAlert ?? true,
         defaultRange: {
           start: '2024-01-01',
-          end: '2024-02-29',
+          end: '2024-01-05',
         },
         defaultLayer: 'Holidays',
         restrictionConfig: {
@@ -152,7 +152,7 @@ export const BoundaryRestrictions: Story = {
         showSelectionAlert: args.showSelectionAlert ?? true,
         defaultRange: {
           start: '2024-01-01',
-          end: '2024-02-29',
+          end: '2024-01-05',
         },
         defaultLayer: 'BookingWindow',
         restrictionConfig: {
@@ -238,7 +238,7 @@ export const WeekdayRestrictions: Story = {
         showSelectionAlert: args.showSelectionAlert ?? true,
         defaultRange: {
           start: '2024-01-01',
-          end: '2024-02-29',
+          end: '2024-01-05',
         },
         defaultLayer: 'BusinessHours',
         restrictionConfig: {
@@ -309,7 +309,7 @@ export const AllowedRangesOnly: Story = {
         showSelectionAlert: args.showSelectionAlert ?? true,
         defaultRange: {
           start: '2024-01-01',
-          end: '2024-02-29',
+          end: '2024-01-05',
         },
         defaultLayer: 'AvailableSlots',
         restrictionConfig: {
@@ -420,7 +420,7 @@ export const MixedRestrictions: Story = {
         showSelectionAlert: args.showSelectionAlert ?? true,
         defaultRange: {
           start: '2024-01-01',
-          end: '2024-02-29',
+          end: '2024-01-05',
         },
         defaultLayer: 'ComplexRestrictions',
         restrictionConfig: {
@@ -539,7 +539,7 @@ export const RestrictedBoundary: Story = {
         showSelectionAlert: args.showSelectionAlert ?? true,
         defaultRange: {
           start: '2024-01-01',
-          end: '2024-02-29',
+          end: '2024-01-05',
         },
         defaultLayer: 'ExecutivePeriods',
         restrictionConfig: {

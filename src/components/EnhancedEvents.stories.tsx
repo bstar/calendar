@@ -54,7 +54,7 @@ export const EventTypesGallery: Story = {
         defaultLayer: 'Meetings',
         defaultRange: {
           start: '2024-01-01',
-          end: '2024-02-29',
+          end: '2024-01-05',
         },
         layers: [
           {
@@ -259,7 +259,7 @@ export const DenseEventCalendar: Story = {
         defaultLayer: 'BusyMonth',
         defaultRange: {
           start: '2024-01-01',
-          end: '2024-01-31',
+          end: '2024-01-05',
         },
         layers: [
           {
@@ -505,7 +505,7 @@ export const RecurringPatterns: Story = {
         defaultLayer: 'Daily',
         defaultRange: {
           start: '2024-01-01',
-          end: '2024-02-29',
+          end: '2024-01-05',
         },
         layers: [
           {
@@ -744,7 +744,7 @@ export const RichEventTooltips: Story = {
         defaultLayer: 'DetailedEvents',
         defaultRange: {
           start: '2024-01-01',
-          end: '2024-01-31',
+          end: '2024-01-05',
         },
         layers: [
           {
