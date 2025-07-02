@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
 import { CLACalendar } from './CLACalendar';
 import type { CalendarSettings } from './CLACalendar.config';
+import { EmbeddedWidgetArgTypes, EmbeddedWidgetDefaultArgs, mapArgsToSettings } from './utils/storybook-argtypes';
 
 const meta = {
   title: 'Calendar/Embedded Widgets',
@@ -14,6 +15,7 @@ const meta = {
       },
     },
   },
+  argTypes: EmbeddedWidgetArgTypes as any, // Type assertion to allow our custom argTypes
 } satisfies Meta<typeof CLACalendar>;
 
 export default meta;
@@ -21,16 +23,12 @@ type Story = StoryObj<typeof meta>;
 
 // Flat embedded - single month
 export const FlatSingleMonth: Story = {
-  render: () => (
+  render: (args) => (
     <CLACalendar 
       key="flat-single"
       settings={{
+        ...mapArgsToSettings(args),
         displayMode: 'embedded',
-        visibleMonths: 1,
-        selectionMode: 'range',
-        showSubmitButton: false,
-        showHeader: true,
-        showFooter: false,
         containerStyle: {
           boxShadow: 'none',
           borderRadius: '0',
@@ -43,6 +41,7 @@ export const FlatSingleMonth: Story = {
       }}
     />
   ),
+  args: EmbeddedWidgetDefaultArgs as any, // Type assertion for Storybook args compatibility
   parameters: {
     docs: {
       description: {
@@ -54,16 +53,12 @@ export const FlatSingleMonth: Story = {
 
 // Four month view
 export const FourMonthView: Story = {
-  render: () => (
+  render: (args) => (
     <CLACalendar 
       key="four-month"
       settings={{
+        ...mapArgsToSettings(args),
         displayMode: 'embedded',
-        visibleMonths: 4,
-        selectionMode: 'range',
-        showSubmitButton: true,
-        showHeader: true,
-        showFooter: false,
         containerStyle: {
           boxShadow: 'none',
           borderRadius: '0',
@@ -76,6 +71,10 @@ export const FourMonthView: Story = {
       }}
     />
   ),
+  args: {
+    ...EmbeddedWidgetDefaultArgs,
+    visibleMonths: 4,
+  } as any, // Type assertion for Storybook args compatibility
   parameters: {
     docs: {
       description: {
@@ -87,16 +86,12 @@ export const FourMonthView: Story = {
 
 // No header or footer
 export const MinimalEmbedded: Story = {
-  render: () => (
+  render: (args) => (
     <CLACalendar 
       key="minimal"
       settings={{
+        ...mapArgsToSettings(args),
         displayMode: 'embedded',
-        visibleMonths: 2,
-        selectionMode: 'single',
-        showSubmitButton: false,
-        showHeader: false,
-        showFooter: false,
         containerStyle: {
           boxShadow: 'none',
           borderRadius: '0',
@@ -109,6 +104,13 @@ export const MinimalEmbedded: Story = {
       }}
     />
   ),
+  args: {
+    ...EmbeddedWidgetDefaultArgs,
+    visibleMonths: 2,
+    selectionMode: 'single',
+    showHeader: false,
+    showTooltips: false,
+  } as any, // Type assertion for Storybook args compatibility
   parameters: {
     docs: {
       description: {
@@ -120,17 +122,12 @@ export const MinimalEmbedded: Story = {
 
 // Compact sidebar size
 export const CompactEmbedded: Story = {
-  render: () => (
+  render: (args) => (
     <CLACalendar 
       key="compact"
       settings={{
+        ...mapArgsToSettings(args),
         displayMode: 'embedded',
-        visibleMonths: 1,
-        selectionMode: 'single',
-        showSubmitButton: false,
-        showHeader: true,
-        showFooter: false,
-        monthWidth: 250,
         containerStyle: {
           boxShadow: 'none',
           borderRadius: '0',
@@ -143,6 +140,11 @@ export const CompactEmbedded: Story = {
       }}
     />
   ),
+  args: {
+    ...EmbeddedWidgetDefaultArgs,
+    selectionMode: 'single',
+    monthWidth: 250,
+  } as any, // Type assertion for Storybook args compatibility
   parameters: {
     docs: {
       description: {
@@ -154,17 +156,12 @@ export const CompactEmbedded: Story = {
 
 // With layers embedded
 export const EmbeddedWithLayers: Story = {
-  render: () => (
+  render: (args) => (
     <CLACalendar 
       key="with-layers"
       settings={{
+        ...mapArgsToSettings(args),
         displayMode: 'embedded',
-        visibleMonths: 2,
-        selectionMode: 'range',
-        showSubmitButton: false,
-        showHeader: true,
-        showFooter: false,
-        showLayersNavigation: true,
         defaultLayer: 'Events',
         containerStyle: {
           boxShadow: 'none',
@@ -179,6 +176,7 @@ export const EmbeddedWithLayers: Story = {
           {
             name: 'Events',
             title: 'Events',
+            description: 'Company events and meetings',
             visible: true,
             data: {
               events: [
@@ -187,6 +185,7 @@ export const EmbeddedWithLayers: Story = {
                   title: 'Meeting',
                   type: 'meeting',
                   time: '10:00 AM',
+                  description: 'Team meeting with layers',
                   color: '#3B82F6',
                 },
               ],
@@ -195,6 +194,7 @@ export const EmbeddedWithLayers: Story = {
           {
             name: 'Holidays',
             title: 'Holidays',
+            description: 'Holiday calendar events',
             visible: true,
             data: {
               events: [
@@ -203,6 +203,7 @@ export const EmbeddedWithLayers: Story = {
                   title: 'New Year',
                   type: 'holiday',
                   time: 'All Day',
+                  description: 'New Year\'s Day celebration',
                   color: '#EF4444',
                 },
               ],
@@ -212,6 +213,11 @@ export const EmbeddedWithLayers: Story = {
       }}
     />
   ),
+  args: {
+    ...EmbeddedWidgetDefaultArgs,
+    visibleMonths: 2,
+    showLayersNavigation: true,
+  } as any, // Type assertion for Storybook args compatibility
   parameters: {
     docs: {
       description: {
@@ -223,16 +229,12 @@ export const EmbeddedWithLayers: Story = {
 
 // Three months with no submit
 export const ThreeMonthNoSubmit: Story = {
-  render: () => (
+  render: (args) => (
     <CLACalendar 
       key="three-month"
       settings={{
+        ...mapArgsToSettings(args),
         displayMode: 'embedded',
-        visibleMonths: 3,
-        selectionMode: 'range',
-        showSubmitButton: false,
-        showHeader: true,
-        showFooter: false,
         containerStyle: {
           boxShadow: 'none',
           borderRadius: '0',
@@ -245,6 +247,10 @@ export const ThreeMonthNoSubmit: Story = {
       }}
     />
   ),
+  args: {
+    ...EmbeddedWidgetDefaultArgs,
+    visibleMonths: 3,
+  } as any, // Type assertion for Storybook args compatibility
   parameters: {
     docs: {
       description: {
@@ -256,7 +262,7 @@ export const ThreeMonthNoSubmit: Story = {
 
 // Year-round calendar with month nicknames
 export const YearRoundCalendar: Story = {
-  render: () => {
+  render: (args) => {
     const [visibleMonths, setVisibleMonths] = React.useState<Date[]>([]);
     
     // Month nicknames for display
@@ -342,12 +348,8 @@ export const YearRoundCalendar: Story = {
         <CLACalendar 
           key="year-round"
           settings={{
+            ...mapArgsToSettings(args),
             displayMode: 'embedded',
-            visibleMonths: 3,
-            selectionMode: 'range',
-            showSubmitButton: false,
-            showHeader: true,
-            showFooter: false,
             containerStyle: {
               boxShadow: 'none',
               borderRadius: '0',
@@ -383,6 +385,14 @@ export const YearRoundCalendar: Story = {
       </div>
     );
   },
+  args: {
+    ...EmbeddedWidgetDefaultArgs,
+    visibleMonths: 3,
+    selectionMode: 'range',
+    showSubmitButton: false,
+    showHeader: true,
+    showFooter: false,
+  } as any, // Type assertion for Storybook args compatibility
   parameters: {
     docs: {
       description: {

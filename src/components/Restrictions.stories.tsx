@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { CLACalendar } from './CLACalendar';
 import type { CalendarSettings } from './CLACalendar.config';
 import { formatRestrictionInfo, formatLayerInfo } from './utils/storybook-docs';
+import { RestrictionArgTypes, RestrictionDefaultArgs, mapArgsToSettings } from './utils/storybook-argtypes';
 
 const meta = {
   title: 'Calendar/Restrictions',
@@ -14,25 +15,7 @@ const meta = {
       },
     },
   },
-  argTypes: {
-    displayMode: {
-      control: { type: 'select' },
-      options: ['embedded', 'popup'],
-      description: 'How the calendar should be displayed',
-    },
-    isOpen: {
-      control: 'boolean',
-      description: 'Whether the calendar is open (for popup mode)',
-    },
-    visibleMonths: {
-      control: { type: 'range', min: 1, max: 6 },
-      description: 'Number of months to display',
-    },
-    showSelectionAlert: {
-      control: 'boolean',
-      description: 'Show alerts when restricted dates are selected',
-    },
-  },
+  argTypes: RestrictionArgTypes as any, // Type assertion to allow our custom argTypes
 } satisfies Meta<typeof CLACalendar>;
 
 export default meta;
@@ -43,11 +26,8 @@ export const DateRangeRestrictions: Story = {
   render: (args) => (
     <CLACalendar 
       settings={{
-        displayMode: args.displayMode || 'popup',
-        isOpen: args.isOpen ?? true,
-        visibleMonths: args.visibleMonths || 2,
+        ...mapArgsToSettings(args),
         showSubmitButton: true,
-        showSelectionAlert: args.showSelectionAlert ?? true,
         defaultRange: {
           start: '2024-01-01',
           end: '2024-01-05',
@@ -126,12 +106,7 @@ export const DateRangeRestrictions: Story = {
       }}
     />
   ),
-  args: {
-    displayMode: 'popup',
-    isOpen: true,
-    visibleMonths: 2,
-    showSelectionAlert: true,
-  },
+  args: RestrictionDefaultArgs as any, // Type assertion for Storybook args compatibility
   parameters: {
     docs: {
       description: {
@@ -173,11 +148,8 @@ export const BoundaryRestrictions: Story = {
   render: (args) => (
     <CLACalendar 
       settings={{
-        displayMode: args.displayMode || 'popup',
-        isOpen: args.isOpen ?? true,
-        visibleMonths: args.visibleMonths || 2,
+        ...mapArgsToSettings(args),
         showSubmitButton: true,
-        showSelectionAlert: args.showSelectionAlert ?? true,
         defaultRange: {
           start: '2024-01-01',
           end: '2024-01-05',
@@ -239,12 +211,7 @@ export const BoundaryRestrictions: Story = {
       }}
     />
   ),
-  args: {
-    displayMode: 'popup',
-    isOpen: true,
-    visibleMonths: 2,
-    showSelectionAlert: true,
-  },
+  args: RestrictionDefaultArgs as any, // Type assertion for Storybook args compatibility
   parameters: {
     docs: {
       description: {
@@ -259,11 +226,8 @@ export const WeekdayRestrictions: Story = {
   render: (args) => (
     <CLACalendar 
       settings={{
-        displayMode: args.displayMode || 'popup',
-        isOpen: args.isOpen ?? true,
-        visibleMonths: args.visibleMonths || 2,
+        ...mapArgsToSettings(args),
         showSubmitButton: true,
-        showSelectionAlert: args.showSelectionAlert ?? true,
         defaultRange: {
           start: '2024-01-01',
           end: '2024-01-05',
@@ -310,12 +274,7 @@ export const WeekdayRestrictions: Story = {
       }}
     />
   ),
-  args: {
-    displayMode: 'popup',
-    isOpen: true,
-    visibleMonths: 2,
-    showSelectionAlert: true,
-  },
+  args: RestrictionDefaultArgs as any, // Type assertion for Storybook args compatibility
   parameters: {
     docs: {
       description: {
@@ -330,11 +289,8 @@ export const AllowedRangesOnly: Story = {
   render: (args) => (
     <CLACalendar 
       settings={{
-        displayMode: args.displayMode || 'popup',
-        isOpen: args.isOpen ?? true,
-        visibleMonths: args.visibleMonths || 2,
+        ...mapArgsToSettings(args),
         showSubmitButton: true,
-        showSelectionAlert: args.showSelectionAlert ?? true,
         defaultRange: {
           start: '2024-01-01',
           end: '2024-01-05',
@@ -421,12 +377,7 @@ export const AllowedRangesOnly: Story = {
       }}
     />
   ),
-  args: {
-    displayMode: 'popup',
-    isOpen: true,
-    visibleMonths: 2,
-    showSelectionAlert: true,
-  },
+  args: RestrictionDefaultArgs as any, // Type assertion for Storybook args compatibility
   parameters: {
     docs: {
       description: {
@@ -441,11 +392,8 @@ export const MixedRestrictions: Story = {
   render: (args) => (
     <CLACalendar 
       settings={{
-        displayMode: args.displayMode || 'popup',
-        isOpen: args.isOpen ?? true,
-        visibleMonths: args.visibleMonths || 2,
+        ...mapArgsToSettings(args),
         showSubmitButton: true,
-        showSelectionAlert: args.showSelectionAlert ?? true,
         defaultRange: {
           start: '2024-01-01',
           end: '2024-01-05',
@@ -540,12 +488,7 @@ export const MixedRestrictions: Story = {
       }}
     />
   ),
-  args: {
-    displayMode: 'popup',
-    isOpen: true,
-    visibleMonths: 2,
-    showSelectionAlert: true,
-  },
+  args: RestrictionDefaultArgs as any, // Type assertion for Storybook args compatibility
   parameters: {
     docs: {
       description: {
@@ -560,11 +503,8 @@ export const RestrictedBoundary: Story = {
   render: (args) => (
     <CLACalendar 
       settings={{
-        displayMode: args.displayMode || 'popup',
-        isOpen: args.isOpen ?? true,
-        visibleMonths: args.visibleMonths || 2,
+        ...mapArgsToSettings(args),
         showSubmitButton: true,
-        showSelectionAlert: args.showSelectionAlert ?? true,
         defaultRange: {
           start: '2024-01-01',
           end: '2024-01-05',
@@ -633,12 +573,7 @@ export const RestrictedBoundary: Story = {
       }}
     />
   ),
-  args: {
-    displayMode: 'popup',
-    isOpen: true,
-    visibleMonths: 2,
-    showSelectionAlert: true,
-  },
+  args: RestrictionDefaultArgs as any, // Type assertion for Storybook args compatibility
   parameters: {
     docs: {
       description: {

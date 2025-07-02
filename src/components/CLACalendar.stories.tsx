@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { CLACalendar, SimpleCalendar } from './CLACalendar';
-import { CalendarSettings, SimpleCalendarSettings } from './CLACalendar.config';
+import { CLACalendar } from './CLACalendar';
+import { CalendarSettings } from './CLACalendar.config';
 import { generateStoryDocs, formatLayerInfo, formatRestrictionInfo } from './utils/storybook-docs';
+import { CLACalendarArgTypes, CLACalendarDefaultArgs, mapArgsToSettings } from './utils/storybook-argtypes';
 
 const meta = {
   title: 'Calendar/CLACalendar',
@@ -14,50 +15,7 @@ const meta = {
       },
     },
   },
-  argTypes: {
-    displayMode: {
-      control: { type: 'select' },
-      options: ['embedded', 'popup'],
-      description: 'How the calendar should be displayed',
-    },
-    isOpen: {
-      control: 'boolean',
-      description: 'Whether the calendar is open (for popup mode)',
-    },
-    visibleMonths: {
-      control: { type: 'range', min: 1, max: 6 },
-      description: 'Number of months to display',
-    },
-    selectionMode: {
-      control: { type: 'select' },
-      options: ['single', 'range'],
-      description: 'Calendar selection mode',
-    },
-    startWeekOnSunday: {
-      control: 'boolean',
-      description: 'Whether to start the week on Sunday (vs Monday)',
-    },
-    showSubmitButton: {
-      control: 'boolean',
-      description: 'Whether to show the submit button',
-    },
-    showTooltips: {
-      control: 'boolean',
-      description: 'Whether to show tooltips on calendar items',
-    },
-    showHeader: {
-      control: 'boolean',
-      description: 'Whether to show the calendar header',
-    },
-    showFooter: {
-      control: 'boolean',
-      description: 'Whether to show the calendar footer',
-    },
-    showLayersNavigation: {
-      control: 'boolean',
-      description: 'Whether to show layer navigation tabs',
-    },
-  },
+  argTypes: CLACalendarArgTypes as any, // Type assertion to allow our custom argTypes
 } satisfies Meta<typeof CLACalendar>;
 
 export default meta;
@@ -68,30 +26,10 @@ export const Default: Story = {
   render: (args) => (
     <CLACalendar 
       key="default-story"
-      settings={{
-        displayMode: args.displayMode || 'popup',
-        isOpen: args.isOpen ?? true,
-        visibleMonths: args.visibleMonths || 2,
-        selectionMode: args.selectionMode || 'range',
-        showSubmitButton: args.showSubmitButton ?? true,
-        showHeader: args.showHeader ?? true,
-        showFooter: args.showFooter ?? true,
-        showTooltips: args.showTooltips ?? true,
-        startWeekOnSunday: args.startWeekOnSunday || false,
-      }}
+      settings={mapArgsToSettings(args)}
     />
   ),
-  args: {
-    displayMode: 'popup',
-    isOpen: true,
-    visibleMonths: 2,
-    selectionMode: 'range',
-    showSubmitButton: true,
-    showHeader: true,
-    showFooter: true,
-    showTooltips: true,
-    startWeekOnSunday: false,
-  },
+  args: CLACalendarDefaultArgs as any, // Type assertion for Storybook args compatibility
   parameters: {
     ...generateStoryDocs(
       'Default Calendar',
@@ -107,33 +45,16 @@ export const Simple: Story = {
   render: (args) => (
     <CLACalendar 
       key="simple-story"
-      settings={{
-        displayMode: args.displayMode || 'popup',
-        isOpen: args.isOpen ?? true,
-        visibleMonths: args.visibleMonths || 1,
-        selectionMode: args.selectionMode || 'range',
-        showSubmitButton: args.showSubmitButton ?? true,
-        startWeekOnSunday: args.startWeekOnSunday || false,
-        showHeader: args.showHeader ?? true,
-        showFooter: args.showFooter ?? true,
-        showTooltips: args.showTooltips ?? true,
-      }}
+      settings={mapArgsToSettings(args)}
       onSubmit={(start, end) => {
         console.log('Date range selected:', { start, end });
       }}
     />
   ),
   args: {
-    displayMode: 'popup',
-    isOpen: true,
+    ...CLACalendarDefaultArgs,
     visibleMonths: 1,
-    selectionMode: 'range',
-    showSubmitButton: true,
-    startWeekOnSunday: false,
-    showHeader: true,
-    showFooter: true,
-    showTooltips: true,
-  },
+  } as any, // Type assertion for Storybook args compatibility
 };
 
 // Single date selection
@@ -141,30 +62,14 @@ export const SingleSelection: Story = {
   render: (args) => (
     <CLACalendar 
       key="single-selection-story"
-      settings={{
-        displayMode: args.displayMode || 'popup',
-        isOpen: args.isOpen ?? true,
-        visibleMonths: args.visibleMonths || 1,
-        selectionMode: args.selectionMode || 'single',
-        showSubmitButton: args.showSubmitButton ?? true,
-        showHeader: args.showHeader ?? true,
-        showFooter: args.showFooter ?? true,
-        showTooltips: args.showTooltips ?? true,
-        startWeekOnSunday: args.startWeekOnSunday || false,
-      }}
+      settings={mapArgsToSettings(args)}
     />
   ),
   args: {
-    displayMode: 'popup',
-    isOpen: true,
+    ...CLACalendarDefaultArgs,
     visibleMonths: 1,
     selectionMode: 'single',
-    showSubmitButton: true,
-    showHeader: true,
-    showFooter: true,
-    showTooltips: true,
-    startWeekOnSunday: false,
-  },
+  } as any, // Type assertion for Storybook args compatibility
   parameters: {
     ...generateStoryDocs(
       'Single Date Selection',
@@ -180,30 +85,13 @@ export const MultipleMonths: Story = {
   render: (args) => (
     <CLACalendar 
       key="multiple-months-story"
-      settings={{
-        displayMode: args.displayMode || 'popup',
-        isOpen: args.isOpen ?? true,
-        visibleMonths: args.visibleMonths || 3,
-        selectionMode: args.selectionMode || 'range',
-        showHeader: args.showHeader ?? true,
-        showFooter: args.showFooter ?? true,
-        showTooltips: args.showTooltips ?? true,
-        startWeekOnSunday: args.startWeekOnSunday || false,
-        showSubmitButton: args.showSubmitButton ?? true,
-      }}
+      settings={mapArgsToSettings(args)}
     />
   ),
   args: {
-    displayMode: 'popup',
-    isOpen: true,
+    ...CLACalendarDefaultArgs,
     visibleMonths: 3,
-    selectionMode: 'range',
-    showHeader: true,
-    showFooter: true,
-    showTooltips: true,
-    startWeekOnSunday: false,
-    showSubmitButton: true,
-  },
+  } as any, // Type assertion for Storybook args compatibility
 };
 
 // With custom colors
@@ -212,15 +100,7 @@ export const CustomColors: Story = {
     <CLACalendar 
       key="custom-colors-story"
       settings={{
-        displayMode: args.displayMode || 'popup',
-        isOpen: args.isOpen ?? true,
-        visibleMonths: args.visibleMonths || 2,
-        selectionMode: args.selectionMode || 'range',
-        showHeader: args.showHeader ?? true,
-        showFooter: args.showFooter ?? true,
-        showTooltips: args.showTooltips ?? true,
-        startWeekOnSunday: args.startWeekOnSunday || false,
-        showSubmitButton: args.showSubmitButton ?? true,
+        ...mapArgsToSettings(args),
         colors: {
           primary: '#8B5CF6',
           success: '#10B981',
@@ -230,17 +110,7 @@ export const CustomColors: Story = {
       }}
     />
   ),
-  args: {
-    displayMode: 'popup',
-    isOpen: true,
-    visibleMonths: 2,
-    selectionMode: 'range',
-    showHeader: true,
-    showFooter: true,
-    showTooltips: true,
-    startWeekOnSunday: false,
-    showSubmitButton: true,
-  },
+  args: CLACalendarDefaultArgs as any, // Type assertion for Storybook args compatibility
 };
 
 // Week starting on Sunday
@@ -248,30 +118,14 @@ export const WeekStartSunday: Story = {
   render: (args) => (
     <CLACalendar 
       key="week-start-sunday-story"
-      settings={{
-        displayMode: args.displayMode || 'popup',
-        isOpen: args.isOpen ?? true,
-        visibleMonths: args.visibleMonths || 1,
-        selectionMode: args.selectionMode || 'range',
-        startWeekOnSunday: args.startWeekOnSunday ?? true,
-        showHeader: args.showHeader ?? true,
-        showFooter: args.showFooter ?? true,
-        showTooltips: args.showTooltips ?? true,
-        showSubmitButton: args.showSubmitButton ?? true,
-      }}
+      settings={mapArgsToSettings(args)}
     />
   ),
   args: {
-    displayMode: 'popup',
-    isOpen: true,
+    ...CLACalendarDefaultArgs,
     visibleMonths: 1,
-    selectionMode: 'range',
     startWeekOnSunday: true,
-    showHeader: true,
-    showFooter: true,
-    showTooltips: true,
-    showSubmitButton: true,
-  },
+  } as any, // Type assertion for Storybook args compatibility
 };
 
 // With sample events
@@ -280,16 +134,7 @@ export const WithEvents: Story = {
     <CLACalendar 
       key="with-events-story"
       settings={{
-        displayMode: args.displayMode || 'popup',
-        isOpen: args.isOpen ?? true,
-        visibleMonths: args.visibleMonths || 2,
-        selectionMode: args.selectionMode || 'range',
-        showHeader: args.showHeader ?? true,
-        showFooter: args.showFooter ?? true,
-        showTooltips: args.showTooltips ?? true,
-        startWeekOnSunday: args.startWeekOnSunday || false,
-        showSubmitButton: args.showSubmitButton ?? true,
-        showLayersNavigation: args.showLayersNavigation ?? true,
+        ...mapArgsToSettings(args),
         defaultLayer: 'Events',
         defaultRange: {
           start: '2024-01-01',
@@ -334,17 +179,9 @@ export const WithEvents: Story = {
     />
   ),
   args: {
-    displayMode: 'popup',
-    isOpen: true,
-    visibleMonths: 2,
-    selectionMode: 'range',
-    showHeader: true,
-    showFooter: true,
-    showTooltips: true,
-    startWeekOnSunday: false,
-    showSubmitButton: true,
+    ...CLACalendarDefaultArgs,
     showLayersNavigation: true,
-  },
+  } as any, // Type assertion for Storybook args compatibility
   parameters: {
     docs: {
       description: {
@@ -391,30 +228,15 @@ export const Minimal: Story = {
     <CLACalendar 
       key="minimal-story"
       settings={{
-        displayMode: args.displayMode || 'popup',
-        isOpen: args.isOpen ?? true,
-        visibleMonths: args.visibleMonths || 1,
-        selectionMode: args.selectionMode || 'range',
-        showHeader: args.showHeader ?? true,
-        showFooter: args.showFooter ?? true,
-        showTooltips: args.showTooltips ?? true,
-        startWeekOnSunday: args.startWeekOnSunday || false,
-        showSubmitButton: args.showSubmitButton ?? true,
+        ...mapArgsToSettings(args),
         defaultLayer: 'Calendar',
       }}
     />
   ),
   args: {
-    displayMode: 'popup',
-    isOpen: true,
+    ...CLACalendarDefaultArgs,
     visibleMonths: 1,
-    selectionMode: 'range',
-    showHeader: true,
-    showFooter: true,
-    showTooltips: true,
-    startWeekOnSunday: false,
-    showSubmitButton: true,
-  },
+  } as any, // Type assertion for Storybook args compatibility
 };
 
 // Test case: Submit button disabled
@@ -422,28 +244,12 @@ export const NoSubmitButton: Story = {
   render: (args) => (
     <CLACalendar 
       key="no-submit-button-story"
-      settings={{
-        displayMode: args.displayMode || 'popup',
-        isOpen: args.isOpen ?? true,
-        visibleMonths: args.visibleMonths || 1,
-        selectionMode: args.selectionMode || 'range',
-        showHeader: args.showHeader ?? true,
-        showFooter: args.showFooter ?? true,
-        showTooltips: args.showTooltips ?? true,
-        startWeekOnSunday: args.startWeekOnSunday || false,
-        showSubmitButton: false, // Explicitly testing submit OFF
-      }}
+      settings={mapArgsToSettings(args)}
     />
   ),
   args: {
-    displayMode: 'popup',
-    isOpen: true,
+    ...CLACalendarDefaultArgs,
     visibleMonths: 1,
-    selectionMode: 'range',
-    showHeader: true,
-    showFooter: true,
-    showTooltips: true,
-    startWeekOnSunday: false,
-    showSubmitButton: false,
-  },
+    showSubmitButton: false, // Explicitly testing submit OFF
+  } as any, // Type assertion for Storybook args compatibility
 };

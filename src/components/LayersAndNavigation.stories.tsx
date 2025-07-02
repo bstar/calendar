@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { CLACalendar } from './CLACalendar';
 import { CalendarSettings } from './CLACalendar.config';
 import { formatLayerInfo } from './utils/storybook-docs';
+import { CLACalendarArgTypes, CLACalendarDefaultArgs, mapArgsToSettings } from './utils/storybook-argtypes';
 
 const meta = {
   title: 'Calendar/Layers & Navigation',
@@ -14,25 +15,7 @@ const meta = {
       },
     },
   },
-  argTypes: {
-    displayMode: {
-      control: { type: 'select' },
-      options: ['embedded', 'popup'],
-      description: 'How the calendar should be displayed',
-    },
-    isOpen: {
-      control: 'boolean',
-      description: 'Whether the calendar is open (for popup mode)',
-    },
-    visibleMonths: {
-      control: { type: 'range', min: 1, max: 6 },
-      description: 'Number of months to display',
-    },
-    showLayersNavigation: {
-      control: 'boolean',
-      description: 'Show layer navigation tabs',
-    },
-  },
+  argTypes: CLACalendarArgTypes as any, // Type assertion to allow our custom argTypes
 } satisfies Meta<typeof CLACalendar>;
 
 export default meta;
@@ -43,10 +26,7 @@ export const MultipleLayers: Story = {
   render: (args) => (
     <CLACalendar 
       settings={{
-        displayMode: args.displayMode || 'popup',
-        isOpen: args.isOpen ?? true,
-        visibleMonths: args.visibleMonths || 2,
-        showLayersNavigation: args.showLayersNavigation ?? true,
+        ...mapArgsToSettings(args),
         showSubmitButton: true,
         defaultLayer: 'Events',
         defaultRange: {
@@ -155,11 +135,9 @@ export const MultipleLayers: Story = {
     />
   ),
   args: {
-    displayMode: 'popup',
-    isOpen: true,
-    visibleMonths: 2,
+    ...CLACalendarDefaultArgs,
     showLayersNavigation: true,
-  },
+  } as any, // Type assertion for Storybook args compatibility
 };
 
 // Background colors demonstration
@@ -167,10 +145,7 @@ export const BackgroundColors: Story = {
   render: (args) => (
     <CLACalendar 
       settings={{
-        displayMode: args.displayMode || 'popup',
-        isOpen: args.isOpen ?? true,
-        visibleMonths: args.visibleMonths || 2,
-        showLayersNavigation: args.showLayersNavigation ?? true,
+        ...mapArgsToSettings(args),
         showSubmitButton: true,
         defaultLayer: 'Vacations',
         defaultRange: {
@@ -276,11 +251,9 @@ export const BackgroundColors: Story = {
     />
   ),
   args: {
-    displayMode: 'popup',
-    isOpen: true,
-    visibleMonths: 2,
+    ...CLACalendarDefaultArgs,
     showLayersNavigation: true,
-  },
+  } as any, // Type assertion for Storybook args compatibility
   parameters: {
     docs: {
       description: {
@@ -348,10 +321,7 @@ export const MixedContent: Story = {
   render: (args) => (
     <CLACalendar 
       settings={{
-        displayMode: args.displayMode || 'popup',
-        isOpen: args.isOpen ?? true,
-        visibleMonths: args.visibleMonths || 2,
-        showLayersNavigation: args.showLayersNavigation ?? true,
+        ...mapArgsToSettings(args),
         showSubmitButton: true,
         defaultLayer: 'WorkSchedule',
         defaultRange: {
@@ -474,11 +444,9 @@ export const MixedContent: Story = {
     />
   ),
   args: {
-    displayMode: 'popup',
-    isOpen: true,
-    visibleMonths: 2,
+    ...CLACalendarDefaultArgs,
     showLayersNavigation: true,
-  },
+  } as any, // Type assertion for Storybook args compatibility
 };
 
 // Layer visibility demo
@@ -486,10 +454,7 @@ export const LayerToggleDemo: Story = {
   render: (args) => (
     <CLACalendar 
       settings={{
-        displayMode: args.displayMode || 'popup',
-        isOpen: args.isOpen ?? true,
-        visibleMonths: args.visibleMonths || 1,
-        showLayersNavigation: args.showLayersNavigation ?? true,
+        ...mapArgsToSettings(args),
         showSubmitButton: true,
         defaultLayer: 'AlwaysVisible',
         defaultRange: {

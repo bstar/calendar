@@ -24,12 +24,10 @@ import { RestrictionBackgroundGenerator } from "./CLACalendarComponents/restrict
 import { LayerManager } from "./CLACalendarComponents/layers/LayerManager";
 import {
   CalendarSettings,
-  SimpleCalendarSettings,
   Layer,
   DEFAULT_COLORS,
   DEFAULT_CONTAINER_STYLES,
   createCalendarSettings,
-  createSimpleCalendarSettings,
   getActiveLayers,
   findLayerByName
 } from "./CLACalendar.config";
@@ -1032,12 +1030,6 @@ interface CLACalendarProps {
   restrictionConfigFactory?: () => RestrictionConfig;
 }
 
-// Simple calendar props for basic use cases
-interface SimpleCalendarProps {
-  config?: SimpleCalendarSettings;
-  onSubmit?: (startDate: string | null, endDate: string | null) => void;
-  initialActiveLayer?: string;
-}
 
 export const CLACalendar: React.FC<CLACalendarProps> = ({
   settings: userSettings = {},
@@ -2159,22 +2151,6 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   );
 };
 
-// Simple calendar component for basic use cases
-export const SimpleCalendar: React.FC<SimpleCalendarProps> = ({
-  config = {},
-  onSubmit,
-  initialActiveLayer
-}) => {
-  const settings = useMemo(() => createSimpleCalendarSettings(config), [config]);
-  
-  return (
-    <CLACalendar
-      settings={settings}
-      onSubmit={onSubmit}
-      initialActiveLayer={initialActiveLayer}
-    />
-  );
-};
 
 export default CLACalendar;
 
