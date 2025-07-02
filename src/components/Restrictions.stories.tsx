@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { CLACalendar } from './CLACalendar';
 import type { CalendarSettings } from './CLACalendar.config';
+import { formatRestrictionInfo, formatLayerInfo } from './utils/storybook-docs';
 
 const meta = {
   title: 'Calendar/Restrictions',
@@ -134,7 +135,34 @@ export const DateRangeRestrictions: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Try selecting dates in the red highlighted periods to see restriction messages.',
+        story: `Date range restrictions prevent users from selecting specific date ranges with custom error messages.
+
+**Restriction Features:**
+- **Multiple Date Ranges:** Define multiple blocked periods
+- **Custom Messages:** Each range can have its own restriction message  
+- **Visual Indicators:** Blocked ranges are highlighted with background colors
+- **Selection Alerts:** Users see helpful messages when trying to select restricted dates
+
+**Configured Restrictions:**
+${formatRestrictionInfo({
+  restrictions: [
+    {
+      type: 'daterange',
+      enabled: true,
+      ranges: [
+        { start: '2024-01-15', end: '2024-01-19', message: 'Company holiday week - no bookings allowed' },
+        { start: '2024-02-10', end: '2024-02-14', message: 'System maintenance period - unavailable' },
+        { start: '2024-01-01', end: '2024-01-01', message: 'New Year\'s Day - office closed' }
+      ]
+    }
+  ]
+})}
+
+**Background Colors:**
+- **Light Red (#FEE2E2):** Indicates restricted/blocked date ranges
+- **Red Event Markers:** Show specific restriction events with details
+
+**Usage:** Try selecting dates in the red highlighted periods to see restriction messages appear.`
       },
     },
   },

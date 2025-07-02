@@ -18,6 +18,61 @@ const preview: Preview = {
       description: {
         component: 'CLACalendar is a flexible date range picker component for React with drag selection support.',
       },
+      source: {
+        excludeDecorators: true,
+        transform: (code: string, storyContext: any) => {
+          // Show calendar configuration when available
+          if (storyContext.args?.settings || storyContext.story?.args?.settings) {
+            const settings = storyContext.args?.settings || storyContext.story?.args?.settings;
+            if (settings && typeof settings === 'object') {
+              // Merge args into settings for real-time updates
+              const dynamicSettings = { ...settings };
+              
+              // Map Storybook controls to settings
+              const controlMappings = {
+                displayMode: 'displayMode',
+                isOpen: 'isOpen',
+                visibleMonths: 'visibleMonths',
+                selectionMode: 'selectionMode',
+                showSubmitButton: 'showSubmitButton',
+                showHeader: 'showHeader',
+                showFooter: 'showFooter',
+                showTooltips: 'showTooltips',
+                showLayersNavigation: 'showLayersNavigation',
+                startWeekOnSunday: 'startWeekOnSunday'
+              };
+
+              // Apply control values to settings
+              Object.entries(controlMappings).forEach(([control, setting]) => {
+                if (storyContext.args[control] !== undefined) {
+                  dynamicSettings[setting] = storyContext.args[control];
+                }
+              });
+
+              // Format configuration info
+              const layerInfo = dynamicSettings.layers ? 
+                `\n// Layer Information:\n// - ${dynamicSettings.layers.length} layer(s) configured\n// - Default layer: ${dynamicSettings.defaultLayer || 'first'}\n// - Navigation: ${dynamicSettings.showLayersNavigation ? 'enabled' : 'disabled'}` : 
+                '\n// No layers configured';
+
+              const restrictionInfo = dynamicSettings.restrictionConfig?.restrictions ? 
+                `\n// Restrictions: ${dynamicSettings.restrictionConfig.restrictions.length} rule(s) active` : 
+                '\n// No restrictions configured';
+
+              return `// Real-time Calendar Configuration (updates with controls)
+${JSON.stringify(dynamicSettings, null, 2)}${layerInfo}${restrictionInfo}
+
+// React Component Usage
+<CLACalendar
+  settings={${JSON.stringify(dynamicSettings, null, 2)}}
+  onSubmit={(startDate, endDate) => {
+    console.log('Selected:', { startDate, endDate });
+  }}
+/>`;
+            }
+          }
+          return code;
+        },
+      },
     },
   },
   argTypes: {

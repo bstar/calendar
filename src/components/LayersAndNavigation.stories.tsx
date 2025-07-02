@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { CLACalendar } from './CLACalendar';
 import { CalendarSettings } from './CLACalendar.config';
+import { formatLayerInfo } from './utils/storybook-docs';
 
 const meta = {
   title: 'Calendar/Layers & Navigation',
@@ -279,6 +280,66 @@ export const BackgroundColors: Story = {
     isOpen: true,
     visibleMonths: 2,
     showLayersNavigation: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: `Comprehensive demonstration of background color functionality across multiple layers and date ranges.
+
+**Background Color Features:**
+- **Multiple Layers:** Each layer can have its own background color scheme
+- **Date Range Highlighting:** Color-coded periods for different purposes
+- **Visual Categorization:** Different colors indicate different types of periods
+
+**Layer Configuration:**
+${formatLayerInfo([
+  {
+    name: 'Vacations',
+    title: 'Team Vacations',
+    data: {
+      events: [{ date: '2024-01-15', title: 'John - Vacation Start' }],
+      background: [
+        { startDate: '2024-01-15', endDate: '2024-01-19', color: '#FEF3C7' },
+        { startDate: '2024-02-05', endDate: '2024-02-09', color: '#DBEAFE' }
+      ]
+    }
+  },
+  {
+    name: 'BusyPeriods',
+    title: 'Busy Periods',
+    data: {
+      events: [{ date: '2024-01-22', title: 'Crunch Week' }],
+      background: [
+        { startDate: '2024-01-22', endDate: '2024-01-26', color: '#FEE2E2' },
+        { startDate: '2024-02-12', endDate: '2024-02-16', color: '#FCE7F3' }
+      ]
+    }
+  },
+  {
+    name: 'Conferences',
+    title: 'Conference Season',
+    data: {
+      events: [
+        { date: '2024-02-20', title: 'Tech Conference 2024' },
+        { date: '2024-02-22', title: 'Keynote Speech' }
+      ],
+      background: [
+        { startDate: '2024-02-20', endDate: '2024-02-23', color: '#F3E8FF' }
+      ]
+    }
+  }
+])}
+
+**Color Scheme:**
+- **Light Yellow (#FEF3C7):** Vacation periods
+- **Light Blue (#DBEAFE):** Additional vacation time  
+- **Light Red (#FEE2E2):** High-intensity work periods
+- **Light Pink (#FCE7F3):** Secondary busy periods
+- **Light Purple (#F3E8FF):** Conference and event periods
+
+**Usage:** Use layer navigation tabs to switch between different background color schemes. Background colors are visible on unselected dates.`
+      }
+    }
   },
 };
 

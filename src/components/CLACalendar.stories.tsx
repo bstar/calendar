@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { CLACalendar, SimpleCalendar } from './CLACalendar';
 import { CalendarSettings, SimpleCalendarSettings } from './CLACalendar.config';
+import { generateStoryDocs, formatLayerInfo, formatRestrictionInfo } from './utils/storybook-docs';
 
 const meta = {
   title: 'Calendar/CLACalendar',
@@ -91,6 +92,14 @@ export const Default: Story = {
     showTooltips: true,
     startWeekOnSunday: false,
   },
+  parameters: {
+    ...generateStoryDocs(
+      'Default Calendar',
+      'Basic calendar configuration with popup display and range selection. This is the most common setup for the CLACalendar component.',
+      'basic',
+      'All standard features are enabled including header, footer, tooltips, and submit button.'
+    ),
+  },
 };
 
 // Simple Calendar story
@@ -155,6 +164,14 @@ export const SingleSelection: Story = {
     showFooter: true,
     showTooltips: true,
     startWeekOnSunday: false,
+  },
+  parameters: {
+    ...generateStoryDocs(
+      'Single Date Selection',
+      'Calendar configured for single date selection instead of date ranges. Perfect for appointment booking or single-date events.',
+      'singleDate',
+      'Click any date to select it. Only one date can be selected at a time.'
+    ),
   },
 };
 
@@ -327,6 +344,44 @@ export const WithEvents: Story = {
     startWeekOnSunday: false,
     showSubmitButton: true,
     showLayersNavigation: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: `Calendar with sample events and background colors demonstrating layer functionality.
+
+**Features Shown:**
+- Layer navigation tabs
+- Event markers with tooltips
+- Background color ranges
+- Interactive event system
+
+**Configuration Details:**
+- **Layers:** 1 layer with events and backgrounds
+- **Events:** 2 sample events (Team Meeting, Project Deadline)
+- **Backgrounds:** 1 highlighted date range (Jan 10-12)
+- **Layer Navigation:** Enabled for switching between layers
+
+**Layer Information:**
+${formatLayerInfo([
+  {
+    name: 'Events',
+    title: 'Sample Events',
+    data: {
+      events: [
+        { date: '2024-01-15', title: 'Team Meeting' },
+        { date: '2024-01-20', title: 'Project Deadline' }
+      ],
+      background: [
+        { startDate: '2024-01-10', endDate: '2024-01-12' }
+      ]
+    }
+  }
+])}
+
+**Usage:** Hover over event markers to see detailed tooltips. Background colors indicate special date ranges.`
+      }
+    }
   },
 };
 

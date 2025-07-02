@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
-import { CLACalendar, SimpleCalendar } from './CLACalendar';
+import { CLACalendar } from './CLACalendar';
 import { CalendarSettings, createCalendarSettings } from './CLACalendar.config';
 
 const meta = {
@@ -172,27 +172,29 @@ export const FullPlayground: Story = {
   },
 };
 
-// Simple Calendar Playground
-export const SimplePlayground: Story = {
+// Minimal Playground
+export const MinimalPlayground: Story = {
   render: (args) => {
     const [selectedRange, setSelectedRange] = useState<{start: string | null, end: string | null}>({
       start: null,
       end: null,
     });
 
+    const settings = createCalendarSettings({
+      displayMode: args.displayMode || 'embedded',
+      visibleMonths: args.visibleMonths || 1,
+      selectionMode: args.selectionMode || 'range',
+      showSubmitButton: args.showSubmitButton ?? true,
+      startWeekOnSunday: args.startWeekOnSunday || false,
+      colors: {
+        primary: args.primaryColor || '#0366d6',
+      },
+    });
+
     return (
       <div style={{ padding: '20px' }}>
-        <SimpleCalendar
-          config={{
-            displayMode: args.displayMode || 'embedded',
-            visibleMonths: args.visibleMonths || 1,
-            selectionMode: args.selectionMode || 'range',
-            showSubmitButton: args.showSubmitButton || false,
-            startWeekOnSunday: args.startWeekOnSunday || false,
-            colors: {
-              primary: args.primaryColor || '#0366d6',
-            },
-          }}
+        <CLACalendar
+          settings={settings}
           onSubmit={(start, end) => {
             setSelectedRange({ start, end });
           }}
@@ -258,40 +260,40 @@ export const ConfigurationComparison: Story = {
           
           <div>
             <h4>Minimal Configuration</h4>
-            <SimpleCalendar />
+            <CLACalendar settings={createCalendarSettings({})} />
           </div>
           
           <div>
             <h4>Single Date Selection</h4>
-            <SimpleCalendar 
-              config={{
+            <CLACalendar 
+              settings={createCalendarSettings({
                 selectionMode: 'single',
                 visibleMonths: 1,
                 showSubmitButton: true,
-              }}
+              })}
             />
           </div>
           
           <div>
             <h4>Multiple Months</h4>
-            <SimpleCalendar 
-              config={{
+            <CLACalendar 
+              settings={createCalendarSettings({
                 visibleMonths: 2,
                 selectionMode: 'range',
-              }}
+              })}
             />
           </div>
           
           <div>
             <h4>Custom Theme</h4>
-            <SimpleCalendar 
-              config={{
+            <CLACalendar 
+              settings={createCalendarSettings({
                 visibleMonths: 1,
                 colors: {
                   primary: '#9333EA',
                   success: '#059669',
                 },
-              }}
+              })}
             />
           </div>
           
@@ -314,14 +316,14 @@ export const PerformanceTest: Story = {
           {Array.from({ length: 6 }, (_, i) => (
             <div key={i}>
               <h4>Calendar {i + 1}</h4>
-              <SimpleCalendar 
-                config={{
+              <CLACalendar 
+                settings={createCalendarSettings({
                   visibleMonths: 1,
                   selectionMode: i % 2 === 0 ? 'single' : 'range',
                   colors: {
                     primary: `hsl(${i * 60}, 70%, 50%)`,
                   },
-                }}
+                })}
               />
             </div>
           ))}
