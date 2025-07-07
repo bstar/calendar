@@ -301,7 +301,6 @@ export const DateInput: React.FC<DateInputProps> = ({
           overflow: 'hidden',
           textOverflow: 'ellipsis'
         }}
-        defaultValue={defaultValue}
       />
       {showIndicator && (
         <div className={`date-input-indicator date-input-indicator-${showIndicator}`}>
