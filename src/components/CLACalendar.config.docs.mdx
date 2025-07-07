@@ -11,6 +11,8 @@ import { configurationExamples } from './utils/storybook-docs';
 
 The CLACalendar component is a highly configurable React date picker that supports layers, restrictions, theming, and multiple display modes. This guide covers all configuration options with practical examples.
 
+> **💡 Pro Tip**: All features in this guide can be tested interactively! Every story includes comprehensive Storybook controls that let you experiment with settings in real-time without writing code. Jump to the [Interactive Testing & Exploration](#interactive-testing--exploration) section to learn how.
+
 ## Table of Contents
 
 1. [Basic Configuration](#basic-configuration)
@@ -772,6 +774,69 @@ For TypeScript users, the main configuration interface is:
 }`}
   language="typescript"
 />
+
+---
+
+## Interactive Testing & Exploration
+
+**🎛️ All CLACalendar features can be tested interactively using Storybook controls!**
+
+Every story in this Storybook includes comprehensive controls that let you:
+
+- **Real-time Configuration**: Change any setting and see immediate results
+- **No Code Required**: Test all features without writing configuration code
+- **Complete Coverage**: Every CalendarSettings property has a working control
+- **Visual Feedback**: See exactly how each setting affects the calendar
+
+### 🔧 Available Interactive Controls
+
+**Core Settings:**
+- **Display Mode**: Switch between popup and embedded modes
+- **Visible Months**: Adjust from 1-6 months (range slider)
+- **Month Width**: Control calendar width (200-600px)
+- **Selection Mode**: Toggle between single date and range selection
+
+**UI Features:**
+- **Start Week on Sunday**: Toggle week start day (Sunday vs Monday)
+- **Show Header**: Toggle navigation header on/off
+- **Show Footer**: Toggle action footer on/off  
+- **Show Submit Button**: Control submit button visibility
+- **Show Tooltips**: Enable/disable hover tooltips
+- **Show Layers Navigation**: Toggle layer tabs visibility
+
+**Advanced Settings:**
+- **Timezone**: Select from multiple timezone options
+- **Position**: Control popup positioning (for popup mode)
+- **Date Range Separator**: Customize range separator text
+- **Font Size**: Adjust base font size
+
+### 📖 How to Use Interactive Controls
+
+1. **Navigate to any story** (Default, Restrictions, Embedded Widgets, etc.)
+2. **Open the Controls panel** at the bottom of Storybook
+3. **Adjust any setting** using the controls
+4. **Watch the calendar update** in real-time
+5. **Experiment freely** - all combinations are supported!
+
+### 🧪 Recommended Testing Flow
+
+**Basic Exploration:**
+1. Start with the **Default** story
+2. Try changing `visibleMonths` to see 1-6 month layouts
+3. Toggle `startWeekOnSunday` to see week layout changes
+4. Switch `selectionMode` between single and range
+
+**Feature Testing:**
+1. Visit **Layers & Navigation** stories to test layer functionality
+2. Use **Restrictions** stories to understand validation rules  
+3. Try **Embedded Widgets** stories for integration examples
+4. Explore the **Year Round Calendar** for advanced features
+
+**Edge Case Testing:**
+1. Combine multiple restrictions in **Mixed Restrictions**
+2. Test embedded styling with different `monthWidth` values
+3. Try various timezone settings with date selection
+4. Test accessibility with `showTooltips` disabled
 
 ---
 
