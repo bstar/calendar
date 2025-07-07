@@ -13,6 +13,9 @@ import {
   isValid as _isValid
 } from 'date-fns';
 
+// Re-export isValid
+export const isValid = _isValid;
+
 // Default timezone
 export const DEFAULT_TIMEZONE = 'UTC';
 

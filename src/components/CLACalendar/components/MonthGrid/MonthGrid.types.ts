@@ -1,0 +1,20 @@
+import { DateRange } from '../../../CLACalendarComponents/selection/DateRangeSelectionManager';
+import { Layer, CalendarSettings } from '../../../CLACalendar.config';
+import { RestrictionConfig } from '../../../CLACalendarComponents/restrictions/types';
+import { Renderer } from '../../CLACalendar.types';
+
+export interface MonthGridProps {
+  baseDate: Date;
+  selectedRange: DateRange;
+  onSelectionStart: (date: Date) => void;
+  onSelectionMove: (date: Date) => void;
+  style?: React.CSSProperties;
+  showMonthHeading?: boolean;
+  showTooltips: boolean;
+  renderDay: Renderer;
+  layer: Layer;
+  startWeekOnSunday?: boolean;
+  restrictionConfig?: RestrictionConfig;
+  activeLayer?: string;
+  settings?: CalendarSettings;
+}

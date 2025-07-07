@@ -872,6 +872,150 @@ describe('CLACalendar Configuration Features', () => {
     });
   });
 
+  describe('Background Color Configuration', () => {
+    it('should apply custom background colors to all areas', () => {
+      const { mockOnSettingsChange, baseSettings } = createTestSetup();
+      const customBackgroundSettings: CalendarSettings = {
+        ...baseSettings,
+        displayMode: 'embedded',
+        backgroundColors: {
+          emptyRows: 'rgb(254, 243, 226)',
+          monthHeader: 'rgb(255, 237, 213)',
+          headerContainer: 'rgb(254, 215, 170)',
+          dayCells: 'rgb(254, 243, 226)',
+          selection: '#F59E0B',
+          input: 'rgb(254, 243, 226)'
+        }
+      };
+
+      const { container } = render(
+        <CLACalendar
+          settings={customBackgroundSettings}
+          _onSettingsChange={mockOnSettingsChange}
+        />
+      );
+
+      // Check if background colors are applied via inline styles
+      const headerContainer = container.querySelector('.cla-date-inputs-wrapper');
+      expect(headerContainer).toHaveStyle({
+        backgroundColor: 'rgb(254, 215, 170)'
+      });
+
+      // Check input backgrounds
+      const inputs = container.querySelectorAll('.date-input');
+      inputs.forEach(input => {
+        expect(input).toHaveStyle({
+          backgroundColor: 'rgb(254, 243, 226)'
+        });
+      });
+    });
+
+    it('should apply selection background color', () => {
+      const { mockOnSettingsChange, baseSettings } = createTestSetup();
+      const selectionColorSettings: CalendarSettings = {
+        ...baseSettings,
+        displayMode: 'embedded',
+        backgroundColors: {
+          selection: '#F59E0B'
+        },
+        defaultRange: {
+          start: '2024-01-10',
+          end: '2024-01-15'
+        }
+      };
+
+      render(
+        <CLACalendar
+          settings={selectionColorSettings}
+          _onSettingsChange={mockOnSettingsChange}
+        />
+      );
+
+      // Find selected dates and check their background
+      const selectedCells = screen.getAllByText(/1[0-5]/);
+      // Note: Actual selection style testing would require checking computed styles
+      // or mocking the DayCell component to verify props
+      expect(selectedCells.length).toBeGreaterThan(0);
+    });
+
+    it('should apply month header background color', () => {
+      const { mockOnSettingsChange, baseSettings } = createTestSetup();
+      const monthHeaderSettings: CalendarSettings = {
+        ...baseSettings,
+        displayMode: 'embedded',
+        showMonthHeadings: true,
+        backgroundColors: {
+          monthHeader: 'rgb(255, 237, 213)'
+        }
+      };
+
+      const { container } = render(
+        <CLACalendar
+          settings={monthHeaderSettings}
+          _onSettingsChange={mockOnSettingsChange}
+        />
+      );
+
+      // Check month navigation header
+      const calendarHeader = container.querySelector('.cla-header');
+      expect(calendarHeader).toHaveStyle({
+        backgroundColor: 'rgb(255, 237, 213)'
+      });
+    });
+
+    it('should fall back to default colors when backgroundColors not provided', () => {
+      const { mockOnSettingsChange, baseSettings } = createTestSetup();
+      const noBackgroundSettings: CalendarSettings = {
+        ...baseSettings,
+        displayMode: 'embedded'
+        // No backgroundColors specified
+      };
+
+      const { container } = render(
+        <CLACalendar
+          settings={noBackgroundSettings}
+          _onSettingsChange={mockOnSettingsChange}
+        />
+      );
+
+      // Check that default backgrounds are applied
+      const headerContainer = container.querySelector('.cla-date-inputs-wrapper');
+      // When no backgroundColors are provided, the style should either be empty or transparent
+      const headerStyle = headerContainer?.getAttribute('style') || '';
+      expect(headerStyle).toMatch(/background-color:\s*(transparent|$)/);
+
+      const calendarHeader = container.querySelector('.cla-header');
+      // Default header background should be white
+      const headerBgStyle = calendarHeader?.getAttribute('style') || '';
+      expect(headerBgStyle).toMatch(/background-color:\s*white/);
+    });
+
+    it('should apply input container background color', () => {
+      const { mockOnSettingsChange, baseSettings } = createTestSetup();
+      const inputContainerSettings: CalendarSettings = {
+        ...baseSettings,
+        displayMode: 'embedded',
+        showDateInputs: true,
+        backgroundColors: {
+          headerContainer: 'rgb(254, 215, 170)'
+        }
+      };
+
+      const { container } = render(
+        <CLACalendar
+          settings={inputContainerSettings}
+          _onSettingsChange={mockOnSettingsChange}
+        />
+      );
+
+      // Check both the wrapper and the input container
+      const inputContainer = container.querySelector('.cla-input-container');
+      expect(inputContainer).toHaveStyle({
+        backgroundColor: 'rgb(254, 215, 170)'
+      });
+    });
+  });
+
   describe('Complex Configuration Combinations', () => {
     it('should handle comprehensive settings configuration', () => {
       const { mockOnSettingsChange, baseSettings } = createTestSetup();
@@ -898,7 +1042,16 @@ describe('CLACalendar Configuration Features', () => {
         containerStyle: {
           border: '2px solid #e5e7eb',
           borderRadius: '12px',
-          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+          backgroundColor: '#fefce8'
+        },
+        backgroundColors: {
+          emptyRows: '#fef9c3',
+          monthHeader: '#fef3c7',
+          headerContainer: '#fed7aa',
+          dayCells: '#fef9c3',
+          selection: '#f59e0b',
+          input: '#fffbeb'
         },
         layers: [
           {

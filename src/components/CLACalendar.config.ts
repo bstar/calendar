@@ -251,6 +251,16 @@ export interface CalendarSettings {
     pink?: string;
   };
 
+  // Background customization
+  backgroundColors?: {
+    emptyRows?: string;        // Background for empty week rows (default: white)
+    monthHeader?: string;      // Background for month headers
+    headerContainer?: string;  // Background for the header input container
+    dayCells?: string;         // Background for day cells (default: transparent)
+    selection?: string;        // Background for selected date range (default: #b1e4e5)
+    input?: string;            // Background for input fields (default: white)
+  };
+
   /**
    * Optional: custom className for the calendar input field (the field that toggles the calendar)
    */
@@ -512,7 +522,7 @@ export function createMinimalCalendar(config: {
   defaultRange?: { start?: string; end?: string };
   displayMode?: 'popup' | 'embedded';
 } = {}): CalendarSettings {
-  return createSimpleCalendarSettings({
+  return createCalendarSettings({
     displayMode: config.displayMode || 'embedded',
     showSubmitButton: !!config.onSubmit,
     defaultRange: config.defaultRange,

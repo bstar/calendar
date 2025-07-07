@@ -6,7 +6,7 @@ import {
   isSameDay,
 } from '../../utils/DateUtils';
 import { DateRange } from './selection/DateRangeSelectionManager';
-import { DEFAULT_CONTAINER_STYLES } from '../CLACalendar.config';
+import { DEFAULT_CONTAINER_STYLES, CalendarSettings } from '../CLACalendar.config';
 import { RestrictionConfig } from './restrictions/types';
 import { Layer } from '../CLACalendar.config';
 import './CalendarComponents.css';
@@ -104,6 +104,7 @@ export interface DateInputProps {
   };
   selectedRange: DateRange;
   defaultValue?: string;
+  settings?: CalendarSettings;
 }
 
 /**
@@ -122,7 +123,8 @@ export const DateInput: React.FC<DateInputProps> = ({
   field,
   placeholder,
   selectedRange,
-  defaultValue
+  defaultValue,
+  settings
 }) => {
   const [inputValue, setInputValue] = useState<string>(defaultValue || '');
   const [error, setError] = useState<ValidationError | null>(null);
@@ -299,7 +301,8 @@ export const DateInput: React.FC<DateInputProps> = ({
           display: 'block',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
-          textOverflow: 'ellipsis'
+          textOverflow: 'ellipsis',
+          backgroundColor: settings?.backgroundColors?.input || '#fff'
         }}
       />
       {showIndicator && (
@@ -326,6 +329,7 @@ export interface CalendarHeaderProps {
   visibleMonths: number;
   moveToMonth: (direction: 'prev' | 'next') => void;
   timezone?: string;
+  settings?: CalendarSettings;
 }
 
 /**
@@ -340,7 +344,8 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   months,
   visibleMonths,
   moveToMonth,
-  timezone = 'UTC'
+  timezone = 'UTC',
+  settings
 }) => {
   // Format timezone for display
   const formatTimezone = (tz: string) => {
@@ -356,13 +361,13 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
            display: 'flex',
            justifyContent: 'space-between',
            alignItems: 'center',
-           padding: '0px 8px !omportant',
+           padding: '0px 8px !important',
            width: '100%',
            margin: 0,
            boxSizing: 'border-box',
            position: 'relative',
            flexWrap: 'nowrap',
-           backgroundColor: 'white'
+           backgroundColor: settings?.backgroundColors?.monthHeader || 'white'
          }}>
       <button
         className="cla-button-nav"
@@ -453,6 +458,7 @@ export interface DateInputSectionProps {
   };
   selectionMode: 'single' | 'range';
   defaultRange?: { start: string; end: string };
+  settings?: CalendarSettings;
 }
 
 /**
@@ -469,7 +475,8 @@ export const DateInputSection: React.FC<DateInputSectionProps> = ({
   handleDateChange,
   dateInputContext,
   selectionMode,
-  defaultRange
+  defaultRange,
+  settings
 }) => (
   <div className={`cla-input-container ${selectionMode === 'single' ? 'single' : 'range'}`}
        style={{
@@ -484,7 +491,8 @@ export const DateInputSection: React.FC<DateInputSectionProps> = ({
          alignItems: 'center',
          boxSizing: 'border-box',
          whiteSpace: 'nowrap',
-         overflow: 'visible'
+         overflow: 'visible',
+         backgroundColor: settings?.backgroundColors?.headerContainer || 'transparent'
        }}>
     <div className="cla-input-wrapper"
          style={{
@@ -505,6 +513,7 @@ export const DateInputSection: React.FC<DateInputSectionProps> = ({
         context={dateInputContext}
         selectedRange={selectedRange}
         defaultValue={defaultRange?.start ? format(new Date(defaultRange.start), "MMM dd, yyyy") : undefined}
+        settings={settings}
       />
     </div>
     {selectionMode === 'range' && (
@@ -526,6 +535,7 @@ export const DateInputSection: React.FC<DateInputSectionProps> = ({
           context={dateInputContext}
           selectedRange={selectedRange}
           defaultValue={defaultRange?.end ? format(new Date(defaultRange.end), "MMM dd, yyyy") : undefined}
+          settings={settings}
         />
       </div>
     )}

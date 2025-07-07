@@ -286,6 +286,60 @@ describe('CLACalendar Configuration', () => {
         expect(settings.colors.primary).toBe('#ff0000');
         expect(settings.colors.success).toBe(DEFAULT_COLORS.success);
       });
+
+      it('should handle backgroundColors configuration', () => {
+        const settings = createCalendarSettings({
+          backgroundColors: {
+            emptyRows: 'rgb(254, 243, 226)',
+            monthHeader: '#FFEDD5',
+            headerContainer: 'rgba(254, 215, 170, 0.8)',
+            dayCells: '#FEF3E2',
+            selection: '#F59E0B',
+            input: 'hsl(39, 100%, 95%)'
+          }
+        });
+        
+        expect(settings.backgroundColors).toBeDefined();
+        expect(settings.backgroundColors?.emptyRows).toBe('rgb(254, 243, 226)');
+        expect(settings.backgroundColors?.monthHeader).toBe('#FFEDD5');
+        expect(settings.backgroundColors?.headerContainer).toBe('rgba(254, 215, 170, 0.8)');
+        expect(settings.backgroundColors?.dayCells).toBe('#FEF3E2');
+        expect(settings.backgroundColors?.selection).toBe('#F59E0B');
+        expect(settings.backgroundColors?.input).toBe('hsl(39, 100%, 95%)');
+      });
+
+      it('should handle partial backgroundColors', () => {
+        const settings = createCalendarSettings({
+          backgroundColors: {
+            selection: '#F59E0B',
+            input: '#FFFBEB'
+          }
+        });
+        
+        expect(settings.backgroundColors?.selection).toBe('#F59E0B');
+        expect(settings.backgroundColors?.input).toBe('#FFFBEB');
+        expect(settings.backgroundColors?.emptyRows).toBeUndefined();
+      });
+
+      it('should handle various color formats in backgroundColors', () => {
+        const settings = createCalendarSettings({
+          backgroundColors: {
+            emptyRows: 'red',
+            monthHeader: '#FFF',
+            headerContainer: 'transparent',
+            dayCells: 'currentColor',
+            selection: 'inherit',
+            input: 'initial'
+          }
+        });
+        
+        expect(settings.backgroundColors?.emptyRows).toBe('red');
+        expect(settings.backgroundColors?.monthHeader).toBe('#FFF');
+        expect(settings.backgroundColors?.headerContainer).toBe('transparent');
+        expect(settings.backgroundColors?.dayCells).toBe('currentColor');
+        expect(settings.backgroundColors?.selection).toBe('inherit');
+        expect(settings.backgroundColors?.input).toBe('initial');
+      });
     });
 
     describe('createSimpleCalendarSettings', () => {

@@ -1,10 +1,8 @@
-export { default as CLACalendar, SimpleCalendar } from './components/CLACalendar';
+export { default as CLACalendar } from './components/CLACalendar';
 export { CalendarErrorBoundary, withCalendarErrorBoundary, useErrorHandler } from './components/ErrorBoundary';
 export {
   CalendarSettings,
-  SimpleCalendarSettings,
   createCalendarSettings,
-  createSimpleCalendarSettings,
   createMinimalCalendar,
   validateCalendarSettings,
   getDefaultSettings,

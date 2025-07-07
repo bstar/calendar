@@ -1,0 +1,33 @@
+/* LayerControl specific styles */
+.cla-layer-control {
+  display: flex;
+  gap: 8px;
+  padding: 8px 16px;
+  flex-wrap: wrap;
+}
+
+.cla-layer-button {
+  padding: 6px 12px;
+  border-radius: 4px;
+  border: 1px solid #dee2e6;
+  background-color: #fff;
+  color: #666;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.cla-layer-button:hover {
+  background-color: #f8f9fa;
+  border-color: #adb5bd;
+}
+
+.cla-layer-button.active {
+  background-color: #e7f3ff;
+  color: #0366d6;
+  border-color: #0366d6;
+}
+
+.cla-layer-button.active:hover {
+  background-color: #d0e8ff;
+}

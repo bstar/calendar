@@ -4,7 +4,7 @@ import './docStyles.css';
 import './App.css';
 import './components/CLACalendarComponents/defensive-styles.css';
 
-import { SimpleCalendar } from './components/CLACalendar';
+import CLACalendar from './components/CLACalendar';
 
 const App: React.FC = () => {
   const [selectedRange, setSelectedRange] = useState<{
@@ -64,8 +64,8 @@ const App: React.FC = () => {
                   <div>
                     <h4>Basic Usage</h4>
                     <p className="text-muted">Minimal configuration with defaults</p>
-                    <SimpleCalendar 
-                      config={{
+                    <CLACalendar 
+                      settings={{
                         displayMode: 'embedded',
                         showSubmitButton: true,
                       }}
@@ -78,8 +78,8 @@ const App: React.FC = () => {
                   <div>
                     <h4>Single Date Selection</h4>
                     <p className="text-muted">Select a single date instead of a range</p>
-                    <SimpleCalendar 
-                      config={{
+                    <CLACalendar 
+                      settings={{
                         displayMode: 'embedded',
                         selectionMode: 'single',
                         visibleMonths: 1,
@@ -94,8 +94,8 @@ const App: React.FC = () => {
                   <div>
                     <h4>Multiple Months</h4>
                     <p className="text-muted">Display multiple months for easier navigation</p>
-                    <SimpleCalendar 
-                      config={{
+                    <CLACalendar 
+                      settings={{
                         displayMode: 'embedded',
                         visibleMonths: 3,
                         showSubmitButton: true,
@@ -109,8 +109,8 @@ const App: React.FC = () => {
                   <div>
                     <h4>Custom Theme</h4>
                     <p className="text-muted">Custom colors and styling</p>
-                    <SimpleCalendar 
-                      config={{
+                    <CLACalendar 
+                      settings={{
                         displayMode: 'embedded',
                         visibleMonths: 2,
                         showSubmitButton: true,
@@ -137,8 +137,8 @@ const App: React.FC = () => {
                     <p className="text-muted">
                       Demonstrates graceful handling of null/undefined values
                     </p>
-                    <SimpleCalendar 
-                      config={{
+                    <CLACalendar 
+                      settings={{
                         // Mixed null/undefined values to test robustness
                         displayMode: undefined as any,
                         visibleMonths: null as any,
@@ -172,7 +172,7 @@ const App: React.FC = () => {
                 <div className="mt-3">
                   <h6>Quick Start:</h6>
                   <pre className="bg-light p-2 rounded">
-                    <code>{`import { SimpleCalendar } from './components/CLACalendar';
+                    <code>{`import CLACalendar from './components/CLACalendar';
 
 <SimpleCalendar 
   config={{

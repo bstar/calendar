@@ -101,16 +101,107 @@ export const CustomColors: Story = {
       key="custom-colors-story"
       settings={{
         ...mapArgsToSettings(args),
-        colors: {
-          primary: '#8B5CF6',
-          success: '#10B981',
-          warning: '#F59E0B',
-          danger: '#EF4444',
+        containerStyle: {
+          backgroundColor: 'rgb(254, 243, 226)',  // Consistent background throughout
+          border: '2px solid #D97706',  // Warm amber border
+          borderRadius: '6px',          // Keep default border radius
+          boxShadow: '0 0.5rem 1rem rgba(0, 0, 0, 0.15)'  // Keep default shadow
         },
+        backgroundColors: {
+          emptyRows: 'rgb(254, 243, 226)',        // Same color for empty rows
+          monthHeader: 'rgb(254, 243, 226)',      // Same color for month headers
+          headerContainer: 'rgb(254, 243, 226)',  // Same color for input container
+          dayCells: 'rgb(254, 243, 226)',         // Same color for day cells
+          selection: '#F59E0B',                   // Warm amber for selection
+          input: 'rgb(254, 243, 226)'             // Same color for input fields
+        },
+        defaultRange: {
+          start: '2024-01-10',
+          end: '2024-01-15'
+        },
+        colors: {
+          primary: '#8B5CF6',   // Purple
+          success: '#10B981',   // Green
+          warning: '#F59E0B',   // Orange
+          danger: '#EF4444',    // Red
+        },
+        layers: [
+          {
+            name: 'Calendar',
+            title: 'Custom Styled Calendar',
+            description: 'Calendar with custom color scheme and background highlights',
+            visible: true,
+            data: {
+              background: [
+                {
+                  startDate: '2024-01-05',
+                  endDate: '2024-01-07',
+                  color: '#DDD6FE' // Light purple
+                },
+                {
+                  startDate: '2024-01-20',
+                  endDate: '2024-01-25',
+                  color: '#FED7AA' // Light orange
+                }
+              ],
+              events: [
+                {
+                  date: '2024-01-06',
+                  title: 'Design Review',
+                  type: 'other',
+                  color: '#8B5CF6',
+                  time: '10:00 AM',
+                  description: 'Monthly design review meeting'
+                },
+                {
+                  date: '2024-01-22',
+                  title: 'Launch Event',
+                  type: 'other',
+                  color: '#FB923C',
+                  time: '2:00 PM',
+                  description: 'Product launch celebration'
+                }
+              ]
+            }
+          }
+        ]
       }}
     />
   ),
-  args: CLACalendarDefaultArgs as any, // Type assertion for Storybook args compatibility
+  args: {
+    ...CLACalendarDefaultArgs,
+    showLayersNavigation: false,
+    showTooltips: true,
+    displayMode: 'embedded',
+    visibleMonths: 1,
+    showMonthHeadings: true,  // Enable to show month header background
+  } as any,
+  parameters: {
+    docs: {
+      description: {
+        story: `Demonstrates a consistent custom background color (rgb(254, 243, 226)) with custom selection and border colors.
+
+**Visual Changes:**
+- **Consistent Background:** Light beige (rgb(254, 243, 226)) throughout all calendar areas
+- **Container Border:** Warm amber border (2px solid #D97706) instead of default blue
+- **Selection Color:** Warm amber (#F59E0B) for selected date ranges
+- **Day Cells:** Same background color for all day cells
+- **Empty Row Backgrounds:** Same color for weeks with no days
+- **Month Headers:** Same background color when showMonthHeadings is true
+- **Header Input Container:** Same background for the date input area
+
+**Background Color Options:**
+- \`backgroundColors.dayCells\` - Sets the background for day cells
+- \`backgroundColors.emptyRows\` - Sets the background for empty week rows
+- \`backgroundColors.monthHeader\` - Sets the background for month name headers
+- \`backgroundColors.headerContainer\` - Sets the background for the date input container
+- \`backgroundColors.selection\` - Sets the background for selected date ranges (warm amber #F59E0B)
+- \`backgroundColors.input\` - Sets the background for input fields
+
+**Note:** This story demonstrates how to achieve a fully consistent background color throughout the calendar by setting all background properties to the same value.`
+      }
+    }
+  }
 };
 
 // Week starting on Sunday
