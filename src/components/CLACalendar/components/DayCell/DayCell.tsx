@@ -116,7 +116,7 @@ export const DayCell: React.FC<DayCellProps> = ({
 
   // Always render the DayCell component, but return a placeholder for non-current month days
   const cellPlaceholder = !isCurrentMonth ? (
-    <div style={{ width: "100%", height: "100%", position: "relative", backgroundColor: settings?.backgroundColors?.emptyRows || "white" }} />
+    <div className="day-cell-placeholder" style={{ backgroundColor: settings?.backgroundColors?.emptyRows || "white" }} />
   ) : null;
 
   // Moved useMemo outside the conditional statement
@@ -148,70 +148,41 @@ export const DayCell: React.FC<DayCellProps> = ({
     return settings?.backgroundColors?.dayCells || 'transparent';
   };
 
+  const dayCellClasses = [
+    'day-cell',
+    !restrictionResult.allowed && 'restricted-date-pattern',
+    !restrictionResult.allowed && 'restricted',
+    isSelected && 'selected',
+    isRangeStart && 'range-start',
+    isRangeEnd && 'range-end',
+    isSingleDay && (isSelected || isInRange) && 'single-day'
+  ].filter(Boolean).join(' ');
+
   const cellContent = (
     <div
-      className={!restrictionResult.allowed ? 'restricted-date-pattern' : ''}
+      className={dayCellClasses}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onMouseDown={onMouseDown}
       style={{
-        width: "100%",
-        height: "100%",
-        position: "relative",
-        cursor: !restrictionResult.allowed ? 'not-allowed' : 'pointer',
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
         // Only apply backgroundColor for non-restricted dates
         ...(!restrictionResult.allowed ? {
           '--row-index': rowIndex,
           '--col-index': colIndex
         } as React.CSSProperties : {
           backgroundColor: (isSelected || isInRange) ? (settings?.backgroundColors?.selection || "#b1e4e5") : getBackgroundColor()
-        }),
-        borderRadius: isSingleDay && (isSelected || isInRange) ? "50%" : (
-          isRangeStart || isRangeEnd ?
-            `${isRangeStart ? "15px" : "0"} ${isRangeEnd ? "15px" : "0"} ${isRangeEnd ? "15px" : "0"} ${isRangeStart ? "15px" : "0"}`
-            : "0"
-        ),
-        fontWeight: isSelected ? "600" : "normal",
-        margin: 0,
-        padding: 0,
-        boxSizing: "border-box",
-        ...(isSingleDay && (isSelected || isInRange) ? {
-          width: "36px",
-          height: "36px",
-          margin: "auto"
-        } : {})
+        })
       }}
     >
-      <div style={{
-        position: 'absolute',
-        inset: 0,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        pointerEvents: 'none',
-        zIndex: 3 // Ensure date number appears above pattern and below events
-      }}>
-        <span style={{
-          position: 'relative',
-          pointerEvents: 'none',
+      <div className="day-cell-date">
+        <span className="day-cell-date-text" style={{
           fontSize: getFontSize(settings, 'small'),
         }}>
           {format(date, "d")}
         </span>
       </div>
       {eventContent?.element && (
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          pointerEvents: 'none',
-          zIndex: 10 // Higher z-index to ensure events display above the restricted pattern
-        }}>
+        <div className="day-cell-event">
           {eventContent.element}
         </div>
       )}

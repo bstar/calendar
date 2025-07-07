@@ -63,6 +63,7 @@ import {
   Layer
 } from './types';
 import { parseISO, isSameDay, isWithinInterval } from '../../../utils/DateUtils';
+import './LayerRenderer.css';
 
 /**
  * LayerRenderer class provides static methods for rendering different types of layers
@@ -121,53 +122,35 @@ export class LayerRenderer {
       return {
         element: (
           <div
+            className="layer-event-container"
             style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '50%',
-              backgroundColor: `${eventColor}33`, // 20% opacity version of the color
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              pointerEvents: 'none',
-              position: 'relative',
-              zIndex: 5 // Higher z-index to appear above restriction patterns
+              backgroundColor: `${eventColor}33` // 20% opacity version of the color
             }}
           >
             {dayEvents.length > 1 && (
-              <span style={{
-                fontSize: '12px',
-                fontWeight: 'bold',
-                color: eventColor,
-                lineHeight: 1,
-                pointerEvents: 'none'
-              }}>
+              <span 
+                className="layer-event-count"
+                style={{ color: eventColor }}
+              >
                 {dayEvents.length}
               </span>
             )}
           </div>
         ),
         tooltipContent: (
-          <div style={{
-            padding: '8px',
-            backgroundColor: '#1a1a1a',
-            color: '#ffffff',
-            borderRadius: '4px',
-            position: 'relative'
-          }}>
+          <div className="layer-event-tooltip">
             {dayEvents.map((event, index) => (
-              <div key={index} style={{
-                marginBottom: index < dayEvents.length - 1 ? '8px' : 0,
-                whiteSpace: 'nowrap'
-              }}>
-                <div style={{
-                  fontWeight: 'bold',
-                  color: event.color ? `${event.color}dd` : '#4dabf7'
-                }}>
+              <div key={index} className="layer-event-tooltip-item">
+                <div 
+                  className="layer-event-tooltip-title"
+                  style={{
+                    color: event.color ? `${event.color}dd` : '#4dabf7'
+                  }}
+                >
                   {event.title}
                 </div>
-                <div style={{ fontSize: '0.9em', color: '#adb5bd' }}>{event.time}</div>
-                <div style={{ fontSize: '0.9em', color: '#e9ecef' }}>{event.description}</div>
+                <div className="layer-event-tooltip-time">{event.time}</div>
+                <div className="layer-event-tooltip-description">{event.description}</div>
               </div>
             ))}
           </div>

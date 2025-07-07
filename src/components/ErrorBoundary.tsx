@@ -1,4 +1,5 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
+import './ErrorBoundary.css';
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -181,93 +182,45 @@ ${JSON.stringify(this.props, null, 2)}
       // Development mode - show detailed error
       if (showDetails) {
         return (
-          <div style={{
-            padding: '20px',
-            margin: '20px',
-            border: '2px solid #dc3545',
-            borderRadius: '8px',
-            backgroundColor: '#f8f9fa',
-            fontFamily: 'monospace',
-            maxWidth: '100%',
-            overflow: 'auto'
-          }}>
-            <div style={{ 
-              color: '#dc3545', 
-              fontSize: '18px', 
-              fontWeight: 'bold',
-              marginBottom: '10px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}>
+          <div className="error-boundary-container">
+            <div className="error-boundary-header">
               🚨 {componentName} Error
-              <span style={{ 
-                fontSize: '12px', 
-                fontWeight: 'normal',
-                backgroundColor: '#dc3545',
-                color: 'white',
-                padding: '2px 6px',
-                borderRadius: '4px'
-              }}>
+              <span className="error-boundary-id">
                 {errorId}
               </span>
             </div>
             
-            <div style={{ marginBottom: '15px' }}>
+            <div className="error-boundary-info">
               <strong>Message:</strong> {error?.message}
             </div>
             
-            <div style={{ marginBottom: '15px' }}>
+            <div className="error-boundary-info">
               <strong>Timestamp:</strong> {new Date().toLocaleString()}
             </div>
 
-            <details style={{ marginBottom: '15px' }}>
-              <summary style={{ cursor: 'pointer', fontWeight: 'bold' }}>
+            <details className="error-boundary-details">
+              <summary className="error-boundary-summary">
                 📋 Stack Trace
               </summary>
-              <pre style={{ 
-                whiteSpace: 'pre-wrap', 
-                backgroundColor: '#f1f1f1',
-                padding: '10px',
-                borderRadius: '4px',
-                fontSize: '12px',
-                overflow: 'auto',
-                maxHeight: '200px'
-              }}>
+              <pre className="error-boundary-pre">
                 {error?.stack}
               </pre>
             </details>
 
-            <details style={{ marginBottom: '15px' }}>
-              <summary style={{ cursor: 'pointer', fontWeight: 'bold' }}>
+            <details className="error-boundary-details">
+              <summary className="error-boundary-summary">
                 🔧 Component Stack
               </summary>
-              <pre style={{ 
-                whiteSpace: 'pre-wrap', 
-                backgroundColor: '#f1f1f1',
-                padding: '10px',
-                borderRadius: '4px',
-                fontSize: '12px',
-                overflow: 'auto',
-                maxHeight: '200px'
-              }}>
+              <pre className="error-boundary-pre">
                 {errorInfo?.componentStack}
               </pre>
             </details>
 
-            <details style={{ marginBottom: '15px' }}>
-              <summary style={{ cursor: 'pointer', fontWeight: 'bold' }}>
+            <details className="error-boundary-details">
+              <summary className="error-boundary-summary">
                 ⚙️ Props & Context
               </summary>
-              <pre style={{ 
-                whiteSpace: 'pre-wrap', 
-                backgroundColor: '#f1f1f1',
-                padding: '10px',
-                borderRadius: '4px',
-                fontSize: '12px',
-                overflow: 'auto',
-                maxHeight: '200px'
-              }}>
+              <pre className="error-boundary-pre">
                 {JSON.stringify({
                   props: {
                     componentName: this.props.componentName,
@@ -282,53 +235,24 @@ ${JSON.stringify(this.props, null, 2)}
               </pre>
             </details>
 
-            <div style={{ 
-              display: 'flex', 
-              gap: '10px', 
-              flexWrap: 'wrap',
-              marginTop: '20px'
-            }}>
+            <div className="error-boundary-actions">
               <button
                 onClick={this.handleRetry}
-                style={{
-                  padding: '8px 16px',
-                  backgroundColor: '#28a745',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '14px'
-                }}
+                className="error-boundary-button error-boundary-button-retry"
               >
                 🔄 Retry
               </button>
               
               <button
                 onClick={this.copyErrorToClipboard}
-                style={{
-                  padding: '8px 16px',
-                  backgroundColor: '#17a2b8',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '14px'
-                }}
+                className="error-boundary-button error-boundary-button-copy"
               >
                 📋 Copy Error Report
               </button>
               
               <button
                 onClick={() => window.location.reload()}
-                style={{
-                  padding: '8px 16px',
-                  backgroundColor: '#6c757d',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '14px'
-                }}
+                className="error-boundary-button error-boundary-button-reload"
               >
                 🔃 Reload Page
               </button>
@@ -339,53 +263,28 @@ ${JSON.stringify(this.props, null, 2)}
 
       // Production mode - show user-friendly error
       return (
-        <div style={{
-          padding: '20px',
-          margin: '20px',
-          border: '1px solid #dc3545',
-          borderRadius: '8px',
-          backgroundColor: '#f8d7da',
-          color: '#721c24',
-          textAlign: 'center'
-        }}>
-          <div style={{ fontSize: '18px', marginBottom: '10px' }}>
+        <div className="error-boundary-production">
+          <div className="error-boundary-production-title">
             📅 Calendar Temporarily Unavailable
           </div>
-          <div style={{ marginBottom: '15px' }}>
+          <div className="error-boundary-production-message">
             We're experiencing a technical issue with the calendar component.
           </div>
-          <button
-            onClick={this.handleRetry}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#dc3545',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              marginRight: '10px'
-            }}
-          >
-            Try Again
-          </button>
-          <button
-            onClick={() => window.location.reload()}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#6c757d',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
-          >
-            Refresh Page
-          </button>
-          <div style={{ 
-            fontSize: '12px', 
-            marginTop: '10px',
-            opacity: 0.7
-          }}>
+          <div className="error-boundary-production-actions">
+            <button
+              onClick={this.handleRetry}
+              className="error-boundary-production-button error-boundary-production-button-retry"
+            >
+              Try Again
+            </button>
+            <button
+              onClick={() => window.location.reload()}
+              className="error-boundary-production-button error-boundary-production-button-reload"
+            >
+              Refresh Page
+            </button>
+          </div>
+          <div className="error-boundary-production-id">
             Error ID: {errorId}
           </div>
         </div>

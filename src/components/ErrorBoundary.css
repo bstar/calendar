@@ -1,0 +1,132 @@
+/* Error boundary container styles */
+.error-boundary-container {
+  padding: 20px;
+  margin: 20px;
+  border: 2px solid #dc3545;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  font-family: monospace;
+  max-width: 100%;
+  overflow: auto;
+}
+
+/* Error boundary header */
+.error-boundary-header {
+  color: #dc3545;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.error-boundary-id {
+  font-size: 12px;
+  font-weight: normal;
+  background-color: #dc3545;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Error boundary info sections */
+.error-boundary-info {
+  margin-bottom: 15px;
+}
+
+.error-boundary-details {
+  margin-bottom: 15px;
+}
+
+.error-boundary-summary {
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.error-boundary-pre {
+  white-space: pre-wrap;
+  background-color: #f1f1f1;
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  overflow: auto;
+  max-height: 200px;
+}
+
+/* Error boundary actions */
+.error-boundary-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.error-boundary-button {
+  padding: 8px 16px;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.error-boundary-button-retry {
+  background-color: #28a745;
+}
+
+.error-boundary-button-copy {
+  background-color: #17a2b8;
+}
+
+.error-boundary-button-reload {
+  background-color: #6c757d;
+}
+
+/* Production error styles */
+.error-boundary-production {
+  padding: 20px;
+  margin: 20px;
+  border: 1px solid #dc3545;
+  border-radius: 8px;
+  background-color: #f8d7da;
+  color: #721c24;
+  text-align: center;
+}
+
+.error-boundary-production-title {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.error-boundary-production-message {
+  margin-bottom: 15px;
+}
+
+.error-boundary-production-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.error-boundary-production-button {
+  padding: 8px 16px;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.error-boundary-production-button-retry {
+  background-color: #dc3545;
+}
+
+.error-boundary-production-button-reload {
+  background-color: #6c757d;
+}
+
+.error-boundary-production-id {
+  font-size: 12px;
+  margin-top: 10px;
+  opacity: 0.7;
+}

@@ -1,0 +1,57 @@
+/* LayerRenderer styles */
+
+/* Event container styles */
+.layer-event-container {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  position: relative;
+  z-index: 5;
+}
+
+/* Event count badge */
+.layer-event-count {
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1;
+  pointer-events: none;
+}
+
+/* Event tooltip */
+.layer-event-tooltip {
+  padding: 8px;
+  background-color: #1a1a1a;
+  color: #ffffff;
+  border-radius: 4px;
+  position: relative;
+}
+
+/* Event tooltip item */
+.layer-event-tooltip-item {
+  white-space: nowrap;
+}
+
+.layer-event-tooltip-item:not(:last-child) {
+  margin-bottom: 8px;
+}
+
+/* Event tooltip title */
+.layer-event-tooltip-title {
+  font-weight: bold;
+}
+
+/* Event tooltip time */
+.layer-event-tooltip-time {
+  font-size: 0.9em;
+  color: #adb5bd;
+}
+
+/* Event tooltip description */
+.layer-event-tooltip-description {
+  font-size: 0.9em;
+  color: #e9ecef;
+}

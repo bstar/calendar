@@ -2,14 +2,18 @@
 .month-grid-container {
   width: 100%;
   padding: 0 8px;
+  margin-top: 0;
 }
 
 .month-grid-heading {
   font-weight: 600;
   color: #333;
   text-align: left;
+  margin-top: 0;
   margin-bottom: 8px;
-  padding-left: 6px;
+  padding: 4px 6px;
+  background-color: transparent;
+  border-radius: 4px;
 }
 
 .month-grid-weekdays {

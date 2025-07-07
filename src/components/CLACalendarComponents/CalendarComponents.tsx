@@ -49,16 +49,10 @@ export const ChevronLeft: React.FC<ChevronProps> = ({ size = 16 }) => (
   <span
     className="cla-chevron cla-chevron-left"
     style={{ 
+      '--chevron-size': `${size}px`,
       width: size, 
-      height: size,
-      display: 'block',
-      position: 'relative',
-      color: '#333',
-      boxSizing: 'border-box',
-      flex: '0 0 auto',
-      margin: 0,
-      padding: 0
-    }}
+      height: size
+    } as React.CSSProperties}
   />
 );
 
@@ -71,16 +65,10 @@ export const ChevronRight: React.FC<ChevronProps> = ({ size = 16 }) => (
   <span
     className="cla-chevron cla-chevron-right"
     style={{ 
+      '--chevron-size': `${size}px`,
       width: size, 
-      height: size,
-      display: 'block',
-      position: 'relative',
-      color: '#333',
-      boxSizing: 'border-box',
-      flex: '0 0 auto',
-      margin: 0,
-      padding: 0
-    }}
+      height: size
+    } as React.CSSProperties}
   />
 );
 
@@ -265,14 +253,6 @@ export const DateInput: React.FC<DateInputProps> = ({
       className="date-input-container"
       onClick={(e) => e.stopPropagation()}
       onMouseDown={(e) => e.stopPropagation()}
-      style={{
-        position: 'relative',
-        display: 'block',
-        width: '100%',
-        minWidth: '120px',
-        boxSizing: 'border-box',
-        whiteSpace: 'nowrap'
-      }}
     >
       <input
         type="text"
@@ -292,16 +272,6 @@ export const DateInput: React.FC<DateInputProps> = ({
         autoComplete="off"
         className="date-input"
         style={{
-          width: '100%',
-          minWidth: '120px',
-          padding: '8px 10px',
-          boxSizing: 'border-box',
-          border: '1px solid #ccc',
-          borderRadius: '4px',
-          display: 'block',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
           backgroundColor: settings?.backgroundColors?.input || '#fff'
         }}
       />
@@ -311,11 +281,7 @@ export const DateInput: React.FC<DateInputProps> = ({
         </div>
       )}
       <div
-        className="date-input-error"
-        style={{
-          height: error && showError ? '24px' : '0',
-          marginTop: error && showError ? '4px' : '0',
-        }}
+        className={`date-input-error ${error && showError ? 'show' : ''}`}
       >
         {error?.message}
       </div>
@@ -358,59 +324,18 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   return (
     <div className="cla-header"
          style={{
-           display: 'flex',
-           justifyContent: 'space-between',
-           alignItems: 'center',
-           padding: '0px 8px !important',
-           width: '100%',
-           margin: 0,
-           boxSizing: 'border-box',
-           position: 'relative',
-           flexWrap: 'nowrap',
            backgroundColor: settings?.backgroundColors?.monthHeader || 'white'
          }}>
       <button
         className="cla-button-nav"
         onClick={() => moveToMonth('prev')}
         aria-label="Previous month"
-        style={{
-          width: '36px',
-          height: '36px',
-          minWidth: '36px',
-          minHeight: '36px',
-          flex: '0 0 36px',
-          padding: 0,
-          margin: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'none',
-          border: 'none',
-          borderRadius: '4px',
-          cursor: 'pointer',
-          position: 'relative',
-          zIndex: 5,
-          boxSizing: 'border-box'
-        }}
       >
         <ChevronLeft size={16} />
       </button>
       <span 
         className="cla-header-title"
         title={`Current timezone: ${formatTimezone(timezone)}`}
-        style={{
-          margin: '0 8px',
-          padding: '0 4px',
-          flex: '1 1 auto',
-          textAlign: 'center',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          fontWeight: 500,
-          fontSize: '16px',
-          lineHeight: 1.5,
-          color: '#333'
-        }}
       >
         {visibleMonths === 1
           ? format(months[0], "MMMM yyyy")
@@ -421,25 +346,6 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
         className="cla-button-nav"
         onClick={() => moveToMonth('next')}
         aria-label="Next month"
-        style={{
-          width: '36px',
-          height: '36px',
-          minWidth: '36px',
-          minHeight: '36px',
-          flex: '0 0 36px',
-          padding: 0,
-          margin: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'none',
-          border: 'none',
-          borderRadius: '4px',
-          cursor: 'pointer',
-          position: 'relative',
-          zIndex: 5,
-          boxSizing: 'border-box'
-        }}
       >
         <ChevronRight size={16} />
       </button>
@@ -480,31 +386,9 @@ export const DateInputSection: React.FC<DateInputSectionProps> = ({
 }) => (
   <div className={`cla-input-container ${selectionMode === 'single' ? 'single' : 'range'}`}
        style={{
-         display: 'flex',
-         flexDirection: 'row',
-         flexWrap: 'nowrap',
-         width: '100%',
-         minWidth: selectionMode === 'single' ? '200px' : '300px',
-         padding: '10px 8px',
-         fontSize: '14px',
-         justifyContent: 'space-between',
-         alignItems: 'center',
-         boxSizing: 'border-box',
-         whiteSpace: 'nowrap',
-         overflow: 'visible',
          backgroundColor: settings?.backgroundColors?.headerContainer || 'transparent'
        }}>
-    <div className="cla-input-wrapper"
-         style={{
-           flex: selectionMode === 'single' ? '1 0 auto' : '0 0 48%',
-           width: selectionMode === 'single' ? 'auto' : '48%',
-           maxWidth: selectionMode === 'single' ? 'none' : '48%',
-           minWidth: '120px',
-           display: 'block',
-           whiteSpace: 'nowrap',
-           position: 'relative',
-           boxSizing: 'border-box'
-         }}>
+    <div className="cla-input-wrapper">
       <DateInput
         value={selectedRange.start ? parseISO(selectedRange.start) : null}
         onChange={handleDateChange('start')}
@@ -517,16 +401,7 @@ export const DateInputSection: React.FC<DateInputSectionProps> = ({
       />
     </div>
     {selectionMode === 'range' && (
-      <div className="cla-input-wrapper"
-           style={{
-             flex: '0 0 48%',
-             width: '50%',
-             minWidth: '120px',
-             display: 'block',
-             whiteSpace: 'nowrap',
-             position: 'relative',
-             boxSizing: 'border-box'
-           }}>
+      <div className="cla-input-wrapper">
         <DateInput
           value={selectedRange.end ? parseISO(selectedRange.end) : null}
           onChange={handleDateChange('end')}
@@ -627,11 +502,11 @@ export const CalendarContainer: React.FC<CalendarContainerProps> = ({
       ref={containerRef}
       className={`cla-card ${displayMode === 'popup' ? 'cla-card-popup' : ''}`}
       style={{
-        width: visibleMonths === 1 ? `${monthWidth}px` : `${monthWidth * Math.min(6, Math.max(1, visibleMonths))}px`,
-        isolation: 'isolate', // Create new stacking context
+        '--calendar-width': visibleMonths === 1 ? `${monthWidth}px` : `${monthWidth * Math.min(6, Math.max(1, visibleMonths))}px`,
+        width: 'var(--calendar-width)',
         ...DEFAULT_CONTAINER_STYLES,
         ...containerStyle
-      }}
+      } as React.CSSProperties}
       onMouseDown={enableOutOfBoundsScroll ? handleMouseDown : undefined}
       onMouseMove={enableOutOfBoundsScroll ? handleMouseMove : undefined}
       onMouseLeave={enableOutOfBoundsScroll ? handleMouseLeave : undefined}
@@ -659,23 +534,8 @@ export const SideChevronIndicator: React.FC<SideChevronIndicatorProps> = ({
 }) => {
   if (!outOfBoundsDirection || !isSelecting) return null;
 
-  const direction = { next: '0px 6px 6px 0px', prev: '6px 0px 0px 6px' }
-
   return (
-    <div style={{
-      position: 'absolute',
-      top: 0,
-      bottom: 0,
-      [outOfBoundsDirection === 'prev' ? 'left' : 'right']: 0,
-      width: '40px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: '#2e334e',
-      zIndex: 9999,
-      cursor: "pointer",
-      borderRadius: direction[outOfBoundsDirection],
-    } as React.CSSProperties}>
+    <div className={`side-chevron-indicator ${outOfBoundsDirection}`}>
       {outOfBoundsDirection === 'prev' ? (
         <ChevronLeft size={24} />
       ) : (
@@ -716,13 +576,6 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, show, children }) => 
     if (!container) {
       container = document.createElement('div');
       container.className = 'cla-portal-container';
-      // Cast to HTMLDivElement to access style properties
-      const divContainer = container as HTMLDivElement;
-      divContainer.style.position = 'absolute';
-      divContainer.style.top = '0';
-      divContainer.style.left = '0';
-      divContainer.style.zIndex = '9999';
-      divContainer.style.pointerEvents = 'none';
       document.body.appendChild(container);
     }
     setPortalContainer(container as HTMLElement);
@@ -795,7 +648,7 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, show, children }) => 
 
   return (
     <>
-      <div ref={targetRef} className="tooltip-container" style={{ display: 'inline-block', position: 'relative' }}>
+      <div ref={targetRef} className="tooltip-container">
         {children}
       </div>
       {show && portalContainer && ReactDOM.createPortal(
@@ -803,20 +656,8 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, show, children }) => 
           ref={tooltipRef}
           className="tooltip"
           style={{
-            position: 'absolute',
             top: `${position.top}px`,
-            left: `${position.left}px`,
-            background: '#333',
-            color: '#fff',
-            padding: '4px 8px',
-            borderRadius: '4px',
-            fontSize: '12px',
-            maxWidth: '200px',
-            zIndex: 9999,
-            pointerEvents: 'none',
-            boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
-            opacity: 1,
-            transition: 'opacity 0.2s ease'
+            left: `${position.left}px`
           }}
         >
           {content}
@@ -931,45 +772,21 @@ const _MonthPair: React.FC<MonthPairProps> = ({
     : ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
   
   return (
-    <div style={{ display: 'flex', width: '100%', gap: '1rem' }}>
+    <div className="month-pair-container">
       {monthsToRender.map((month, _index) => (
         <div 
           key={month.toISOString()}
-          style={{ 
-            flex: 1,
-            minWidth: 0,
-            maxWidth: visibleMonths === 1 ? '100%' : '50%'
-          }}
+          className={`month-pair-item ${visibleMonths === 1 ? 'single' : 'multiple'}`}
         >
           {showMonthHeadings && (
-            <div style={{ 
-              textAlign: 'center', 
-              padding: '0.5rem 0', 
-              fontWeight: 'bold',
-              marginBottom: '0.5rem' 
-            }}>
+            <div className="month-pair-heading">
               {format(month, 'MMMM yyyy')}
             </div>
           )}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(7, 1fr)',
-              gap: '0.25rem'
-            }}
-          >
+          <div className="month-pair-grid">
             {/* Day header row with weekday abbreviations */}
             {weekDays.map(day => (
-              <div 
-                key={day} 
-                style={{ 
-                  textAlign: 'center', 
-                  fontWeight: 'bold',
-                  fontSize: '0.8rem',
-                  color: '#666',
-                  padding: '0.25rem 0'
-                }}
-              >
+              <div key={day} className="month-pair-weekday">
                 {day}
               </div>
             ))}

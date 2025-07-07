@@ -1,4 +1,112 @@
 /* DayCell specific styles */
+
+/* Base day cell styles */
+.day-cell {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-weight: normal;
+  background-color: transparent;
+  border-radius: 0;
+}
+
+/* Day cell placeholder for non-current month days */
+.day-cell-placeholder {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+/* Single day selection styles */
+.day-cell.single-day {
+  width: 36px;
+  height: 36px;
+  margin: auto;
+  border-radius: 50%;
+}
+
+/* Selected day styles */
+.day-cell.selected {
+  font-weight: 600;
+}
+
+/* Range start styles */
+.day-cell.range-start {
+  border-radius: 15px 0 0 15px;
+}
+
+/* Range end styles */
+.day-cell.range-end {
+  border-radius: 0 15px 15px 0;
+}
+
+/* Range start and end (single day) styles */
+.day-cell.range-start.range-end {
+  border-radius: 50%;
+}
+
+/* Restricted date styles */
+.day-cell.restricted {
+  cursor: not-allowed;
+}
+
+/* Date number container */
+.day-cell-date {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Date number text */
+.day-cell-date-text {
+  position: relative;
+  pointer-events: none;
+}
+
+/* Event content container */
+.day-cell-event {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Restricted date pattern styles moved from CLACalendar.css */
 .restricted-date-pattern {
-  /* Restricted date pattern styles will be moved here from CLACalendar.css */
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 10px,
+    rgba(128, 128, 128, 0.1) 10px,
+    rgba(128, 128, 128, 0.1) 20px
+  );
+  filter: grayscale(100%) opacity(0.5);
+}
+
+.restricted-date-pattern::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 3px,
+    rgba(128, 128, 128, 0.15) 3px,
+    rgba(128, 128, 128, 0.15) 6px
+  );
+  z-index: 1;
 }

@@ -94,22 +94,11 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
 
     return ReactDOM.createPortal(
       <div
+        className="month-grid-tooltip"
         style={{
-          position: 'fixed',
           left: `${position.x + 10}px`,
           top: `${position.y + 10}px`,
-          backgroundColor: 'rgba(220, 53, 69, 0.9)',
-          color: 'white',
-          padding: '8px 12px',
-          borderRadius: '4px',
-          fontSize: getFontSize(settings, 'small'),
-          pointerEvents: 'none',
-          zIndex: 2147483647, // Maximum possible z-index value
-          boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-          maxWidth: '250px',
-          whiteSpace: 'pre-line',
-          margin: 0,
-          transform: 'none'
+          fontSize: getFontSize(settings, 'small')
         }}
       >
         {message}
@@ -119,46 +108,27 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
   }, []);
 
   return (
-    <div style={{
-      width: '100%',
-      padding: '0 8px',
-      marginTop: 0,  // Ensure no top margin
-      ...style
-    }}>
+    <div className="month-grid-container" style={style}>
       {showMonthHeading && (
-        <div style={{
-          fontSize: getFontSize(settings, 'small'),
-          fontWeight: '600',
-          color: '#333',
-          textAlign: 'left',
-          marginTop: 0,  // Ensure no top margin
-          marginBottom: '8px',
-          padding: '4px 6px',  // Add padding to make background more visible
-          backgroundColor: settings?.backgroundColors?.monthHeader || 'transparent',
-          borderRadius: '4px'  // Add slight rounding for better appearance
-        }}>
+        <div 
+          className="month-grid-heading" 
+          style={{
+            fontSize: getFontSize(settings, 'small'),
+            backgroundColor: settings?.backgroundColors?.monthHeader || 'transparent'
+          }}
+        >
           {format(monthStart, 'MMM yyyy')}
         </div>
       )}
 
       {/* Weekday header row */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(7, 1fr)',
-        marginBottom: '8px',
-        paddingLeft: '2px'  // Match month heading alignment
-      }}>
+      <div className="month-grid-weekdays">
         {weekDays.map(day => (
           <div
             key={day}
+            className="month-grid-weekday"
             style={{
-              fontSize: getFontSize(settings, 'small'),
-              fontWeight: "600",
-              color: "#6c757d",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              height: "24px"  // Reduced header height
+              fontSize: getFontSize(settings, 'small')
             }}
           >
             {day}
@@ -168,15 +138,9 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
 
       {/* Days grid */}
       <div
+        className="month-grid-days"
         onMouseMove={handleGridMouseMove}
         onMouseLeave={handleGridMouseLeave}
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(7, 1fr)',
-          gridAutoRows: '36px',
-          rowGap: '3px',
-          paddingLeft: '2px'  // Match month heading alignment
-        }}
       >
         {Object.values(weeks).flatMap((week, weekIndex) =>
           week.map((date, dayIndex) => (
@@ -204,7 +168,11 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
         )}
 
         {[...Array(emptyWeeks * 7)].map((_, i) => (
-          <div key={`empty-${i}`} style={{ backgroundColor: settings?.backgroundColors?.emptyRows || "white" }} />
+          <div 
+            key={`empty-${i}`} 
+            className="month-grid-empty-cell" 
+            style={{ backgroundColor: settings?.backgroundColors?.emptyRows || "white" }} 
+          />
         ))}
       </div>
 

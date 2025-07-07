@@ -1,5 +1,42 @@
 /* General styles */
 
+/* Chevron Icon styles */
+.cla-chevron {
+  display: block;
+  position: relative;
+  color: #333;
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0;
+  pointer-events: none; /* Prevent chevron from interfering with button hover */
+}
+
+.cla-chevron::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  border: solid currentColor;
+  border-width: 0 2px 2px 0;
+  transform: translate(-50%, -50%);
+}
+
+/* Make chevron slightly darker on parent hover */
+.cla-button-nav:hover .cla-chevron {
+  color: #000;
+}
+
+.cla-chevron-left::before {
+  transform: translate(-25%, -50%) rotate(135deg);
+}
+
+.cla-chevron-right::before {
+  transform: translate(-75%, -50%) rotate(-45deg);
+}
+
 .cla-form-control {
   position: relative;
   width: 200px;
@@ -39,26 +76,28 @@
 /* DateInput styles */
 .date-input-container {
   position: relative;
-  flex: 1 1 0; /* Equal width distribution, flex-basis 0 */
-  display: flex;
-  flex-direction: column;
-  min-width: 0; /* Allow shrinking below content size */
+  display: block;
   width: 100%;
+  min-width: 120px;
+  box-sizing: border-box;
+  white-space: nowrap;
+  flex: 1 1 0; /* Equal width distribution, flex-basis 0 */
+  flex-direction: column;
   isolation: isolate;
 }
 
 .date-input {
   width: 100%;
-  min-width: 0;
-  padding: 8px 12px;
+  min-width: 120px;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
   border-radius: 4px;
   background-color: white;
   color: #000;
   transition: border-color 0.15s ease;
   cursor: text;
   user-select: text;
-  border: 1px solid #979797;
-  text-align: left; /* Left align text */
+  text-align: left;
   margin: 0;
   box-sizing: border-box;
   font-family: inherit;
@@ -69,6 +108,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: block;
 }
 
 .date-input-indicator {
@@ -81,23 +121,147 @@
   pointer-events: none;
 }
 
+.date-input-indicator-success {
+  color: #28a745;
+}
+
+.date-input-indicator-error {
+  color: #dc3545;
+}
+
 .date-input-error {
   font-size: 0.875rem;
   color: #dc3545;
   overflow: hidden;
   transition: height 0.2s ease-in-out, margin-top 0.2s ease-in-out;
+  height: 0;
+  margin-top: 0;
+}
+
+.date-input-error.show {
+  height: 24px;
+  margin-top: 4px;
 }
 
 /* Calendar header styles */
+.cla-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px 8px;
+  width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+  position: relative;
+  flex-wrap: nowrap;
+  background-color: white;
+}
+
+.cla-button-nav {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  flex: 0 0 36px;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  z-index: 5;
+  box-sizing: border-box;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cla-button-nav:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+.cla-button-nav:active {
+  background-color: rgba(0, 0, 0, 0.12);
+  transform: scale(0.95);
+}
+
+.cla-button-nav:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.5);
+}
+
+.cla-button-nav:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.cla-button-nav:disabled:hover {
+  background-color: transparent;
+}
+
+.cla-header-title {
+  margin: 0 8px;
+  padding: 0 4px;
+  flex: 1 1 auto;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #333;
+}
 
 /* DateInputSection styles */
+.cla-input-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  width: 100%;
+  padding: 10px 8px;
+  font-size: 14px;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  white-space: nowrap;
+  overflow: visible;
+  background-color: transparent;
+}
+
+.cla-input-container.single {
+  min-width: 200px;
+}
+
+.cla-input-container.range {
+  min-width: 300px;
+}
 
 .cla-input-wrapper {
-  display: flex !important;
-  flex: 1 1 0 !important; /* Equal width distribution */
-  min-width: 0 !important;
-  position: relative !important;
-  isolation: isolate !important;
+  display: block;
+  white-space: nowrap;
+  position: relative;
+  box-sizing: border-box;
+  min-width: 120px;
+}
+
+.cla-input-container.single .cla-input-wrapper {
+  flex: 1 0 auto;
+  width: auto;
+  max-width: none;
+}
+
+.cla-input-container.range .cla-input-wrapper {
+  flex: 0 0 48%;
+  width: 48%;
+  max-width: 48%;
+}
+
+.cla-input-container.range .cla-input-wrapper:last-child {
+  width: 50%;
 }
 
 /* CalendarFooter styles */
@@ -133,6 +297,10 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   position: absolute;
   isolation: isolate;
+  /* Default container styles from config */
+  border: 1px solid #e0e0e0;
+  overflow: visible;
+  box-sizing: border-box;
 }
 
 .cla-card-popup {
@@ -171,6 +339,28 @@
 }
 
 /* SideChevronIndicator styles */
+.side-chevron-indicator {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #2e334e;
+  z-index: 9999;
+  cursor: pointer;
+}
+
+.side-chevron-indicator.prev {
+  left: 0;
+  border-radius: 6px 0px 0px 6px;
+}
+
+.side-chevron-indicator.next {
+  right: 0;
+  border-radius: 0px 6px 6px 0px;
+}
 
 /* Tooltip container styles */
 .tooltip-container {
@@ -183,23 +373,18 @@
 
 /* Tooltip styles - use !important to ensure they can't be overridden */
 .tooltip {
-  position: fixed !important;
-  background-color: #1a1a1a !important;
-  color: #ffffff !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.35) !important;
-  border-radius: 3px !important;
-  z-index: 2147483647 !important;  /* Maximum z-index */
-  font-size: 13px !important;
-  max-width: 300px !important;
-  padding: 3px 6px !important;
+  position: absolute !important;
+  background: #333 !important;
+  color: #fff !important;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+  font-size: 12px !important;
+  max-width: 200px !important;
+  z-index: 9999 !important;
   pointer-events: none !important;
-  border: none !important;
-  margin-top: 5px !important;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important;
   opacity: 1 !important;
-  transition: opacity 0.15s ease-in-out !important;
-  isolation: isolate !important;
-  transform: translateZ(0) !important;
-  will-change: transform !important;
+  transition: opacity 0.2s ease !important;
 }
 
 .tooltip[style*="hidden"] {
@@ -262,4 +447,45 @@
 
 .cla-portal-container > * {
   pointer-events: auto !important;
+}
+
+/* MonthPair styles */
+.month-pair-container {
+  display: flex;
+  width: 100%;
+  gap: 1rem;
+}
+
+.month-pair-item {
+  flex: 1;
+  min-width: 0;
+}
+
+.month-pair-item.single {
+  max-width: 100%;
+}
+
+.month-pair-item.multiple {
+  max-width: 50%;
+}
+
+.month-pair-heading {
+  text-align: center;
+  padding: 0.5rem 0;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.month-pair-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.25rem;
+}
+
+.month-pair-weekday {
+  text-align: center;
+  font-weight: bold;
+  font-size: 0.8rem;
+  color: #666;
+  padding: 0.25rem 0;
 }
