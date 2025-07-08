@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { CLACalendar, SimpleCalendar } from './CLACalendar';
-import { createCalendarSettings, createSimpleCalendarSettings, createMinimalCalendar } from './CLACalendar.config';
+import CLACalendar from './CLACalendar';
+import { getDefaultSettings } from './CLACalendar.config';
 
 const meta = {
   title: 'Calendar/Configuration Edge Cases',
@@ -21,7 +21,7 @@ type Story = StoryObj<typeof meta>;
 // Null settings
 export const NullSettings: Story = {
   render: () => (
-    <CLACalendar settings={createCalendarSettings(null as any)} />
+    <CLACalendar settings={null as any} _onSettingsChange={() => {}} />
   ),
   parameters: {
     docs: {
@@ -35,7 +35,7 @@ export const NullSettings: Story = {
 // Undefined settings
 export const UndefinedSettings: Story = {
   render: () => (
-    <CLACalendar settings={createCalendarSettings(undefined)} />
+    <CLACalendar settings={undefined as any} _onSettingsChange={() => {}} />
   ),
   parameters: {
     docs: {
@@ -49,7 +49,7 @@ export const UndefinedSettings: Story = {
 // Empty object settings
 export const EmptySettings: Story = {
   render: () => (
-    <CLACalendar settings={createCalendarSettings({})} />
+    <CLACalendar settings={{} as any} _onSettingsChange={() => {}} />
   ),
   parameters: {
     docs: {
@@ -64,10 +64,12 @@ export const EmptySettings: Story = {
 export const InvalidNumbers: Story = {
   render: () => (
     <CLACalendar 
-      settings={createCalendarSettings({
+      settings={{
+        ...getDefaultSettings(),
         visibleMonths: -5, // Invalid: negative
         monthWidth: 50,   // Invalid: too small
-      })} 
+      }} 
+      _onSettingsChange={() => {}}
     />
   ),
   parameters: {
@@ -83,9 +85,11 @@ export const InvalidNumbers: Story = {
 export const NullArrays: Story = {
   render: () => (
     <CLACalendar 
-      settings={createCalendarSettings({
+      settings={{
+        ...getDefaultSettings(),
         layers: null as any,
-      })} 
+      }} 
+      _onSettingsChange={() => {}}
     />
   ),
   parameters: {
@@ -101,9 +105,11 @@ export const NullArrays: Story = {
 export const EmptyLayers: Story = {
   render: () => (
     <CLACalendar 
-      settings={createCalendarSettings({
+      settings={{
+        ...getDefaultSettings(),
         layers: [],
-      })} 
+      }} 
+      _onSettingsChange={() => {}}
     />
   ),
   parameters: {
@@ -119,13 +125,15 @@ export const EmptyLayers: Story = {
 export const MixedNullProperties: Story = {
   render: () => (
     <CLACalendar 
-      settings={createCalendarSettings({
+      settings={{
+        ...getDefaultSettings(),
         displayMode: undefined,
         visibleMonths: null as any,
         layers: undefined,
         colors: null as any,
         showHeader: undefined,
-      })} 
+      }} 
+      _onSettingsChange={() => {}}
     />
   ),
   parameters: {
@@ -137,54 +145,62 @@ export const MixedNullProperties: Story = {
   },
 };
 
-// SimpleCalendar with null config
-export const SimpleNullConfig: Story = {
+// Calendar with null config passed directly
+export const NullConfigDirect: Story = {
   render: () => (
-    <SimpleCalendar config={null as any} />
+    <CLACalendar 
+      settings={null as any}
+      _onSettingsChange={() => {}}
+    />
   ),
   parameters: {
     docs: {
       description: {
-        story: 'SimpleCalendar with null config - should work with minimal defaults.',
+        story: 'Calendar with null config passed directly - should work with minimal defaults.',
       },
     },
   },
 };
 
-// SimpleCalendar with partial config
-export const SimplePartialConfig: Story = {
+// Calendar with partial config
+export const PartialConfig: Story = {
   render: () => (
-    <SimpleCalendar 
-      config={{
+    <CLACalendar 
+      settings={{
+        ...getDefaultSettings(),
         visibleMonths: undefined,
         displayMode: null as any,
         selectionMode: 'range',
       }}
+      _onSettingsChange={() => {}}
     />
   ),
   parameters: {
     docs: {
       description: {
-        story: 'SimpleCalendar with partial config containing nulls - should handle gracefully.',
+        story: 'Calendar with partial config containing nulls - should handle gracefully.',
       },
     },
   },
 };
 
-// Minimal calendar helper
-export const MinimalCalendarHelper: Story = {
+// Minimal calendar setup
+export const MinimalSetup: Story = {
   render: () => (
     <CLACalendar 
-      settings={createMinimalCalendar({
-        onSubmit: (start, end) => console.log('Selected:', start, end),
-        defaultRange: { start: '2024-01-10' },
-      })} 
+      settings={{
+        ...getDefaultSettings(),
+        displayMode: 'embedded',
+        defaultRange: { start: '2024-01-10', end: '' },
+      }} 
+      onSubmit={(start, end) => console.log('Selected:', start, end)}
+      _onSettingsChange={() => {}}
     />
   ),
   parameters: {
     docs: {
       description: {
-        story: 'Using createMinimalCalendar helper for the simplest possible setup.',
+        story: 'Minimal calendar setup with just the essentials.',
       },
     },
   },
@@ -194,12 +210,14 @@ export const MinimalCalendarHelper: Story = {
 export const InvalidDateRange: Story = {
   render: () => (
     <CLACalendar 
-      settings={createCalendarSettings({
+      settings={{
+        ...getDefaultSettings(),
         defaultRange: {
           start: '2024-01-20',
           end: '2024-01-10', // End before start
         },
-      })} 
+      }} 
+      _onSettingsChange={() => {}}
     />
   ),
   parameters: {
@@ -215,7 +233,8 @@ export const InvalidDateRange: Story = {
 export const MalformedLayers: Story = {
   render: () => (
     <CLACalendar 
-      settings={createCalendarSettings({
+      settings={{
+        ...getDefaultSettings(),
         layers: [
           null as any,
           {
@@ -229,7 +248,8 @@ export const MalformedLayers: Story = {
             name: '',
           } as any,
         ],
-      })} 
+      }} 
+      _onSettingsChange={() => {}}
     />
   ),
   parameters: {
@@ -245,15 +265,18 @@ export const MalformedLayers: Story = {
 export const ExtremeValues: Story = {
   render: () => (
     <CLACalendar 
-      settings={createCalendarSettings({
+      settings={{
+        ...getDefaultSettings(),
         visibleMonths: 999,  // Too high
         monthWidth: -100,    // Negative
         colors: {
           primary: null as any,
           success: '',       // Empty string
           warning: 'invalid-color',
+          danger: '#dc3545',
         },
-      })} 
+      }} 
+      _onSettingsChange={() => {}}
     />
   ),
   parameters: {

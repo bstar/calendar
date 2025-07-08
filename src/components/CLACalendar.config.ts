@@ -376,8 +376,23 @@ export function createCalendarSettings(userSettings: Partial<CalendarSettings> =
     ),
   };
   
-  // Ensure arrays are never null/undefined and provide default layer if empty
-  if (!Array.isArray(settings.layers) || settings.layers.length === 0) {
+  // Ensure arrays are never null/undefined and filter out malformed layers
+  if (!Array.isArray(settings.layers)) {
+    settings.layers = [];
+  }
+  
+  // Filter out null/undefined/invalid layers
+  const validLayers = settings.layers.filter((layer): layer is Layer => {
+    return layer != null && 
+           typeof layer === 'object' && 
+           typeof layer.name === 'string' && 
+           layer.name.length > 0 &&
+           typeof layer.title === 'string' &&
+           typeof layer.description === 'string';
+  });
+  
+  // If no valid layers, provide default layer
+  if (validLayers.length === 0) {
     settings.layers = [{
       name: 'Calendar',
       title: 'Base Calendar',
@@ -389,6 +404,8 @@ export function createCalendarSettings(userSettings: Partial<CalendarSettings> =
         background: []
       }
     }];
+  } else {
+    settings.layers = validLayers;
   }
   
   // Ensure defaultLayer is set if not provided

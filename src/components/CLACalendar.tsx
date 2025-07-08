@@ -368,10 +368,40 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
 
   // Get the effective layers to use - either from lazy loading or direct settings
   const effectiveLayers = useMemo(() => {
+    let layers: Layer[] = [];
+    
     if (layersFactory && lazyLayers) {
-      return Array.isArray(lazyLayers) ? lazyLayers : [];
+      layers = Array.isArray(lazyLayers) ? lazyLayers : [];
+    } else {
+      layers = Array.isArray(settings.layers) ? settings.layers : [];
     }
-    return Array.isArray(settings.layers) ? settings.layers : [];
+    
+    // Filter out null/undefined values and validate required properties
+    const validLayers = layers.filter((layer): layer is Layer => {
+      return layer != null && 
+             typeof layer === 'object' && 
+             typeof layer.name === 'string' && 
+             layer.name.length > 0 &&
+             typeof layer.title === 'string' &&
+             typeof layer.description === 'string';
+    });
+    
+    // If no valid layers, provide a default one
+    if (validLayers.length === 0) {
+      return [{
+        name: 'Calendar',
+        title: 'Base Calendar',
+        description: 'Default calendar layer',
+        required: true,
+        visible: true,
+        data: {
+          events: [],
+          background: []
+        }
+      }];
+    }
+    
+    return validLayers;
   }, [settings.layers, lazyLayers, layersFactory]);
 
   // Get the effective restriction config to use - either from lazy loading or direct settings
