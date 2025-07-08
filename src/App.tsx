@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './bootstrap.min.css';
+import './cla-base.css';
 import './docStyles.css';
 import './App.css';
 import './components/CLACalendarComponents/defensive-styles.css';
@@ -19,23 +19,24 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="container-fluid py-4">
-      <div className="row">
-        <div className="col-12">
-          <div className="card">
-            <div className="card-header">
-              <h1 className="h3 mb-0">CLA Calendar - Simple Demo</h1>
-              <p className="text-muted mb-0">
+    <div className="cla-cal-wrapper">
+      <div className="cla-cal-container-fluid cla-cal-py-4">
+        <div className="cla-cal-row">
+          <div className="cla-cal-col-12">
+            <div className="cla-cal-card">
+              <div className="cla-cal-card-header">
+                <h1 className="cla-cal-h3 cla-cal-mb-0">CLA Calendar - Simple Demo</h1>
+                <p className="cla-cal-text-muted cla-cal-mb-0">
                 A demonstration of the hardened configuration system with SimpleCalendar
               </p>
             </div>
-            <div className="card-body">
+            <div className="cla-cal-card-body">
 
               {/* Demo selector */}
-              <div className="mb-4">
-                <label className="form-label">Choose Demo:</label>
+              <div className="cla-cal-mb-4">
+                <label className="cla-cal-form-label">Choose Demo:</label>
                 <select 
-                  className="form-select"
+                  className="cla-cal-form-select"
                   value={currentDemo}
                   onChange={(e) => setCurrentDemo(e.target.value)}
                 >
@@ -49,7 +50,7 @@ const App: React.FC = () => {
 
               {/* Selected range display */}
               {selectedRange.start && (
-                <div className="alert alert-info mb-3">
+                <div className="cla-cal-alert cla-cal-alert-info cla-cal-mb-3">
                   <strong>Selected:</strong>{' '}
                   {currentDemo === 'single' 
                     ? selectedRange.start 
@@ -63,7 +64,7 @@ const App: React.FC = () => {
                 {currentDemo === 'basic' && (
                   <div>
                     <h4>Basic Usage</h4>
-                    <p className="text-muted">Minimal configuration with defaults</p>
+                    <p className="cla-cal-text-muted">Minimal configuration with defaults</p>
                     <CLACalendar 
                       settings={{
                         displayMode: 'embedded',
@@ -77,7 +78,7 @@ const App: React.FC = () => {
                 {currentDemo === 'single' && (
                   <div>
                     <h4>Single Date Selection</h4>
-                    <p className="text-muted">Select a single date instead of a range</p>
+                    <p className="cla-cal-text-muted">Select a single date instead of a range</p>
                     <CLACalendar 
                       settings={{
                         displayMode: 'embedded',
@@ -93,7 +94,7 @@ const App: React.FC = () => {
                 {currentDemo === 'multiple' && (
                   <div>
                     <h4>Multiple Months</h4>
-                    <p className="text-muted">Display multiple months for easier navigation</p>
+                    <p className="cla-cal-text-muted">Display multiple months for easier navigation</p>
                     <CLACalendar 
                       settings={{
                         displayMode: 'embedded',
@@ -108,7 +109,7 @@ const App: React.FC = () => {
                 {currentDemo === 'custom' && (
                   <div>
                     <h4>Custom Theme</h4>
-                    <p className="text-muted">Custom colors and styling</p>
+                    <p className="cla-cal-text-muted">Custom colors and styling</p>
                     <CLACalendar 
                       settings={{
                         displayMode: 'embedded',
@@ -134,7 +135,7 @@ const App: React.FC = () => {
                 {currentDemo === 'null-safe' && (
                   <div>
                     <h4>Null-Safe Configuration</h4>
-                    <p className="text-muted">
+                    <p className="cla-cal-text-muted">
                       Demonstrates graceful handling of null/undefined values
                     </p>
                     <CLACalendar 
@@ -149,8 +150,8 @@ const App: React.FC = () => {
                       }}
                       onSubmit={handleDateSubmit}
                     />
-                    <div className="alert alert-success mt-3">
-                      <small>
+                    <div className="cla-cal-alert cla-cal-alert-success cla-cal-mt-3">
+                      <small className="cla-cal-small">
                         ✅ Calendar handles null/undefined values gracefully using defaults
                       </small>
                     </div>
@@ -159,9 +160,9 @@ const App: React.FC = () => {
               </div>
 
               {/* Configuration info */}
-              <div className="mt-4 border-top pt-3">
-                <h5 className="text-muted">Features Demonstrated:</h5>
-                <ul className="text-muted">
+              <div className="cla-cal-mt-4 cla-cal-border-top cla-cal-pt-3">
+                <h5 className="cla-cal-text-muted">Features Demonstrated:</h5>
+                <ul className="cla-cal-text-muted">
                   <li>✅ Simplified configuration API</li>
                   <li>✅ Null-safe property handling</li>
                   <li>✅ Intelligent defaults</li>
@@ -169,9 +170,9 @@ const App: React.FC = () => {
                   <li>✅ Comprehensive test coverage (252 tests)</li>
                 </ul>
                 
-                <div className="mt-3">
+                <div className="cla-cal-mt-3">
                   <h6>Quick Start:</h6>
-                  <pre className="bg-light p-2 rounded">
+                  <pre className="cla-cal-bg-light cla-cal-p-2 cla-cal-rounded">
                     <code>{`import CLACalendar from './components/CLACalendar';
 
 <SimpleCalendar 
@@ -184,8 +185,8 @@ const App: React.FC = () => {
                   </pre>
                 </div>
 
-                <div className="mt-3">
-                  <p className="text-muted small">
+                <div className="cla-cal-mt-3">
+                  <p className="cla-cal-text-muted cla-cal-small">
                     <strong>Storybook:</strong> Run <code>npm run storybook</code> for interactive playground<br/>
                     <strong>Tests:</strong> Run <code>npm test</code> to verify all 252 tests pass
                   </p>
@@ -196,6 +197,7 @@ const App: React.FC = () => {
         </div>
       </div>
     </div>
+  </div>
   );
 };
 

@@ -1,0 +1,246 @@
+/* Base styles for CLA Calendar - namespaced to avoid conflicts */
+/* All classes are prefixed with cla-cal- to prevent collisions with Bootstrap or other frameworks */
+
+/* Reset and Base Styles - Applied to demo wrapper */
+.cla-cal-wrapper {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #212529;
+  background-color: #fff;
+}
+
+.cla-cal-wrapper *,
+.cla-cal-wrapper *::before,
+.cla-cal-wrapper *::after {
+  box-sizing: border-box;
+}
+
+/* Typography */
+.cla-cal-wrapper h1,
+.cla-cal-wrapper h2,
+.cla-cal-wrapper h3,
+.cla-cal-wrapper h4,
+.cla-cal-wrapper h5,
+.cla-cal-wrapper h6 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.cla-cal-h3 {
+  font-size: 1.75rem;
+}
+
+.cla-cal-text-muted {
+  color: #6c757d !important;
+}
+
+.cla-cal-small {
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+/* Grid System */
+.cla-cal-container-fluid {
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.cla-cal-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -15px;
+  margin-left: -15px;
+}
+
+.cla-cal-col-12 {
+  position: relative;
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  flex: 0 0 100%;
+  max-width: 100%;
+}
+
+/* Card Component */
+.cla-cal-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  word-wrap: break-word;
+  background-color: #fff;
+  background-clip: border-box;
+  border: 1px solid rgba(0,0,0,.125);
+  border-radius: 0.25rem;
+}
+
+.cla-cal-card-header {
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 0;
+  background-color: rgba(0,0,0,.03);
+  border-bottom: 1px solid rgba(0,0,0,.125);
+}
+
+.cla-cal-card-header:first-child {
+  border-radius: calc(0.25rem - 1px) calc(0.25rem - 1px) 0 0;
+}
+
+.cla-cal-card-body {
+  flex: 1 1 auto;
+  padding: 1.25rem;
+}
+
+/* Forms */
+.cla-cal-form-label {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+
+.cla-cal-form-select {
+  display: block;
+  width: 100%;
+  padding: 0.375rem 2.25rem 0.375rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #212529;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 16px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  appearance: none;
+}
+
+.cla-cal-form-select:focus {
+  border-color: #86b7fe;
+  outline: 0;
+  box-shadow: 0 0 0 0.25rem rgba(13,110,253,.25);
+}
+
+/* Alerts */
+.cla-cal-alert {
+  position: relative;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+}
+
+.cla-cal-alert-info {
+  color: #055160;
+  background-color: #cff4fc;
+  border-color: #b6effb;
+}
+
+.cla-cal-alert-success {
+  color: #0a3622;
+  background-color: #d1e7dd;
+  border-color: #badbcc;
+}
+
+/* Spacing Utilities */
+.cla-cal-py-4 {
+  padding-top: 1.5rem !important;
+  padding-bottom: 1.5rem !important;
+}
+
+.cla-cal-pt-3 {
+  padding-top: 1rem !important;
+}
+
+.cla-cal-p-2 {
+  padding: 0.5rem !important;
+}
+
+.cla-cal-mb-0 {
+  margin-bottom: 0 !important;
+}
+
+.cla-cal-mb-3 {
+  margin-bottom: 1rem !important;
+}
+
+.cla-cal-mb-4 {
+  margin-bottom: 1.5rem !important;
+}
+
+.cla-cal-mt-3 {
+  margin-top: 1rem !important;
+}
+
+.cla-cal-mt-4 {
+  margin-top: 1.5rem !important;
+}
+
+/* Borders */
+.cla-cal-border-top {
+  border-top: 1px solid #dee2e6 !important;
+}
+
+/* Background */
+.cla-cal-bg-light {
+  background-color: #f8f9fa !important;
+}
+
+/* Border Radius */
+.cla-cal-rounded {
+  border-radius: 0.25rem !important;
+}
+
+/* Additional Resets for consistency within demo wrapper */
+.cla-cal-wrapper button,
+.cla-cal-wrapper select {
+  text-transform: none;
+}
+
+.cla-cal-wrapper button,
+.cla-cal-wrapper [type="button"],
+.cla-cal-wrapper [type="reset"],
+.cla-cal-wrapper [type="submit"] {
+  -webkit-appearance: button;
+}
+
+.cla-cal-wrapper button::-moz-focus-inner,
+.cla-cal-wrapper [type="button"]::-moz-focus-inner,
+.cla-cal-wrapper [type="reset"]::-moz-focus-inner,
+.cla-cal-wrapper [type="submit"]::-moz-focus-inner {
+  padding: 0;
+  border-style: none;
+}
+
+/* Ensure proper rendering */
+.cla-cal-wrapper main {
+  display: block;
+}
+
+.cla-cal-wrapper hr {
+  box-sizing: content-box;
+  height: 0;
+  overflow: visible;
+}
+
+.cla-cal-wrapper pre {
+  font-family: monospace, monospace;
+  font-size: 1em;
+}
+
+/* Links */
+.cla-cal-wrapper a {
+  color: #0d6efd;
+  text-decoration: underline;
+}
+
+.cla-cal-wrapper a:hover {
+  color: #0a58ca;
+}
