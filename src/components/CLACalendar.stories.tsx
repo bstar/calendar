@@ -344,3 +344,207 @@ export const NoSubmitButton: Story = {
     showSubmitButton: false, // Explicitly testing submit OFF
   } as any, // Type assertion for Storybook args compatibility
 };
+
+// Embedded mode example
+export const EmbeddedMode: Story = {
+  render: (args) => (
+    <CLACalendar 
+      key="embedded-mode-story"
+      settings={mapArgsToSettings(args)}
+    />
+  ),
+  args: {
+    ...CLACalendarDefaultArgs,
+    displayMode: 'embedded',
+    visibleMonths: 2,
+  } as any,
+  parameters: {
+    docs: {
+      description: {
+        story: `Calendar displayed inline within the page layout instead of as a popup.
+
+**Key Differences from Popup Mode:**
+- Always visible on the page
+- No overlay or backdrop
+- Takes up space in document flow
+- No open/close behavior
+- Ideal for dedicated calendar pages
+
+**Common Use Cases:**
+- Dashboard widgets
+- Booking pages
+- Event management interfaces
+- Administrative panels`
+      }
+    }
+  },
+};
+
+// Date restrictions example
+export const WithRestrictions: Story = {
+  render: (args) => (
+    <CLACalendar 
+      key="with-restrictions-story"
+      settings={mapArgsToSettings(args)}
+      restrictionConfigFactory={() => ({
+        restrictions: [
+          {
+            type: 'weekday',
+            enabled: true,
+            days: [0, 6],
+            message: 'Weekends are not available for selection',
+          },
+          {
+            type: 'daterange',
+            enabled: true,
+            ranges: [
+              {
+                startDate: '2024-01-15',
+                endDate: '2024-01-17',
+                message: 'These dates are fully booked',
+              },
+            ],
+          },
+        ],
+      })}
+    />
+  ),
+  args: {
+    ...CLACalendarDefaultArgs,
+    visibleMonths: 2,
+  } as any,
+  parameters: {
+    docs: {
+      description: {
+        story: `Calendar with date restrictions showing how to prevent selection of certain dates.
+
+**Restrictions Applied:**
+- **Weekends Blocked:** Saturdays and Sundays cannot be selected
+- **Specific Dates Blocked:** January 15-17 are marked as unavailable
+
+**Visual Indicators:**
+- Restricted dates show diagonal stripe pattern
+- Hover over restricted dates to see explanation
+- Selection automatically skips restricted dates
+
+**Restriction Information:**
+${formatRestrictionInfo([
+  {
+    type: 'weekday',
+    enabled: true,
+    days: [0, 6],
+    message: 'Weekends are not available for selection',
+  },
+  {
+    type: 'daterange',
+    enabled: true,
+    ranges: [
+      {
+        startDate: '2024-01-15',
+        endDate: '2024-01-17',
+        message: 'These dates are fully booked',
+      },
+    ],
+  },
+])}`
+      }
+    }
+  },
+};
+
+// Custom date formatting
+export const CustomDateFormat: Story = {
+  render: (args) => (
+    <CLACalendar 
+      key="custom-date-format-story"
+      settings={{
+        ...mapArgsToSettings(args),
+        dateFormatter: (date: Date) => {
+          return date.toLocaleDateString('en-US', {
+            weekday: 'short',
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+          });
+        },
+        dateRangeSeparator: ' → ',
+        defaultRange: {
+          start: '2024-01-10',
+          end: '2024-01-15',
+        },
+      }}
+    />
+  ),
+  args: {
+    ...CLACalendarDefaultArgs,
+    visibleMonths: 1,
+  } as any,
+  parameters: {
+    docs: {
+      description: {
+        story: `Demonstrates custom date formatting for display.
+
+**Custom Format Features:**
+- **Date Format:** "Wed, Jan 10, 2024" style
+- **Separator:** Arrow (→) instead of dash
+- **Localization:** Uses browser locale for formatting
+
+**Date Formatter Function:**
+\`\`\`javascript
+dateFormatter: (date) => {
+  return date.toLocaleDateString('en-US', {
+    weekday: 'short',
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+}
+\`\`\`
+
+**Use Cases:**
+- International date formats
+- Custom business requirements
+- Accessibility improvements
+- Brand consistency`
+      }
+    }
+  },
+};
+
+// Year view with many months
+export const YearView: Story = {
+  render: (args) => (
+    <CLACalendar 
+      key="year-view-story"
+      settings={mapArgsToSettings(args)}
+    />
+  ),
+  args: {
+    ...CLACalendarDefaultArgs,
+    displayMode: 'embedded',
+    visibleMonths: 6,
+    monthWidth: 300,
+    showSubmitButton: false,
+  } as any,
+  parameters: {
+    docs: {
+      description: {
+        story: `Extended calendar view showing 6 months at once.
+
+**Configuration:**
+- **Visible Months:** 6 (half year view)
+- **Month Width:** 300px per month
+- **Display Mode:** Embedded for better layout
+- **Submit Button:** Hidden for cleaner view
+
+**Use Cases:**
+- Long-term planning
+- Vacation scheduling
+- Project timelines
+- Academic calendars
+
+**Performance Note:** Showing many months may impact performance on slower devices. Consider reducing visibleMonths for mobile users.`
+      }
+    }
+  },
+};

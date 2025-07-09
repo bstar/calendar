@@ -1,0 +1,348 @@
+import { Meta, Story, Canvas } from '@storybook/addon-docs';
+import { CLACalendar } from './CLACalendar';
+import { createStoryParameters } from './utils/story-helpers';
+import {
+  FlatSingleMonthStory,
+  FourMonthViewStory,
+  MinimalEmbeddedStory,
+  CompactEmbeddedStory,
+  EmbeddedWithLayersStory,
+  ThreeMonthNoSubmitStory,
+  BorderlessStory,
+  SubtleCardStory,
+  FormIntegrationStory,
+  DashboardWidgetStory,
+  YearRoundCalendarStory,
+} from './stories/EmbeddedWidgetsStories';
+import {
+  flatSingleMonthCode,
+  fourMonthViewCode,
+  minimalEmbeddedCode,
+  compactEmbeddedCode,
+  embeddedWithLayersCode,
+  threeMonthNoSubmitCode,
+  borderlessCode,
+  subtleCardCode,
+  formIntegrationCode,
+  dashboardWidgetCode,
+  yearRoundCalendarCode,
+} from './stories/embedded-widgets-code-examples';
+
+<Meta title="Calendar/Embedded Widgets" component={CLACalendar} />
+
+# Embedded Widgets
+
+Clean embedded calendar examples with no drop shadows, rounded corners, or popup styling. Perfect for integrating calendars directly into your application's UI.
+
+## Overview
+
+Embedded calendars are designed to:
+- **Integrate seamlessly** into existing layouts
+- **Remove popup styling** for a flat, native appearance
+- **Adapt to containers** with flexible sizing options
+- **Support all features** while maintaining a clean look
+
+## Basic Embedded Styles
+
+### Flat Single Month
+
+A single month calendar with flat styling and subtle borders:
+
+<Canvas withSource="open">
+  <Story name="Flat Single Month Example" parameters={createStoryParameters(flatSingleMonthCode)}>
+    {() => <FlatSingleMonthStory />}
+  </Story>
+</Canvas>
+
+**Key styling:**
+- No box shadow (`boxShadow: 'none'`)
+- No border radius (`borderRadius: '0'`)
+- Subtle border (`border: '1px solid #d1d5db'`)
+
+### Borderless Calendar
+
+Completely borderless for maximum integration:
+
+<Canvas withSource="open">
+  <Story name="Borderless Style" parameters={createStoryParameters(borderlessCode)}>
+    {() => <BorderlessStory />}
+  </Story>
+</Canvas>
+
+**Use cases:**
+- Inside existing containers
+- Custom wrapper components
+- Maximum visual integration
+
+### Subtle Card Style
+
+Card-like appearance with minimal elevation:
+
+<Canvas withSource="open">
+  <Story name="Subtle Card Style" parameters={createStoryParameters(subtleCardCode)}>
+    {() => <SubtleCardStory />}
+  </Story>
+</Canvas>
+
+**Features:**
+- Light shadow for depth
+- Rounded corners (customizable)
+- Clean background
+
+## Size Variations
+
+### Compact Sidebar Widget
+
+Optimized for narrow spaces like sidebars:
+
+<Canvas withSource="open">
+  <Story name="Compact Sidebar Widget" parameters={createStoryParameters(compactEmbeddedCode)}>
+    {() => <CompactEmbeddedStory />}
+  </Story>
+</Canvas>
+
+**Configuration:**
+- `monthWidth: 250` for narrow display
+- Single date selection mode
+- Reduced padding
+
+### Four Month View
+
+Extended view for planning and overview:
+
+<Canvas withSource="open">
+  <Story name="Four Month Display" parameters={createStoryParameters(fourMonthViewCode)}>
+    {() => <FourMonthViewStory />}
+  </Story>
+</Canvas>
+
+**Benefits:**
+- Long-range planning
+- Visual continuity
+- Comparison across months
+
+### Three Month No Submit
+
+Auto-submit configuration for immediate feedback:
+
+<Canvas withSource="open">
+  <Story name="Three Month Auto Submit" parameters={createStoryParameters(threeMonthNoSubmitCode)}>
+    {() => <ThreeMonthNoSubmitStory />}
+  </Story>
+</Canvas>
+
+**Behavior:**
+- No submit button
+- Immediate selection feedback
+- Cleaner interface
+
+## Minimal Configurations
+
+### Ultra Minimal
+
+Stripped down to essentials only:
+
+<Canvas withSource="open">
+  <Story name="Ultra Minimal Widget" parameters={createStoryParameters(minimalEmbeddedCode)}>
+    {() => <MinimalEmbeddedStory />}
+  </Story>
+</Canvas>
+
+**Removed elements:**
+- No header (`showHeader: false`)
+- No tooltips (`showTooltips: false`)
+- No submit button
+- Single date mode
+
+## Integration Examples
+
+### Form Integration
+
+Calendar as a form input element:
+
+<Canvas withSource="open">
+  <Story name="Form Integration Example" parameters={createStoryParameters(formIntegrationCode)}>
+    {() => <FormIntegrationStory />}
+  </Story>
+</Canvas>
+
+**Form styling:**
+- Inset shadow for depth
+- Stronger border
+- Label integration
+- Submit callback
+
+### Dashboard Widget
+
+Calendar as a dashboard component:
+
+<Canvas withSource="open">
+  <Story name="Dashboard Component" parameters={createStoryParameters(dashboardWidgetCode)}>
+    {() => <DashboardWidgetStory />}
+  </Story>
+</Canvas>
+
+**Dashboard features:**
+- Title header
+- Event display
+- Background highlights
+- No footer for space
+
+## Advanced Features
+
+### Embedded with Layers
+
+Full layer support in embedded mode:
+
+<Canvas withSource="open">
+  <Story name="Embedded Layers Example" parameters={createStoryParameters(embeddedWithLayersCode)}>
+    {() => <EmbeddedWithLayersStory />}
+  </Story>
+</Canvas>
+
+**Layer features:**
+- Tab navigation
+- Multiple data sources
+- Toggle visibility
+- Clean integration
+
+### Year-Round Calendar
+
+Interactive calendar with month tracking:
+
+<Canvas withSource="open">
+  <Story name="Year Round Calendar Display" parameters={createStoryParameters(yearRoundCalendarCode)}>
+    {() => <YearRoundCalendarStory />}
+  </Story>
+</Canvas>
+
+**Advanced features:**
+- Month change callbacks
+- Dynamic content updates
+- Custom month backgrounds
+- External state display
+
+## Styling Guidelines
+
+### Container Style Properties
+
+Control the calendar's appearance with `containerStyle`:
+
+```tsx
+containerStyle: {
+  // Remove popup styling
+  boxShadow: 'none',
+  borderRadius: '0',
+  
+  // Border options
+  border: 'none',                    // No border
+  border: '1px solid #d1d5db',      // Subtle border
+  border: '2px solid #3B82F6',      // Accent border
+  
+  // Background
+  backgroundColor: '#ffffff',        // White background
+  backgroundColor: 'transparent',    // Inherit from parent
+  
+  // Spacing
+  padding: '16px',                  // Internal spacing
+  margin: '0',                      // External spacing
+}
+```
+
+### Common Patterns
+
+**Flat embedded (most common):**
+```tsx
+containerStyle: {
+  boxShadow: 'none',
+  borderRadius: '0',
+  border: '1px solid #d1d5db'
+}
+```
+
+**Completely invisible container:**
+```tsx
+containerStyle: {
+  boxShadow: 'none',
+  borderRadius: '0',
+  border: 'none',
+  backgroundColor: 'transparent'
+}
+```
+
+**Form input style:**
+```tsx
+containerStyle: {
+  boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.1)',
+  border: '2px solid #d1d5db',
+  borderRadius: '6px',
+  backgroundColor: '#ffffff'
+}
+```
+
+## Responsive Considerations
+
+### Mobile Optimization
+```tsx
+// Single month for mobile
+const isMobile = window.innerWidth < 768;
+settings={{
+  ...getDefaultSettings(),
+  visibleMonths: isMobile ? 1 : 2,
+  monthWidth: isMobile ? 280 : 400,
+}}
+```
+
+### Container Queries
+```tsx
+// Adapt to container width
+<div style={{ maxWidth: '600px' }}>
+  <CLACalendar settings={{
+    displayMode: 'embedded',
+    monthWidth: 280, // Fit container
+  }} />
+</div>
+```
+
+## Integration Tips
+
+### 1. Remove Visual Noise
+- Set `boxShadow: 'none'` for flat appearance
+- Use `borderRadius: '0'` for sharp corners
+- Consider `border: 'none'` when inside containers
+
+### 2. Size Appropriately
+- Use `monthWidth` to control calendar width
+- Adjust `visibleMonths` based on available space
+- Consider compact modes for sidebars
+
+### 3. Match Your Design System
+- Use your app's border colors
+- Match background colors
+- Apply consistent spacing
+
+### 4. Optimize for Context
+- Forms: Add borders and inset shadows
+- Dashboards: Use cards with subtle shadows
+- Sidebars: Compact width and single month
+- Full-width: Multiple months for overview
+
+## Accessibility
+
+Embedded calendars maintain full accessibility:
+- Keyboard navigation works normally
+- Screen reader support unchanged
+- Focus indicators remain visible
+- Color contrast preserved
+
+## Performance
+
+Embedded mode is optimized for:
+- Faster initial render (no popup logic)
+- Reduced re-renders (no open/close)
+- Smaller DOM footprint
+- Better mobile performance
+
+## Summary
+
+Embedded widgets provide maximum flexibility for integrating calendars into your application. By removing popup-specific styling and offering fine-grained control over appearance, you can create calendars that feel native to your design system while maintaining all the powerful features of CLACalendar.

@@ -16,6 +16,12 @@ const preview: Preview = {
         date: /Date$/,
       },
     },
+    options: {
+      storySort: {
+        method: 'alphabetical',
+        order: ['Calendar', ['Interactive Playground', ['Docs', '*']]],
+      },
+    },
     docs: {
       story: {
         inline: true,

@@ -1,0 +1,348 @@
+import { Meta, Story, Canvas } from '@storybook/addon-docs';
+import { CLACalendar } from './CLACalendar';
+import { createStoryParameters } from './utils/story-helpers';
+import {
+  EventTypesGalleryStory,
+  DenseEventCalendarStory,
+  RecurringPatternsStory,
+  RichEventTooltipsStory,
+  MultiLayerVisualizationStory,
+  EventConflictsStory,
+} from './stories/EnhancedEventsStories';
+import {
+  eventTypesGalleryCode,
+  denseEventCalendarCode,
+  recurringPatternsCode,
+  richEventTooltipsCode,
+  multiLayerVisualizationCode,
+  eventConflictsCode,
+  colorCodedEventsCode,
+  eventDensityVisualizationCode,
+} from './stories/enhanced-events-code-examples';
+
+<Meta title="Calendar/Enhanced Events" component={CLACalendar} />
+
+# Enhanced Events
+
+Rich examples showcasing different event types, dense calendars, recurring patterns, and complex event configurations.
+
+## Overview
+
+The Enhanced Events section demonstrates:
+- **Event Type Galleries** - Different categories of events with custom styling
+- **Dense Calendars** - High-density event rendering and performance
+- **Recurring Patterns** - Simulating daily, weekly, and monthly events
+- **Rich Tooltips** - Detailed event information on hover
+- **Multi-Layer Visualization** - Complex event organization
+- **Conflict Management** - Handling overlapping events
+
+## Event Types Gallery
+
+Comprehensive gallery showing different event categories with distinct styling and purposes:
+
+<Canvas withSource="open">
+  <Story name="Event Types Gallery Demo" parameters={createStoryParameters(eventTypesGalleryCode)}>
+    {() => <EventTypesGalleryStory />}
+  </Story>
+</Canvas>
+
+**Event categories:**
+- **Meetings & Calls** - Team syncs, client calls, 1:1s (Blue)
+- **Deadlines & Milestones** - Critical dates and deliverables (Orange/Red)
+- **Training & Development** - Learning opportunities (Green)
+- **Social & Team Building** - Culture and team events (Purple)
+
+## Dense Event Calendar
+
+Testing calendar performance with many events per month:
+
+<Canvas withSource="open">
+  <Story name="Dense Calendar Display" parameters={createStoryParameters(denseEventCalendarCode)}>
+    {() => <DenseEventCalendarStory />}
+  </Story>
+</Canvas>
+
+**Performance features:**
+- Efficient event rendering
+- Smooth hover interactions
+- Optimized tooltip display
+- Fast layer switching
+
+## Recurring Event Patterns
+
+Simulating recurring events across different frequencies:
+
+<Canvas withSource="open">
+  <Story name="Recurring Patterns Example" parameters={createStoryParameters(recurringPatternsCode)}>
+    {() => <RecurringPatternsStory />}
+  </Story>
+</Canvas>
+
+**Recurrence types:**
+- **Daily** - Standups, check-ins (weekdays only)
+- **Weekly** - Reviews, 1:1s, recurring meetings
+- **Monthly** - All hands, retrospectives, reports
+
+## Rich Event Tooltips
+
+Events with comprehensive descriptions for detailed information:
+
+<Canvas withSource="open">
+  <Story name="Rich Tooltips Display" parameters={createStoryParameters(richEventTooltipsCode)}>
+    {() => <RichEventTooltipsStory />}
+  </Story>
+</Canvas>
+
+**Tooltip content:**
+- Extended descriptions
+- Attendee information
+- Location details
+- Pre-meeting requirements
+- Duration and timing
+
+## Multi-Layer Visualization
+
+Complex calendar with multiple event layers and backgrounds:
+
+<Canvas withSource="open">
+  <Story name="Multi-Layer Event Display" parameters={createStoryParameters(multiLayerVisualizationCode)}>
+    {() => <MultiLayerVisualizationStory />}
+  </Story>
+</Canvas>
+
+**Layer features:**
+- **Meetings Layer** - All meetings with blue background periods
+- **Development Layer** - Dev activities with green highlights
+- **Important Layer** - Critical dates that can't be hidden
+
+## Event Conflicts
+
+Handling overlapping events and scheduling conflicts:
+
+<Canvas withSource="open">
+  <Story name="Event Conflicts Example" parameters={createStoryParameters(eventConflictsCode)}>
+    {() => <EventConflictsStory />}
+  </Story>
+</Canvas>
+
+**Conflict visualization:**
+- Multiple events at same time
+- Priority indicators (red for critical)
+- Visual stacking of conflicts
+- Tooltip details for resolution
+
+## Event Styling Patterns
+
+### Color Coding by Type
+
+Consistent color scheme for event categories:
+
+{colorCodedEventsCode}
+
+**Color meanings:**
+- Blue (`#3B82F6`) - Regular meetings
+- Red (`#DC2626`) - Critical deadlines
+- Green (`#059669`) - Training/learning
+- Purple (`#8B5CF6`) - Social events
+- Amber (`#F59E0B`) - Reviews
+- Pink (`#EC4899`) - Milestones
+
+### Event Density Visualization
+
+Using background colors to indicate busy periods:
+
+{eventDensityVisualizationCode}
+
+**Density indicators:**
+- Light green - Quiet periods
+- Yellow - Normal activity
+- Light red - Busy periods
+
+## Event Data Structure
+
+### Basic Event Format
+
+```typescript
+interface CalendarEvent {
+  date: string;        // YYYY-MM-DD format
+  title: string;       // Event name
+  type: string;        // Event category
+  time: string;        // Display time
+  description: string; // Detailed description
+  color?: string;      // Custom color override
+}
+```
+
+### Example Event
+
+```typescript
+{
+  date: '2024-01-15',
+  title: 'Product Strategy Meeting',
+  type: 'meeting',
+  time: '10:00 AM - 12:00 PM',
+  description: 'Quarterly planning session with stakeholders',
+  color: '#3B82F6'
+}
+```
+
+## Best Practices
+
+### 1. Event Organization
+
+**Group by purpose:**
+- Use layers for logical grouping
+- Apply consistent colors per category
+- Enable layer toggling for clarity
+
+**Time management:**
+- Show duration in time field
+- Use descriptions for details
+- Highlight conflicts clearly
+
+### 2. Performance Optimization
+
+**For dense calendars:**
+- Limit visible months
+- Use efficient data structures
+- Consider pagination for large datasets
+- Optimize tooltip rendering
+
+**Event rendering:**
+```typescript
+// Good: Pre-process events
+const eventsByDate = events.reduce((acc, event) => {
+  acc[event.date] = [...(acc[event.date] || []), event];
+  return acc;
+}, {});
+
+// Avoid: Filtering in render
+events.filter(e => e.date === currentDate) // Slow for large lists
+```
+
+### 3. User Experience
+
+**Clear visual hierarchy:**
+- Critical events in red
+- Regular events in primary color
+- Optional events in muted colors
+- Social events in friendly colors
+
+**Information density:**
+- Title for quick scanning
+- Type for categorization
+- Time for scheduling
+- Description for details
+
+### 4. Accessibility
+
+**Event information:**
+- Descriptive titles
+- Clear time formats
+- Meaningful colors
+- Keyboard navigation
+
+**Screen reader support:**
+- Proper ARIA labels
+- Event count announcements
+- Focus management
+- Tooltip alternatives
+
+## Advanced Patterns
+
+### Dynamic Event Loading
+
+```typescript
+const [events, setEvents] = useState([]);
+
+// Load events for visible months
+useEffect(() => {
+  const loadEvents = async () => {
+    const start = getCurrentMonthStart();
+    const end = getMonthsAhead(visibleMonths);
+    const newEvents = await fetchEvents(start, end);
+    setEvents(newEvents);
+  };
+  
+  loadEvents();
+}, [visibleMonths, currentMonth]);
+```
+
+### Event Filtering
+
+```typescript
+// Filter events by type
+const filteredLayers = layers.map(layer => ({
+  ...layer,
+  data: {
+    ...layer.data,
+    events: layer.data.events.filter(event => 
+      selectedTypes.includes(event.type)
+    )
+  }
+}));
+```
+
+### Conflict Detection
+
+```typescript
+// Find conflicting events
+const findConflicts = (events) => {
+  const conflicts = {};
+  
+  events.forEach(event => {
+    const key = `${event.date}-${event.time}`;
+    if (!conflicts[key]) conflicts[key] = [];
+    conflicts[key].push(event);
+  });
+  
+  return Object.values(conflicts)
+    .filter(group => group.length > 1);
+};
+```
+
+## Integration Examples
+
+### With Calendar API
+
+```typescript
+// Google Calendar style events
+const formatGoogleEvents = (googleEvents) => {
+  return googleEvents.map(event => ({
+    date: formatDate(event.start.dateTime),
+    title: event.summary,
+    type: event.eventType || 'meeting',
+    time: formatTime(event.start.dateTime, event.end.dateTime),
+    description: event.description || '',
+    color: event.colorId ? colorMap[event.colorId] : '#3B82F6'
+  }));
+};
+```
+
+### With Outlook Integration
+
+```typescript
+// Outlook event transformation
+const transformOutlookEvents = (outlookEvents) => {
+  return outlookEvents.value.map(event => ({
+    date: event.start.dateTime.split('T')[0],
+    title: event.subject,
+    type: mapOutlookCategory(event.categories),
+    time: `${formatTime(event.start)} - ${formatTime(event.end)}`,
+    description: stripHtml(event.body.content),
+    color: event.importance === 'high' ? '#DC2626' : '#3B82F6'
+  }));
+};
+```
+
+## Summary
+
+Enhanced Events showcase the full potential of the CLACalendar component for complex scheduling needs. From simple event displays to sophisticated multi-layer visualizations with conflict management, these patterns provide a foundation for building powerful calendar applications.
+
+Key takeaways:
+- Use layers for logical event grouping
+- Apply consistent color coding
+- Optimize for performance with large datasets
+- Provide rich tooltips for detailed information
+- Handle conflicts gracefully
+- Maintain accessibility throughout

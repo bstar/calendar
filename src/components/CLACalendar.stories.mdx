@@ -1,0 +1,485 @@
+import { Meta, Story, Canvas } from '@storybook/addon-docs';
+import { CLACalendar } from './CLACalendar';
+import { createStoryParameters } from './utils/story-helpers';
+import {
+  DefaultStory,
+  SingleSelectionStory,
+  MultipleMonthsStory,
+  EmbeddedModeStory,
+  CustomColorsStory,
+  WeekStartSundayStory,
+  WithEventsStory,
+  WithRestrictionsStory,
+  CustomDateFormatStory,
+  MinimalUIStory,
+  NoSubmitButtonStory,
+  YearViewStory,
+} from './stories/CLACalendarStories';
+import {
+  defaultCode,
+  singleSelectionCode,
+  multipleMonthsCode,
+  embeddedModeCode,
+  customColorsCode,
+  weekStartSundayCode,
+  withEventsCode,
+  withRestrictionsCode,
+  customDateFormatCode,
+  minimalUICode,
+  noSubmitButtonCode,
+  yearViewCode,
+} from './stories/clacalendar-code-examples';
+
+<Meta title="Calendar/CLACalendar" component={CLACalendar} />
+
+# CLACalendar
+
+The main calendar component that provides a flexible date selection interface with support for layers, restrictions, theming, and multiple display modes.
+
+## Overview
+
+CLACalendar is a comprehensive React date picker component that offers:
+- **Date Range Selection**: Select single dates or date ranges with drag support
+- **Multiple Display Modes**: Popup or embedded calendar layouts
+- **Layer System**: Organize data into toggleable layers
+- **Date Restrictions**: Control which dates can be selected
+- **Customizable Theming**: Full control over colors and styling
+- **UTC Date Handling**: Consistent timezone behavior
+
+## Basic Usage
+
+### Default Configuration
+
+The simplest way to use CLACalendar with default settings:
+
+<Canvas withSource="open">
+  <Story name="Basic Example" parameters={createStoryParameters(defaultCode)}>
+    {() => <DefaultStory />}
+  </Story>
+</Canvas>
+
+### Single Date Selection
+
+Configure the calendar for single date selection instead of ranges:
+
+<Canvas withSource="open">
+  <Story name="Single Date Mode" parameters={createStoryParameters(singleSelectionCode)}>
+    {() => <SingleSelectionStory />}
+  </Story>
+</Canvas>
+
+### Multiple Months Display
+
+Show multiple months side by side for better date range visibility:
+
+<Canvas withSource="open">
+  <Story name="Multi Month View" parameters={createStoryParameters(multipleMonthsCode)}>
+    {() => <MultipleMonthsStory />}
+  </Story>
+</Canvas>
+
+## Display Modes
+
+### Popup Mode (Default)
+
+The calendar appears as a popup overlay when the input field is clicked:
+
+```tsx
+<CLACalendar 
+  settings={{
+    ...getDefaultSettings(),
+    displayMode: 'popup',
+    isOpen: false,
+    closeOnClickAway: true
+  }}
+/>
+```
+
+**Key Features:**
+- Opens on input click
+- Closes on outside click (configurable)
+- Positioned relative to input
+- Ideal for forms and space-constrained layouts
+
+### Embedded Mode
+
+The calendar is displayed inline within your layout:
+
+<Canvas withSource="open">
+  <Story name="Embedded Display" parameters={createStoryParameters(embeddedModeCode)}>
+    {() => <EmbeddedModeStory />}
+  </Story>
+</Canvas>
+
+**Key Features:**
+- Always visible
+- No popup behavior
+- Flexible sizing
+- Perfect for dashboards and dedicated calendar pages
+
+## Selection Modes
+
+### Range Selection (Default)
+
+Users can select a start and end date by clicking and dragging:
+
+```tsx
+<CLACalendar 
+  settings={{
+    ...getDefaultSettings(),
+    selectionMode: 'range',
+    defaultRange: {
+      start: '2024-01-01',
+      end: '2024-01-05'
+    }
+  }}
+/>
+```
+
+**Interaction:**
+- Click to set start date
+- Click again or drag to set end date
+- Visual feedback during selection
+
+### Single Date Selection
+
+For scenarios requiring only one date:
+
+```tsx
+<CLACalendar 
+  settings={{
+    ...getDefaultSettings(),
+    selectionMode: 'single'
+  }}
+/>
+```
+
+**Interaction:**
+- Click any date to select
+- Previous selection is replaced
+- Simpler UI with single date display
+
+## Customization
+
+### Custom Colors and Theming
+
+Apply custom color schemes and styling to match your brand:
+
+<Canvas withSource="open">
+  <Story name="Custom Theme" parameters={createStoryParameters(customColorsCode)}>
+    {() => <CustomColorsStory />}
+  </Story>
+</Canvas>
+
+**Available Color Properties:**
+- `colors.primary`: Main accent color
+- `colors.success`: Success/confirmation states  
+- `colors.warning`: Warning indicators
+- `colors.danger`: Error/restriction states
+- `containerStyle`: Override container CSS
+- `backgroundColors`: Control background colors for different areas
+
+### Week Start Configuration
+
+Configure whether weeks start on Sunday or Monday:
+
+<Canvas withSource="open">
+  <Story name="Sunday Week Start" parameters={createStoryParameters(weekStartSundayCode)}>
+    {() => <WeekStartSundayStory />}
+  </Story>
+</Canvas>
+
+```tsx
+<CLACalendar 
+  settings={{
+    ...getDefaultSettings(),
+    startWeekOnSunday: true // Sunday start
+    // startWeekOnSunday: false // Monday start (default)
+  }}
+/>
+```
+
+## Events and Layers
+
+Display events, holidays, and other data using the layer system:
+
+<Canvas withSource="open">
+  <Story name="Event Display" parameters={createStoryParameters(withEventsCode)}>
+    {() => <WithEventsStory />}
+  </Story>
+</Canvas>
+
+**Layer Configuration:**
+```tsx
+layers: [{
+  name: 'Events',
+  title: 'Calendar Events',
+  description: 'Important dates',
+  visible: true,
+  data: {
+    events: [{
+      date: '2024-01-15',
+      title: 'Team Meeting',
+      type: 'meeting',
+      time: '10:00 AM',
+      description: 'Weekly sync',
+      color: '#3B82F6'
+    }],
+    background: [{
+      startDate: '2024-01-10',
+      endDate: '2024-01-12',
+      color: '#FEF3C7'
+    }]
+  }
+}]
+```
+
+## Date Restrictions
+
+Control which dates users can select:
+
+<Canvas withSource="open">
+  <Story name="Date Restrictions Example" parameters={createStoryParameters(withRestrictionsCode)}>
+    {() => <WithRestrictionsStory />}
+  </Story>
+</Canvas>
+
+## Date Formatting
+
+Customize how dates are displayed:
+
+<Canvas withSource="open">
+  <Story name="Date Formatting" parameters={createStoryParameters(customDateFormatCode)}>
+    {() => <CustomDateFormatStory />}
+  </Story>
+</Canvas>
+
+```tsx
+<CLACalendar 
+  settings={{
+    ...getDefaultSettings(),
+    dateFormatter: (date) => {
+      return date.toLocaleDateString('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric'
+      });
+    },
+    dateRangeSeparator: ' → '
+  }}
+/>
+```
+
+## Event Handling
+
+### Submit Callback
+
+Handle date selection with the onSubmit callback:
+
+```tsx
+<CLACalendar 
+  settings={{
+    ...getDefaultSettings(),
+    showSubmitButton: true
+  }}
+  onSubmit={(startDate, endDate) => {
+    console.log('Selected range:', startDate, endDate);
+    // startDate: '2024-01-01'
+    // endDate: '2024-01-05'
+  }}
+/>
+```
+
+### Settings Change Handler
+
+Track all setting changes:
+
+```tsx
+<CLACalendar 
+  settings={settings}
+  _onSettingsChange={(newSettings) => {
+    setSettings(newSettings);
+    // Handle any setting change
+  }}
+/>
+```
+
+## UI Options
+
+### Minimal Configuration
+
+Remove UI elements for a cleaner look:
+
+<Canvas withSource="open">
+  <Story name="Minimal UI" parameters={createStoryParameters(minimalUICode)}>
+    {() => <MinimalUIStory />}
+  </Story>
+</Canvas>
+
+### No Submit Button
+
+Hide the submit button for auto-submit behavior:
+
+<Canvas withSource="open">
+  <Story name="Without Submit" parameters={createStoryParameters(noSubmitButtonCode)}>
+    {() => <NoSubmitButtonStory />}
+  </Story>
+</Canvas>
+
+## Year View
+
+Extended calendar view showing multiple months:
+
+<Canvas withSource="open">
+  <Story name="Extended View" parameters={createStoryParameters(yearViewCode)}>
+    {() => <YearViewStory />}
+  </Story>
+</Canvas>
+
+## Advanced Configuration
+
+### Complete Settings Example
+
+```tsx
+const settings: CalendarSettings = {
+  // Display
+  displayMode: 'popup',
+  visibleMonths: 2,
+  monthWidth: 400,
+  
+  // Selection
+  selectionMode: 'range',
+  defaultRange: {
+    start: '2024-01-01',
+    end: '2024-01-05'
+  },
+  
+  // UI Features
+  showHeader: true,
+  showFooter: true,
+  showSubmitButton: true,
+  showTooltips: true,
+  showLayersNavigation: true,
+  showMonthHeadings: true,
+  showDateInputs: true,
+  
+  // Behavior
+  closeOnClickAway: true,
+  enableOutOfBoundsScroll: true,
+  suppressTooltipsOnSelection: false,
+  showSelectionAlert: true,
+  
+  // Localization
+  startWeekOnSunday: false,
+  timezone: 'UTC',
+  dateFormatter: (date) => format(date, 'MM/dd/yyyy'),
+  dateRangeSeparator: ' - ',
+  
+  // Theming
+  colors: {
+    primary: '#3B82F6',
+    success: '#10B981',
+    warning: '#F59E0B',
+    danger: '#EF4444'
+  },
+  
+  // Layers
+  layers: [],
+  defaultLayer: 'Events',
+  
+  // Styling
+  containerStyle: {},
+  inputStyle: {},
+  baseFontSize: '1rem'
+};
+```
+
+## Best Practices
+
+### 1. Date Handling
+- Always use UTC dates for consistency
+- Use the provided `DateUtils` for date operations
+- Format dates only for display, not for logic
+
+### 2. Performance
+- Limit `visibleMonths` to 6 or fewer
+- Use `showLayersNavigation: false` if only one layer
+- Minimize re-renders by memoizing settings
+
+### 3. Accessibility
+- Keep `showTooltips: true` for better UX
+- Provide clear `dateFormatter` output
+- Use semantic color choices
+
+### 4. Mobile Considerations
+- Use `visibleMonths: 1` on mobile
+- Consider `displayMode: 'embedded'` for touch devices
+- Test touch interactions for date selection
+
+## Common Patterns
+
+### Booking Calendar
+```tsx
+{
+  selectionMode: 'range',
+  showSubmitButton: true,
+  restrictionConfig: {
+    restrictions: [{
+      type: 'weekday',
+      days: [0, 6],
+      message: 'Weekends unavailable'
+    }]
+  }
+}
+```
+
+### Event Calendar
+```tsx
+{
+  selectionMode: 'single',
+  showLayersNavigation: true,
+  layers: [/* event layers */],
+  showTooltips: true
+}
+```
+
+### Date Picker Widget
+```tsx
+{
+  displayMode: 'popup',
+  visibleMonths: 1,
+  selectionMode: 'single',
+  showSubmitButton: false
+}
+```
+
+## Troubleshooting
+
+### Calendar Not Showing
+- Check `displayMode` setting
+- For popup mode, ensure `isOpen: true` or click handler works
+- Verify container has proper dimensions
+
+### Dates Not Selectable
+- Check restriction configuration
+- Verify dates are within boundaries
+- Ensure `selectionMode` is set correctly
+
+### Styling Issues
+- Use `containerStyle` for container overrides
+- Check CSS specificity conflicts
+- Verify theme color format (hex values)
+
+### Performance Issues
+- Reduce `visibleMonths` count
+- Disable unused features (tooltips, layers)
+- Memoize settings object
+
+## Related Documentation
+
+- [Layers & Navigation](/docs/calendar-layers-navigation--docs) - Learn about the layer system
+- [Date Restrictions](/docs/calendar-date-restrictions--docs) - Control date selectability
+- [Enhanced Events](/docs/calendar-enhanced-events--docs) - Rich event display examples
+- [Configuration Edge Cases](/docs/calendar-configuration-edge-cases--docs) - Edge case handling
+- [Embedded Widgets](/docs/calendar-embedded-widgets--docs) - Embedded calendar patterns
+- [Interactive Playground](/docs/calendar-interactive-playground--docs) - Live experimentation
