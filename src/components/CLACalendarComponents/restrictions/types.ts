@@ -8,41 +8,53 @@ export interface BaseRestriction {
 export interface DateRangeRestriction extends BaseRestriction {
   type: 'daterange';
   ranges: {
-    start: string;  // YYYY-MM-DD format
-    end: string;    // YYYY-MM-DD format
-    message: string;
+    startDate: string;  // YYYY-MM-DD format
+    endDate: string;    // YYYY-MM-DD format
+    message?: string;
   }[];
+  message?: string;
 }
 
 export interface BoundaryRestriction extends BaseRestriction {
   type: 'boundary';
   date: string;  // YYYY-MM-DD format
   direction: 'before' | 'after';
-  message: string;
+  inclusive?: boolean;
+  message?: string;
 }
 
 export interface AllowedRangesRestriction extends BaseRestriction {
   type: 'allowedranges';
   ranges: {
-    start: string;  // YYYY-MM-DD format
-    end: string;    // YYYY-MM-DD format
-    message: string;
+    startDate: string;  // YYYY-MM-DD format
+    endDate: string;    // YYYY-MM-DD format
+    message?: string;
   }[];
+  message?: string;
 }
 
 export interface RestrictedBoundaryRestriction extends BaseRestriction {
   type: 'restricted_boundary';
+  minDate?: string;  // YYYY-MM-DD format
+  maxDate?: string;  // YYYY-MM-DD format
   ranges: {
-    start: string;  // YYYY-MM-DD format
-    end: string;    // YYYY-MM-DD format
-    message: string;
+    startDate: string;  // YYYY-MM-DD format
+    endDate: string;    // YYYY-MM-DD format
+    message?: string;
+    restricted?: boolean;
+    exceptions?: {
+      startDate: string;
+      endDate: string;
+      message?: string;
+    }[];
   }[];
+  message?: string;
 }
 
 export interface WeekdayRestriction extends BaseRestriction {
   type: 'weekday';
   days: number[];  // 0-6 for Sunday-Saturday
-  message: string;
+  message?: string;
 }
 
 // Union type for all restriction types

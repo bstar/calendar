@@ -1,8 +1,10 @@
 import type { Preview } from '@storybook/react';
+import React from 'react';
 import '../src/index.css';
 import '../src/components/CLACalendar.css';
 import '../src/components/CLACalendarComponents/CalendarComponents.css';
 import '../src/components/CLACalendarComponents/defensive-styles.css';
+import './preview.css';
 
 const preview: Preview = {
   parameters: {
@@ -15,6 +17,10 @@ const preview: Preview = {
       },
     },
     docs: {
+      story: {
+        inline: true,
+        height: '600px',
+      },
       description: {
         component: 'CLACalendar is a flexible date range picker component for React with drag selection support.',
       },
@@ -112,6 +118,13 @@ ${JSON.stringify(dynamicSettings, null, 2)}${layerInfo}${restrictionInfo}
       description: 'Whether to show the calendar footer',
     },
   },
+  decorators: [
+    (Story) => (
+      <div style={{ minHeight: '600px', display: 'flex', flexDirection: 'column' }}>
+        <Story />
+      </div>
+    ),
+  ],
 };
 
 export default preview;

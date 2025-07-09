@@ -1,8 +1,6 @@
 import { Meta, Source, Story, Canvas } from '@storybook/addon-docs/blocks';
 import { CLACalendar } from './CLACalendar';
 import * as CalendarStories from './CLACalendar.stories';
-import * as LayerStories from './LayersAndNavigation.stories';
-import * as RestrictionStories from './Restrictions.stories';
 import { configurationExamples } from './utils/storybook-docs';
 
 <Meta title="Documentation/Calendar Configuration Guide" />
@@ -158,9 +156,7 @@ Layers allow you to display different types of content (events, backgrounds, res
 
 ### Multiple Layers Example
 
-<Canvas>
-  <Story of={LayerStories.BackgroundColors} />
-</Canvas>
+See the [Layers and Navigation stories](/story/features-layers--multiple-layers) for interactive examples of multiple layers with background colors.
 
 ### Layer Properties
 
@@ -276,9 +272,7 @@ Block specific date ranges:
   language="json"
 />
 
-<Canvas>
-  <Story of={RestrictionStories.DateRangeRestrictions} />
-</Canvas>
+See the [Restrictions stories](/story/features-restrictions--date-range-restrictions) for interactive examples.
 
 #### 2. Boundary Restrictions
 Block dates before/after a specific date:

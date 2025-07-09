@@ -58,8 +58,9 @@
 
 import { parseISO, isWithinInterval } from '../../../utils/DateUtils';
 import { isValid } from 'date-fns';
-import { RestrictionConfig, BoundaryRestriction, DateRangeRestriction, RestrictedBoundaryRestriction, AllowedRangesRestriction } from './types';
+import { RestrictionConfig, BoundaryRestriction, DateRangeRestriction, RestrictedBoundaryRestriction, AllowedRangesRestriction, WeekdayRestriction } from './types';
 import { BackgroundData } from '../../CLACalendar.config';
+import { isValidDateString, hasValidDateStrings } from './utils';
 
 export class RestrictionBackgroundGenerator {
   /**
@@ -76,6 +77,8 @@ export class RestrictionBackgroundGenerator {
    * @private
    */
   private handleBoundaryRestriction(date: Date, restriction: BoundaryRestriction): string | undefined {
+    if (!isValidDateString(restriction.date)) return undefined;
+    
     const boundaryDate = parseISO(restriction.date);
     if (!isValid(boundaryDate)) return undefined;
 
@@ -100,8 +103,11 @@ export class RestrictionBackgroundGenerator {
    */
   private handleDateRangeRestriction(date: Date, restriction: DateRangeRestriction): string | undefined {
     for (const range of restriction.ranges) {
-      const rangeStart = parseISO(range.start);
-      const rangeEnd = parseISO(range.end);
+      // Skip if range doesn't have valid date strings
+      if (!hasValidDateStrings(range)) continue;
+      
+      const rangeStart = parseISO(range.startDate);
+      const rangeEnd = parseISO(range.endDate);
 
       if (!isValid(rangeStart) || !isValid(rangeEnd)) continue;
 
@@ -121,8 +127,11 @@ export class RestrictionBackgroundGenerator {
    */
   private handleRestrictedBoundaryRestriction(date: Date, restriction: RestrictedBoundaryRestriction): string | undefined {
     for (const range of restriction.ranges) {
-      const rangeStart = parseISO(range.start);
-      const rangeEnd = parseISO(range.end);
+      // Skip if range doesn't have valid date strings
+      if (!hasValidDateStrings(range)) continue;
+      
+      const rangeStart = parseISO(range.startDate);
+      const rangeEnd = parseISO(range.endDate);
 
       if (!isValid(rangeStart) || !isValid(rangeEnd)) continue;
 
@@ -144,8 +153,10 @@ export class RestrictionBackgroundGenerator {
     if (!restriction.ranges.length) return undefined;
 
     const isAllowed = restriction.ranges.some(range => {
-      const rangeStart = parseISO(range.start);
-      const rangeEnd = parseISO(range.end);
+      if (!hasValidDateStrings(range)) return false;
+      
+      const rangeStart = parseISO(range.startDate);
+      const rangeEnd = parseISO(range.endDate);
 
       if (!isValid(rangeStart) || !isValid(rangeEnd)) return false;
 
@@ -156,13 +167,30 @@ export class RestrictionBackgroundGenerator {
   }
 
   /**
+   * Handler for weekday type restrictions
+   * @param {Date} date - Date to check
+   * @param {WeekdayRestriction} restriction - Weekday restriction configuration
+   * @returns {string | undefined} Background color if restricted, undefined if allowed
+   * @private
+   */
+  private handleWeekdayRestriction(date: Date, restriction: WeekdayRestriction): string | undefined {
+    const dayOfWeek = date.getDay();
+    if (restriction.days && restriction.days.includes(dayOfWeek)) {
+      return 'rgba(0, 0, 0, 0.1)';
+    }
+    return undefined;
+  }
+
+  /**
    * Map of restriction types to their handlers
    * @private
    */
   private restrictionHandlers = {
     boundary: this.handleBoundaryRestriction.bind(this),
     daterange: this.handleDateRangeRestriction.bind(this),
-    allowedranges: this.handleAllowedRangesRestriction.bind(this)
+    allowedranges: this.handleAllowedRangesRestriction.bind(this),
+    weekday: this.handleWeekdayRestriction.bind(this),
+    restricted_boundary: this.handleRestrictedBoundaryRestriction.bind(this)
   };
 
   /**
@@ -199,13 +227,14 @@ export class RestrictionBackgroundGenerator {
     daterange: (restriction: DateRangeRestriction): BackgroundData[] => {
       return restriction.ranges
         .filter(range => {
-          const start = parseISO(range.start);
-          const end = parseISO(range.end);
+          if (!hasValidDateStrings(range)) return false;
+          const start = parseISO(range.startDate);
+          const end = parseISO(range.endDate);
           return isValid(start) && isValid(end) && start <= end;
         })
         .map(range => ({
-          startDate: range.start,
-          endDate: range.end,
+          startDate: range.startDate,
+          endDate: range.endDate,
           color: '#ffe6e6'
         }));
     },
@@ -218,18 +247,19 @@ export class RestrictionBackgroundGenerator {
     allowedranges: (restriction: AllowedRangesRestriction): BackgroundData[] => {
       return restriction.ranges
         .filter(range => {
-          const start = parseISO(range.start);
-          const end = parseISO(range.end);
+          if (!hasValidDateStrings(range)) return false;
+          const start = parseISO(range.startDate);
+          const end = parseISO(range.endDate);
           return isValid(start) && isValid(end) && start <= end;
         })
         .map(range => [
           {
             startDate: '1900-01-01',
-            endDate: range.start,
+            endDate: range.startDate,
             color: '#ffe6e6'
           },
           {
-            startDate: range.end,
+            startDate: range.endDate,
             endDate: '2100-12-31',
             color: '#ffe6e6'
           }
@@ -242,6 +272,8 @@ export class RestrictionBackgroundGenerator {
      * @returns {BackgroundData[]} Array of background data for rendering
      */
     boundary: (restriction: BoundaryRestriction): BackgroundData[] => {
+      if (!isValidDateString(restriction.date)) return [];
+      
       const boundaryDate = parseISO(restriction.date);
       if (!isValid(boundaryDate)) return [];
 
@@ -259,6 +291,16 @@ export class RestrictionBackgroundGenerator {
      */
     restricted_boundary: (_restriction: RestrictedBoundaryRestriction): BackgroundData[] => {
       // Return empty array since restricted boundary is only enforced during selection
+      return [];
+    },
+
+    /**
+     * Handler to generate background data for weekday type restrictions
+     * @param {WeekdayRestriction} restriction - Weekday restriction configuration
+     * @returns {BackgroundData[]} Array of background data for rendering
+     */
+    weekday: (_restriction: WeekdayRestriction): BackgroundData[] => {
+      // Weekday restrictions are handled per-date, not as ranges
       return [];
     }
   };
@@ -278,13 +320,15 @@ export class RestrictionBackgroundGenerator {
       // Type-safe handler selection based on restriction type
       switch (restriction.type) {
         case 'daterange':
-          return RestrictionBackgroundGenerator.backgroundDataHandlers.daterange(restriction);
+          return RestrictionBackgroundGenerator.backgroundDataHandlers.daterange(restriction as DateRangeRestriction);
         case 'allowedranges':
-          return RestrictionBackgroundGenerator.backgroundDataHandlers.allowedranges(restriction);
+          return RestrictionBackgroundGenerator.backgroundDataHandlers.allowedranges(restriction as AllowedRangesRestriction);
         case 'boundary':
-          return RestrictionBackgroundGenerator.backgroundDataHandlers.boundary(restriction);
+          return RestrictionBackgroundGenerator.backgroundDataHandlers.boundary(restriction as BoundaryRestriction);
         case 'restricted_boundary':
-          return RestrictionBackgroundGenerator.backgroundDataHandlers.restricted_boundary(restriction);
+          return RestrictionBackgroundGenerator.backgroundDataHandlers.restricted_boundary(restriction as RestrictedBoundaryRestriction);
+        case 'weekday':
+          return RestrictionBackgroundGenerator.backgroundDataHandlers.weekday(restriction as WeekdayRestriction);
         default:
           return [];
       }

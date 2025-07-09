@@ -237,8 +237,8 @@ describe('DateRangeSelectionManager', () => {
             enabled: true,
             ranges: [
               {
-                start: '2025-06-10',
-                end: '2025-06-15',
+                startDate: '2025-06-10',
+                endDate: '2025-06-15',
                 message: 'Holiday period blocked'
               }
             ]
@@ -294,10 +294,8 @@ describe('DateRangeSelectionManager', () => {
       const sunday = new Date('2025-06-15T12:00:00.000Z');
       const result = manager.canSelectDate(sunday);
       
-      // TODO: Weekday restriction logic may be inverted or not working
-      // Currently allows weekend dates when they should be restricted
-      expect(result.allowed).toBe(true);
-      // expect(result.message).toBe('Weekends not allowed');
+      expect(result.allowed).toBe(false);
+      expect(result.message).toBe('Weekends not allowed');
     });
 
     it('should allow weekday dates', () => {
@@ -305,10 +303,8 @@ describe('DateRangeSelectionManager', () => {
       const monday = new Date('2025-06-16T12:00:00.000Z');
       const result = manager.canSelectDate(monday);
       
-      // TODO: Weekday restriction logic seems inverted
-      // Currently rejects weekdays when they should be allowed
-      expect(result.allowed).toBe(false);
-      // expect(result.message).toBeNull();
+      expect(result.allowed).toBe(true);
+      expect(result.message).toBeNull();
     });
   });
 
@@ -321,8 +317,8 @@ describe('DateRangeSelectionManager', () => {
             enabled: true,
             ranges: [
               {
-                start: '2025-06-10',
-                end: '2025-06-20',
+                startDate: '2025-06-10',
+                endDate: '2025-06-20',
                 message: 'Selection must stay within this boundary'
               }
             ]
@@ -381,8 +377,8 @@ describe('DateRangeSelectionManager', () => {
             enabled: true,
             ranges: [
               {
-                start: '2025-06-10',
-                end: '2025-06-15',
+                startDate: '2025-06-10',
+                endDate: '2025-06-15',
                 message: 'Holiday period'
               }
             ]
@@ -412,10 +408,8 @@ describe('DateRangeSelectionManager', () => {
       const date = new Date('2025-06-23T12:00:00.000Z');
       const result = manager.canSelectDate(date);
       
-      // TODO: Multiple restrictions may be conflicting
-      // Currently rejects date that should pass all restrictions
-      expect(result.allowed).toBe(false);
-      // expect(result.message).toBeNull();
+      expect(result.allowed).toBe(true);
+      expect(result.message).toBeNull();
     });
   });
 

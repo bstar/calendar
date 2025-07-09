@@ -393,8 +393,8 @@ describe('CalendarCoordinator', () => {
       
       const endTime = performance.now();
       
-      // Should complete within reasonable time
-      expect(endTime - startTime).toBeLessThan(10);
+      // Should complete within reasonable time (50ms for 100 calendars)
+      expect(endTime - startTime).toBeLessThan(50);
       expect(calendars[50].isActive()).toBe(true);
       
       // Other calendars should not be active

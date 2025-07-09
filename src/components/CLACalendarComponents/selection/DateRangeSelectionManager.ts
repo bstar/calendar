@@ -118,8 +118,8 @@ export class DateRangeSelectionManager {
       if (!boundary.enabled) continue;
 
       for (const range of boundary.ranges) {
-        const rangeStart = parseISO(range.start);
-        const rangeEnd = parseISO(range.end);
+        const rangeStart = parseISO(range.startDate);
+        const rangeEnd = parseISO(range.endDate);
 
         if (!isValid(rangeStart) || !isValid(rangeEnd)) continue;
 

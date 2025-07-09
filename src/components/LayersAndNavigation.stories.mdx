@@ -1,0 +1,366 @@
+import { Meta, Story, Canvas } from '@storybook/addon-docs';
+import { CLACalendar } from './CLACalendar';
+import { createStoryParameters } from './utils/story-helpers';
+import {
+  MultipleLayersStory,
+  BackgroundHighlightsStory,
+  SingleLayerStory,
+  MixedContentStory,
+  DynamicLayerControlStory,
+} from './stories/LayersStories';
+import {
+  multipleLayersCode,
+  backgroundHighlightsCode,
+  singleLayerCode,
+} from './stories/code-examples';
+
+<Meta title="Calendar/Layers & Navigation" component={CLACalendar} />
+
+# Layers & Navigation
+
+The Layers system allows you to organize calendar data into multiple toggleable views. This is essential for complex calendars that need to display different types of information.
+
+## Overview
+
+Layers enable you to:
+- 📊 **Separate different types of events** (meetings, holidays, deadlines)
+- 🎨 **Show/hide background highlights** for visual context
+- 👥 **Organize data by team, project, or category**
+- 🔄 **Toggle between different views** without reloading
+
+## Key Concepts
+
+### Layer Structure
+
+Each layer must have:
+- `name` - Unique identifier for the layer
+- `title` - Display name shown in the UI
+- `description` - Brief description of the layer's content
+- `visible` - Whether the layer is initially visible
+- `data` - Object containing events and/or backgrounds
+
+Optional properties:
+- `required` - Whether the layer can be hidden
+- `enabled` - Whether the layer can be toggled
+- `color` - Theme color for the layer
+
+### Basic Configuration
+
+```typescript
+const settings = {
+  ...getDefaultSettings(),
+  showLayersNavigation: true,
+  defaultLayer: 'Events',
+  layers: [
+    {
+      name: 'Events',
+      title: 'Team Events',
+      description: 'Company meetings and events',
+      visible: true,
+      data: {
+        events: [...],
+        background: [...]
+      }
+    }
+  ]
+};
+```
+
+---
+
+## Multiple Layers
+
+This example shows how to configure multiple layers with different types of content. Users can toggle between layers using the navigation tabs.
+
+### Features Demonstrated:
+- 3 distinct layers (Events, Holidays, Deadlines)
+- Navigation tabs for switching views
+- Different color themes per layer
+- Combined events and backgrounds
+
+<Canvas withSource="open">
+  <Story name="Multiple Layers" parameters={createStoryParameters(multipleLayersCode)}>
+    {() => <MultipleLayersStory />}
+  </Story>
+</Canvas>
+
+### How It Works
+
+1. **Layer Navigation** - Tabs appear at the top of the calendar
+2. **Toggle Layers** - Click tabs to switch between different views
+3. **Color Coding** - Each layer can have its own color scheme
+4. **Data Organization** - Events and backgrounds are layer-specific
+
+---
+
+## Background Highlights
+
+Use layers primarily for background highlights to indicate different types of periods (sprints, holidays, busy periods).
+
+### Features Demonstrated:
+- Focus on background colors rather than events
+- Visual period indicators
+- Minimal event markers for key dates
+- Multiple overlapping backgrounds
+
+<Canvas withSource="open">
+  <Story name="Background Highlights" parameters={createStoryParameters(backgroundHighlightsCode)}>
+    {() => <BackgroundHighlightsStory />}
+  </Story>
+</Canvas>
+
+### Use Cases for Background Highlights
+
+- **Sprint Planning** - Visualize sprint boundaries
+- **Resource Planning** - Show busy/available periods  
+- **Seasonal Patterns** - Highlight peak seasons or quiet periods
+- **Project Phases** - Indicate different project stages
+
+### Background Configuration
+
+```typescript
+background: [
+  {
+    startDate: '2024-02-01',
+    endDate: '2024-02-14',
+    color: 'rgba(99, 102, 241, 0.1)', // Semi-transparent
+  }
+]
+```
+
+> **Tip**: Use semi-transparent colors (rgba with alpha < 0.2) for backgrounds to maintain readability.
+
+---
+
+## Single Layer (No Navigation)
+
+Sometimes you only need one layer and don't want to show navigation tabs. This creates a cleaner, simpler interface.
+
+### Features Demonstrated:
+- Hidden layer navigation
+- Single data source
+- Simplified UI
+- Focus on content
+
+<Canvas withSource="open">
+  <Story name="Single Layer" parameters={createStoryParameters(singleLayerCode)}>
+    {() => <SingleLayerStory />}
+  </Story>
+</Canvas>
+
+### When to Use Single Layer
+
+- **Simple Calendars** - When you don't need multiple views
+- **Embedded Widgets** - In space-constrained layouts
+- **Focused Views** - When showing specific-purpose calendars
+- **Performance** - Reduces complexity for better performance
+
+---
+
+## Mixed Content Layers
+
+Combine events and backgrounds effectively within layers to create rich, informative calendar views.
+
+### Features Demonstrated:
+- Events and backgrounds in each layer
+- Visual hierarchy with colors
+- Context through backgrounds
+- Detail through events
+
+<Canvas withSource="open">
+  <Story name="Mixed Content">
+    {() => <MixedContentStory />}
+  </Story>
+</Canvas>
+
+### Best Practices for Mixed Content
+
+1. **Color Coordination** - Use the same base color for events and backgrounds
+2. **Transparency Levels**
+   - Events: Full opacity
+   - Backgrounds: 10-20% opacity
+3. **Visual Hierarchy** - Backgrounds provide context, events provide detail
+4. **Meaningful Periods** - Use backgrounds to show phases, stages, or periods
+
+---
+
+## Dynamic Layer Control
+
+This example demonstrates programmatic control over layers, including enabling/disabling layers and handling layer changes.
+
+### Features Demonstrated:
+- Required layers that cannot be hidden
+- Disabled layers that are view-only
+- Programmatic state management
+- Dynamic layer updates
+
+<Canvas withSource="open">
+  <Story name="Dynamic Layer Control">
+    {() => <DynamicLayerControlStory />}
+  </Story>
+</Canvas>
+
+### Layer Control Options
+
+1. **Required Layers** (`required: true`)
+   - Always visible
+   - Cannot be hidden by users
+   - Useful for critical information
+
+2. **Disabled Layers** (`enabled: false`)
+   - Visible but not selectable
+   - Good for read-only information
+   - Visual indicator of locked state
+
+3. **Optional Layers** (default)
+   - Can be shown/hidden
+   - Normal interaction
+
+## Configuration Reference
+
+### Layer Properties
+
+<table>
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Type</th>
+      <th>Required</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>name</code></td>
+      <td>string</td>
+      <td>✅</td>
+      <td>Unique identifier for the layer</td>
+    </tr>
+    <tr>
+      <td><code>title</code></td>
+      <td>string</td>
+      <td>✅</td>
+      <td>Display name shown in UI</td>
+    </tr>
+    <tr>
+      <td><code>description</code></td>
+      <td>string</td>
+      <td>✅</td>
+      <td>Brief description of the layer</td>
+    </tr>
+    <tr>
+      <td><code>visible</code></td>
+      <td>boolean</td>
+      <td>❌</td>
+      <td>Whether layer is initially visible</td>
+    </tr>
+    <tr>
+      <td><code>required</code></td>
+      <td>boolean</td>
+      <td>❌</td>
+      <td>Whether layer can be hidden</td>
+    </tr>
+    <tr>
+      <td><code>enabled</code></td>
+      <td>boolean</td>
+      <td>❌</td>
+      <td>Whether layer can be toggled</td>
+    </tr>
+    <tr>
+      <td><code>color</code></td>
+      <td>string</td>
+      <td>❌</td>
+      <td>Theme color for the layer</td>
+    </tr>
+    <tr>
+      <td><code>data</code></td>
+      <td>object</td>
+      <td>✅</td>
+      <td>Contains events and backgrounds</td>
+    </tr>
+  </tbody>
+</table>
+
+### Event Properties
+
+<table>
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Type</th>
+      <th>Required</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>date</code></td>
+      <td>string</td>
+      <td>✅</td>
+      <td>Date in YYYY-MM-DD format</td>
+    </tr>
+    <tr>
+      <td><code>title</code></td>
+      <td>string</td>
+      <td>✅</td>
+      <td>Event title</td>
+    </tr>
+    <tr>
+      <td><code>type</code></td>
+      <td>string</td>
+      <td>✅</td>
+      <td>Event type/category</td>
+    </tr>
+    <tr>
+      <td><code>time</code></td>
+      <td>string</td>
+      <td>✅</td>
+      <td>Time or duration</td>
+    </tr>
+    <tr>
+      <td><code>description</code></td>
+      <td>string</td>
+      <td>✅</td>
+      <td>Event description</td>
+    </tr>
+    <tr>
+      <td><code>color</code></td>
+      <td>string</td>
+      <td>❌</td>
+      <td>Custom color for this event</td>
+    </tr>
+  </tbody>
+</table>
+
+### Background Properties
+
+<table>
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Type</th>
+      <th>Required</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>startDate</code></td>
+      <td>string</td>
+      <td>✅</td>
+      <td>Start date in YYYY-MM-DD format</td>
+    </tr>
+    <tr>
+      <td><code>endDate</code></td>
+      <td>string</td>
+      <td>✅</td>
+      <td>End date in YYYY-MM-DD format</td>
+    </tr>
+    <tr>
+      <td><code>color</code></td>
+      <td>string</td>
+      <td>✅</td>
+      <td>Background color (use rgba for transparency)</td>
+    </tr>
+  </tbody>
+</table>

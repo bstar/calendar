@@ -65,8 +65,8 @@ describe('CLACalendar Restriction Configurations', () => {
             enabled: true,
             ranges: [
               {
-                start: '2025-06-20',
-                end: '2025-06-25',
+                startDate: '2025-06-20',
+                endDate: '2025-06-25',
                 message: 'Holiday week - no bookings allowed'
               }
             ]
@@ -100,18 +100,18 @@ describe('CLACalendar Restriction Configurations', () => {
             enabled: true,
             ranges: [
               {
-                start: '2025-06-20',
-                end: '2025-06-22',
+                startDate: '2025-06-20',
+                endDate: '2025-06-22',
                 message: 'System maintenance period'
               },
               {
-                start: '2025-06-28',
-                end: '2025-06-30',
+                startDate: '2025-06-28',
+                endDate: '2025-06-30',
                 message: 'End of month closure'
               },
               {
-                start: '2025-07-04',
-                end: '2025-07-04',
+                startDate: '2025-07-04',
+                endDate: '2025-07-04',
                 message: 'Independence Day - office closed'
               }
             ]
@@ -174,8 +174,8 @@ describe('CLACalendar Restriction Configurations', () => {
             enabled: false, // Disabled restriction
             ranges: [
               {
-                start: '2025-06-20',
-                end: '2025-06-25',
+                startDate: '2025-06-20',
+                endDate: '2025-06-25',
                 message: 'This restriction is disabled'
               }
             ]
@@ -435,8 +435,8 @@ describe('CLACalendar Restriction Configurations', () => {
             enabled: true,
             ranges: [
               {
-                start: '2025-06-15',
-                end: '2025-06-20',
+                startDate: '2025-06-15',
+                endDate: '2025-06-20',
                 message: 'Available booking window'
               }
             ]
@@ -470,18 +470,18 @@ describe('CLACalendar Restriction Configurations', () => {
             enabled: true,
             ranges: [
               {
-                start: '2025-06-10',
-                end: '2025-06-15',
+                startDate: '2025-06-10',
+                endDate: '2025-06-15',
                 message: 'Conference Room A available'
               },
               {
-                start: '2025-06-20',
-                end: '2025-06-25',
+                startDate: '2025-06-20',
+                endDate: '2025-06-25',
                 message: 'Conference Room B available'
               },
               {
-                start: '2025-07-01',
-                end: '2025-07-05',
+                startDate: '2025-07-01',
+                endDate: '2025-07-05',
                 message: 'Training Room available'
               }
             ]
@@ -515,13 +515,13 @@ describe('CLACalendar Restriction Configurations', () => {
             enabled: true,
             ranges: [
               {
-                start: '2025-06-05',
-                end: '2025-06-07',
+                startDate: '2025-06-05',
+                endDate: '2025-06-07',
                 message: 'Early week availability'
               },
               {
-                start: '2025-06-25',
-                end: '2025-06-27',
+                startDate: '2025-06-25',
+                endDate: '2025-06-27',
                 message: 'Late month availability'
               }
             ]
@@ -577,13 +577,13 @@ describe('CLACalendar Restriction Configurations', () => {
             enabled: true,
             ranges: [
               {
-                start: '2025-07-04',
-                end: '2025-07-04',
+                startDate: '2025-07-04',
+                endDate: '2025-07-04',
                 message: 'Independence Day - office closed'
               },
               {
-                start: '2025-07-15',
-                end: '2025-07-19',
+                startDate: '2025-07-15',
+                endDate: '2025-07-19',
                 message: 'Summer shutdown week'
               }
             ]
@@ -623,8 +623,8 @@ describe('CLACalendar Restriction Configurations', () => {
             enabled: true, // Enabled
             ranges: [
               {
-                start: '2025-06-20',
-                end: '2025-06-22',
+                startDate: '2025-06-20',
+                endDate: '2025-06-22',
                 message: 'Active restriction period'
               }
             ]
@@ -665,8 +665,8 @@ describe('CLACalendar Restriction Configurations', () => {
             enabled: true,
             ranges: [
               {
-                start: '2025-06-15',
-                end: '2025-06-20',
+                startDate: '2025-06-15',
+                endDate: '2025-06-20',
                 message: 'Maintenance period'
               }
             ]
@@ -706,8 +706,8 @@ describe('CLACalendar Restriction Configurations', () => {
             enabled: true,
             ranges: [
               {
-                start: '2025-06-10',
-                end: '2025-06-25',
+                startDate: '2025-06-10',
+                endDate: '2025-06-25',
                 message: 'Available period'
               }
             ]
@@ -717,8 +717,8 @@ describe('CLACalendar Restriction Configurations', () => {
             enabled: true,
             ranges: [
               {
-                start: '2025-06-15',
-                end: '2025-06-18',
+                startDate: '2025-06-15',
+                endDate: '2025-06-18',
                 message: 'Blocked period within allowed range'
               }
             ]
@@ -796,8 +796,8 @@ describe('CLACalendar Restriction Configurations', () => {
             enabled: true,
             ranges: [
               {
-                start: '2025-06-15',
-                end: '2025-06-15',
+                startDate: '2025-06-15',
+                endDate: '2025-06-15',
                 message: 'Single day restriction'
               }
             ]
@@ -863,8 +863,8 @@ describe('CLACalendar Restriction Configurations', () => {
             enabled: true,
             ranges: [
               {
-                start: '2025-06-20',
-                end: '2025-06-22',
+                startDate: '2025-06-20',
+                endDate: '2025-06-22',
                 message: longMessage
               }
             ]

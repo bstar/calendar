@@ -59,6 +59,7 @@ import { parseISO } from '../../../utils/DateUtils';
 import { isValid } from 'date-fns';
 import { isWithinInterval } from '../../../utils/DateUtils';
 import { RestrictionConfig, BoundaryRestriction, DateRangeRestriction, RestrictedBoundaryRestriction, AllowedRangesRestriction, WeekdayRestriction } from './types';
+import { isValidDateString, hasValidDateStrings } from './utils';
 
 /**
  * Manages date selection restrictions for the calendar
@@ -80,6 +81,9 @@ export class RestrictionManager {
    * @private
    */
   private checkBoundaryRestriction(start: Date, end: Date, restriction: BoundaryRestriction): string | null {
+    // Skip if date is not a valid string
+    if (!isValidDateString(restriction.date)) return null;
+    
     const boundaryDate = parseISO(restriction.date);
     if (!isValid(boundaryDate)) return null;
 
@@ -107,8 +111,11 @@ export class RestrictionManager {
    */
   private checkDateRangeRestriction(start: Date, end: Date, restriction: DateRangeRestriction): string | null {
     for (const range of restriction.ranges) {
-      const rangeStart = parseISO(range.start);
-      const rangeEnd = parseISO(range.end);
+      // Skip if range doesn't have valid date strings
+      if (!hasValidDateStrings(range)) continue;
+      
+      const rangeStart = parseISO(range.startDate);
+      const rangeEnd = parseISO(range.endDate);
 
       if (!isValid(rangeStart) || !isValid(rangeEnd)) continue;
 
@@ -144,8 +151,11 @@ export class RestrictionManager {
    */
   private checkRestrictedBoundaryRestriction(start: Date, end: Date, restriction: RestrictedBoundaryRestriction): string | null {
     for (const range of restriction.ranges) {
-      const rangeStart = parseISO(range.start);
-      const rangeEnd = parseISO(range.end);
+      // Skip if range doesn't have valid date strings
+      if (!hasValidDateStrings(range)) continue;
+      
+      const rangeStart = parseISO(range.startDate);
+      const rangeEnd = parseISO(range.endDate);
 
       if (!isValid(rangeStart) || !isValid(rangeEnd)) continue;
 
@@ -178,8 +188,11 @@ export class RestrictionManager {
     const message = restriction.ranges[0]?.message || 'Selection must be within allowed ranges';
 
     for (const range of restriction.ranges) {
-      const rangeStart = parseISO(range.start);
-      const rangeEnd = parseISO(range.end);
+      // Skip if range doesn't have valid date strings
+      if (!hasValidDateStrings(range)) continue;
+      
+      const rangeStart = parseISO(range.startDate);
+      const rangeEnd = parseISO(range.endDate);
 
       if (!isValid(rangeStart) || !isValid(rangeEnd)) continue;
 
@@ -204,10 +217,25 @@ export class RestrictionManager {
    * @private
    */
   private checkWeekdayRestriction(start: Date, end: Date, restriction: WeekdayRestriction): string | null {
-    const day = start.getDay();
-    if (!restriction.days.includes(day)) {
-      return restriction.message || 'Invalid weekday selected';
+    // Check if either start or end date falls on a restricted weekday
+    const startDay = start.getDay();
+    const endDay = end.getDay();
+    
+    if (restriction.days.includes(startDay) || restriction.days.includes(endDay)) {
+      return restriction.message || 'Selection includes restricted weekdays';
     }
+    
+    // For date ranges, check if any day in between is restricted
+    if (start < end) {
+      const current = new Date(start);
+      while (current <= end) {
+        if (restriction.days.includes(current.getDay())) {
+          return restriction.message || 'Selection includes restricted weekdays';
+        }
+        current.setDate(current.getDate() + 1);
+      }
+    }
+    
     return null;
   }
 
