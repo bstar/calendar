@@ -1,34 +1,17 @@
 import type { StorybookConfig } from '@storybook/react-vite';
 
 const config: StorybookConfig = {
-  stories: [
-    '../src/**/*.stories.@(js|jsx|ts|tsx|mdx)',
-    '../src/**/*.docs.mdx'
+  "stories": [
+    "../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"
   ],
-  addons: [
-    '@storybook/addon-links',
-    '@storybook/addon-essentials',
-    '@storybook/addon-interactions',
+  "addons": [
+    "@storybook/addon-controls",
+    "@storybook/addon-docs",
+    "@storybook/addon-onboarding"
   ],
-  framework: {
-    name: '@storybook/react-vite',
-    options: {},
-  },
-  typescript: {
-    check: false,
-    reactDocgen: 'react-docgen-typescript',
-    reactDocgenTypescriptOptions: {
-      shouldExtractLiteralValuesFromEnum: true,
-      propFilter: (prop) => (prop.parent ? !/node_modules/.test(prop.parent.fileName) : true),
-    },
-  },
-  viteFinal: async (config) => {
-    // Ensure proper CSS handling
-    config.css = config.css || {};
-    config.css.postcss = null;
-    
-    return config;
-  },
+  "framework": {
+    "name": "@storybook/react-vite",
+    "options": {}
+  }
 };
-
 export default config;

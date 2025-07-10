@@ -48,4 +48,4 @@ export default [js.configs.recommended, ...tseslint.configs.recommended, {
       project: ['./tsconfig.json'],
     },
   },
-}, ...storybook.configs["flat/recommended"]]; 
+}, ...storybook.configs["flat/recommended"], ...storybook.configs["flat/recommended"]]; 
