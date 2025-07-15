@@ -73,6 +73,7 @@ Key functions to use instead of date-fns directly:
 - lodash-es for utilities
 - TypeScript for type safety
 - ESLint with TypeScript support
+- Storybook v9 for component documentation and development
 
 ## Important Development Notes
 
@@ -115,6 +116,383 @@ ESLint is configured with TypeScript support:
 ## Custom Date Formatting
 
 The project supports custom date formatting through the `dateFormatter` function in settings. This allows flexible date display formats while maintaining UTC consistency internally.
+
+## Storybook Development
+
+### Storybook v9 Best Practices
+
+The project uses Storybook v9 for component documentation and development. **IMPORTANT**: With our installed packages (`@storybook/addon-docs` v9.0.16), imports must use the correct paths.
+
+#### MDX Files (Documentation)
+```typescript
+// CORRECT imports for our Storybook v9 setup
+import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
+import * as YourComponentStories from './YourComponent.stories';
+
+// INCORRECT - these will cause import errors
+// import { Meta } from '@storybook/blocks';  // Package not installed
+// import { Meta } from '@storybook/addon-docs';  // Wrong export path
+```
+
+#### Story Files (.stories.tsx)
+```typescript
+import type { Meta, StoryObj } from '@storybook/react';
+import { calendarArgTypes, defaultArgs } from './shared/storyControls';
+import { CalendarStoryWrapper } from './shared/CalendarStoryWrapper';
+
+const meta: Meta<typeof CLACalendar> = {
+  title: 'Category/ComponentName',
+  component: CLACalendar,
+  argTypes: calendarArgTypes,  // Use shared controls
+  args: defaultArgs,           // Use shared defaults
+  parameters: {
+    docs: {
+      description: {
+        component: 'Component description here'
+      }
+    }
+  }
+};
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+// Use the shared wrapper for consistent story rendering
+export const Default: Story = {
+  render: (args) => <CalendarStoryWrapper args={args} />
+};
+```
+
+#### MDX File Structure
+```mdx
+import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
+import * as ComponentStories from './Component.stories';
+
+<Meta of={ComponentStories} />
+
+# Component Name
+
+Component description...
+
+## Basic Usage
+
+<Canvas>
+  <Story of={ComponentStories.Default} />
+</Canvas>
+
+## Props
+
+Component props documentation...
+```
+
+#### Beautiful Tables in MDX Documentation
+
+**SUCCESS**: We've developed a clean, parser-friendly approach for tables in Storybook MDX that creates beautiful, readable documentation without breaking the build.
+
+##### The Winning Formula
+
+```html
+<!-- Clean HTML table structure that works perfectly -->
+<div className="props-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Property</th>
+        <th>Type</th>
+        <th>Default</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>propertyName</td>
+        <td>string</td>
+        <td>'default'</td>
+        <td>Description of the property</td>
+      </tr>
+      <tr>
+        <td>displayMode</td>
+        <td>'embedded' or 'popup'</td>
+        <td>'embedded'</td>
+        <td>How the calendar is displayed</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+```
+
+##### Table Styling (in `.storybook/preview.css`)
+
+```css
+/* Beautiful GitHub-style tables */
+.sbdocs-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1em 0;
+  font-size: 0.9em;
+}
+
+.sbdocs-content th,
+.sbdocs-content td {
+  text-align: left;
+  padding: 0.75rem;
+  border-bottom: 1px solid #e1e4e8;
+}
+
+.sbdocs-content th {
+  font-weight: 600;
+  background-color: #f6f8fa;
+}
+
+.sbdocs-content tbody tr:hover {
+  background-color: #f6f8fa;
+}
+
+/* Monospace font for property names */
+.sbdocs-content td:first-child {
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.85em;
+  color: #0969da;
+}
+```
+
+##### Key Rules for MDX Tables
+
+1. **Keep It Simple**:
+   - Plain text in cells (no `<code>` tags needed)
+   - First column automatically gets monospace styling
+   - Hover effects for better readability
+
+2. **Avoid Parser Breakers**:
+   - NO markdown tables (`| col | col |`)
+   - NO `<code>` tags inside table cells
+   - NO HTML entities (`&gt;`, `&lt;`, `&amp;`)
+   - NO pipe characters in content - use "or" instead
+
+3. **Type Descriptions**:
+   - Instead of: `'option1' | 'option2' | 'option3'`
+   - Write: `'option1' or 'option2' or 'option3'`
+   - Or just list the values: `'bottom-left', 'bottom-right', 'top-left', 'top-right'`
+
+4. **Complex Types**:
+   - Keep table cells simple (e.g., "Function" or "object")
+   - Explain details in prose or code blocks after the table
+
+5. **Consistent Structure**:
+   - Always wrap tables in a `<div>` with a className
+   - Use semantic table structure (thead, tbody)
+   - Keep column headers consistent across similar tables
+
+##### Example: Different Table Types
+
+```html
+<!-- Props table -->
+<div className="props-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Prop</th>
+        <th>Type</th>
+        <th>Required</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>settings</td>
+        <td>CalendarSettings</td>
+        <td>Yes</td>
+        <td>Configuration object for the calendar</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Settings table -->
+<div className="settings-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Property</th>
+        <th>Type</th>
+        <th>Default</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>visibleMonths</td>
+        <td>number</td>
+        <td>2</td>
+        <td>Number of months to display (1-12)</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Simple feature table -->
+<div className="feature-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Feature</th>
+        <th>Enabled</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>showHeader</td>
+        <td>boolean</td>
+        <td>true</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+```
+
+This approach creates professional-looking documentation tables that:
+- Parse correctly in Storybook v9
+- Look beautiful with GitHub-style formatting
+- Are easy to read and maintain
+- Don't require complex escaping or special handling
+
+### Shared Story Infrastructure
+
+To maintain consistency across all calendar stories, use the shared infrastructure:
+
+#### 1. Shared Controls (`src/stories/shared/storyControls.ts`)
+Provides comprehensive ArgTypes and default args for all calendar properties:
+```typescript
+import { calendarArgTypes, defaultArgs } from './shared/storyControls';
+```
+
+#### 2. Story Wrapper (`src/stories/shared/CalendarStoryWrapper.tsx`)
+Handles state management and consistent rendering:
+```typescript
+import { CalendarStoryWrapper } from './shared/CalendarStoryWrapper';
+
+export const YourStory: Story = {
+  render: (args) => (
+    <CalendarStoryWrapper 
+      args={args}
+      title="Optional Title"
+      description="Optional description"
+      showSelectedDate={true}  // Show selection feedback
+    />
+  )
+};
+```
+
+### Handling Calendar Width in Docs
+
+The calendar component has a default width of 500px per month. With 2 visible months (default), this creates a 1000px+ wide component. To handle this in Storybook docs:
+
+#### Preview Styles (`.storybook/preview.css`)
+```css
+/* Force Storybook docs to handle wide content */
+.sbdocs.sbdocs-wrapper {
+  max-width: none !important;
+  overflow-x: auto !important;
+}
+
+/* Make story previews handle calendar width properly */
+.docs-story {
+  min-width: fit-content !important;
+  overflow-x: auto !important;
+}
+
+/* Calendar specific fixes in docs */
+.cla-calendar-wrapper {
+  display: inline-block;
+}
+```
+
+#### Story Wrapper Best Practices
+- Don't force width: 100% on containers
+- Let the calendar determine its natural width
+- Use minimal wrapper styling:
+```tsx
+<div style={{ padding: '20px', ...containerStyle }}>
+  <CLACalendar {...props} />
+</div>
+```
+
+### Common Storybook Issues and Solutions
+
+#### 1. Import Errors in MDX Files
+**Problem**: `Failed to resolve import '@storybook/blocks'`
+**Solution**: Use `@storybook/addon-docs/blocks` instead
+
+#### 2. Meta Import Not Found
+**Problem**: `Importing binding name 'Meta' is not found`
+**Solution**: Import all components together:
+```typescript
+import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
+```
+
+#### 3. Horizontal Scrollbars in Docs
+**Problem**: Calendar creates unwanted horizontal scrollbars
+**Solution**: 
+- Use the preview.css styles provided above
+- Don't force containers to 100% width
+- Let Storybook's docs container handle overflow
+
+#### 4. Inconsistent Story Controls
+**Problem**: Different stories have different control configurations
+**Solution**: Always use the shared `calendarArgTypes` and `defaultArgs`
+
+### Creating New Stories
+
+When creating new stories:
+
+1. **Always use shared infrastructure**:
+   ```typescript
+   import { calendarArgTypes, defaultArgs } from './shared/storyControls';
+   import { CalendarStoryWrapper } from './shared/CalendarStoryWrapper';
+   ```
+
+2. **Follow the naming convention**:
+   - Story files: `FeatureName.stories.tsx`
+   - MDX docs: `FeatureName.mdx`
+   - Place in `src/stories/` directory
+
+3. **Use consistent meta configuration**:
+   ```typescript
+   const meta: Meta<typeof CLACalendar> = {
+     title: 'Category/FeatureName',
+     component: CLACalendar,
+     argTypes: calendarArgTypes,
+     args: defaultArgs
+   };
+   ```
+
+4. **Minimize story-specific overrides**:
+   - Use args to customize behavior
+   - Keep rendering logic in CalendarStoryWrapper
+   - Only override when absolutely necessary
+
+### Storybook Commands
+```bash
+# Start Storybook development server
+npm run storybook
+
+# Build static Storybook
+npm run build-storybook
+```
+
+### File Organization
+```
+src/stories/
+├── shared/
+│   ├── storyControls.ts        # Shared ArgTypes and defaults
+│   ├── CalendarStoryWrapper.tsx # Shared story wrapper component
+│   └── story-helpers.tsx       # Additional shared utilities
+├── Welcome.mdx                 # Welcome page (no stories)
+├── Overview.mdx                # API documentation
+├── GettingStarted.stories.tsx  # Main story file
+└── GettingStarted.mdx          # Getting started docs
+```
 
 ## Migration Path
 

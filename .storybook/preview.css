@@ -1,0 +1,75 @@
+/* Storybook preview styles */
+
+/* Force Storybook docs to handle wide content */
+.sbdocs.sbdocs-wrapper {
+  max-width: none !important;
+  overflow-x: auto !important;
+}
+
+.sbdocs.sbdocs-content {
+  max-width: none !important;
+}
+
+/* Make story previews handle calendar width properly */
+.docs-story {
+  min-width: fit-content !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+}
+
+/* Ensure the preview area can expand */
+.sbdocs-preview {
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+}
+
+.sbdocs-preview > div {
+  min-width: fit-content !important;
+}
+
+/* Story containers should expand to content */
+[id^="story--"] {
+  min-width: fit-content !important;
+}
+
+/* Calendar specific fixes in docs */
+.cla-calendar-wrapper {
+  display: inline-block;
+}
+
+/* Ensure the calendar container respects its content width */
+.cla-card:not(.cla-card-popup) {
+  display: inline-block !important;
+  min-width: fit-content !important;
+}
+
+/* Style tables in MDX documentation */
+.sbdocs-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1em 0;
+  font-size: 0.9em;
+}
+
+.sbdocs-content th,
+.sbdocs-content td {
+  text-align: left;
+  padding: 0.75rem;
+  border-bottom: 1px solid #e1e4e8;
+}
+
+.sbdocs-content th {
+  font-weight: 600;
+  background-color: #f6f8fa;
+}
+
+.sbdocs-content tbody tr:hover {
+  background-color: #f6f8fa;
+}
+
+/* Remove code styling from table cells */
+.sbdocs-content td:first-child {
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.85em;
+  color: #0969da;
+}

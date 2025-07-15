@@ -5,6 +5,7 @@ import '../src/components/CLACalendar.css';
 import '../src/components/CLACalendarComponents/CalendarComponents.css';
 import '../src/components/CLACalendarComponents/defensive-styles.css';
 import './story-container.css';
+import './preview.css';
 
 const preview: Preview = {
   parameters: {

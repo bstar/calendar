@@ -1,7 +1,7 @@
-import { Meta, Story } from '@storybook/addon-docs/blocks';
+import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
 import * as GettingStartedStories from './GettingStarted.stories';
 
-<Meta title="Getting Started/Overview" />
+<Meta of={GettingStartedStories} />
 
 # Getting Started
 
@@ -20,12 +20,16 @@ The calendar can be used in two main modes:
 ### Embedded Mode
 The calendar is displayed inline within your page layout.
 
-<Story of={GettingStartedStories.BasicCalendar} />
+<Canvas>
+  <Story of={GettingStartedStories.BasicCalendar} />
+</Canvas>
 
 ### Popup Mode  
 The calendar appears as a popup when clicking an input field.
 
-<Story of={GettingStartedStories.PopupCalendar} />
+<Canvas>
+  <Story of={GettingStartedStories.PopupCalendar} />
+</Canvas>
 
 ## Core Concepts
 
@@ -38,4 +42,6 @@ The calendar appears as a popup when clicking an input field.
 
 Try out the calendar with different configurations:
 
-<Story of={GettingStartedStories.SimpleSandbox} />
+<Canvas>
+  <Story of={GettingStartedStories.InteractiveSandbox} />
+</Canvas>

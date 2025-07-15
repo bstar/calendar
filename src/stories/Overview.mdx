@@ -1,0 +1,392 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Overview" />
+
+# Component Overview
+
+The CLACalendar is a flexible React date range picker component with support for single date and date range selection, customizable themes, layers, and restrictions.
+
+## API Reference
+
+### Main Component Props
+
+<div className="props-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Prop</th>
+        <th>Type</th>
+        <th>Required</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>settings</td>
+        <td>CalendarSettings</td>
+        <td>Yes</td>
+        <td>Configuration object for the calendar</td>
+      </tr>
+      <tr>
+        <td>onSubmit</td>
+        <td>Function</td>
+        <td>No</td>
+        <td>Callback when date(s) are selected</td>
+      </tr>
+      <tr>
+        <td>_onSettingsChange</td>
+        <td>Function</td>
+        <td>No</td>
+        <td>Callback when settings change</td>
+      </tr>
+      <tr>
+        <td>initialActiveLayer</td>
+        <td>string</td>
+        <td>No</td>
+        <td>Initial active layer name</td>
+      </tr>
+      <tr>
+        <td>layersFactory</td>
+        <td>Function</td>
+        <td>No</td>
+        <td>Factory function for lazy-loading layers</td>
+      </tr>
+      <tr>
+        <td>restrictionConfigFactory</td>
+        <td>Function</td>
+        <td>No</td>
+        <td>Factory function for lazy-loading restrictions</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+### CalendarSettings Configuration
+
+#### Display Options
+
+<div className="settings-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Property</th>
+        <th>Type</th>
+        <th>Default</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>displayMode</td>
+        <td>'embedded' or 'popup'</td>
+        <td>'embedded'</td>
+        <td>How the calendar is displayed</td>
+      </tr>
+      <tr>
+        <td>visibleMonths</td>
+        <td>number</td>
+        <td>2</td>
+        <td>Number of months to display (1-12)</td>
+      </tr>
+      <tr>
+        <td>monthWidth</td>
+        <td>number</td>
+        <td>500</td>
+        <td>Width of each month in pixels</td>
+      </tr>
+      <tr>
+        <td>showMonthHeadings</td>
+        <td>boolean</td>
+        <td>true</td>
+        <td>Show month/year headers</td>
+      </tr>
+      <tr>
+        <td>baseFontSize</td>
+        <td>string</td>
+        <td>'1rem'</td>
+        <td>Base font size for the calendar</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+#### Selection Options
+
+<div className="settings-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Property</th>
+        <th>Type</th>
+        <th>Default</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>selectionMode</td>
+        <td>'single' or 'range'</td>
+        <td>'range'</td>
+        <td>Date selection mode</td>
+      </tr>
+      <tr>
+        <td>defaultRange</td>
+        <td>object</td>
+        <td>undefined</td>
+        <td>Initial selected date range</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+#### Popup Options
+
+<div className="settings-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Property</th>
+        <th>Type</th>
+        <th>Default</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>position</td>
+        <td>string</td>
+        <td>'bottom-left'</td>
+        <td>Popup position relative to input</td>
+      </tr>
+      <tr>
+        <td>useDynamicPosition</td>
+        <td>boolean</td>
+        <td>true</td>
+        <td>Auto-adjust position based on viewport</td>
+      </tr>
+      <tr>
+        <td>closeOnClickAway</td>
+        <td>boolean</td>
+        <td>true</td>
+        <td>Close popup when clicking outside</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+#### Feature Toggles
+
+<div className="settings-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Property</th>
+        <th>Type</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>showHeader</td>
+        <td>boolean</td>
+        <td>true</td>
+      </tr>
+      <tr>
+        <td>showFooter</td>
+        <td>boolean</td>
+        <td>true</td>
+      </tr>
+      <tr>
+        <td>showSubmitButton</td>
+        <td>boolean</td>
+        <td>false</td>
+      </tr>
+      <tr>
+        <td>showTooltips</td>
+        <td>boolean</td>
+        <td>true</td>
+      </tr>
+      <tr>
+        <td>showLayersNavigation</td>
+        <td>boolean</td>
+        <td>false</td>
+      </tr>
+      <tr>
+        <td>showDateInputs</td>
+        <td>boolean</td>
+        <td>true</td>
+      </tr>
+      <tr>
+        <td>showSelectionAlert</td>
+        <td>boolean</td>
+        <td>false</td>
+      </tr>
+      <tr>
+        <td>suppressTooltipsOnSelection</td>
+        <td>boolean</td>
+        <td>false</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+## Usage Examples
+
+### Basic Usage
+
+```jsx
+import { CLACalendar } from 'cla-calendar';
+
+function MyComponent() {
+  const handleDateSubmit = (start, end) => {
+    console.log('Selected:', start, end);
+  };
+
+  return (
+    <CLACalendar 
+      settings={{
+        displayMode: 'embedded',
+        visibleMonths: 2,
+        selectionMode: 'range'
+      }}
+      onSubmit={handleDateSubmit}
+    />
+  );
+}
+```
+
+### Popup Mode
+
+```jsx
+<CLACalendar 
+  settings={{
+    displayMode: 'popup',
+    position: 'top-right',
+    useDynamicPosition: false,
+    selectionMode: 'single'
+  }}
+  onSubmit={(date) => console.log('Selected:', date)}
+/>
+```
+
+### Custom Theme
+
+```jsx
+<CLACalendar 
+  settings={{
+    colors: {
+      primary: '#8B5CF6',
+      success: '#10B981',
+      warning: '#F59E0B',
+      danger: '#EF4444'
+    },
+    baseFontSize: '14px',
+    containerStyle: {
+      borderRadius: '12px',
+      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+    }
+  }}
+/>
+```
+
+## Advanced Features
+
+### Layer System
+
+Layers allow you to overlay additional data on the calendar. Each layer can contain:
+- **Events**: Specific date markers with titles and descriptions
+- **Backgrounds**: Date range highlights
+
+```typescript
+interface Layer {
+  name: string;
+  title: string;
+  description: string;
+  required?: boolean;
+  visible?: boolean;
+  enabled?: boolean;
+  color?: string;
+  data?: {
+    events?: Event[];
+    background?: BackgroundItem[];
+  };
+}
+```
+
+### Restriction System
+
+Control which dates can be selected using these restriction types:
+
+<div className="restriction-types">
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>daterange</td>
+        <td>Block specific date ranges</td>
+      </tr>
+      <tr>
+        <td>boundary</td>
+        <td>Set min/max selectable dates</td>
+      </tr>
+      <tr>
+        <td>allowedRanges</td>
+        <td>Only allow specific ranges</td>
+      </tr>
+      <tr>
+        <td>restrictedBoundary</td>
+        <td>Complex boundary rules</td>
+      </tr>
+      <tr>
+        <td>weekday</td>
+        <td>Block specific weekdays</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+### Default Color Theme
+
+```javascript
+{
+  primary: '#0366d6',
+  success: '#28a745',
+  warning: '#f6c23e',
+  danger: '#dc3545',
+  purple: '#6f42c1',
+  teal: '#20c997',
+  orange: '#fd7e14',
+  pink: '#e83e8c'
+}
+```
+
+## TypeScript Support
+
+The calendar is fully typed. Import types as needed:
+
+```typescript
+import type { 
+  CalendarSettings, 
+  Layer, 
+  RestrictionConfig 
+} from 'cla-calendar';
+```
+
+## Performance Considerations
+
+- **Lazy Loading**: Use `layersFactory` and `restrictionConfigFactory` for better initial load performance
+- **Memoization**: The calendar uses React.memo and useMemo extensively
+- **Event Delegation**: Mouse events are delegated for better performance with many date cells
+
+## Browser Compatibility
+
+- Chrome 90+
+- Firefox 88+
+- Safari 14+
+- Edge 90+
+- Mobile browsers (iOS Safari 14+, Chrome Android)

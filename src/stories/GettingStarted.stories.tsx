@@ -1,162 +1,201 @@
-import React, { useState } from 'react';
+import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { CLACalendar } from '../components/CLACalendar';
-import { getDefaultSettings } from '../components/CLACalendar.config';
+import { calendarArgTypes, defaultArgs } from './shared/storyControls';
+import { CalendarStoryWrapper } from './shared/CalendarStoryWrapper';
 
 const meta = {
   title: 'Getting Started',
+  component: CLACalendar,
+  argTypes: calendarArgTypes,
+  args: defaultArgs,
   parameters: {
     layout: 'padded',
-  },
-} satisfies Meta;
+    controls: { expanded: true },
+    docs: {
+      description: {
+        component: 'Interactive calendar examples with full control panel. Adjust the controls to see how different settings affect the calendar behavior.'
+      }
+    }
+  }
+} satisfies Meta<typeof CLACalendar>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Basic embedded calendar example
+// Basic embedded calendar
 export const BasicCalendar: Story = {
   name: 'Basic Calendar',
-  render: () => {
-    const [selectedDates, setSelectedDates] = useState<{start: string, end: string} | null>(null);
-    
-    return (
-      <div>
-        <h3>Basic Calendar</h3>
-        <p>A simple embedded calendar with date range selection.</p>
-        
-        {selectedDates && (
-          <div style={{ 
-            padding: '10px', 
-            backgroundColor: '#e8f5e9', 
-            borderRadius: '4px',
-            marginBottom: '20px' 
-          }}>
-            <strong>Selected:</strong> {selectedDates.start} to {selectedDates.end}
-          </div>
-        )}
-        
-        <CLACalendar 
-          settings={getDefaultSettings()}
-          onSubmit={(start, end) => {
-            setSelectedDates({ start, end });
-          }}
-          _onSettingsChange={() => {}}
-        />
-        
-        <div style={{ marginTop: '30px' }}>
-          <h4>Code:</h4>
-          <pre style={{ 
-            backgroundColor: '#f6f8fa', 
-            padding: '16px', 
-            borderRadius: '6px',
-            overflow: 'auto'
-          }}>
-            <code>{`import { CLACalendar, getDefaultSettings } from 'cla-calendar';
-
-function MyCalendar() {
-  const [selectedDates, setSelectedDates] = useState(null);
-  
-  return (
-    <CLACalendar 
-      settings={getDefaultSettings()}
-      onSubmit={(start, end) => {
-        setSelectedDates({ start, end });
-      }}
-      _onSettingsChange={() => {}}
-    />
-  );
-}`}</code>
-          </pre>
-        </div>
-      </div>
-    );
+  args: {
+    ...defaultArgs,
+    displayMode: 'embedded',
+    visibleMonths: 2,
+    selectionMode: 'range'
   },
+  render: (args) => (
+    <CalendarStoryWrapper 
+      args={args}
+      title="Basic Embedded Calendar"
+      description="A simple calendar with default settings. Select a date range by clicking and dragging."
+    />
+  ),
 };
 
-// Popup calendar example
+// Popup calendar
 export const PopupCalendar: Story = {
   name: 'Popup Calendar',
-  render: () => {
-    const [date, setDate] = useState<string>('');
-    
-    return (
-      <div style={{ padding: '50px' }}>
-        <h3>Popup Calendar</h3>
-        <p>Click the input below to open the calendar:</p>
-        
-        <CLACalendar 
-          settings={{
-            ...getDefaultSettings(),
-            displayMode: 'popup',
-            selectionMode: 'single',
-            visibleMonths: 1,
-          }}
-          onSubmit={(selectedDate) => {
-            setDate(selectedDate);
-          }}
-          _onSettingsChange={() => {}}
-        />
-        
-        {date && (
-          <p style={{ marginTop: '10px', color: '#666' }}>
-            You selected: {date}
-          </p>
-        )}
-        
-        <div style={{ marginTop: '30px' }}>
-          <h4>Code:</h4>
-          <pre style={{ 
-            backgroundColor: '#f6f8fa', 
-            padding: '16px', 
-            borderRadius: '6px',
-            overflow: 'auto'
-          }}>
-            <code>{`<CLACalendar 
-  settings={{
-    ...getDefaultSettings(),
+  args: {
+    ...defaultArgs,
     displayMode: 'popup',
     selectionMode: 'single',
     visibleMonths: 1,
-  }}
-  onSubmit={(selectedDate) => {
-    setDate(selectedDate);
-  }}
-  _onSettingsChange={() => {}}
-/>`}</code>
-          </pre>
-        </div>
-      </div>
-    );
+    position: 'bottom-left',
+    useDynamicPosition: true,
+    closeOnClickAway: true
   },
+  render: (args) => (
+    <CalendarStoryWrapper 
+      args={args}
+      title="Popup Calendar"
+      description="Click the input below to open the calendar. Try changing the position and dynamic positioning settings in the controls."
+      containerStyle={{ padding: '50px' }}
+    />
+  ),
 };
 
-// Simple sandbox for experimentation
-export const SimpleSandbox: Story = {
-  name: 'Calendar Sandbox',
-  render: () => {
-    return (
-      <div>
-        <h3>Live Calendar Sandbox</h3>
-        <p>Experiment with the calendar - select some dates!</p>
-        
-        <div style={{ 
-          border: '2px dashed #e1e4e8', 
-          borderRadius: '8px', 
-          padding: '30px',
-          marginTop: '20px',
-          backgroundColor: '#fafbfc'
-        }}>
-          <CLACalendar 
-            settings={{
-              ...getDefaultSettings(),
-              displayMode: 'embedded',
-              selectionMode: 'range',
-              visibleMonths: 2,
-            }}
-            _onSettingsChange={() => {}}
-          />
-        </div>
-      </div>
-    );
+// Interactive sandbox with all controls
+export const InteractiveSandbox: Story = {
+  name: 'Interactive Sandbox',
+  args: defaultArgs,
+  parameters: {
+    docs: {
+      description: {
+        story: 'Full interactive sandbox with all controls. Experiment with different combinations of settings to see how they work together.'
+      }
+    }
   },
+  render: (args) => (
+    <CalendarStoryWrapper 
+      args={args}
+      title="Interactive Calendar Sandbox"
+      description="Use the controls panel to experiment with all calendar settings. This is the best way to explore the full capabilities of the calendar component."
+    />
+  ),
+};
+
+// Single date selection example
+export const SingleDateSelection: Story = {
+  name: 'Single Date Selection',
+  args: {
+    ...defaultArgs,
+    selectionMode: 'single',
+    visibleMonths: 1,
+    showSubmitButton: true
+  },
+  render: (args) => (
+    <CalendarStoryWrapper 
+      args={args}
+      title="Single Date Selection"
+      description="Calendar configured for selecting a single date. Notice how the UI adapts for single selection mode."
+    />
+  ),
+};
+
+// Multiple months example
+export const MultipleMonths: Story = {
+  name: 'Multiple Months Display',
+  args: {
+    ...defaultArgs,
+    visibleMonths: 3,
+    monthWidth: 400
+  },
+  render: (args) => (
+    <CalendarStoryWrapper 
+      args={args}
+      title="Multiple Months Display"
+      description="Display multiple months side by side. Adjust the visibleMonths and monthWidth controls to see different layouts."
+    />
+  ),
+};
+
+// Custom themed calendar
+export const CustomTheme: Story = {
+  name: 'Custom Theme',
+  args: {
+    ...defaultArgs,
+    primaryColor: '#8B5CF6',
+    successColor: '#10B981',
+    warningColor: '#F59E0B',
+    dangerColor: '#EF4444',
+    baseFontSize: '0.875rem'
+  },
+  render: (args) => (
+    <CalendarStoryWrapper 
+      args={args}
+      title="Custom Themed Calendar"
+      description="Calendar with custom colors and styling. Use the color controls to create your own theme."
+    />
+  ),
+};
+
+// Dynamic positioning demo
+export const DynamicPositioning: Story = {
+  name: 'Dynamic Positioning',
+  args: {
+    ...defaultArgs,
+    displayMode: 'popup',
+    visibleMonths: 2,
+    useDynamicPosition: true
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Demonstrates how the calendar automatically repositions itself to stay within the viewport. Try opening the calendar near the edges of the screen.'
+      }
+    }
+  },
+  render: (args) => (
+    <div style={{ 
+      height: '400px', 
+      display: 'flex', 
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      padding: '20px'
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <CalendarStoryWrapper 
+          args={args}
+          title="Top Left"
+          showSelectedDate={false}
+          containerStyle={{ padding: '10px' }}
+        />
+        <CalendarStoryWrapper 
+          args={args}
+          title="Top Right"
+          showSelectedDate={false}
+          containerStyle={{ padding: '10px' }}
+        />
+      </div>
+      
+      <div style={{ textAlign: 'center', padding: '20px' }}>
+        <h4>Dynamic Positioning Demo</h4>
+        <p>The calendar will automatically reposition to stay visible</p>
+      </div>
+      
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <CalendarStoryWrapper 
+          args={args}
+          title="Bottom Left"
+          showSelectedDate={false}
+          containerStyle={{ padding: '10px' }}
+        />
+        <CalendarStoryWrapper 
+          args={args}
+          title="Bottom Right"
+          showSelectedDate={false}
+          containerStyle={{ padding: '10px' }}
+        />
+      </div>
+    </div>
+  ),
 };

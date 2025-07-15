@@ -1,0 +1,504 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Overview" />
+
+# Component Overview
+
+## API Reference
+
+### Props
+
+The `CLACalendar` component accepts the following props:
+
+<table>
+  <thead>
+    <tr>
+      <th>Prop</th>
+      <th>Type</th>
+      <th>Required</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>settings</code></td>
+      <td><code>CalendarSettings</code></td>
+      <td>Yes</td>
+      <td>Configuration object for the calendar</td>
+    </tr>
+    <tr>
+      <td><code>onSubmit</code></td>
+      <td><code>(start: string, end?: string) => void</code></td>
+      <td>No</td>
+      <td>Callback when date(s) are selected</td>
+    </tr>
+    <tr>
+      <td><code>_onSettingsChange</code></td>
+      <td><code>(settings: CalendarSettings) => void</code></td>
+      <td>No</td>
+      <td>Callback when settings change</td>
+    </tr>
+    <tr>
+      <td><code>initialActiveLayer</code></td>
+      <td><code>string</code></td>
+      <td>No</td>
+      <td>Initial active layer name</td>
+    </tr>
+    <tr>
+      <td><code>layersFactory</code></td>
+      <td><code>() => Layer[]</code></td>
+      <td>No</td>
+      <td>Factory function for lazy-loading layers</td>
+    </tr>
+    <tr>
+      <td><code>restrictionConfigFactory</code></td>
+      <td><code>() => RestrictionConfig</code></td>
+      <td>No</td>
+      <td>Factory function for lazy-loading restrictions</td>
+    </tr>
+  </tbody>
+</table>
+
+### CalendarSettings
+
+The `settings` prop is an object with the following properties:
+
+#### Display Options
+
+<table>
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>displayMode</code></td>
+      <td><code>'embedded' \| 'popup'</code></td>
+      <td><code>'embedded'</code></td>
+      <td>How the calendar is displayed</td>
+    </tr>
+    <tr>
+      <td><code>visibleMonths</code></td>
+      <td><code>number</code></td>
+      <td><code>2</code></td>
+      <td>Number of months to display (1-12)</td>
+    </tr>
+    <tr>
+      <td><code>monthWidth</code></td>
+      <td><code>number</code></td>
+      <td><code>500</code></td>
+      <td>Width of each month in pixels</td>
+    </tr>
+    <tr>
+      <td><code>showMonthHeadings</code></td>
+      <td><code>boolean</code></td>
+      <td><code>true</code></td>
+      <td>Show month/year headers</td>
+    </tr>
+    <tr>
+      <td><code>baseFontSize</code></td>
+      <td><code>string</code></td>
+      <td><code>'1rem'</code></td>
+      <td>Base font size for the calendar</td>
+    </tr>
+  </tbody>
+</table>
+
+#### Selection Options
+
+<table>
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>selectionMode</code></td>
+      <td><code>'single' \| 'range'</code></td>
+      <td><code>'range'</code></td>
+      <td>Date selection mode</td>
+    </tr>
+    <tr>
+      <td><code>defaultRange</code></td>
+      <td><code>{ start: string, end: string }</code></td>
+      <td><code>undefined</code></td>
+      <td>Initial selected date range</td>
+    </tr>
+  </tbody>
+</table>
+
+#### Popup Options (when `displayMode` is `'popup'`)
+
+<table>
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>position</code></td>
+      <td><code>'bottom-left' \| 'bottom-right' \| 'top-left' \| 'top-right'</code></td>
+      <td><code>'bottom-left'</code></td>
+      <td>Popup position relative to input</td>
+    </tr>
+    <tr>
+      <td><code>useDynamicPosition</code></td>
+      <td><code>boolean</code></td>
+      <td><code>true</code></td>
+      <td>Auto-adjust position based on viewport</td>
+    </tr>
+    <tr>
+      <td><code>closeOnClickAway</code></td>
+      <td><code>boolean</code></td>
+      <td><code>true</code></td>
+      <td>Close popup when clicking outside</td>
+    </tr>
+  </tbody>
+</table>
+
+#### Feature Toggles
+
+<table>
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>showHeader</code></td>
+      <td><code>boolean</code></td>
+      <td><code>true</code></td>
+      <td>Show calendar header</td>
+    </tr>
+    <tr>
+      <td><code>showFooter</code></td>
+      <td><code>boolean</code></td>
+      <td><code>true</code></td>
+      <td>Show calendar footer</td>
+    </tr>
+    <tr>
+      <td><code>showSubmitButton</code></td>
+      <td><code>boolean</code></td>
+      <td><code>false</code></td>
+      <td>Show submit button in footer</td>
+    </tr>
+    <tr>
+      <td><code>showTooltips</code></td>
+      <td><code>boolean</code></td>
+      <td><code>true</code></td>
+      <td>Show hover tooltips</td>
+    </tr>
+    <tr>
+      <td><code>showLayersNavigation</code></td>
+      <td><code>boolean</code></td>
+      <td><code>false</code></td>
+      <td>Show layer toggle controls</td>
+    </tr>
+    <tr>
+      <td><code>showDateInputs</code></td>
+      <td><code>boolean</code></td>
+      <td><code>true</code></td>
+      <td>Show date input fields</td>
+    </tr>
+    <tr>
+      <td><code>showSelectionAlert</code></td>
+      <td><code>boolean</code></td>
+      <td><code>false</code></td>
+      <td>Show selection feedback alert</td>
+    </tr>
+    <tr>
+      <td><code>suppressTooltipsOnSelection</code></td>
+      <td><code>boolean</code></td>
+      <td><code>false</code></td>
+      <td>Hide tooltips during selection</td>
+    </tr>
+  </tbody>
+</table>
+
+#### Behavior Options
+
+<table>
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>startWeekOnSunday</code></td>
+      <td><code>boolean</code></td>
+      <td><code>false</code></td>
+      <td>Start week on Sunday (vs Monday)</td>
+    </tr>
+    <tr>
+      <td><code>enableOutOfBoundsScroll</code></td>
+      <td><code>boolean</code></td>
+      <td><code>true</code></td>
+      <td>Allow scrolling beyond calendar bounds</td>
+    </tr>
+    <tr>
+      <td><code>timezone</code></td>
+      <td><code>string</code></td>
+      <td><code>'UTC'</code></td>
+      <td>Timezone for date operations</td>
+    </tr>
+    <tr>
+      <td><code>dateRangeSeparator</code></td>
+      <td><code>string</code></td>
+      <td><code>' - '</code></td>
+      <td>Separator for date range display</td>
+    </tr>
+    <tr>
+      <td><code>dateFormatter</code></td>
+      <td><code>(date: Date) => string</code></td>
+      <td><code>undefined</code></td>
+      <td>Custom date format function</td>
+    </tr>
+  </tbody>
+</table>
+
+#### Styling Options
+
+<table>
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>colors</code></td>
+      <td><code>ColorTheme</code></td>
+      <td>See below</td>
+      <td>Color theme configuration</td>
+    </tr>
+    <tr>
+      <td><code>containerStyle</code></td>
+      <td><code>CSSProperties</code></td>
+      <td><code>{}</code></td>
+      <td>Custom styles for container</td>
+    </tr>
+    <tr>
+      <td><code>inputStyle</code></td>
+      <td><code>CSSProperties</code></td>
+      <td><code>{}</code></td>
+      <td>Custom styles for input field</td>
+    </tr>
+  </tbody>
+</table>
+
+##### Default Color Theme
+
+```javascript
+{
+  primary: '#0366d6',
+  success: '#28a745',
+  warning: '#f6c23e',
+  danger: '#dc3545',
+  purple: '#6f42c1',
+  teal: '#20c997',
+  orange: '#fd7e14',
+  pink: '#e83e8c'
+}
+```
+
+## Usage Examples
+
+### Basic Usage
+
+```jsx
+import { CLACalendar } from 'cla-calendar';
+
+function MyComponent() {
+  const handleDateSubmit = (start, end) => {
+    console.log('Selected:', start, end);
+  };
+
+  return (
+    <CLACalendar 
+      settings={{
+        displayMode: 'embedded',
+        visibleMonths: 2,
+        selectionMode: 'range'
+      }}
+      onSubmit={handleDateSubmit}
+    />
+  );
+}
+```
+
+### Popup Mode with Custom Positioning
+
+```jsx
+<CLACalendar 
+  settings={{
+    displayMode: 'popup',
+    position: 'top-right',
+    useDynamicPosition: false,
+    selectionMode: 'single'
+  }}
+  onSubmit={(date) => console.log('Selected:', date)}
+/>
+```
+
+### Custom Theme
+
+```jsx
+<CLACalendar 
+  settings={{
+    colors: {
+      primary: '#8B5CF6',
+      success: '#10B981',
+      warning: '#F59E0B',
+      danger: '#EF4444'
+    },
+    baseFontSize: '14px',
+    containerStyle: {
+      borderRadius: '12px',
+      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+    }
+  }}
+/>
+```
+
+### With Layers and Restrictions
+
+```jsx
+<CLACalendar 
+  settings={{
+    displayMode: 'embedded',
+    showLayersNavigation: true
+  }}
+  layersFactory={() => [
+    {
+      name: 'holidays',
+      title: 'Public Holidays',
+      description: 'Federal holidays',
+      data: {
+        events: [
+          {
+            date: '2024-12-25',
+            title: 'Christmas',
+            type: 'holiday',
+            time: 'All day',
+            description: 'Federal holiday'
+          }
+        ]
+      }
+    }
+  ]}
+  restrictionConfigFactory={() => ({
+    restrictions: [
+      {
+        type: 'boundary',
+        enabled: true,
+        minDate: '2024-01-01',
+        maxDate: '2024-12-31'
+      }
+    ]
+  })}
+/>
+```
+
+## Advanced Features
+
+### Layer System
+
+Layers allow you to overlay additional data on the calendar:
+
+```typescript
+interface Layer {
+  name: string;
+  title: string;
+  description: string;
+  required?: boolean;
+  visible?: boolean;
+  enabled?: boolean;
+  color?: string;
+  data?: {
+    events?: Event[];
+    background?: BackgroundItem[];
+  };
+}
+```
+
+### Restriction System
+
+Control which dates can be selected:
+
+```typescript
+type RestrictionType = 
+  'daterange' |        // Block specific date ranges
+  'boundary' |         // Set min/max selectable dates
+  'allowedRanges' |    // Only allow specific ranges
+  'restrictedBoundary' | // Complex boundary rules
+  'weekday';           // Block specific weekdays
+```
+
+### UTC Date Handling
+
+All dates are handled in UTC to ensure consistency across timezones. The calendar includes a comprehensive set of UTC-aware date utilities in `src/utils/DateUtils.ts`.
+
+## TypeScript Support
+
+The calendar is fully typed. Import types as needed:
+
+```typescript
+import type { 
+  CalendarSettings, 
+  Layer, 
+  RestrictionConfig 
+} from 'cla-calendar';
+```
+
+## Performance Considerations
+
+- **Lazy Loading**: Use `layersFactory` and `restrictionConfigFactory` for better initial load performance
+- **Memoization**: The calendar uses React.memo and useMemo extensively
+- **Virtual Scrolling**: Not currently implemented but planned for future versions
+- **Event Delegation**: Mouse events are delegated for better performance with many date cells
+
+## Accessibility
+
+- Keyboard navigation support (arrow keys, Enter, Escape)
+- ARIA labels for screen readers
+- Focus management for popup mode
+- High contrast mode support
+
+## Browser Compatibility
+
+- Chrome 90+
+- Firefox 88+
+- Safari 14+
+- Edge 90+
+- Mobile browsers (iOS Safari 14+, Chrome Android)
+
+## Known Limitations
+
+1. Maximum of 12 visible months
+2. No year view (only month view)
+3. No time selection (date only)
+4. Limited mobile gesture support
+5. No built-in internationalization (i18n)
