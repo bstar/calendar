@@ -2,29 +2,397 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 <Meta title="Welcome" />
 
-# CLA Calendar
+<style>{`
+  .welcome-container {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: #24292e;
+    line-height: 1.6;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .welcome-header {
+    border-bottom: 1px solid #e1e4e8;
+    padding-bottom: 2rem;
+    margin-bottom: 3rem;
+  }
+  
+  .welcome-header h1 {
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    color: #24292e;
+  }
+  
+  .welcome-header p {
+    font-size: 1.125rem;
+    color: #586069;
+    margin: 0;
+  }
+  
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin: 3rem 0;
+  }
+  
+  .overview-card {
+    border: 1px solid #e1e4e8;
+    border-radius: 6px;
+    padding: 1.5rem;
+    background: #ffffff;
+  }
+  
+  .overview-card h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0 0 0.75rem 0;
+    color: #24292e;
+  }
+  
+  .overview-card ul {
+    margin: 0;
+    padding-left: 1.25rem;
+    color: #586069;
+  }
+  
+  .overview-card li {
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+  }
+  
+  .section-header {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 3rem 0 1.5rem 0;
+    color: #24292e;
+  }
+  
+  .tech-section {
+    background: #f6f8fa;
+    border-radius: 6px;
+    padding: 2rem;
+    margin: 2rem 0;
+  }
+  
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+  
+  .tech-item {
+    background: #ffffff;
+    border: 1px solid #e1e4e8;
+    border-radius: 6px;
+    padding: 1rem;
+  }
+  
+  .tech-item h4 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    color: #24292e;
+  }
+  
+  .tech-item p {
+    font-size: 0.813rem;
+    color: #586069;
+    margin: 0;
+  }
+  
+  .code-example {
+    background: #f6f8fa;
+    border: 1px solid #e1e4e8;
+    border-radius: 6px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.875rem;
+    overflow-x: auto;
+  }
+  
+  .feature-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+  
+  .feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .feature-icon {
+    color: #0366d6;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  
+  .feature-text {
+    flex: 1;
+    font-size: 0.875rem;
+    color: #586069;
+  }
+  
+  .nav-section {
+    border-top: 1px solid #e1e4e8;
+    margin-top: 3rem;
+    padding-top: 2.5rem;
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .nav-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 1rem 2.5rem;
+    background: transparent;
+    color: #586069;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 0.01em;
+    transition: all 0.15s ease;
+    border: 2px solid #d1d5da;
+    cursor: pointer;
+    box-shadow: none;
+    position: relative;
+  }
+  
+  .nav-button:hover {
+    background: #f6f8fa;
+    color: #24292e;
+    border-color: #959da5;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  }
+  
+  .nav-button.secondary {
+    background: transparent;
+    color: #586069;
+    border: 2px solid #d1d5da;
+    box-shadow: none;
+  }
+  
+  .nav-button.secondary:hover {
+    background: #f6f8fa;
+    color: #24292e;
+    border-color: #959da5;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  }
+  
+  .specs-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+  }
+  
+  .specs-table th,
+  .specs-table td {
+    text-align: left;
+    padding: 0.75rem;
+    border-bottom: 1px solid #e1e4e8;
+    font-size: 0.875rem;
+  }
+  
+  .specs-table th {
+    font-weight: 600;
+    color: #24292e;
+    background: #f6f8fa;
+  }
+  
+  .specs-table td {
+    color: #586069;
+  }
+  
+  .notice {
+    background: #f1f8ff;
+    border: 1px solid #c8e1ff;
+    border-radius: 6px;
+    padding: 1rem;
+    margin: 1.5rem 0;
+    font-size: 0.875rem;
+    color: #0366d6;
+  }
+`}</style>
 
-A flexible React date range picker component with drag selection support.
+<div className="welcome-container">
+  <div className="welcome-header">
+    <h1>CLA Calendar</h1>
+    <p>React date picker component with range selection, restrictions, and layer support</p>
+  </div>
 
-## Getting Started
+  <h2 className="section-header">Component Overview</h2>
+  
+  <div className="overview-grid">
+    <div className="overview-card">
+      <h3>Core Features</h3>
+      <ul>
+        <li>Single date and date range selection</li>
+        <li>Drag-to-select interaction</li>
+        <li>Embedded and popup display modes</li>
+        <li>1-12 month view configuration</li>
+        <li>UTC-first date handling</li>
+        <li>TypeScript support</li>
+      </ul>
+    </div>
+    
+    <div className="overview-card">
+      <h3>Date Restrictions</h3>
+      <ul>
+        <li>Min/max date boundaries</li>
+        <li>Blackout date ranges</li>
+        <li>Weekday restrictions</li>
+        <li>Custom validation rules</li>
+        <li>Business day calculations</li>
+        <li>Holiday blocking</li>
+      </ul>
+    </div>
+    
+    <div className="overview-card">
+      <h3>Customization</h3>
+      <ul>
+        <li>Theme configuration</li>
+        <li>Custom date formatting</li>
+        <li>Event data layers</li>
+        <li>CSS variable overrides</li>
+        <li>Component composition</li>
+        <li>Internationalization ready</li>
+      </ul>
+    </div>
+  </div>
 
-Visit the **Getting Started** section to see:
-- Basic calendar examples
-- Popup mode demonstration
-- Live sandbox to experiment
+  <h2 className="section-header">Technical Specifications</h2>
+  
+  <table className="specs-table">
+    <thead>
+      <tr>
+        <th>Specification</th>
+        <th>Details</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>React Version</td>
+        <td>18.0.0+</td>
+      </tr>
+      <tr>
+        <td>TypeScript</td>
+        <td>Full type definitions included</td>
+      </tr>
+      <tr>
+        <td>Bundle Size</td>
+        <td>~85KB minified + gzipped</td>
+      </tr>
+      <tr>
+        <td>Browser Support</td>
+        <td>Chrome 90+, Firefox 88+, Safari 14+, Edge 90+</td>
+      </tr>
+      <tr>
+        <td>Dependencies</td>
+        <td>React, date-fns, lodash-es</td>
+      </tr>
+      <tr>
+        <td>Testing</td>
+        <td>Vitest with 90%+ coverage</td>
+      </tr>
+    </tbody>
+  </table>
 
-## Key Features
+  <h2 className="section-header">Implementation Example</h2>
+  
+  <div className="code-example">
+{`import { CLACalendar } from 'cla-calendar';
 
-- 📅 Date range and single date selection
-- 🎨 Customizable themes and colors
-- 📱 Responsive design
-- 🔧 TypeScript support
-- ⚡ Performant and lightweight
+function DateSelector() {
+  const handleDateSubmit = (start, end) => {
+    console.log('Selected:', { start, end });
+  };
 
-## Quick Links
+  return (
+    <CLACalendar 
+      settings={{
+        displayMode: 'popup',
+        visibleMonths: 2,
+        selectionMode: 'range'
+      }}
+      onSubmit={handleDateSubmit}
+    />
+  );
+}`}
+  </div>
 
-- [Basic Examples](/story/getting-started--basic-calendar)
-- [Popup Calendar](/story/getting-started--popup-calendar)
-- [Live Sandbox](/story/getting-started--simple-sandbox)
+  <div className="notice">
+    <strong>Note:</strong> This component uses UTC dates internally to ensure consistent behavior across timezones. All date operations are timezone-agnostic unless explicitly configured otherwise.
+  </div>
 
-Start by exploring the Getting Started section to see the calendar in action!
+  <h2 className="section-header">Architecture</h2>
+  
+  <div className="tech-section">
+    <div className="tech-grid">
+      <div className="tech-item">
+        <h4>Component Structure</h4>
+        <p>Modular architecture with separate concerns for selection, restrictions, and rendering</p>
+      </div>
+      <div className="tech-item">
+        <h4>State Management</h4>
+        <p>React hooks with optimized re-renders and memoization strategies</p>
+      </div>
+      <div className="tech-item">
+        <h4>Event System</h4>
+        <p>Delegated event handling for performance with large date ranges</p>
+      </div>
+      <div className="tech-item">
+        <h4>Styling Approach</h4>
+        <p>CSS modules with CSS variables for runtime theming</p>
+      </div>
+    </div>
+  </div>
+
+  <h2 className="section-header">Key Capabilities</h2>
+  
+  <div className="feature-list">
+    <div className="feature-item">
+      <span className="feature-icon">•</span>
+      <span className="feature-text">Dynamic viewport positioning for popup mode</span>
+    </div>
+    <div className="feature-item">
+      <span className="feature-icon">•</span>
+      <span className="feature-text">Keyboard navigation with accessibility support</span>
+    </div>
+    <div className="feature-item">
+      <span className="feature-icon">•</span>
+      <span className="feature-text">Touch gesture support for mobile devices</span>
+    </div>
+    <div className="feature-item">
+      <span className="feature-icon">•</span>
+      <span className="feature-text">Lazy loading support for performance</span>
+    </div>
+    <div className="feature-item">
+      <span className="feature-icon">•</span>
+      <span className="feature-text">Server-side rendering compatibility</span>
+    </div>
+    <div className="feature-item">
+      <span className="feature-icon">•</span>
+      <span className="feature-text">Comprehensive event callbacks</span>
+    </div>
+  </div>
+
+  <div className="nav-section">
+    <a href="?path=/docs/overview--docs" className="nav-button">
+      API Reference
+    </a>
+    <a href="?path=/docs/getting-started--docs" className="nav-button secondary">
+      Examples
+    </a>
+  </div>
+</div>
