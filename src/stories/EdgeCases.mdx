@@ -1,0 +1,135 @@
+import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
+import * as EdgeCasesStories from './EdgeCases.stories';
+
+<Meta of={EdgeCasesStories} />
+
+# Configuration Stress Tests
+
+This section tests how the CLA Calendar component handles edge cases, invalid configurations, and problematic inputs. These tests help ensure the component degrades gracefully and provides meaningful feedback when given unexpected data.
+
+## Invalid Numeric Values
+
+Testing how the component handles out-of-range or invalid numeric inputs.
+
+### Negative Visible Months
+<Canvas>
+  <Story of={EdgeCasesStories.NegativeVisibleMonths} />
+</Canvas>
+
+### Excessive Visible Months
+<Canvas>
+  <Story of={EdgeCasesStories.ExcessiveVisibleMonths} />
+</Canvas>
+
+### Zero Visible Months
+<Canvas>
+  <Story of={EdgeCasesStories.ZeroVisibleMonths} />
+</Canvas>
+
+## Date Handling Edge Cases
+
+Testing invalid date configurations and malformed date strings.
+
+### Invalid Date Range
+<Canvas>
+  <Story of={EdgeCasesStories.InvalidDateRange} />
+</Canvas>
+
+### Malformed Date Strings
+<Canvas>
+  <Story of={EdgeCasesStories.MalformedDates} />
+</Canvas>
+
+## Restriction Conflicts
+
+Testing how the component handles conflicting restriction rules.
+
+### Conflicting Restrictions
+<Canvas>
+  <Story of={EdgeCasesStories.ConflictingRestrictions} />
+</Canvas>
+
+## Layout Edge Cases
+
+Testing extreme or invalid layout configurations.
+
+### Negative Month Width
+<Canvas>
+  <Story of={EdgeCasesStories.NegativeMonthWidth} />
+</Canvas>
+
+### Extremely Small Month Width
+<Canvas>
+  <Story of={EdgeCasesStories.ExtremelySmallMonthWidth} />
+</Canvas>
+
+## Invalid Configuration Values
+
+Testing how the component handles invalid strings, colors, and other configuration values.
+
+### Invalid Timezone
+<Canvas>
+  <Story of={EdgeCasesStories.InvalidTimezone} />
+</Canvas>
+
+### Invalid Color Values
+<Canvas>
+  <Story of={EdgeCasesStories.InvalidColorValues} />
+</Canvas>
+
+## Layer Configuration Issues
+
+Testing problematic layer configurations.
+
+### Empty Layers with Navigation
+<Canvas>
+  <Story of={EdgeCasesStories.EmptyLayersWithNavigation} />
+</Canvas>
+
+### Duplicate Layer Names
+<Canvas>
+  <Story of={EdgeCasesStories.DuplicateLayerNames} />
+</Canvas>
+
+## Error Handling
+
+Testing how the component handles functions that throw errors.
+
+### Throwing Date Formatter
+<Canvas>
+  <Story of={EdgeCasesStories.CircularDateFormatter} />
+</Canvas>
+
+## Null and Undefined Handling
+
+Testing how the component handles null and undefined values.
+
+### Null and Undefined Values
+<Canvas>
+  <Story of={EdgeCasesStories.NullAndUndefinedValues} />
+</Canvas>
+
+## Extreme Values
+
+Testing extreme but technically valid values.
+
+### Extreme Font Sizes
+<Canvas>
+  <Story of={EdgeCasesStories.ExtremeFontSize} />
+</Canvas>
+
+## Expected Behaviors
+
+When encountering these edge cases, the calendar should:
+
+1. **Validate and clamp numeric values** - Negative or excessive month counts should be clamped to valid ranges (1-12)
+2. **Handle invalid dates gracefully** - Invalid date strings should be ignored or default to current date
+3. **Resolve restriction conflicts** - More restrictive rules should take precedence
+4. **Provide fallbacks for invalid styles** - Invalid colors or dimensions should fall back to defaults
+5. **Catch and handle errors** - Functions that throw should not crash the component
+6. **Sanitize layer configurations** - Handle duplicates and empty arrays appropriately
+7. **Maintain usability** - Even with bad configuration, the calendar should remain somewhat functional
+
+## Developer Notes
+
+These edge cases help identify areas where additional validation or error handling might be needed. If any of these cases cause the component to crash or become completely unusable, it indicates a need for better defensive programming.

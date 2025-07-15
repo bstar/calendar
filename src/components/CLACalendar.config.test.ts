@@ -23,8 +23,8 @@ describe('CLACalendar Configuration', () => {
       expect(settings.monthWidth).toBe(500);
       expect(settings.showMonthHeadings).toBe(true);
       expect(settings.baseFontSize).toBeUndefined();
-      expect(settings.position).toBeUndefined();
-      expect(settings.useDynamicPosition).toBeUndefined();
+      expect(settings.position).toBe('bottom-left');
+      expect(settings.useDynamicPosition).toBe(true);
       
       // Feature settings
       expect(settings.selectionMode).toBe('range');
