@@ -225,7 +225,7 @@ export const defaultArgs = {
  * Helper to convert story args to calendar settings
  */
 export function argsToSettings(args: any) {
-  return {
+  const settings: any = {
     displayMode: args.displayMode,
     visibleMonths: args.visibleMonths,
     monthWidth: args.monthWidth,
@@ -250,4 +250,20 @@ export function argsToSettings(args: any) {
       danger: args.dangerColor
     }
   };
+  
+  // Include any additional properties that might be passed for edge cases
+  if (args.defaultRange !== undefined) {
+    settings.defaultRange = args.defaultRange;
+  }
+  if (args.layers !== undefined) {
+    settings.layers = args.layers;
+  }
+  if (args.dateFormatter !== undefined) {
+    settings.dateFormatter = args.dateFormatter;
+  }
+  if (args.colors !== undefined && typeof args.colors === 'object') {
+    settings.colors = args.colors;
+  }
+  
+  return settings;
 }

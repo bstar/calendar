@@ -1,0 +1,137 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { CLACalendar } from '../components/CLACalendar';
+import { CalendarStoryWrapper } from './shared/CalendarStoryWrapper';
+import { defaultArgs } from './shared/storyControls';
+
+<Meta title="Edge Cases/Direct Rendering Test" />
+
+# Direct Rendering Test
+
+Testing if directly rendering components fixes the configuration issue.
+
+## Negative Visible Months (-5)
+
+<CalendarStoryWrapper 
+  args={{
+    ...defaultArgs,
+    visibleMonths: -5
+  }}
+  title="Negative Visible Months"
+  description="Testing with visibleMonths: -5 (should clamp to valid range)"
+/>
+
+## Excessive Visible Months (100)
+
+<CalendarStoryWrapper 
+  args={{
+    ...defaultArgs,
+    visibleMonths: 100
+  }}
+  title="Excessive Visible Months"
+  description="Testing with visibleMonths: 100"
+/>
+
+## Zero Visible Months (0)
+
+<CalendarStoryWrapper 
+  args={{
+    ...defaultArgs,
+    visibleMonths: 0
+  }}
+  title="Zero Visible Months"
+  description="Testing with visibleMonths: 0"
+/>
+
+## Null and Undefined Values
+
+<CalendarStoryWrapper 
+  args={{
+    ...defaultArgs,
+    defaultRange: null,
+    dateFormatter: undefined,
+    colors: null
+  }}
+  title="Null and Undefined Values"
+  description="Testing with null and undefined for various properties"
+/>
+
+## Invalid Date Range
+
+<CalendarStoryWrapper 
+  args={{
+    ...defaultArgs,
+    defaultRange: {
+      start: '2025-12-31',
+      end: '2025-01-01'
+    }
+  }}
+  title="Invalid Date Range"
+  description="End date is before start date"
+/>
+
+## Malformed Date Strings
+
+<CalendarStoryWrapper 
+  args={{
+    ...defaultArgs,
+    defaultRange: {
+      start: 'not-a-date',
+      end: '2025-13-45'
+    }
+  }}
+  title="Malformed Date Strings"
+  description="Testing with invalid date formats"
+/>
+
+## Negative Month Width
+
+<CalendarStoryWrapper 
+  args={{
+    ...defaultArgs,
+    monthWidth: -500
+  }}
+  title="Negative Month Width"
+  description="Testing with monthWidth: -500"
+/>
+
+## Invalid Colors
+
+<CalendarStoryWrapper 
+  args={{
+    ...defaultArgs,
+    colors: {
+      primary: 'not-a-color',
+      success: '#GGGGGG',
+      warning: 'rgb(999, 999, 999)',
+      danger: '12345'
+    }
+  }}
+  title="Invalid Color Values"
+  description="Testing with malformed color values"
+/>
+
+## Extreme Font Sizes
+
+### Tiny Font (0.1rem)
+
+<CalendarStoryWrapper 
+  args={{
+    ...defaultArgs,
+    baseFontSize: '0.1rem'
+  }}
+  title="Tiny Font Size"
+  description="baseFontSize: 0.1rem - Text becomes nearly invisible"
+/>
+
+### Huge Font (5rem)
+
+<CalendarStoryWrapper 
+  args={{
+    ...defaultArgs,
+    baseFontSize: '5rem'
+  }}
+  title="Huge Font Size"
+  description="baseFontSize: 5rem - Text becomes comically large"
+/>
+
+This page directly renders the CalendarStoryWrapper components instead of using Storybook's Story components to ensure each calendar gets its correct configuration.
