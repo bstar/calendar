@@ -14,8 +14,7 @@
  */
 
 /* Main wrapper protection */
-.cla-calendar-wrapper,
-.cla-calendar-portal {
+.cla-calendar-wrapper {
   isolation: isolate !important;
   position: relative !important;
   display: inline-block !important;
@@ -23,6 +22,30 @@
   line-height: 1.5 !important;
   box-sizing: border-box !important;
   max-width: 100% !important;
+  text-align: left !important;
+  vertical-align: top !important;
+}
+
+.cla-calendar-portal {
+  isolation: isolate !important;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+  line-height: 1.5 !important;
+  box-sizing: border-box !important;
+  text-align: left !important;
+}
+
+/* Ensure embedded calendars are never centered by parent containers */
+.cla-calendar-wrapper[data-display-mode="embedded"] {
+  margin-left: 0 !important;
+  margin-right: initial !important;
+  align-self: flex-start !important;
+  justify-self: start !important;
+}
+
+/* For popup mode, wrapper should only contain the input */
+.cla-calendar-wrapper[data-display-mode="popup"] {
+  width: auto !important;
+  overflow: visible !important;
 }
 
 /* When calendar is open, ensure high z-index */

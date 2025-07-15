@@ -1,0 +1,41 @@
+import { Meta, Story } from '@storybook/addon-docs/blocks';
+import * as GettingStartedStories from './GettingStarted.stories';
+
+<Meta title="Getting Started/Overview" />
+
+# Getting Started
+
+Welcome to the CLA Calendar component! This guide will walk you through the basic usage and features.
+
+## Installation
+
+```bash
+npm install cla-calendar
+```
+
+## Basic Usage
+
+The calendar can be used in two main modes:
+
+### Embedded Mode
+The calendar is displayed inline within your page layout.
+
+<Story of={GettingStartedStories.BasicCalendar} />
+
+### Popup Mode  
+The calendar appears as a popup when clicking an input field.
+
+<Story of={GettingStartedStories.PopupCalendar} />
+
+## Core Concepts
+
+- **Settings**: Configure display options, colors, and behavior
+- **Selection Modes**: Choose between single date or date range selection
+- **Callbacks**: Handle date selection events
+- **Customization**: Style the calendar to match your design
+
+## Live Sandbox
+
+Try out the calendar with different configurations:
+
+<Story of={GettingStartedStories.SimpleSandbox} />

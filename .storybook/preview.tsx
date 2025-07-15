@@ -4,11 +4,16 @@ import '../src/index.css';
 import '../src/components/CLACalendar.css';
 import '../src/components/CLACalendarComponents/CalendarComponents.css';
 import '../src/components/CLACalendarComponents/defensive-styles.css';
+import './story-container.css';
 
 const preview: Preview = {
   parameters: {
-    layout: 'centered',
+    layout: 'padded', // Use padded layout for consistent spacing
+    docs: {
+      inlineStories: true, // Enable inline rendering for better control integration
+    },
     controls: {
+      expanded: true, // Show all controls by default
       matchers: {
         color: /(background|color)$/i,
         date: /Date$/i,
@@ -16,16 +21,15 @@ const preview: Preview = {
     },
     options: {
       storySort: {
-        order: ['Getting Started', 'Examples'],
+        order: ['Welcome', 'Getting Started', 'Examples', 'Features', 'Playground'],
       },
     },
   },
   decorators: [
-    (Story) => (
-      <div style={{ margin: '3rem' }}>
-        <Story />
-      </div>
-    ),
+    (Story) => {
+      // Minimal decorator - let stories handle their own layout
+      return <Story />;
+    },
   ],
 };
 

@@ -1,0 +1,26 @@
+/* Story container styles for consistent calendar positioning */
+
+/* Minimal container styles - let calendars position themselves */
+.story-calendar-container {
+  overflow: visible;
+}
+
+/* For popup mode, ensure enough space */
+.story-calendar-container[data-display-mode="popup"] {
+  min-height: 400px;
+}
+
+/* Remove any flex/grid centering from Storybook */
+#storybook-root,
+#storybook-root > *,
+.sb-show-main.sb-main-padded {
+  display: block !important;
+  align-items: unset !important;
+  justify-content: unset !important;
+}
+
+/* Ensure calendars align to top-left in their containers */
+.cla-calendar-wrapper {
+  display: inline-block;
+  text-align: left;
+}

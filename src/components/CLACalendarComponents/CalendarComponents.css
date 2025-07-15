@@ -303,12 +303,22 @@
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  position: absolute;
   isolation: isolate;
   /* Default container styles from config */
   border: 1px solid #e0e0e0;
   overflow: visible;
   box-sizing: border-box;
+}
+
+/* Embedded mode - normal document flow */
+.cla-calendar-wrapper[data-display-mode="embedded"] .cla-card {
+  position: relative;
+  display: inline-block;
+}
+
+/* Popup mode - absolute positioning for portal */
+.cla-calendar-wrapper[data-display-mode="popup"] .cla-card {
+  position: absolute;
 }
 
 .cla-card-popup {

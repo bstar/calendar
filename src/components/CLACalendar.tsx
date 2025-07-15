@@ -1,5 +1,4 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from "react";
-import ReactDOM from 'react-dom';
 import debounce from "lodash-es/debounce";
 import { parse, isValid, eachDayOfInterval } from "date-fns"; // Remove unused imports
 import {
@@ -22,6 +21,7 @@ import { DateRangeSelectionManager, DateRange } from "./CLACalendarComponents/se
 import { CLACalendarHandlers } from "./CLACalendarComponents/handlers/CLACalendarHandlers";
 import { RestrictionBackgroundGenerator } from "./CLACalendarComponents/restrictions/RestrictionBackgroundGenerator";
 import { LayerManager } from "./CLACalendarComponents/layers/LayerManager";
+import { CalendarPortal } from "./CLACalendarComponents/CalendarPortal";
 import {
   CalendarSettings,
   Layer,
@@ -884,41 +884,8 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     }
   };
 
-  // Effect to handle clicks outside the portal for the direct portal implementation
-  useEffect(() => {
-    if (!isOpen || settings.displayMode === 'embedded' || !settings.closeOnClickAway) return;
-
-    const handleOutsideClick = (event: MouseEvent) => {
-      // Don't close if clicking on the input field
-      if (inputRef.current && inputRef.current.contains(event.target as Node)) {
-        return;
-      }
-
-      // Don't close if clicking inside the calendar container
-      if (containerRef.current && containerRef.current.contains(event.target as Node)) {
-        return;
-      }
-
-      // Don't close if clicking inside the calendar portal
-      const portalElement = document.querySelector('.cla-calendar-portal');
-      if (portalElement && portalElement.contains(event.target as Node)) {
-        return;
-      }
-
-      // Close the calendar
-      setIsOpen(false);
-    };
-
-    // Add the event listener with a slight delay to prevent immediate closing
-    const timeoutId = setTimeout(() => {
-      document.addEventListener('mousedown', handleOutsideClick);
-    }, 100);
-
-    return () => {
-      clearTimeout(timeoutId);
-      document.removeEventListener('mousedown', handleOutsideClick);
-    };
-  }, [isOpen, settings.closeOnClickAway, settings.displayMode]);
+  // Note: Click outside handling is now managed by the CalendarPortal component itself
+  // The CalendarPortal's onClose prop handles the click-away behavior
 
   // Simple effect to hide calendar on scroll
   useEffect(() => {
@@ -1038,244 +1005,32 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   };
 
   const calendarRef = useRef<HTMLDivElement>(null);
-  const [calendarPosition, setCalendarPosition] = useState({ top: '0px', left: '0px' });
-  const [isPositioned, setIsPositioned] = useState(false);
-  const [measuredHeight, setMeasuredHeight] = useState<number | null>(null);
   const [isReady, setIsReady] = useState(false);
 
   // Reset states when calendar closes
   useEffect(() => {
     if (!isOpen) {
-      setIsPositioned(false);
-      setMeasuredHeight(null);
       setIsReady(false);
     }
   }, [isOpen]);
 
-  // Measure calendar height when content changes but before showing
+  // Show calendar after a brief delay
   useEffect(() => {
-    if (!isOpen || !calendarRef.current) return;
+    if (!isOpen) return;
 
-    // Reset states
-    setIsPositioned(false);
-    setMeasuredHeight(null);
+    // Reset state
     setIsReady(false);
 
-    // Measure height while calendar is hidden
-    requestAnimationFrame(() => {
-      if (!calendarRef.current) return;
-      const height = calendarRef.current.offsetHeight;
-      setMeasuredHeight(height);
-    });
-  }, [isOpen, settings.visibleMonths, settings.showHeader, settings.showFooter, settings.showLayersNavigation]);
+    // Show after a brief delay to allow portal to position
+    const timer = setTimeout(() => {
+      setIsReady(true);
+    }, 50);
 
-  // Function to determine best position based on window boundaries
-  const getBestPosition = useCallback((rect: DOMRect, calendarHeight: number, calendarWidth: number) => {
-    const PADDING = 8;
-    const windowHeight = window.innerHeight;
-    const windowWidth = window.innerWidth;
+    return () => clearTimeout(timer);
+  }, [isOpen]);
 
-    // Check if calendar would fit below
-    const fitsBelow = rect.bottom + PADDING + calendarHeight <= windowHeight;
 
-    // Check if calendar would fit above
-    const fitsAbove = rect.top - PADDING - calendarHeight >= 0;
 
-    // Check left alignment
-    const fitsFromLeft = rect.left + calendarWidth <= windowWidth;
-
-    // Check right alignment
-    const fitsFromRight = rect.right - calendarWidth >= 0;
-
-    // Determine best vertical position
-    let verticalPosition: 'top' | 'bottom';
-    if (fitsBelow) {
-      verticalPosition = 'bottom';
-    } else if (fitsAbove) {
-      verticalPosition = 'top';
-    } else {
-      // If it doesn't fit either way, prefer bottom if there's more space below
-      verticalPosition = (windowHeight - rect.bottom) > rect.top ? 'bottom' : 'top';
-    }
-
-    // Determine best horizontal position
-    let horizontalPosition: 'left' | 'right';
-    if (fitsFromLeft) {
-      horizontalPosition = 'left';
-    } else if (fitsFromRight) {
-      horizontalPosition = 'right';
-    } else {
-      // If it doesn't fit either way, prefer left if there's more space from left
-      horizontalPosition = rect.left > (windowWidth - rect.right) ? 'right' : 'left';
-    }
-
-    return `${verticalPosition}-${horizontalPosition}` as const;
-  }, []);
-
-  // Calculate and set position only after we have the height
-  useEffect(() => {
-    if (!isOpen || !inputRef.current || !measuredHeight) return;
-
-    const rect = inputRef.current.getBoundingClientRect();
-    const calendarWidth = settings.visibleMonths * settings.monthWidth + ((settings.visibleMonths - 1) * 16);
-    const PADDING = 8;
-
-    // If dynamic positioning is disabled, use the fixed position from settings
-    if (settings.useDynamicPosition === false && settings.position) {
-      let newPosition;
-      switch (settings.position) {
-        case 'bottom-left':
-          newPosition = {
-            top: `${rect.bottom + PADDING}px`,
-            left: `${rect.left}px`
-          };
-          break;
-        case 'top-right':
-          newPosition = {
-            top: `${rect.top - measuredHeight - PADDING}px`,
-            left: `${rect.right - calendarWidth}px`
-          };
-          break;
-        case 'top-left':
-          newPosition = {
-            top: `${rect.top - measuredHeight - PADDING}px`,
-            left: `${rect.left}px`
-          };
-          break;
-        case 'bottom-right':
-        default:
-          newPosition = {
-            top: `${rect.bottom + PADDING}px`,
-            left: `${rect.right - calendarWidth}px`
-          };
-          break;
-      }
-      setCalendarPosition(newPosition);
-    } else {
-      // Use dynamic positioning
-      const bestPosition = getBestPosition(rect, measuredHeight, calendarWidth);
-
-      let newPosition;
-      switch (bestPosition) {
-        case 'bottom-left':
-          newPosition = {
-            top: `${rect.bottom + PADDING}px`,
-            left: `${rect.left}px`
-          };
-          break;
-        case 'top-right':
-          newPosition = {
-            top: `${rect.top - measuredHeight - PADDING}px`,
-            left: `${rect.right - calendarWidth}px`
-          };
-          break;
-        case 'top-left':
-          newPosition = {
-            top: `${rect.top - measuredHeight - PADDING}px`,
-            left: `${rect.left}px`
-          };
-          break;
-        case 'bottom-right':
-          newPosition = {
-            top: `${rect.bottom + PADDING}px`,
-            left: `${rect.right - calendarWidth}px`
-          };
-          break;
-      }
-      setCalendarPosition(newPosition);
-    }
-
-    // Wait for position to be applied before showing
-    requestAnimationFrame(() => {
-      setIsPositioned(true);
-      requestAnimationFrame(() => {
-        setIsReady(true);
-      });
-    });
-  }, [isOpen, measuredHeight, settings.visibleMonths, settings.monthWidth, getBestPosition, settings.position, settings.useDynamicPosition]);
-
-  // Add window resize handler to reposition if needed
-  useEffect(() => {
-    if (!isOpen || !inputRef.current || !measuredHeight) return;
-
-    const handleResize = debounce(() => {
-      const rect = inputRef.current?.getBoundingClientRect();
-      if (!rect) return;
-
-      const calendarWidth = settings.visibleMonths * settings.monthWidth + ((settings.visibleMonths - 1) * 16);
-
-      // If dynamic positioning is disabled, use the fixed position from settings
-      if (settings.useDynamicPosition === false && settings.position) {
-        let newPosition;
-        switch (settings.position) {
-          case 'bottom-left':
-            newPosition = {
-              top: `${rect.bottom + 8}px`,
-              left: `${rect.left}px`
-            };
-            break;
-          case 'top-right':
-            newPosition = {
-              top: `${rect.top - measuredHeight - 8}px`,
-              left: `${rect.right - calendarWidth}px`
-            };
-            break;
-          case 'top-left':
-            newPosition = {
-              top: `${rect.top - measuredHeight - 8}px`,
-              left: `${rect.left}px`
-            };
-            break;
-          case 'bottom-right':
-          default:
-            newPosition = {
-              top: `${rect.bottom + 8}px`,
-              left: `${rect.right - calendarWidth}px`
-            };
-            break;
-        }
-        setCalendarPosition(newPosition);
-      } else {
-        // Use dynamic positioning
-        const bestPosition = getBestPosition(rect, measuredHeight, calendarWidth);
-
-        let newPosition;
-        switch (bestPosition) {
-          case 'bottom-left':
-            newPosition = {
-              top: `${rect.bottom + 8}px`,
-              left: `${rect.left}px`
-            };
-            break;
-          case 'top-right':
-            newPosition = {
-              top: `${rect.top - measuredHeight - 8}px`,
-              left: `${rect.right - calendarWidth}px`
-            };
-            break;
-          case 'top-left':
-            newPosition = {
-              top: `${rect.top - measuredHeight - 8}px`,
-              left: `${rect.left}px`
-            };
-            break;
-          case 'bottom-right':
-            newPosition = {
-              top: `${rect.bottom + 8}px`,
-              left: `${rect.right - calendarWidth}px`
-            };
-            break;
-        }
-        setCalendarPosition(newPosition);
-      }
-    }, 100);
-
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      handleResize.cancel();
-    };
-  }, [isOpen, measuredHeight, settings.visibleMonths, settings.monthWidth, getBestPosition, settings.position, settings.useDynamicPosition]);
 
   return (
     <CalendarErrorBoundary
@@ -1299,6 +1054,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       <div
         className="cla-calendar-wrapper"
         data-open={isOpen ? "true" : "false"}
+        data-display-mode={settings.displayMode}
       >
         {settings.inputStyle && (
           <style>
@@ -1342,16 +1098,28 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
               {renderCalendarContent()}
             </CalendarContainer>
           ) : (
-            ReactDOM.createPortal(
+            <CalendarPortal
+              isOpen={true}
+              triggerRef={inputRef}
+              onClose={settings.closeOnClickAway ? () => setIsOpen(false) : undefined}
+              portalClassName={`cla-calendar-portal cla-calendar-portal-${calendarIdRef.current}`}
+              position={settings.position}
+              dynamicPosition={settings.useDynamicPosition}
+              expectedWidth={settings.visibleMonths * settings.monthWidth + ((settings.visibleMonths - 1) * 10)}
+              portalStyle={{
+                width: `${settings.visibleMonths * settings.monthWidth + ((settings.visibleMonths - 1) * 10)}px`,
+                visibility: isReady ? 'visible' : 'hidden',
+                pointerEvents: isReady ? 'auto' : 'none'
+              }}
+            >
               <div
-                className="cla-calendar-portal"
+                ref={calendarRef}
+                className="cla-card"
                 style={{
-                  position: 'fixed',
-                  zIndex: 2147483647,
-                  ...calendarPosition,
-                  width: `${settings.visibleMonths * settings.monthWidth + ((settings.visibleMonths - 1) * 10)}px`,
-                  display: isReady ? 'block' : 'none',
-                  pointerEvents: isReady ? 'auto' : 'none'
+                  width: `${settings.visibleMonths * settings.monthWidth + ((settings.visibleMonths - 1) * 16)}px`,
+                  ...DEFAULT_CONTAINER_STYLES,
+                  ...settings.containerStyle,
+                  visibility: isReady ? 'visible' : 'hidden'
                 }}
                 onMouseDown={(e) => {
                   e.stopPropagation();
@@ -1362,33 +1130,21 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
                 onClick={(e) => e.stopPropagation()}
               >
                 <div
-                  ref={calendarRef}
-                  className="cla-card"
-                  style={{
-                    width: `${settings.visibleMonths * settings.monthWidth + ((settings.visibleMonths - 1) * 16)}px`,
-                    ...DEFAULT_CONTAINER_STYLES,
-                    ...settings.containerStyle,
-                    visibility: isReady ? 'visible' : 'hidden'
+                  ref={containerRef}
+                  style={{ width: '100%', height: '100%' }}
+                  onMouseDown={(e) => {
+                    e.stopPropagation();
+                    if (settings.enableOutOfBoundsScroll) {
+                      handleMouseDown(e);
+                    }
                   }}
+                  onMouseMove={settings.enableOutOfBoundsScroll ? handleMouseMove : undefined}
+                  onMouseLeave={settings.enableOutOfBoundsScroll ? handleMouseLeave : undefined}
                 >
-                  <div
-                    ref={containerRef}
-                    style={{ width: '100%', height: '100%' }}
-                    onMouseDown={(e) => {
-                      e.stopPropagation();
-                      if (settings.enableOutOfBoundsScroll) {
-                        handleMouseDown(e);
-                      }
-                    }}
-                    onMouseMove={settings.enableOutOfBoundsScroll ? handleMouseMove : undefined}
-                    onMouseLeave={settings.enableOutOfBoundsScroll ? handleMouseLeave : undefined}
-                  >
-                    {renderCalendarContent()}
-                  </div>
+                  {renderCalendarContent()}
                 </div>
-              </div>,
-              document.body
-            )
+              </div>
+            </CalendarPortal>
           )
         )}
       </div>

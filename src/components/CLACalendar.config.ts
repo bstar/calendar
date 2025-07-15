@@ -350,7 +350,9 @@ const CORE_DEFAULTS = {
   layers: DEFAULT_LAYERS,
   showLayersNavigation: false, // Changed to false for simpler default
   defaultLayer: '',
-  colors: DEFAULT_COLORS
+  colors: DEFAULT_COLORS,
+  position: 'bottom-left' as const,
+  useDynamicPosition: true
 };
 
 /**

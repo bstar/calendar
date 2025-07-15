@@ -44,6 +44,9 @@ const App: React.FC = () => {
                   <option value="single">Single Date Selection</option>
                   <option value="multiple">Multiple Months</option>
                   <option value="custom">Custom Theme</option>
+                  <option value="popup">Popup Mode</option>
+                  <option value="popup-positions">Popup Positioning Tests</option>
+                  <option value="dynamic-positioning">Dynamic Positioning Demo</option>
                   <option value="null-safe">Null-Safe Configuration</option>
                 </select>
               </div>
@@ -129,6 +132,306 @@ const App: React.FC = () => {
                       }}
                       onSubmit={handleDateSubmit}
                     />
+                  </div>
+                )}
+
+                {currentDemo === 'popup' && (
+                  <div>
+                    <h4>Popup Mode</h4>
+                    <p className="cla-cal-text-muted">Calendar appears as a popup when clicking the input field</p>
+                    
+                    <div style={{ 
+                      border: '2px dashed #ccc', 
+                      padding: '40px', 
+                      borderRadius: '8px',
+                      backgroundColor: '#f9f9f9',
+                      marginBottom: '20px'
+                    }}>
+                      <p style={{ marginBottom: '20px' }}>Click the input below to open the calendar:</p>
+                      
+                      <CLACalendar 
+                        settings={{
+                          displayMode: 'popup',
+                          selectionMode: 'range',
+                          visibleMonths: 2,
+                          showSubmitButton: false,
+                          position: 'bottom-left',
+                          useDynamicPosition: false,
+                          closeOnClickAway: true,
+                        }}
+                        onSubmit={handleDateSubmit}
+                      />
+                    </div>
+                    
+                    <div className="cla-cal-alert cla-cal-alert-info">
+                      <small>
+                        <strong>Debug Info:</strong> Check console for positioning logs. 
+                        The calendar should appear directly below the input field, aligned to the left edge.
+                      </small>
+                    </div>
+                  </div>
+                )}
+
+                {currentDemo === 'popup-positions' && (
+                  <div>
+                    <h4>Fixed Positioning Tests</h4>
+                    <p className="cla-cal-text-muted">Test different fixed popup positions (useDynamicPosition: false)</p>
+                    
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', marginTop: '20px' }}>
+                      {/* Bottom-left test */}
+                      <div style={{ 
+                        border: '1px solid #ddd', 
+                        padding: '20px', 
+                        borderRadius: '8px'
+                      }}>
+                        <h5 style={{ fontSize: '16px', marginBottom: '10px' }}>Bottom-Left (Default)</h5>
+                        <CLACalendar 
+                          settings={{
+                            displayMode: 'popup',
+                            selectionMode: 'single',
+                            visibleMonths: 1,
+                            position: 'bottom-left',
+                            useDynamicPosition: false,
+                          }}
+                          onSubmit={handleDateSubmit}
+                        />
+                      </div>
+
+                      {/* Bottom-right test */}
+                      <div style={{ 
+                        border: '1px solid #ddd', 
+                        padding: '20px', 
+                        borderRadius: '8px'
+                      }}>
+                        <h5 style={{ fontSize: '16px', marginBottom: '10px' }}>Bottom-Right</h5>
+                        <CLACalendar 
+                          settings={{
+                            displayMode: 'popup',
+                            selectionMode: 'single',
+                            visibleMonths: 1,
+                            position: 'bottom-right',
+                            useDynamicPosition: false,
+                          }}
+                          onSubmit={handleDateSubmit}
+                        />
+                      </div>
+
+                      {/* Top-left test */}
+                      <div style={{ 
+                        border: '1px solid #ddd', 
+                        padding: '20px', 
+                        borderRadius: '8px'
+                      }}>
+                        <h5 style={{ fontSize: '16px', marginBottom: '10px' }}>Top-Left</h5>
+                        <CLACalendar 
+                          settings={{
+                            displayMode: 'popup',
+                            selectionMode: 'single',
+                            visibleMonths: 1,
+                            position: 'top-left',
+                            useDynamicPosition: false,
+                          }}
+                          onSubmit={handleDateSubmit}
+                        />
+                      </div>
+
+                      {/* Top-right test */}
+                      <div style={{ 
+                        border: '1px solid #ddd', 
+                        padding: '20px', 
+                        borderRadius: '8px'
+                      }}>
+                        <h5 style={{ fontSize: '16px', marginBottom: '10px' }}>Top-Right</h5>
+                        <CLACalendar 
+                          settings={{
+                            displayMode: 'popup',
+                            selectionMode: 'single',
+                            visibleMonths: 1,
+                            position: 'top-right',
+                            useDynamicPosition: false,
+                          }}
+                          onSubmit={handleDateSubmit}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="cla-cal-alert cla-cal-alert-warning cla-cal-mt-3">
+                      <small>
+                        <strong>Fixed Positioning:</strong> Each calendar appears in the specified position regardless of viewport constraints.
+                        Compare with the Dynamic Positioning demo to see the difference.
+                      </small>
+                    </div>
+                  </div>
+                )}
+
+                {currentDemo === 'dynamic-positioning' && (
+                  <div>
+                    <h4>Dynamic Positioning Demo</h4>
+                    <p className="cla-cal-text-muted">
+                      The calendar automatically repositions itself based on available space. 
+                      Try opening calendars near the edges of the viewport!
+                    </p>
+                    
+                    <div style={{ 
+                      display: 'grid', 
+                      gridTemplateColumns: 'repeat(3, 1fr)', 
+                      gridTemplateRows: 'repeat(3, 150px)',
+                      gap: '20px',
+                      padding: '20px',
+                      backgroundColor: '#f5f5f5',
+                      borderRadius: '8px',
+                      marginTop: '20px'
+                    }}>
+                      {/* Top row */}
+                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
+                        <div>
+                          <p style={{ fontSize: '12px', marginBottom: '5px' }}>Top-Left Corner</p>
+                          <CLACalendar 
+                            settings={{
+                              displayMode: 'popup',
+                              selectionMode: 'single',
+                              visibleMonths: 1,
+                              useDynamicPosition: true,
+                            }}
+                            onSubmit={handleDateSubmit}
+                          />
+                        </div>
+                      </div>
+                      
+                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center' }}>
+                        <div>
+                          <p style={{ fontSize: '12px', marginBottom: '5px' }}>Top-Center</p>
+                          <CLACalendar 
+                            settings={{
+                              displayMode: 'popup',
+                              selectionMode: 'single',
+                              visibleMonths: 1,
+                              useDynamicPosition: true,
+                            }}
+                            onSubmit={handleDateSubmit}
+                          />
+                        </div>
+                      </div>
+                      
+                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end' }}>
+                        <div>
+                          <p style={{ fontSize: '12px', marginBottom: '5px' }}>Top-Right Corner</p>
+                          <CLACalendar 
+                            settings={{
+                              displayMode: 'popup',
+                              selectionMode: 'single',
+                              visibleMonths: 1,
+                              useDynamicPosition: true,
+                            }}
+                            onSubmit={handleDateSubmit}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Middle row */}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+                        <div>
+                          <p style={{ fontSize: '12px', marginBottom: '5px' }}>Middle-Left</p>
+                          <CLACalendar 
+                            settings={{
+                              displayMode: 'popup',
+                              selectionMode: 'single',
+                              visibleMonths: 1,
+                              useDynamicPosition: true,
+                            }}
+                            onSubmit={handleDateSubmit}
+                          />
+                        </div>
+                      </div>
+                      
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div>
+                          <p style={{ fontSize: '12px', marginBottom: '5px' }}>Center</p>
+                          <CLACalendar 
+                            settings={{
+                              displayMode: 'popup',
+                              selectionMode: 'single',
+                              visibleMonths: 2,
+                              useDynamicPosition: true,
+                            }}
+                            onSubmit={handleDateSubmit}
+                          />
+                        </div>
+                      </div>
+                      
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                        <div>
+                          <p style={{ fontSize: '12px', marginBottom: '5px' }}>Middle-Right</p>
+                          <CLACalendar 
+                            settings={{
+                              displayMode: 'popup',
+                              selectionMode: 'single',
+                              visibleMonths: 1,
+                              useDynamicPosition: true,
+                            }}
+                            onSubmit={handleDateSubmit}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Bottom row */}
+                      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-start' }}>
+                        <div>
+                          <p style={{ fontSize: '12px', marginBottom: '5px' }}>Bottom-Left Corner</p>
+                          <CLACalendar 
+                            settings={{
+                              displayMode: 'popup',
+                              selectionMode: 'single',
+                              visibleMonths: 1,
+                              useDynamicPosition: true,
+                            }}
+                            onSubmit={handleDateSubmit}
+                          />
+                        </div>
+                      </div>
+                      
+                      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+                        <div>
+                          <p style={{ fontSize: '12px', marginBottom: '5px' }}>Bottom-Center</p>
+                          <CLACalendar 
+                            settings={{
+                              displayMode: 'popup',
+                              selectionMode: 'single',
+                              visibleMonths: 1,
+                              useDynamicPosition: true,
+                            }}
+                            onSubmit={handleDateSubmit}
+                          />
+                        </div>
+                      </div>
+                      
+                      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-end' }}>
+                        <div>
+                          <p style={{ fontSize: '12px', marginBottom: '5px' }}>Bottom-Right Corner</p>
+                          <CLACalendar 
+                            settings={{
+                              displayMode: 'popup',
+                              selectionMode: 'single',
+                              visibleMonths: 1,
+                              useDynamicPosition: true,
+                            }}
+                            onSubmit={handleDateSubmit}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="cla-cal-alert cla-cal-alert-info cla-cal-mt-3">
+                      <small>
+                        <strong>How it works:</strong>
+                        <ul style={{ marginTop: '10px', paddingLeft: '20px' }}>
+                          <li>Top inputs: Calendar appears below when there's space, otherwise above</li>
+                          <li>Bottom inputs: Calendar appears above when there's no space below</li>
+                          <li>Right-edge inputs: Calendar aligns to the right edge to stay in viewport</li>
+                          <li>The center calendar has 2 months to show how it handles larger calendars</li>
+                        </ul>
+                      </small>
+                    </div>
                   </div>
                 )}
 
