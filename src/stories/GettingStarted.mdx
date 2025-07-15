@@ -1,11 +1,12 @@
-import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
-import * as GettingStartedStories from './GettingStarted.stories';
+import { Meta } from '@storybook/addon-docs/blocks';
 
-<Meta of={GettingStartedStories} />
+<Meta title="Getting Started/Documentation" />
 
 # Getting Started
 
 Welcome to the CLA Calendar component! This guide will walk you through the basic usage and features.
+
+> **Note**: To see live examples of these configurations, visit the "Direct Rendering" page under this section.
 
 ## Installation
 
@@ -15,33 +16,321 @@ npm install cla-calendar
 
 ## Basic Usage
 
-The calendar can be used in two main modes:
+Import and use the calendar component in your React application:
+
+```typescript
+import { CLACalendar } from 'cla-calendar';
+
+function MyComponent() {
+  const [settings, setSettings] = useState(getDefaultSettings());
+  
+  const handleDateSubmit = (startDate, endDate) => {
+    console.log('Selected:', { startDate, endDate });
+  };
+  
+  return (
+    <CLACalendar
+      settings={settings}
+      onSubmit={handleDateSubmit}
+      _onSettingsChange={setSettings}
+    />
+  );
+}
+```
+
+## Display Modes
+
+The calendar supports two primary display modes:
 
 ### Embedded Mode
 The calendar is displayed inline within your page layout.
 
-<Canvas>
-  <Story of={GettingStartedStories.BasicCalendar} />
-</Canvas>
+**Configuration:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: 2,
+  monthWidth: 500
+}
+```
+
+**Use Cases:**
+- Dashboard date pickers
+- Form date selection
+- Full-page calendar views
 
 ### Popup Mode  
 The calendar appears as a popup when clicking an input field.
 
-<Canvas>
-  <Story of={GettingStartedStories.PopupCalendar} />
-</Canvas>
+**Configuration:**
+```javascript
+{
+  displayMode: 'popup',
+  position: 'bottom-left',
+  useDynamicPosition: true,
+  closeOnClickAway: true
+}
+```
+
+**Use Cases:**
+- Compact date inputs
+- Space-constrained layouts
+- Mobile-friendly interfaces
+
+## Selection Modes
+
+### Single Date Selection
+Select individual dates for appointments, deadlines, or events.
+
+**Configuration:**
+```javascript
+{
+  selectionMode: 'single',
+  showSubmitButton: true
+}
+```
+
+### Date Range Selection
+Select start and end dates with drag-to-select functionality.
+
+**Configuration:**
+```javascript
+{
+  selectionMode: 'range',
+  dateRangeSeparator: ' - ',
+  showSubmitButton: true
+}
+```
 
 ## Core Concepts
 
-- **Settings**: Configure display options, colors, and behavior
-- **Selection Modes**: Choose between single date or date range selection
-- **Callbacks**: Handle date selection events
-- **Customization**: Style the calendar to match your design
+### Settings Object
+The `settings` prop controls all calendar configuration:
 
-## Live Sandbox
+```typescript
+const settings = {
+  // Display options
+  displayMode: 'embedded',
+  visibleMonths: 2,
+  monthWidth: 500,
+  
+  // Selection behavior
+  selectionMode: 'range',
+  defaultRange: { start: '2025-07-01', end: '2025-07-07' },
+  
+  // UI features
+  showHeader: true,
+  showFooter: true,
+  showTooltips: true,
+  showLayersNavigation: false,
+  
+  // Styling
+  colors: {
+    primary: '#0366d6',
+    success: '#28a745',
+    warning: '#f6c23e',
+    danger: '#dc3545'
+  },
+  
+  // Localization
+  timezone: 'UTC',
+  startWeekOnSunday: false,
+  dateFormatter: (date) => format(date, 'MMM dd, yyyy')
+};
+```
 
-Try out the calendar with different configurations:
+### Event Handlers
 
-<Canvas>
-  <Story of={GettingStartedStories.InteractiveSandbox} />
-</Canvas>
+**onSubmit**
+Called when the user confirms their date selection:
+```javascript
+const handleSubmit = (startDate: string, endDate?: string) => {
+  // For single selection mode, endDate will be undefined
+  // For range mode, both dates will be provided
+  console.log('User selected:', { startDate, endDate });
+};
+```
+
+**_onSettingsChange**
+Called when settings need to be updated (required for popup mode):
+```javascript
+const handleSettingsChange = (newSettings: CalendarSettings) => {
+  setSettings(newSettings);
+};
+```
+
+## Customization Options
+
+### Colors
+Customize the calendar's color scheme:
+
+```javascript
+{
+  colors: {
+    primary: '#0366d6',    // Selection color
+    success: '#28a745',    // Available dates
+    warning: '#f6c23e',    // Warnings
+    danger: '#dc3545',     // Restricted dates
+    purple: '#6f42c1',     // Layer colors
+    teal: '#20c997',
+    orange: '#fd7e14',
+    pink: '#e83e8c'
+  }
+}
+```
+
+### Date Formatting
+Provide a custom date formatter:
+
+```javascript
+{
+  dateFormatter: (date) => {
+    // Custom formatting logic
+    return format(date, 'dd/MM/yyyy');
+  }
+}
+```
+
+### Positioning (Popup Mode)
+Control where the popup appears:
+
+```javascript
+{
+  position: 'bottom-right',  // or 'bottom-left', 'top-right', 'top-left'
+  useDynamicPosition: true   // Auto-adjust if not enough space
+}
+```
+
+## Working with Layers
+
+Layers allow you to display additional data on the calendar:
+
+```javascript
+{
+  layers: [
+    {
+      name: 'holidays',
+      title: 'Public Holidays',
+      description: 'Federal holiday dates',
+      visible: true,
+      enabled: true,
+      color: 'danger',
+      data: {
+        events: [
+          {
+            date: '2025-12-25',
+            title: 'Christmas',
+            type: 'holiday',
+            time: 'All day',
+            description: 'Federal holiday'
+          }
+        ]
+      }
+    }
+  ],
+  showLayersNavigation: true
+}
+```
+
+## Date Restrictions
+
+Control which dates can be selected:
+
+```javascript
+const restrictionConfig = {
+  restrictions: [
+    {
+      type: 'boundary',
+      enabled: true,
+      minDate: '2025-01-01',
+      maxDate: '2025-12-31'
+    },
+    {
+      type: 'weekday',
+      enabled: true,
+      weekdays: [0, 6]  // Block Sundays (0) and Saturdays (6)
+    }
+  ]
+};
+
+<CLACalendar
+  settings={settings}
+  restrictionConfigFactory={() => restrictionConfig}
+/>
+```
+
+## Common Patterns
+
+### Form Integration
+```typescript
+function DateField({ onDateChange }) {
+  const [settings, setSettings] = useState({
+    ...getDefaultSettings(),
+    displayMode: 'popup',
+    selectionMode: 'single'
+  });
+  
+  return (
+    <CLACalendar
+      settings={settings}
+      onSubmit={(date) => onDateChange(date)}
+      _onSettingsChange={setSettings}
+    />
+  );
+}
+```
+
+### Dashboard Widget
+```typescript
+function CalendarWidget() {
+  const [settings] = useState({
+    ...getDefaultSettings(),
+    displayMode: 'embedded',
+    visibleMonths: 1,
+    monthWidth: 300,
+    showHeader: false,
+    showFooter: false
+  });
+  
+  return <CLACalendar settings={settings} />;
+}
+```
+
+### Date Range Filter
+```typescript
+function DateRangeFilter({ onRangeChange }) {
+  const [settings, setSettings] = useState({
+    ...getDefaultSettings(),
+    selectionMode: 'range',
+    showSubmitButton: true,
+    defaultRange: {
+      start: startOfMonth(new Date()),
+      end: endOfMonth(new Date())
+    }
+  });
+  
+  return (
+    <CLACalendar
+      settings={settings}
+      onSubmit={(start, end) => onRangeChange({ start, end })}
+      _onSettingsChange={setSettings}
+    />
+  );
+}
+```
+
+## Next Steps
+
+1. **Explore Live Examples**: Visit the "Direct Rendering" page to see these configurations in action
+2. **Check the API Reference**: See the Overview page for complete prop documentation
+3. **Try Different Configurations**: Use the Interactive Sandbox story to experiment
+4. **Learn About Edge Cases**: See how the component handles invalid configurations
+
+## Tips and Best Practices
+
+- Always provide `_onSettingsChange` when using popup mode
+- Use UTC timezone for consistent behavior across time zones
+- Test your date formatter function with edge cases
+- Consider mobile users when choosing between embedded and popup modes
+- Use layers to enhance the calendar with contextual information
+- Apply restrictions to guide users toward valid date selections

@@ -3,7 +3,7 @@ import { CLACalendar } from '../components/CLACalendar';
 import { CalendarStoryWrapper } from './shared/CalendarStoryWrapper';
 import { defaultArgs } from './shared/storyControls';
 
-<Meta title="Edge Cases/Direct Rendering Test" />
+<Meta title="Edge Cases/Configuration Stress Tests/Direct Rendering" />
 
 # Direct Rendering Test
 
@@ -11,10 +11,56 @@ Testing if directly rendering components fixes the configuration issue.
 
 ## Negative Visible Months (-5)
 
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: -5,  // Edge case: negative value
+  monthWidth: 500,
+  selectionMode: 'range',
+  position: 'bottom-left',
+  useDynamicPosition: true,
+  showHeader: true,
+  showFooter: true,
+  showSubmitButton: false,
+  showTooltips: true,
+  showLayersNavigation: false,
+  showDateInputs: true,
+  closeOnClickAway: true,
+  startWeekOnSunday: false,
+  primaryColor: '#0366d6',
+  successColor: '#28a745',
+  warningColor: '#f6c23e',
+  dangerColor: '#dc3545',
+  timezone: 'UTC',
+  dateRangeSeparator: ' - ',
+  baseFontSize: '1rem'
+}
+```
+
 <CalendarStoryWrapper 
   args={{
-    ...defaultArgs,
-    visibleMonths: -5
+    displayMode: 'embedded',
+    visibleMonths: -5,
+    monthWidth: 500,
+    selectionMode: 'range',
+    position: 'bottom-left',
+    useDynamicPosition: true,
+    showHeader: true,
+    showFooter: true,
+    showSubmitButton: false,
+    showTooltips: true,
+    showLayersNavigation: false,
+    showDateInputs: true,
+    closeOnClickAway: true,
+    startWeekOnSunday: false,
+    primaryColor: '#0366d6',
+    successColor: '#28a745',
+    warningColor: '#f6c23e',
+    dangerColor: '#dc3545',
+    timezone: 'UTC',
+    dateRangeSeparator: ' - ',
+    baseFontSize: '1rem'
   }}
   title="Negative Visible Months"
   description="Testing with visibleMonths: -5 (should clamp to valid range)"
@@ -22,10 +68,56 @@ Testing if directly rendering components fixes the configuration issue.
 
 ## Excessive Visible Months (100)
 
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: 100,  // Edge case: excessive value
+  monthWidth: 500,
+  selectionMode: 'range',
+  position: 'bottom-left',
+  useDynamicPosition: true,
+  showHeader: true,
+  showFooter: true,
+  showSubmitButton: false,
+  showTooltips: true,
+  showLayersNavigation: false,
+  showDateInputs: true,
+  closeOnClickAway: true,
+  startWeekOnSunday: false,
+  primaryColor: '#0366d6',
+  successColor: '#28a745',
+  warningColor: '#f6c23e',
+  dangerColor: '#dc3545',
+  timezone: 'UTC',
+  dateRangeSeparator: ' - ',
+  baseFontSize: '1rem'
+}
+```
+
 <CalendarStoryWrapper 
   args={{
-    ...defaultArgs,
-    visibleMonths: 100
+    displayMode: 'embedded',
+    visibleMonths: 100,
+    monthWidth: 500,
+    selectionMode: 'range',
+    position: 'bottom-left',
+    useDynamicPosition: true,
+    showHeader: true,
+    showFooter: true,
+    showSubmitButton: false,
+    showTooltips: true,
+    showLayersNavigation: false,
+    showDateInputs: true,
+    closeOnClickAway: true,
+    startWeekOnSunday: false,
+    primaryColor: '#0366d6',
+    successColor: '#28a745',
+    warningColor: '#f6c23e',
+    dangerColor: '#dc3545',
+    timezone: 'UTC',
+    dateRangeSeparator: ' - ',
+    baseFontSize: '1rem'
   }}
   title="Excessive Visible Months"
   description="Testing with visibleMonths: 100"
@@ -33,10 +125,56 @@ Testing if directly rendering components fixes the configuration issue.
 
 ## Zero Visible Months (0)
 
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: 0,  // Edge case: zero value
+  monthWidth: 500,
+  selectionMode: 'range',
+  position: 'bottom-left',
+  useDynamicPosition: true,
+  showHeader: true,
+  showFooter: true,
+  showSubmitButton: false,
+  showTooltips: true,
+  showLayersNavigation: false,
+  showDateInputs: true,
+  closeOnClickAway: true,
+  startWeekOnSunday: false,
+  primaryColor: '#0366d6',
+  successColor: '#28a745',
+  warningColor: '#f6c23e',
+  dangerColor: '#dc3545',
+  timezone: 'UTC',
+  dateRangeSeparator: ' - ',
+  baseFontSize: '1rem'
+}
+```
+
 <CalendarStoryWrapper 
   args={{
-    ...defaultArgs,
-    visibleMonths: 0
+    displayMode: 'embedded',
+    visibleMonths: 0,
+    monthWidth: 500,
+    selectionMode: 'range',
+    position: 'bottom-left',
+    useDynamicPosition: true,
+    showHeader: true,
+    showFooter: true,
+    showSubmitButton: false,
+    showTooltips: true,
+    showLayersNavigation: false,
+    showDateInputs: true,
+    closeOnClickAway: true,
+    startWeekOnSunday: false,
+    primaryColor: '#0366d6',
+    successColor: '#28a745',
+    warningColor: '#f6c23e',
+    dangerColor: '#dc3545',
+    timezone: 'UTC',
+    dateRangeSeparator: ' - ',
+    baseFontSize: '1rem'
   }}
   title="Zero Visible Months"
   description="Testing with visibleMonths: 0"
@@ -44,9 +182,59 @@ Testing if directly rendering components fixes the configuration issue.
 
 ## Null and Undefined Values
 
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: 2,
+  monthWidth: 500,
+  selectionMode: 'range',
+  position: 'bottom-left',
+  useDynamicPosition: true,
+  showHeader: true,
+  showFooter: true,
+  showSubmitButton: false,
+  showTooltips: true,
+  showLayersNavigation: false,
+  showDateInputs: true,
+  closeOnClickAway: true,
+  startWeekOnSunday: false,
+  primaryColor: '#0366d6',
+  successColor: '#28a745',
+  warningColor: '#f6c23e',
+  dangerColor: '#dc3545',
+  timezone: 'UTC',
+  dateRangeSeparator: ' - ',
+  baseFontSize: '1rem',
+  defaultRange: null,  // Edge case: null value
+  dateFormatter: undefined,  // Edge case: undefined value
+  colors: null  // Edge case: null value
+}
+```
+
 <CalendarStoryWrapper 
   args={{
-    ...defaultArgs,
+    displayMode: 'embedded',
+    visibleMonths: 2,
+    monthWidth: 500,
+    selectionMode: 'range',
+    position: 'bottom-left',
+    useDynamicPosition: true,
+    showHeader: true,
+    showFooter: true,
+    showSubmitButton: false,
+    showTooltips: true,
+    showLayersNavigation: false,
+    showDateInputs: true,
+    closeOnClickAway: true,
+    startWeekOnSunday: false,
+    primaryColor: '#0366d6',
+    successColor: '#28a745',
+    warningColor: '#f6c23e',
+    dangerColor: '#dc3545',
+    timezone: 'UTC',
+    dateRangeSeparator: ' - ',
+    baseFontSize: '1rem',
     defaultRange: null,
     dateFormatter: undefined,
     colors: null
@@ -57,9 +245,60 @@ Testing if directly rendering components fixes the configuration issue.
 
 ## Invalid Date Range
 
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: 2,
+  monthWidth: 500,
+  selectionMode: 'range',
+  position: 'bottom-left',
+  useDynamicPosition: true,
+  showHeader: true,
+  showFooter: true,
+  showSubmitButton: false,
+  showTooltips: true,
+  showLayersNavigation: false,
+  showDateInputs: true,
+  closeOnClickAway: true,
+  startWeekOnSunday: false,
+  primaryColor: '#0366d6',
+  successColor: '#28a745',
+  warningColor: '#f6c23e',
+  dangerColor: '#dc3545',
+  timezone: 'UTC',
+  dateRangeSeparator: ' - ',
+  baseFontSize: '1rem',
+  defaultRange: {  // Edge case: end before start
+    start: '2025-12-31',
+    end: '2025-01-01'
+  }
+}
+```
+
 <CalendarStoryWrapper 
   args={{
-    ...defaultArgs,
+    displayMode: 'embedded',
+    visibleMonths: 2,
+    monthWidth: 500,
+    selectionMode: 'range',
+    position: 'bottom-left',
+    useDynamicPosition: true,
+    showHeader: true,
+    showFooter: true,
+    showSubmitButton: false,
+    showTooltips: true,
+    showLayersNavigation: false,
+    showDateInputs: true,
+    closeOnClickAway: true,
+    startWeekOnSunday: false,
+    primaryColor: '#0366d6',
+    successColor: '#28a745',
+    warningColor: '#f6c23e',
+    dangerColor: '#dc3545',
+    timezone: 'UTC',
+    dateRangeSeparator: ' - ',
+    baseFontSize: '1rem',
     defaultRange: {
       start: '2025-12-31',
       end: '2025-01-01'
@@ -71,9 +310,60 @@ Testing if directly rendering components fixes the configuration issue.
 
 ## Malformed Date Strings
 
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: 2,
+  monthWidth: 500,
+  selectionMode: 'range',
+  position: 'bottom-left',
+  useDynamicPosition: true,
+  showHeader: true,
+  showFooter: true,
+  showSubmitButton: false,
+  showTooltips: true,
+  showLayersNavigation: false,
+  showDateInputs: true,
+  closeOnClickAway: true,
+  startWeekOnSunday: false,
+  primaryColor: '#0366d6',
+  successColor: '#28a745',
+  warningColor: '#f6c23e',
+  dangerColor: '#dc3545',
+  timezone: 'UTC',
+  dateRangeSeparator: ' - ',
+  baseFontSize: '1rem',
+  defaultRange: {  // Edge case: invalid date formats
+    start: 'not-a-date',
+    end: '2025-13-45'
+  }
+}
+```
+
 <CalendarStoryWrapper 
   args={{
-    ...defaultArgs,
+    displayMode: 'embedded',
+    visibleMonths: 2,
+    monthWidth: 500,
+    selectionMode: 'range',
+    position: 'bottom-left',
+    useDynamicPosition: true,
+    showHeader: true,
+    showFooter: true,
+    showSubmitButton: false,
+    showTooltips: true,
+    showLayersNavigation: false,
+    showDateInputs: true,
+    closeOnClickAway: true,
+    startWeekOnSunday: false,
+    primaryColor: '#0366d6',
+    successColor: '#28a745',
+    warningColor: '#f6c23e',
+    dangerColor: '#dc3545',
+    timezone: 'UTC',
+    dateRangeSeparator: ' - ',
+    baseFontSize: '1rem',
     defaultRange: {
       start: 'not-a-date',
       end: '2025-13-45'
@@ -85,10 +375,56 @@ Testing if directly rendering components fixes the configuration issue.
 
 ## Negative Month Width
 
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: 2,
+  monthWidth: -500,  // Edge case: negative width
+  selectionMode: 'range',
+  position: 'bottom-left',
+  useDynamicPosition: true,
+  showHeader: true,
+  showFooter: true,
+  showSubmitButton: false,
+  showTooltips: true,
+  showLayersNavigation: false,
+  showDateInputs: true,
+  closeOnClickAway: true,
+  startWeekOnSunday: false,
+  primaryColor: '#0366d6',
+  successColor: '#28a745',
+  warningColor: '#f6c23e',
+  dangerColor: '#dc3545',
+  timezone: 'UTC',
+  dateRangeSeparator: ' - ',
+  baseFontSize: '1rem'
+}
+```
+
 <CalendarStoryWrapper 
   args={{
-    ...defaultArgs,
-    monthWidth: -500
+    displayMode: 'embedded',
+    visibleMonths: 2,
+    monthWidth: -500,
+    selectionMode: 'range',
+    position: 'bottom-left',
+    useDynamicPosition: true,
+    showHeader: true,
+    showFooter: true,
+    showSubmitButton: false,
+    showTooltips: true,
+    showLayersNavigation: false,
+    showDateInputs: true,
+    closeOnClickAway: true,
+    startWeekOnSunday: false,
+    primaryColor: '#0366d6',
+    successColor: '#28a745',
+    warningColor: '#f6c23e',
+    dangerColor: '#dc3545',
+    timezone: 'UTC',
+    dateRangeSeparator: ' - ',
+    baseFontSize: '1rem'
   }}
   title="Negative Month Width"
   description="Testing with monthWidth: -500"
@@ -96,9 +432,62 @@ Testing if directly rendering components fixes the configuration issue.
 
 ## Invalid Colors
 
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: 2,
+  monthWidth: 500,
+  selectionMode: 'range',
+  position: 'bottom-left',
+  useDynamicPosition: true,
+  showHeader: true,
+  showFooter: true,
+  showSubmitButton: false,
+  showTooltips: true,
+  showLayersNavigation: false,
+  showDateInputs: true,
+  closeOnClickAway: true,
+  startWeekOnSunday: false,
+  primaryColor: '#0366d6',
+  successColor: '#28a745',
+  warningColor: '#f6c23e',
+  dangerColor: '#dc3545',
+  timezone: 'UTC',
+  dateRangeSeparator: ' - ',
+  baseFontSize: '1rem',
+  colors: {  // Edge case: invalid color values
+    primary: 'not-a-color',
+    success: '#GGGGGG',
+    warning: 'rgb(999, 999, 999)',
+    danger: '12345'
+  }
+}
+```
+
 <CalendarStoryWrapper 
   args={{
-    ...defaultArgs,
+    displayMode: 'embedded',
+    visibleMonths: 2,
+    monthWidth: 500,
+    selectionMode: 'range',
+    position: 'bottom-left',
+    useDynamicPosition: true,
+    showHeader: true,
+    showFooter: true,
+    showSubmitButton: false,
+    showTooltips: true,
+    showLayersNavigation: false,
+    showDateInputs: true,
+    closeOnClickAway: true,
+    startWeekOnSunday: false,
+    primaryColor: '#0366d6',
+    successColor: '#28a745',
+    warningColor: '#f6c23e',
+    dangerColor: '#dc3545',
+    timezone: 'UTC',
+    dateRangeSeparator: ' - ',
+    baseFontSize: '1rem',
     colors: {
       primary: 'not-a-color',
       success: '#GGGGGG',
@@ -114,9 +503,55 @@ Testing if directly rendering components fixes the configuration issue.
 
 ### Tiny Font (0.1rem)
 
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: 2,
+  monthWidth: 500,
+  selectionMode: 'range',
+  position: 'bottom-left',
+  useDynamicPosition: true,
+  showHeader: true,
+  showFooter: true,
+  showSubmitButton: false,
+  showTooltips: true,
+  showLayersNavigation: false,
+  showDateInputs: true,
+  closeOnClickAway: true,
+  startWeekOnSunday: false,
+  primaryColor: '#0366d6',
+  successColor: '#28a745',
+  warningColor: '#f6c23e',
+  dangerColor: '#dc3545',
+  timezone: 'UTC',
+  dateRangeSeparator: ' - ',
+  baseFontSize: '0.1rem'  // Edge case: extremely small font
+}
+```
+
 <CalendarStoryWrapper 
   args={{
-    ...defaultArgs,
+    displayMode: 'embedded',
+    visibleMonths: 2,
+    monthWidth: 500,
+    selectionMode: 'range',
+    position: 'bottom-left',
+    useDynamicPosition: true,
+    showHeader: true,
+    showFooter: true,
+    showSubmitButton: false,
+    showTooltips: true,
+    showLayersNavigation: false,
+    showDateInputs: true,
+    closeOnClickAway: true,
+    startWeekOnSunday: false,
+    primaryColor: '#0366d6',
+    successColor: '#28a745',
+    warningColor: '#f6c23e',
+    dangerColor: '#dc3545',
+    timezone: 'UTC',
+    dateRangeSeparator: ' - ',
     baseFontSize: '0.1rem'
   }}
   title="Tiny Font Size"
@@ -125,9 +560,55 @@ Testing if directly rendering components fixes the configuration issue.
 
 ### Huge Font (5rem)
 
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: 2,
+  monthWidth: 500,
+  selectionMode: 'range',
+  position: 'bottom-left',
+  useDynamicPosition: true,
+  showHeader: true,
+  showFooter: true,
+  showSubmitButton: false,
+  showTooltips: true,
+  showLayersNavigation: false,
+  showDateInputs: true,
+  closeOnClickAway: true,
+  startWeekOnSunday: false,
+  primaryColor: '#0366d6',
+  successColor: '#28a745',
+  warningColor: '#f6c23e',
+  dangerColor: '#dc3545',
+  timezone: 'UTC',
+  dateRangeSeparator: ' - ',
+  baseFontSize: '5rem'  // Edge case: extremely large font
+}
+```
+
 <CalendarStoryWrapper 
   args={{
-    ...defaultArgs,
+    displayMode: 'embedded',
+    visibleMonths: 2,
+    monthWidth: 500,
+    selectionMode: 'range',
+    position: 'bottom-left',
+    useDynamicPosition: true,
+    showHeader: true,
+    showFooter: true,
+    showSubmitButton: false,
+    showTooltips: true,
+    showLayersNavigation: false,
+    showDateInputs: true,
+    closeOnClickAway: true,
+    startWeekOnSunday: false,
+    primaryColor: '#0366d6',
+    successColor: '#28a745',
+    warningColor: '#f6c23e',
+    dangerColor: '#dc3545',
+    timezone: 'UTC',
+    dateRangeSeparator: ' - ',
     baseFontSize: '5rem'
   }}
   title="Huge Font Size"

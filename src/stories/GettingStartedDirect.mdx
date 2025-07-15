@@ -1,0 +1,546 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { CalendarStoryWrapper } from './shared/CalendarStoryWrapper';
+
+<Meta title="Getting Started/Direct Rendering" />
+
+# Getting Started - Live Examples
+
+This page shows working calendar instances for the configurations described in the Getting Started documentation.
+
+## Basic Embedded Calendar
+
+A simple embedded calendar with default settings.
+
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: 2,
+  monthWidth: 500,
+  selectionMode: 'range',
+  position: 'bottom-left',
+  useDynamicPosition: true,
+  showHeader: true,
+  showFooter: true,
+  showSubmitButton: false,
+  showTooltips: true,
+  showLayersNavigation: false,
+  showDateInputs: true,
+  closeOnClickAway: true,
+  startWeekOnSunday: false,
+  primaryColor: '#0366d6',
+  successColor: '#28a745',
+  warningColor: '#f6c23e',
+  dangerColor: '#dc3545',
+  timezone: 'UTC',
+  dateRangeSeparator: ' - ',
+  baseFontSize: '1rem'
+}
+```
+
+<CalendarStoryWrapper 
+  args={{
+    displayMode: 'embedded',
+    visibleMonths: 2,
+    monthWidth: 500,
+    selectionMode: 'range',
+    position: 'bottom-left',
+    useDynamicPosition: true,
+    showHeader: true,
+    showFooter: true,
+    showSubmitButton: false,
+    showTooltips: true,
+    showLayersNavigation: false,
+    showDateInputs: true,
+    closeOnClickAway: true,
+    startWeekOnSunday: false,
+    primaryColor: '#0366d6',
+    successColor: '#28a745',
+    warningColor: '#f6c23e',
+    dangerColor: '#dc3545',
+    timezone: 'UTC',
+    dateRangeSeparator: ' - ',
+    baseFontSize: '1rem'
+  }}
+  title="Basic Embedded Calendar"
+  description="Standard configuration with range selection"
+/>
+
+## Popup Mode Calendar
+
+A calendar that appears as a popup when clicking the input field.
+
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'popup',
+  visibleMonths: 2,
+  monthWidth: 500,
+  selectionMode: 'range',
+  position: 'bottom-left',
+  useDynamicPosition: true,
+  showHeader: true,
+  showFooter: true,
+  showSubmitButton: true,
+  showTooltips: true,
+  showLayersNavigation: false,
+  showDateInputs: true,
+  closeOnClickAway: true,
+  startWeekOnSunday: false,
+  primaryColor: '#0366d6',
+  successColor: '#28a745',
+  warningColor: '#f6c23e',
+  dangerColor: '#dc3545',
+  timezone: 'UTC',
+  dateRangeSeparator: ' - ',
+  baseFontSize: '1rem'
+}
+```
+
+<CalendarStoryWrapper 
+  args={{
+    displayMode: 'popup',
+    visibleMonths: 2,
+    monthWidth: 500,
+    selectionMode: 'range',
+    position: 'bottom-left',
+    useDynamicPosition: true,
+    showHeader: true,
+    showFooter: true,
+    showSubmitButton: true,
+    showTooltips: true,
+    showLayersNavigation: false,
+    showDateInputs: true,
+    closeOnClickAway: true,
+    startWeekOnSunday: false,
+    primaryColor: '#0366d6',
+    successColor: '#28a745',
+    warningColor: '#f6c23e',
+    dangerColor: '#dc3545',
+    timezone: 'UTC',
+    dateRangeSeparator: ' - ',
+    baseFontSize: '1rem'
+  }}
+  title="Popup Mode Calendar"
+  description="Click the input field to open the calendar"
+/>
+
+## Single Date Selection
+
+Calendar configured for selecting individual dates.
+
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: 1,
+  monthWidth: 500,
+  selectionMode: 'single',  // Single date selection
+  position: 'bottom-left',
+  useDynamicPosition: true,
+  showHeader: true,
+  showFooter: true,
+  showSubmitButton: true,
+  showTooltips: true,
+  showLayersNavigation: false,
+  showDateInputs: true,
+  closeOnClickAway: true,
+  startWeekOnSunday: false,
+  primaryColor: '#0366d6',
+  successColor: '#28a745',
+  warningColor: '#f6c23e',
+  dangerColor: '#dc3545',
+  timezone: 'UTC',
+  dateRangeSeparator: ' - ',
+  baseFontSize: '1rem'
+}
+```
+
+<CalendarStoryWrapper 
+  args={{
+    displayMode: 'embedded',
+    visibleMonths: 1,
+    monthWidth: 500,
+    selectionMode: 'single',
+    position: 'bottom-left',
+    useDynamicPosition: true,
+    showHeader: true,
+    showFooter: true,
+    showSubmitButton: true,
+    showTooltips: true,
+    showLayersNavigation: false,
+    showDateInputs: true,
+    closeOnClickAway: true,
+    startWeekOnSunday: false,
+    primaryColor: '#0366d6',
+    successColor: '#28a745',
+    warningColor: '#f6c23e',
+    dangerColor: '#dc3545',
+    timezone: 'UTC',
+    dateRangeSeparator: ' - ',
+    baseFontSize: '1rem'
+  }}
+  title="Single Date Selection"
+  description="Click any date to select it"
+/>
+
+## Custom Styled Calendar
+
+Calendar with custom colors and styling.
+
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: 2,
+  monthWidth: 450,
+  selectionMode: 'range',
+  position: 'bottom-left',
+  useDynamicPosition: true,
+  showHeader: true,
+  showFooter: true,
+  showSubmitButton: false,
+  showTooltips: true,
+  showLayersNavigation: false,
+  showDateInputs: true,
+  closeOnClickAway: true,
+  startWeekOnSunday: true,  // Start week on Sunday
+  primaryColor: '#7c3aed',  // Custom purple
+  successColor: '#10b981',  // Custom green
+  warningColor: '#f59e0b',  // Custom amber
+  dangerColor: '#ef4444',   // Custom red
+  timezone: 'UTC',
+  dateRangeSeparator: ' → ',  // Custom separator
+  baseFontSize: '0.9rem'    // Slightly smaller font
+}
+```
+
+<CalendarStoryWrapper 
+  args={{
+    displayMode: 'embedded',
+    visibleMonths: 2,
+    monthWidth: 450,
+    selectionMode: 'range',
+    position: 'bottom-left',
+    useDynamicPosition: true,
+    showHeader: true,
+    showFooter: true,
+    showSubmitButton: false,
+    showTooltips: true,
+    showLayersNavigation: false,
+    showDateInputs: true,
+    closeOnClickAway: true,
+    startWeekOnSunday: true,
+    primaryColor: '#7c3aed',
+    successColor: '#10b981',
+    warningColor: '#f59e0b',
+    dangerColor: '#ef4444',
+    timezone: 'UTC',
+    dateRangeSeparator: ' → ',
+    baseFontSize: '0.9rem'
+  }}
+  title="Custom Styled Calendar"
+  description="Custom colors, Sunday start, and arrow separator"
+/>
+
+## Calendar with Layers
+
+Calendar showing event layers and navigation.
+
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: 2,
+  monthWidth: 500,
+  selectionMode: 'range',
+  position: 'bottom-left',
+  useDynamicPosition: true,
+  showHeader: true,
+  showFooter: true,
+  showSubmitButton: false,
+  showTooltips: true,
+  showLayersNavigation: true,  // Show layer controls
+  showDateInputs: true,
+  closeOnClickAway: true,
+  startWeekOnSunday: false,
+  primaryColor: '#0366d6',
+  successColor: '#28a745',
+  warningColor: '#f6c23e',
+  dangerColor: '#dc3545',
+  timezone: 'UTC',
+  dateRangeSeparator: ' - ',
+  baseFontSize: '1rem',
+  layers: [
+    {
+      name: 'holidays',
+      title: 'Public Holidays',
+      description: 'Federal holiday dates',
+      visible: true,
+      enabled: true,
+      color: 'danger',
+      data: {
+        events: [
+          {
+            date: '2025-07-04',
+            title: 'Independence Day',
+            type: 'holiday',
+            time: 'All day',
+            description: 'Federal holiday'
+          },
+          {
+            date: '2025-09-01',
+            title: 'Labor Day',
+            type: 'holiday',
+            time: 'All day',
+            description: 'Federal holiday'
+          }
+        ]
+      }
+    },
+    {
+      name: 'meetings',
+      title: 'Team Meetings',
+      description: 'Scheduled team meetings',
+      visible: true,
+      enabled: true,
+      color: 'primary',
+      data: {
+        events: [
+          {
+            date: '2025-07-15',
+            title: 'Sprint Planning',
+            type: 'meeting',
+            time: '10:00 AM',
+            description: 'Q3 Sprint Planning'
+          },
+          {
+            date: '2025-07-22',
+            title: 'Team Standup',
+            type: 'meeting',
+            time: '9:00 AM',
+            description: 'Weekly team sync'
+          }
+        ]
+      }
+    }
+  ]
+}
+```
+
+<CalendarStoryWrapper 
+  args={{
+    displayMode: 'embedded',
+    visibleMonths: 2,
+    monthWidth: 500,
+    selectionMode: 'range',
+    position: 'bottom-left',
+    useDynamicPosition: true,
+    showHeader: true,
+    showFooter: true,
+    showSubmitButton: false,
+    showTooltips: true,
+    showLayersNavigation: true,
+    showDateInputs: true,
+    closeOnClickAway: true,
+    startWeekOnSunday: false,
+    primaryColor: '#0366d6',
+    successColor: '#28a745',
+    warningColor: '#f6c23e',
+    dangerColor: '#dc3545',
+    timezone: 'UTC',
+    dateRangeSeparator: ' - ',
+    baseFontSize: '1rem',
+    layers: [
+      {
+        name: 'holidays',
+        title: 'Public Holidays',
+        description: 'Federal holiday dates',
+        visible: true,
+        enabled: true,
+        color: 'danger',
+        data: {
+          events: [
+            {
+              date: '2025-07-04',
+              title: 'Independence Day',
+              type: 'holiday',
+              time: 'All day',
+              description: 'Federal holiday'
+            },
+            {
+              date: '2025-09-01',
+              title: 'Labor Day',
+              type: 'holiday',
+              time: 'All day',
+              description: 'Federal holiday'
+            }
+          ]
+        }
+      },
+      {
+        name: 'meetings',
+        title: 'Team Meetings',
+        description: 'Scheduled team meetings',
+        visible: true,
+        enabled: true,
+        color: 'primary',
+        data: {
+          events: [
+            {
+              date: '2025-07-15',
+              title: 'Sprint Planning',
+              type: 'meeting',
+              time: '10:00 AM',
+              description: 'Q3 Sprint Planning'
+            },
+            {
+              date: '2025-07-22',
+              title: 'Team Standup',
+              type: 'meeting',
+              time: '9:00 AM',
+              description: 'Weekly team sync'
+            }
+          ]
+        }
+      }
+    ]
+  }}
+  title="Calendar with Layers"
+  description="Toggle layers to show/hide different event types"
+/>
+
+## Calendar with Restrictions
+
+Calendar with date selection restrictions applied.
+
+**Full Configuration with Restriction Factory:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: 2,
+  monthWidth: 500,
+  selectionMode: 'range',
+  // ... other settings ...
+  
+  restrictionConfigFactory: () => ({
+    restrictions: [
+      {
+        type: 'boundary',
+        enabled: true,
+        minDate: '2025-07-01',
+        maxDate: '2025-12-31'
+      },
+      {
+        type: 'weekday',
+        enabled: true,
+        weekdays: [0, 6]  // Block weekends
+      }
+    ]
+  })
+}
+```
+
+<CalendarStoryWrapper 
+  args={{
+    displayMode: 'embedded',
+    visibleMonths: 2,
+    monthWidth: 500,
+    selectionMode: 'range',
+    position: 'bottom-left',
+    useDynamicPosition: true,
+    showHeader: true,
+    showFooter: true,
+    showSubmitButton: false,
+    showTooltips: true,
+    showLayersNavigation: false,
+    showDateInputs: true,
+    closeOnClickAway: true,
+    startWeekOnSunday: false,
+    primaryColor: '#0366d6',
+    successColor: '#28a745',
+    warningColor: '#f6c23e',
+    dangerColor: '#dc3545',
+    timezone: 'UTC',
+    dateRangeSeparator: ' - ',
+    baseFontSize: '1rem'
+  }}
+  restrictionConfigFactory={() => ({
+    restrictions: [
+      {
+        type: 'boundary',
+        enabled: true,
+        minDate: '2025-07-01',
+        maxDate: '2025-12-31'
+      },
+      {
+        type: 'weekday',
+        enabled: true,
+        weekdays: [0, 6]
+      }
+    ]
+  })}
+  title="Calendar with Restrictions"
+  description="Only July-December 2025 weekdays are selectable"
+/>
+
+## Compact Dashboard Widget
+
+A minimal calendar for dashboard integration.
+
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: 1,
+  monthWidth: 300,  // Compact width
+  selectionMode: 'single',
+  position: 'bottom-left',
+  useDynamicPosition: true,
+  showHeader: false,  // Hide header
+  showFooter: false,  // Hide footer
+  showSubmitButton: false,
+  showTooltips: false,  // Hide tooltips for cleaner look
+  showLayersNavigation: false,
+  showDateInputs: false,  // Hide date inputs
+  closeOnClickAway: true,
+  startWeekOnSunday: false,
+  primaryColor: '#0366d6',
+  successColor: '#28a745',
+  warningColor: '#f6c23e',
+  dangerColor: '#dc3545',
+  timezone: 'UTC',
+  dateRangeSeparator: ' - ',
+  baseFontSize: '0.875rem'  // Smaller font
+}
+```
+
+<CalendarStoryWrapper 
+  args={{
+    displayMode: 'embedded',
+    visibleMonths: 1,
+    monthWidth: 300,
+    selectionMode: 'single',
+    position: 'bottom-left',
+    useDynamicPosition: true,
+    showHeader: false,
+    showFooter: false,
+    showSubmitButton: false,
+    showTooltips: false,
+    showLayersNavigation: false,
+    showDateInputs: false,
+    closeOnClickAway: true,
+    startWeekOnSunday: false,
+    primaryColor: '#0366d6',
+    successColor: '#28a745',
+    warningColor: '#f6c23e',
+    dangerColor: '#dc3545',
+    timezone: 'UTC',
+    dateRangeSeparator: ' - ',
+    baseFontSize: '0.875rem'
+  }}
+  title="Compact Dashboard Widget"
+  description="Minimal UI for space-constrained layouts"
+/>
+
+These examples demonstrate various configurations of the CLA Calendar component. Each shows the complete configuration used, making it easy to copy and adapt for your own use cases.

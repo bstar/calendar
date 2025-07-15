@@ -472,6 +472,71 @@ When creating new stories:
    - Keep rendering logic in CalendarStoryWrapper
    - Only override when absolutely necessary
 
+### Direct Rendering in MDX (Edge Cases)
+
+When creating edge case tests or when Storybook's Story components don't properly pass args, use direct rendering in MDX files:
+
+#### Example: Edge Case Testing
+
+```mdx
+import { Meta } from '@storybook/addon-docs/blocks';
+import { CalendarStoryWrapper } from './shared/CalendarStoryWrapper';
+
+<Meta title="Edge Cases/Direct Rendering Test" />
+
+# Direct Rendering Test
+
+## Negative Visible Months (-5)
+
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: -5,  // Edge case: negative value
+  monthWidth: 500,
+  selectionMode: 'range',
+  // ... all other properties explicitly listed
+}
+```
+
+<CalendarStoryWrapper 
+  args={{
+    displayMode: 'embedded',
+    visibleMonths: -5,
+    monthWidth: 500,
+    selectionMode: 'range',
+    position: 'bottom-left',
+    useDynamicPosition: true,
+    showHeader: true,
+    showFooter: true,
+    showSubmitButton: false,
+    showTooltips: true,
+    showLayersNavigation: false,
+    showDateInputs: true,
+    closeOnClickAway: true,
+    startWeekOnSunday: false,
+    primaryColor: '#0366d6',
+    successColor: '#28a745',
+    warningColor: '#f6c23e',
+    dangerColor: '#dc3545',
+    timezone: 'UTC',
+    dateRangeSeparator: ' - ',
+    baseFontSize: '1rem'
+  }}
+  title="Negative Visible Months"
+  description="Testing with visibleMonths: -5 (should clamp to valid range)"
+/>
+```
+
+#### Key Points for Direct Rendering:
+
+1. **No Canvas/Story components**: Render CalendarStoryWrapper directly in MDX
+2. **Full configuration**: List every property explicitly (no spreading defaultArgs)
+3. **Documentation**: Include a code block showing the exact configuration
+4. **Comments**: Add comments to highlight the specific edge case being tested
+
+This approach ensures each calendar instance gets its exact configuration and avoids any issues with Storybook's arg passing in docs mode.
+
 ### Storybook Commands
 ```bash
 # Start Storybook development server

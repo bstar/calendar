@@ -1,13 +1,12 @@
-import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
-import * as EdgeCasesStories from './EdgeCases.stories';
+import { Meta } from '@storybook/addon-docs/blocks';
 
-<Meta of={EdgeCasesStories} />
+<Meta title="Edge Cases/Configuration Stress Tests/Documentation" />
 
-# Configuration Stress Tests
+# Configuration Stress Tests Documentation
 
-This section tests how the CLA Calendar component handles edge cases, invalid configurations, and problematic inputs. These tests help ensure the component degrades gracefully and provides meaningful feedback when given unexpected data.
+This documentation describes how the CLA Calendar component should handle edge cases, invalid configurations, and problematic inputs. These tests help ensure the component degrades gracefully and provides meaningful feedback when given unexpected data.
 
-Each example below shows the exact configuration being tested, allowing you to see how the calendar responds to various problematic scenarios.
+> **Note**: To see these edge cases in action with actual calendar instances, visit the "Direct Rendering" page under this section.
 
 ## Invalid Numeric Values
 
@@ -18,30 +17,44 @@ Tests the calendar with `visibleMonths: -5`. The component should validate and c
 
 **Configuration:**
 ```javascript
-visibleMonths: -5
+{
+  visibleMonths: -5  // Negative value should be clamped to minimum (1)
+}
 ```
 
-<Canvas>
-  <Story of={EdgeCasesStories.NegativeVisibleMonths} />
-</Canvas>
+**Expected Behavior:**
+- Calendar should display at least 1 month
+- No errors or crashes
+- Console may show a warning about invalid value
 
 ### Excessive Visible Months
 Tests the calendar with `visibleMonths: 100`. The component should cap this at a reasonable maximum (typically 12 months).
 
 **Configuration:**
 ```javascript
-visibleMonths: 100
+{
+  visibleMonths: 100  // Should be clamped to maximum (12)
+}
 ```
 
-<Canvas>
-  <Story of={EdgeCasesStories.ExcessiveVisibleMonths} />
-</Canvas>
+**Expected Behavior:**
+- Calendar displays maximum allowed months (12)
+- Performance remains acceptable
+- Layout doesn't break
 
 ### Zero Visible Months
 Tests the calendar with `visibleMonths: 0`. The component should default to showing at least 1 month.
-<Canvas>
-  <Story of={EdgeCasesStories.ZeroVisibleMonths} />
-</Canvas>
+
+**Configuration:**
+```javascript
+{
+  visibleMonths: 0  // Should default to minimum (1)
+}
+```
+
+**Expected Behavior:**
+- Calendar displays 1 month minimum
+- No empty or broken UI
 
 ## Date Handling Edge Cases
 
@@ -52,21 +65,37 @@ Tests with an invalid date range where the end date (2025-01-01) comes before th
 
 **Configuration:**
 ```javascript
-defaultRange: {
-  start: '2025-12-31',
-  end: '2025-01-01'
+{
+  defaultRange: {
+    start: '2025-12-31',
+    end: '2025-01-01'  // End before start
+  }
 }
 ```
 
-<Canvas>
-  <Story of={EdgeCasesStories.InvalidDateRange} />
-</Canvas>
+**Expected Behavior:**
+- Dates may be swapped automatically
+- Or selection is cleared/ignored
+- No visual glitches in date highlighting
 
 ### Malformed Date Strings
-Tests with completely invalid date strings: `start: 'not-a-date'` and `end: '2025-13-45'`. The component should ignore these invalid dates and show no selection.
-<Canvas>
-  <Story of={EdgeCasesStories.MalformedDates} />
-</Canvas>
+Tests with completely invalid date strings. The component should ignore these invalid dates and show no selection.
+
+**Configuration:**
+```javascript
+{
+  defaultRange: {
+    start: 'not-a-date',    // Invalid format
+    end: '2025-13-45'       // Invalid date (month 13, day 45)
+  }
+}
+```
+
+**Expected Behavior:**
+- Invalid dates are ignored
+- Calendar shows no selection
+- No JavaScript errors thrown
+- Possibly logs warnings to console
 
 ## Restriction Conflicts
 
@@ -77,10 +106,32 @@ Tests a scenario where:
 - A boundary restriction allows only June 2025 (minDate: '2025-06-01', maxDate: '2025-06-30')
 - A daterange restriction blocks the entire month of June 2025
 
-The more restrictive rule should take precedence, making the entire month unselectable.
-<Canvas>
-  <Story of={EdgeCasesStories.ConflictingRestrictions} />
-</Canvas>
+**Configuration:**
+```javascript
+{
+  restrictionConfigFactory: () => ({
+    restrictions: [
+      {
+        type: 'boundary',
+        enabled: true,
+        minDate: '2025-06-01',
+        maxDate: '2025-06-30'
+      },
+      {
+        type: 'daterange',
+        enabled: true,
+        startDate: '2025-06-01',
+        endDate: '2025-06-30'
+      }
+    ]
+  })
+}
+```
+
+**Expected Behavior:**
+- More restrictive rule takes precedence
+- Entire June 2025 becomes unselectable
+- No conflicting visual states
 
 ## Layout Edge Cases
 
@@ -88,94 +139,195 @@ Testing extreme or invalid layout configurations.
 
 ### Negative Month Width
 Tests the calendar with `monthWidth: -500`. The component should use a default positive width instead.
-<Canvas>
-  <Story of={EdgeCasesStories.NegativeMonthWidth} />
-</Canvas>
+
+**Configuration:**
+```javascript
+{
+  monthWidth: -500  // Negative width
+}
+```
+
+**Expected Behavior:**
+- Falls back to default width (500px)
+- Layout remains functional
+- No rendering errors
 
 ### Extremely Small Month Width
 Tests the calendar with `monthWidth: 10` pixels. The component should either enforce a minimum width or handle the overflow gracefully.
-<Canvas>
-  <Story of={EdgeCasesStories.ExtremelySmallMonthWidth} />
-</Canvas>
+
+**Configuration:**
+```javascript
+{
+  monthWidth: 10  // Extremely small
+}
+```
+
+**Expected Behavior:**
+- Content may overflow or be clipped
+- Calendar remains interactive
+- Possible minimum width enforcement
 
 ## Invalid Configuration Values
 
 Testing how the component handles invalid strings, colors, and other configuration values.
 
 ### Invalid Timezone
-Tests the calendar with `timezone: 'Not/A/Real/Timezone'`. The component should fall back to UTC or the system timezone.
-<Canvas>
-  <Story of={EdgeCasesStories.InvalidTimezone} />
-</Canvas>
+Tests the calendar with an invalid timezone string.
+
+**Configuration:**
+```javascript
+{
+  timezone: 'Not/A/Real/Timezone'
+}
+```
+
+**Expected Behavior:**
+- Falls back to UTC or system timezone
+- Date calculations remain consistent
+- Warning in console
 
 ### Invalid Color Values
-Tests the calendar with invalid color values:
-- `primary: 'not-a-color'`
-- `success: '#GGGGGG'` (invalid hex)
-- `warning: 'rgb(999, 999, 999)'` (out of range)
-- `danger: '12345'`
+Tests the calendar with various invalid color formats.
 
-The component should fall back to default colors when invalid values are provided.
-<Canvas>
-  <Story of={EdgeCasesStories.InvalidColorValues} />
-</Canvas>
+**Configuration:**
+```javascript
+{
+  colors: {
+    primary: 'not-a-color',
+    success: '#GGGGGG',      // Invalid hex
+    warning: 'rgb(999, 999, 999)',  // Out of range
+    danger: '12345'
+  }
+}
+```
+
+**Expected Behavior:**
+- Falls back to default colors
+- No CSS errors
+- Visual styling remains intact
 
 ## Layer Configuration Issues
 
 Testing problematic layer configurations.
 
 ### Empty Layers with Navigation
-Tests with `layers: []` and `showLayersNavigation: true`. The navigation UI should either be hidden or show an empty state.
-<Canvas>
-  <Story of={EdgeCasesStories.EmptyLayersWithNavigation} />
-</Canvas>
+Tests with empty layers array but navigation enabled.
+
+**Configuration:**
+```javascript
+{
+  layers: [],
+  showLayersNavigation: true
+}
+```
+
+**Expected Behavior:**
+- Navigation UI hidden or shows empty state
+- No JavaScript errors
+- Calendar remains functional
 
 ### Duplicate Layer Names
-Tests with two layers both named 'duplicate'. The component should handle this gracefully, possibly by using array indices or warning about duplicates.
-<Canvas>
-  <Story of={EdgeCasesStories.DuplicateLayerNames} />
-</Canvas>
+Tests with multiple layers having the same name identifier.
+
+**Configuration:**
+```javascript
+{
+  layers: [
+    {
+      name: 'duplicate',
+      title: 'First Layer',
+      description: 'This is the first layer',
+      visible: true,
+      enabled: true
+    },
+    {
+      name: 'duplicate',
+      title: 'Second Layer',
+      description: 'This has the same name as the first',
+      visible: true,
+      enabled: true
+    }
+  ],
+  showLayersNavigation: true
+}
+```
+
+**Expected Behavior:**
+- May use array indices as fallback
+- Or only first/last layer is recognized
+- Warning in console about duplicates
 
 ## Error Handling
 
 Testing how the component handles functions that throw errors.
 
 ### Throwing Date Formatter
-Tests with a `dateFormatter` function that throws an error. The component should catch the error and fall back to default date formatting.
-<Canvas>
-  <Story of={EdgeCasesStories.CircularDateFormatter} />
-</Canvas>
+Tests with a date formatter function that throws an error.
+
+**Configuration:**
+```javascript
+{
+  dateFormatter: (date) => {
+    throw new Error('Date formatter error!');
+  }
+}
+```
+
+**Expected Behavior:**
+- Error is caught and handled
+- Falls back to default date formatting
+- Error logged to console
+- Calendar remains functional
 
 ## Null and Undefined Handling
 
 Testing how the component handles null and undefined values.
 
 ### Null and Undefined Values
-Tests with:
-- `defaultRange: null`
-- `dateFormatter: undefined`
-- `colors: null`
+Tests with various null and undefined configurations.
 
-The component should use default values when null or undefined is provided.
-<Canvas>
-  <Story of={EdgeCasesStories.NullAndUndefinedValues} />
-</Canvas>
+**Configuration:**
+```javascript
+{
+  defaultRange: null,
+  dateFormatter: undefined,
+  colors: null
+}
+```
+
+**Expected Behavior:**
+- Uses default values for null/undefined
+- No type errors
+- Component initializes normally
 
 ## Extreme Values
 
 Testing extreme but technically valid values.
 
 ### Extreme Font Sizes
-Tests two extreme font size scenarios:
-1. **Tiny Font**: `baseFontSize: '0.1rem'` - Text becomes nearly invisible
-2. **Huge Font**: `baseFontSize: '5rem'` - Text becomes comically large
+Tests with both extremely small and large font sizes.
 
-Both calendars are shown to demonstrate how the component scales with extreme font sizes.
-<Canvas>
-  <Story of={EdgeCasesStories.ExtremeFontSize} />
-</Canvas>
+**Tiny Font Configuration:**
+```javascript
+{
+  baseFontSize: '0.1rem'  // Nearly invisible
+}
+```
 
-## Expected Behaviors
+**Huge Font Configuration:**
+```javascript
+{
+  baseFontSize: '5rem'  // Comically large
+}
+```
+
+**Expected Behavior:**
+- Layout scales with font size
+- Calendar remains somewhat usable
+- No overflow breaking the container
+- All text remains within boundaries
+
+## Summary of Expected Behaviors
 
 When encountering these edge cases, the calendar should:
 
@@ -190,3 +342,19 @@ When encountering these edge cases, the calendar should:
 ## Developer Notes
 
 These edge cases help identify areas where additional validation or error handling might be needed. If any of these cases cause the component to crash or become completely unusable, it indicates a need for better defensive programming.
+
+### Testing These Cases
+
+To see these edge cases in action:
+1. Visit the "Direct Rendering" page under Configuration Stress Tests
+2. Each test case shows the exact configuration and resulting calendar behavior
+3. Check the browser console for warnings or errors
+4. Verify that the calendar degrades gracefully
+
+### Adding New Edge Cases
+
+When adding new edge cases:
+1. Document the configuration clearly
+2. Describe the expected behavior
+3. Add the test to the Direct Rendering page
+4. Update this documentation

@@ -5,7 +5,7 @@ import { calendarArgTypes, defaultArgs } from './shared/storyControls';
 import { CalendarStoryWrapper } from './shared/CalendarStoryWrapper';
 
 const meta = {
-  title: 'Getting Started',
+  title: 'Getting Started/Stories',
   component: CLACalendar,
   argTypes: calendarArgTypes,
   args: defaultArgs,

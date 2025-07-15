@@ -4,7 +4,7 @@ import { calendarArgTypes } from './shared/storyControls';
 import { CalendarStoryWrapper } from './shared/CalendarStoryWrapper';
 
 const meta: Meta<typeof CLACalendar> = {
-  title: 'Edge Cases/Configuration Stress Tests',
+  title: 'Edge Cases/Configuration Stress Tests/Stories',
   component: CLACalendar,
   argTypes: calendarArgTypes,
   parameters: {
