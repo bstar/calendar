@@ -142,7 +142,7 @@ export const DateInput: React.FC<DateInputProps> = ({
   // Update input value when value changes
   useEffect(() => {
     if (!isEditing && value) {
-      const formattedValue = format(value, "MMM dd, yyyy");
+      const formattedValue = format(value, "MMM dd, yyyy", 'UTC');
       setInputValue(formattedValue);
       previousInputRef.current = formattedValue;
     } else if (!isEditing && !value && !defaultValue) {
@@ -338,8 +338,8 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
         title={`Current timezone: ${formatTimezone(timezone)}`}
       >
         {visibleMonths === 1
-          ? format(months[0], "MMMM yyyy")
-          : `${format(months[0], "MMMM yyyy")} - ${format(months[months.length - 1], "MMMM yyyy")}`
+          ? format(months[0], "MMMM yyyy", 'UTC')
+          : `${format(months[0], "MMMM yyyy", 'UTC')} - ${format(months[months.length - 1], "MMMM yyyy", 'UTC')}`
         }
       </span>
       <button
@@ -396,7 +396,7 @@ export const DateInputSection: React.FC<DateInputSectionProps> = ({
         placeholder={selectionMode === 'single' ? "Select date" : "Start date"}
         context={dateInputContext}
         selectedRange={selectedRange}
-        defaultValue={defaultRange?.start ? format(new Date(defaultRange.start), "MMM dd, yyyy") : undefined}
+        defaultValue={defaultRange?.start ? format(new Date(defaultRange.start), "MMM dd, yyyy", 'UTC') : undefined}
         settings={settings}
       />
     </div>
@@ -409,7 +409,7 @@ export const DateInputSection: React.FC<DateInputSectionProps> = ({
           placeholder="End date"
           context={dateInputContext}
           selectedRange={selectedRange}
-          defaultValue={defaultRange?.end ? format(new Date(defaultRange.end), "MMM dd, yyyy") : undefined}
+          defaultValue={defaultRange?.end ? format(new Date(defaultRange.end), "MMM dd, yyyy", 'UTC') : undefined}
           settings={settings}
         />
       </div>
@@ -780,7 +780,7 @@ const _MonthPair: React.FC<MonthPairProps> = ({
         >
           {showMonthHeadings && (
             <div className="month-pair-heading">
-              {format(month, 'MMMM yyyy')}
+              {format(month, 'MMMM yyyy', 'UTC')}
             </div>
           )}
           <div className="month-pair-grid">

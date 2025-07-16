@@ -18,7 +18,7 @@ describe('Custom Calendar Hooks', () => {
       const { result } = renderHook(() => useMonthNavigation());
       
       expect(result.current.currentMonth.getFullYear()).toBe(2025);
-      expect(result.current.currentMonth.getMonth()).toBe(5); // June (0-indexed)
+      expect(result.current.currentMonth.getUTCMonth()).toBe(5); // June (0-indexed)
       expect(result.current.isAnimating).toBe(false);
     });
 
@@ -27,8 +27,8 @@ describe('Custom Calendar Hooks', () => {
       const { result } = renderHook(() => useMonthNavigation(initialMonth));
       
       expect(result.current.currentMonth.getFullYear()).toBe(2025);
-      expect(result.current.currentMonth.getMonth()).toBe(2); // March (0-indexed)
-      expect(result.current.currentMonth.getDate()).toBe(1); // startOfMonth
+      expect(result.current.currentMonth.getUTCMonth()).toBe(2); // March (0-indexed)
+      expect(result.current.currentMonth.getUTCDate()).toBe(1); // startOfMonth
     });
 
     it('should provide three months (prev, current, next)', () => {
@@ -38,9 +38,9 @@ describe('Custom Calendar Hooks', () => {
       
       // Check order: previous, current, next
       const [prev, current, next] = result.current.months;
-      expect(prev.getMonth()).toBe(4); // May
-      expect(current.getMonth()).toBe(5); // June
-      expect(next.getMonth()).toBe(6); // July
+      expect(prev.getUTCMonth()).toBe(4); // May
+      expect(current.getUTCMonth()).toBe(5); // June
+      expect(next.getUTCMonth()).toBe(6); // July
     });
 
     it('should move to next month correctly with container', () => {
@@ -58,7 +58,7 @@ describe('Custom Calendar Hooks', () => {
         result.current.moveToMonth('next');
       });
       
-      expect(result.current.currentMonth.getMonth()).toBe(6); // July
+      expect(result.current.currentMonth.getUTCMonth()).toBe(6); // July
       expect(result.current.isAnimating).toBe(true);
     });
 
@@ -91,7 +91,7 @@ describe('Custom Calendar Hooks', () => {
       });
       
       expect(result.current.currentMonth.getFullYear()).toBe(2024);
-      expect(result.current.currentMonth.getMonth()).toBe(11); // December
+      expect(result.current.currentMonth.getUTCMonth()).toBe(11); // December
     });
 
     it('should handle cooldown period to prevent rapid month changes', () => {

@@ -32,25 +32,26 @@ export const DayCell: React.FC<DayCellProps> = ({
       return { isSelected: false, isInRange: false, isRangeStart: false, isRangeEnd: false };
     }
 
-    const startDate = parseISO(selectedRange.start);
-    const endDate = selectedRange.end ? parseISO(selectedRange.end) : null;
+    const startDate = parseISO(selectedRange.start, settings?.timezone);
+    const endDate = selectedRange.end ? parseISO(selectedRange.end, settings?.timezone) : null;
 
     // Always use chronological ordering for visual styling
     const [chronologicalStart, chronologicalEnd] = endDate && startDate > endDate
       ? [endDate, startDate]
       : [startDate, endDate];
 
+    const timezone = settings?.timezone || 'UTC';
     return {
-      isSelected: isSameDay(date, startDate) || (endDate && isSameDay(date, endDate)),
+      isSelected: isSameDay(date, startDate, timezone) || (endDate && isSameDay(date, endDate, timezone)),
       isInRange: chronologicalEnd
         ? (date >= chronologicalStart && date <= chronologicalEnd)
         : false,
       // Use chronological ordering for range start/end determination
-      isRangeStart: isSameDay(date, chronologicalStart),
+      isRangeStart: isSameDay(date, chronologicalStart, timezone),
       // For single day selection in range mode, treat it as both start and end for circular appearance
-      isRangeEnd: chronologicalEnd ? isSameDay(date, chronologicalEnd) : isSameDay(date, chronologicalStart)
+      isRangeEnd: chronologicalEnd ? isSameDay(date, chronologicalEnd, timezone) : isSameDay(date, chronologicalStart, timezone)
     };
-  }, [date, selectedRange]);
+  }, [date, selectedRange, settings?.timezone]);
 
   const [isHovered, setIsHovered] = useState(false);
 
@@ -77,8 +78,8 @@ export const DayCell: React.FC<DayCellProps> = ({
     // From here, we're dealing with a selection in progress
     // Get the anchor date - the fixed point of the selection
     const anchorDate = selectedRange.anchorDate
-      ? parseISO(selectedRange.anchorDate)
-      : parseISO(selectedRange.start);
+      ? parseISO(selectedRange.anchorDate, settings?.timezone)
+      : parseISO(selectedRange.start, settings?.timezone);
 
     // Check if the anchor is in a boundary - this is the key to determine if we need
     // to apply boundary restrictions
@@ -112,8 +113,12 @@ export const DayCell: React.FC<DayCellProps> = ({
   const isSingleDay = useMemo(() => {
     if (!selectedRange.start) return false;
     if (!selectedRange.end) return true;
-    return isSameDay(parseISO(selectedRange.start), parseISO(selectedRange.end));
-  }, [selectedRange.start, selectedRange.end]);
+    return isSameDay(
+      parseISO(selectedRange.start, settings?.timezone), 
+      parseISO(selectedRange.end, settings?.timezone),
+      settings?.timezone
+    );
+  }, [selectedRange.start, selectedRange.end, settings?.timezone]);
 
   // Always render the DayCell component, but return a placeholder for non-current month days
   const cellPlaceholder = !isCurrentMonth ? (
@@ -179,7 +184,7 @@ export const DayCell: React.FC<DayCellProps> = ({
         <span className="day-cell-date-text" style={{
           fontSize: getFontSize(settings, 'small'),
         }}>
-          {format(date, "d")}
+          {format(date, "d", settings?.timezone || 'UTC')}
         </span>
       </div>
       {eventContent?.element && (

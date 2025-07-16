@@ -3,11 +3,9 @@ import {
   addMonths, 
   startOfMonth,
   format,
-  parseISO
-} from 'date-fns';
-
-// Simple now function to replace the missing import
-const now = () => new Date();
+  parseISO,
+  now
+} from '../../utils/DateUtils';
 
 export const useMonthNavigation = (initialMonth = now()) => {
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(initialMonth));
@@ -121,9 +119,9 @@ export const useRangeSelection = () => {
   const getDisplayText = useCallback(() => {
     if (!selectedRange.start && !selectedRange.end) return 'Select date range';
     if (selectedRange.start && !selectedRange.end) {
-      return format(parseISO(selectedRange.start), 'MMM dd, yyyy');
+      return format(parseISO(selectedRange.start), 'MMM dd, yyyy', 'UTC');
     }
-    return `${format(parseISO(selectedRange.start || ''), 'MMM dd, yyyy')} to ${format(parseISO(selectedRange.end || ''), 'MMM dd, yyyy')}`;
+    return `${format(parseISO(selectedRange.start || ''), 'MMM dd, yyyy', 'UTC')} to ${format(parseISO(selectedRange.end || ''), 'MMM dd, yyyy', 'UTC')}`;
   }, [selectedRange]);
 
   return {

@@ -39,12 +39,20 @@ The project is actively migrating to TypeScript. Current state:
 - Utils fully migrated: `src/utils/DateUtils.ts`
 
 ### UTC Date Handling System
-**CRITICAL**: This project enforces UTC timezone for all date operations through a custom utility layer (`src/utils/DateUtils.ts`). This addresses timezone inconsistencies, DST transitions, and calendar display issues.
+**CRITICAL**: This project defaults to UTC timezone for all date operations through a custom utility layer (`src/utils/DateUtils.ts`). This addresses timezone inconsistencies, DST transitions, and calendar display issues.
 
-Key functions to use instead of date-fns directly:
-- `eachDayOfInterval` - Generates date ranges without timezone issues
-- `format`, `parseISO` - UTC-aware date formatting and parsing
-- `addDaysUTC`, `now` - UTC date manipulation
+The calendar supports configurable timezone through `settings.timezone` (default: 'UTC'). All timezone-aware functions now accept an optional timezone parameter that defaults to UTC.
+
+Key timezone-aware functions:
+- `parseISO(dateString, timezone = 'UTC')` - Parses dates in specified timezone
+- `isSameDay(date1, date2, timezone = 'UTC')` - Compares dates in specified timezone
+- `isSameMonth(date1, date2, timezone = 'UTC')` - Compares months in specified timezone
+- `startOfMonth(date, timezone = 'UTC')` - Gets month start in specified timezone
+- `endOfMonth(date, timezone = 'UTC')` - Gets month end in specified timezone
+- `startOfWeek(date, { weekStartsOn, timezone })` - Gets week start with timezone
+- `endOfWeek(date, { weekStartsOn, timezone })` - Gets week end with timezone
+
+When `timezone === 'UTC'`, these functions use UTC-specific implementations. For other values, they use date-fns functions which respect local timezone.
 
 ### Component Architecture
 
@@ -568,6 +576,69 @@ The codebase is transitioning from:
 - Inline handlers → Separated handler modules
 
 When making changes, prefer working in the new TypeScript components under `DateRangePickerNew/` rather than modifying the legacy JavaScript files.
+
+## Recent Updates and Known Issues
+
+### Single Day Selection in Range Mode (Fixed)
+When in range selection mode, selecting a single day now appears as a perfect circle (like single selection mode) until a second date is selected. This was fixed by ensuring that a single selected date receives both `range-start` and `range-end` CSS classes, triggering the circular border-radius styling.
+
+**Implementation**: In `DayCell.tsx`, the `isRangeEnd` logic was updated:
+```typescript
+isRangeEnd: chronologicalEnd ? isSameDayUTC(date, chronologicalEnd) : isSameDayUTC(date, chronologicalStart)
+```
+
+### Timezone-Aware Date Handling Implementation
+The calendar now supports both UTC and other timezone configurations through `settings.timezone`:
+
+- **Default Behavior**: All date operations default to UTC for consistency
+- **Implementation**: Timezone-aware wrapper functions that accept a timezone parameter
+- **Backward Compatibility**: Existing code continues to work with UTC default
+
+**Key Implementation Details**:
+1. All date parsing and comparison functions accept an optional timezone parameter
+2. When `timezone === 'UTC'`, dedicated UTC implementations are used
+3. Components pass `settings.timezone` to all date functions
+4. Grid generation and date comparisons now use consistent timezone
+
+This ensures dates are handled consistently throughout the calendar, preventing timezone-related bugs while allowing flexibility for applications that need local timezone support.
+
+### Weekday Restriction Configuration
+The `weekday` restriction type uses a `days` property (not `weekdays`):
+```javascript
+{
+  type: 'weekday',
+  enabled: true,
+  days: [0, 6]  // 0 = Sunday, 6 = Saturday
+}
+```
+
+### Storybook v9 Documentation Challenges
+When creating edge case or complex configuration examples in Storybook v9:
+1. **Issue**: Story args may not properly pass to components in MDX docs view
+2. **Solution**: Use direct rendering in MDX without Canvas/Story components
+3. **Best Practice**: Hardcode all configuration values instead of spreading or using defaultArgs
+
+Example of direct rendering approach:
+```mdx
+<CalendarStoryWrapper 
+  args={{
+    displayMode: 'embedded',
+    visibleMonths: 2,
+    // ... all properties explicitly listed
+  }}
+  title="Example Title"
+  description="Example description"
+/>
+```
+
+### Background Colors Configuration
+The calendar supports custom background colors through `settings.backgroundColors`:
+```typescript
+backgroundColors: {
+  selection: '#b1e4e5',  // Selected date background
+  // ... other background colors
+}
+```
 
 ## Testing
 

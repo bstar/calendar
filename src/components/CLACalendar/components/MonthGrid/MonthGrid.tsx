@@ -33,10 +33,11 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
   activeLayer,
   settings
 }) => {
-  const monthStart = startOfMonth(baseDate);
-  const monthEnd = endOfMonth(monthStart);
-  const weekStart = startOfWeek(monthStart, { weekStartsOn: startWeekOnSunday ? 0 : 1 });
-  const weekEnd = endOfWeek(monthEnd, { weekStartsOn: startWeekOnSunday ? 0 : 1 });
+  const timezone = settings?.timezone || 'UTC';
+  const monthStart = startOfMonth(baseDate, timezone);
+  const monthEnd = endOfMonth(monthStart, timezone);
+  const weekStart = startOfWeek(monthStart, { weekStartsOn: startWeekOnSunday ? 0 : 1, timezone });
+  const weekEnd = endOfWeek(monthEnd, { weekStartsOn: startWeekOnSunday ? 0 : 1, timezone });
 
   // Use our UTC-aware version for the critical date interval calculation
   // This ensures all days are correctly included regardless of timezone
@@ -148,7 +149,7 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
               key={date.toISOString()}
               date={date}
               selectedRange={selectedRange}
-              isCurrentMonth={isSameMonth(date, baseDate)}
+              isCurrentMonth={isSameMonth(date, baseDate, timezone)}
               onMouseDown={() => onSelectionStart(date)}
               onMouseEnter={() => {
                 onSelectionMove(date);

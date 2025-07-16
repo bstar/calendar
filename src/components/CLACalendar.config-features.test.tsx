@@ -443,7 +443,8 @@ describe('CLACalendar Configuration Features', () => {
     it('should use custom date formatter in popup mode', () => {
       const { mockOnSettingsChange, baseSettings } = createTestSetup();
       const customFormatter = (date: Date) => {
-        return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+        // Use UTC methods since the calendar defaults to UTC
+        return `${date.getUTCDate().toString().padStart(2, '0')}/${(date.getUTCMonth() + 1).toString().padStart(2, '0')}/${date.getUTCFullYear()}`;
       };
 
       const formatterSettings: CalendarSettings = {

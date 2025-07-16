@@ -164,7 +164,7 @@ const dateValidator = (() => {
         };
       }
     },
-    formatValue: (date) => !date ? '' : format(date, DATE_FORMAT),
+    formatValue: (date) => !date ? '' : format(date, DATE_FORMAT, 'UTC'),
     parseValue: (value) => {
       if (!value) return null;
       return /\d\./.test(value) ? parseDotNotation(value) : parse(value, DATE_FORMAT, new Date());
@@ -321,7 +321,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
           const date = parseISO(dateString);
           return settings.dateFormatter
             ? settings.dateFormatter(date)
-            : format(date, "MMM dd, yyyy");
+            : format(date, "MMM dd, yyyy", 'UTC');
         } catch (e) {
           return null;
         }
@@ -557,7 +557,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
             const date = parseISO(dateString);
             return settings.dateFormatter
               ? settings.dateFormatter(date)
-              : format(date, "MMM dd, yyyy");
+              : format(date, "MMM dd, yyyy", 'UTC');
           } catch (e) {
             return null;
           }

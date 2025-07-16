@@ -92,8 +92,13 @@ export class RestrictionManager {
         return restriction.message || 'Selection before boundary date is not allowed';
       }
     } else {
-      const boundaryEndOfDay = new Date(boundaryDate);
-      boundaryEndOfDay.setHours(23, 59, 59, 999);
+      // Create end of day in UTC to match parseISO's UTC behavior
+      const boundaryEndOfDay = new Date(Date.UTC(
+        boundaryDate.getUTCFullYear(),
+        boundaryDate.getUTCMonth(),
+        boundaryDate.getUTCDate(),
+        23, 59, 59, 999
+      ));
       if (start > boundaryEndOfDay) {
         return restriction.message || 'Selection after boundary date is not allowed';
       }
@@ -218,8 +223,8 @@ export class RestrictionManager {
    */
   private checkWeekdayRestriction(start: Date, end: Date, restriction: WeekdayRestriction): string | null {
     // Check if either start or end date falls on a restricted weekday
-    const startDay = start.getDay();
-    const endDay = end.getDay();
+    const startDay = start.getUTCDay();
+    const endDay = end.getUTCDay();
     
     if (restriction.days.includes(startDay) || restriction.days.includes(endDay)) {
       return restriction.message || 'Selection includes restricted weekdays';
@@ -229,10 +234,10 @@ export class RestrictionManager {
     if (start < end) {
       const current = new Date(start);
       while (current <= end) {
-        if (restriction.days.includes(current.getDay())) {
+        if (restriction.days.includes(current.getUTCDay())) {
           return restriction.message || 'Selection includes restricted weekdays';
         }
-        current.setDate(current.getDate() + 1);
+        current.setUTCDate(current.getUTCDate() + 1);
       }
     }
     

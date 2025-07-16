@@ -1,5 +1,6 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { RestrictionManager } from './RestrictionManager';
+import { parseISO } from '../../../utils/DateUtils';
 import type { 
   RestrictionConfig, 
   BoundaryRestriction, 
@@ -15,7 +16,7 @@ describe('RestrictionManager', () => {
   beforeEach(() => {
     // Mock current date for consistent testing
     vi.useFakeTimers();
-    vi.setSystemTime(new Date('2025-06-15T12:00:00Z'));
+    vi.setSystemTime(parseISO('2025-06-15T12:00:00Z'));
   });
 
   afterEach(() => {
@@ -27,7 +28,7 @@ describe('RestrictionManager', () => {
       const config: RestrictionConfig = { restrictions: [] };
       manager = new RestrictionManager(config);
       
-      const result = manager.checkSelection(new Date('2025-06-15'), new Date('2025-06-15'));
+      const result = manager.checkSelection(parseISO('2025-06-15'), parseISO('2025-06-15'));
       expect(result.allowed).toBe(true);
       expect(result.message).toBeUndefined();
     });
@@ -75,8 +76,8 @@ describe('RestrictionManager', () => {
 
 
     it('should allow dates within boundary', () => {
-      const start = new Date('2025-06-10');
-      const end = new Date('2025-06-20');
+      const start = parseISO('2025-06-10');
+      const end = parseISO('2025-06-20');
       const result = manager.checkSelection(start, end);
       
       expect(result.allowed).toBe(true);
@@ -84,31 +85,32 @@ describe('RestrictionManager', () => {
     });
 
     it('should reject dates before minimum boundary', () => {
-      const start = new Date('2025-05-31');
-      const end = new Date('2025-06-15');
+      const start = parseISO('2025-05-31');
+      const end = parseISO('2025-06-15');
       const result = manager.checkSelection(start, end);
       
       expect(result.allowed).toBe(false);
       expect(result.message).toBeTruthy();
     });
 
-    it('should allow dates after maximum boundary (implementation behavior)', () => {
-      const start = new Date('2025-07-01'); // Start date is after boundary
-      const end = new Date('2025-07-01');
+    it('should reject dates after maximum boundary', () => {
+      const start = parseISO('2025-07-01'); // Start date is after boundary
+      const end = parseISO('2025-07-01');
       const result = manager.checkSelection(start, end);
       
-      // Implementation allows this - boundary logic may need review
-      expect(result.allowed).toBe(true);
+      // Dates after June 30th should be rejected
+      expect(result.allowed).toBe(false);
+      expect(result.message).toBeTruthy();
     });
 
-    it('should reject dates exactly on boundary (implementation behavior)', () => {
-      // Start date on boundary should be allowed (before check: start >= boundary date)
-      const start = new Date('2025-06-01');
-      const end = new Date('2025-06-15');
+    it('should allow dates on minimum boundary', () => {
+      // June 1st is the minimum allowed date, so it should be allowed
+      const start = parseISO('2025-06-01');
+      const end = parseISO('2025-06-15');
       const result = manager.checkSelection(start, end);
       
-      // Implementation rejects this due to before restriction
-      expect(result.allowed).toBe(false);
+      // June 1st and after should be allowed
+      expect(result.allowed).toBe(true);
     });
 
     it('should work with only minimum date', () => {
@@ -125,8 +127,8 @@ describe('RestrictionManager', () => {
       };
       manager = new RestrictionManager(config);
 
-      const beforeMin = new Date('2025-06-14');
-      const afterMin = new Date('2025-06-16');
+      const beforeMin = parseISO('2025-06-14');
+      const afterMin = parseISO('2025-06-16');
       
       expect(manager.checkSelection(beforeMin, beforeMin).allowed).toBe(false);
       expect(manager.checkSelection(afterMin, afterMin).allowed).toBe(true);
@@ -146,11 +148,11 @@ describe('RestrictionManager', () => {
       };
       manager = new RestrictionManager(config);
 
-      const beforeMax = new Date('2025-06-14');
-      const afterMax = new Date('2025-06-16');
+      const beforeMax = parseISO('2025-06-14');
+      const afterMax = parseISO('2025-06-16');
       
       expect(manager.checkSelection(beforeMax, beforeMax).allowed).toBe(true);
-      expect(manager.checkSelection(afterMax, afterMax).allowed).toBe(true); // Implementation allows this
+      expect(manager.checkSelection(afterMax, afterMax).allowed).toBe(false); // After boundary should be rejected
     });
   });
 
@@ -180,7 +182,7 @@ describe('RestrictionManager', () => {
     });
 
     it('should reject dates within blocked ranges', () => {
-      const blockedDate = new Date('2025-06-12');
+      const blockedDate = parseISO('2025-06-12');
       const result = manager.checkSelection(blockedDate, blockedDate);
       
       expect(result.allowed).toBe(false);
@@ -188,15 +190,15 @@ describe('RestrictionManager', () => {
     });
 
     it('should allow dates outside blocked ranges', () => {
-      const allowedDate = new Date('2025-06-18');
+      const allowedDate = parseISO('2025-06-18');
       const result = manager.checkSelection(allowedDate, allowedDate);
       
       expect(result.allowed).toBe(true);
     });
 
     it('should reject ranges that overlap blocked periods', () => {
-      const start = new Date('2025-06-08');
-      const end = new Date('2025-06-12');
+      const start = parseISO('2025-06-08');
+      const end = parseISO('2025-06-12');
       const result = manager.checkSelection(start, end);
       
       expect(result.allowed).toBe(false);
@@ -204,16 +206,16 @@ describe('RestrictionManager', () => {
     });
 
     it('should reject ranges that span multiple blocked periods', () => {
-      const start = new Date('2025-06-12');
-      const end = new Date('2025-06-22');
+      const start = parseISO('2025-06-12');
+      const end = parseISO('2025-06-22');
       const result = manager.checkSelection(start, end);
       
       expect(result.allowed).toBe(false);
     });
 
     it('should allow ranges between blocked periods', () => {
-      const start = new Date('2025-06-16');
-      const end = new Date('2025-06-19');
+      const start = parseISO('2025-06-16');
+      const end = parseISO('2025-06-19');
       const result = manager.checkSelection(start, end);
       
       expect(result.allowed).toBe(true);
@@ -237,7 +239,7 @@ describe('RestrictionManager', () => {
       };
       manager = new RestrictionManager(config);
 
-      const blockedDate = new Date('2025-06-12');
+      const blockedDate = parseISO('2025-06-12');
       const result = manager.checkSelection(blockedDate, blockedDate);
       
       expect(result.allowed).toBe(true);
@@ -262,7 +264,7 @@ describe('RestrictionManager', () => {
     it('should reject restricted weekdays', () => {
       // June 15, 2025 is a Sunday (day 0)
       // The weekday restriction blocks days that ARE in the list
-      const sunday = new Date('2025-06-15');
+      const sunday = parseISO('2025-06-15');
       const result = manager.checkSelection(sunday, sunday);
       
       expect(result.allowed).toBe(false); // Implementation rejects days IN the list
@@ -271,7 +273,7 @@ describe('RestrictionManager', () => {
 
     it('should allow non-restricted weekdays', () => {
       // June 17, 2025 is a Monday (day 1)
-      const monday = new Date('2025-06-17');
+      const monday = parseISO('2025-06-17');
       const result = manager.checkSelection(monday, monday);
       
       expect(result.allowed).toBe(true);
@@ -279,8 +281,8 @@ describe('RestrictionManager', () => {
 
     it('should reject ranges that include restricted weekdays', () => {
       // Range from Friday to Monday (includes Saturday and Sunday)
-      const friday = new Date('2025-06-13');
-      const monday = new Date('2025-06-16');
+      const friday = parseISO('2025-06-13');
+      const monday = parseISO('2025-06-16');
       const result = manager.checkSelection(friday, monday);
       
       expect(result.allowed).toBe(false);
@@ -289,8 +291,8 @@ describe('RestrictionManager', () => {
 
     it('should allow ranges that avoid restricted weekdays', () => {
       // Range from Monday to Friday
-      const monday = new Date('2025-06-17');
-      const friday = new Date('2025-06-20');
+      const monday = parseISO('2025-06-17');
+      const friday = parseISO('2025-06-20');
       const result = manager.checkSelection(monday, friday);
       
       expect(result.allowed).toBe(true);
@@ -309,8 +311,8 @@ describe('RestrictionManager', () => {
       };
       manager = new RestrictionManager(config);
 
-      const monday = new Date('2025-06-17');    // Actually Monday
-      const tuesday = new Date('2025-06-18');   // Actually Tuesday
+      const monday = parseISO('2025-06-16');    // Monday in UTC
+      const tuesday = parseISO('2025-06-17');   // Tuesday in UTC
       
       expect(manager.checkSelection(monday, monday).allowed).toBe(false);
       expect(manager.checkSelection(tuesday, tuesday).allowed).toBe(true);
@@ -346,8 +348,8 @@ describe('RestrictionManager', () => {
     });
 
     it('should allow selections within boundary', () => {
-      const start = new Date('2025-06-12');
-      const end = new Date('2025-06-18');
+      const start = parseISO('2025-06-12');
+      const end = parseISO('2025-06-18');
       const result = manager.checkSelection(start, end);
       
       expect(result.allowed).toBe(true);
@@ -408,14 +410,14 @@ describe('RestrictionManager', () => {
     });
 
     it('should allow dates within allowed ranges', () => {
-      const allowedDate = new Date('2025-06-05');
+      const allowedDate = parseISO('2025-06-05');
       const result = manager.checkSelection(allowedDate, allowedDate);
       
       expect(result.allowed).toBe(true);
     });
 
     it('should reject dates outside allowed ranges', () => {
-      const rejectedDate = new Date('2025-06-15');
+      const rejectedDate = parseISO('2025-06-15');
       const result = manager.checkSelection(rejectedDate, rejectedDate);
       
       expect(result.allowed).toBe(false);
@@ -423,24 +425,24 @@ describe('RestrictionManager', () => {
     });
 
     it('should allow ranges entirely within allowed periods', () => {
-      const start = new Date('2025-06-02');
-      const end = new Date('2025-06-08');
+      const start = parseISO('2025-06-02');
+      const end = parseISO('2025-06-08');
       const result = manager.checkSelection(start, end);
       
       expect(result.allowed).toBe(true);
     });
 
     it('should reject ranges that span outside allowed periods', () => {
-      const start = new Date('2025-06-08');
-      const end = new Date('2025-06-15');
+      const start = parseISO('2025-06-08');
+      const end = parseISO('2025-06-15');
       const result = manager.checkSelection(start, end);
       
       expect(result.allowed).toBe(false);
     });
 
     it('should reject ranges that span multiple allowed periods', () => {
-      const start = new Date('2025-06-05');
-      const end = new Date('2025-06-25');
+      const start = parseISO('2025-06-05');
+      const end = parseISO('2025-06-25');
       const result = manager.checkSelection(start, end);
       
       expect(result.allowed).toBe(false);
@@ -488,22 +490,22 @@ describe('RestrictionManager', () => {
     });
 
     it('should apply all applicable restrictions', () => {
-      // Outside boundary - but due to timezone issue in setHours, this is allowed
-      const outsideBoundary = new Date('2025-07-01');
-      expect(manager.checkSelection(outsideBoundary, outsideBoundary).allowed).toBe(true);
+      // Outside boundary - should be rejected
+      const outsideBoundary = parseISO('2025-07-01');
+      expect(manager.checkSelection(outsideBoundary, outsideBoundary).allowed).toBe(false);
       
       // In blocked range
-      const blockedDate = new Date('2025-06-12');
+      const blockedDate = parseISO('2025-06-12');
       expect(manager.checkSelection(blockedDate, blockedDate).allowed).toBe(false);
       
       // On weekend
-      const weekend = new Date('2025-06-22'); // Sunday
+      const weekend = parseISO('2025-06-22'); // Sunday
       expect(manager.checkSelection(weekend, weekend).allowed).toBe(false);
     });
 
     it('should allow dates that pass all restrictions', () => {
       // Within boundary, not in blocked range, and on weekday
-      const validDate = new Date('2025-06-24'); // Tuesday
+      const validDate = parseISO('2025-06-24'); // Tuesday
       const result = manager.checkSelection(validDate, validDate);
       
       expect(result.allowed).toBe(true);
@@ -511,7 +513,7 @@ describe('RestrictionManager', () => {
 
     it('should return first applicable restriction message', () => {
       // Test order of restriction checking - use a date that's actually blocked
-      const blockedDate = new Date('2025-06-12'); // In blocked date range
+      const blockedDate = parseISO('2025-06-12'); // In blocked date range
       const result = manager.checkSelection(blockedDate, blockedDate);
       
       expect(result.allowed).toBe(false);
@@ -526,8 +528,8 @@ describe('RestrictionManager', () => {
     });
 
     it('should handle invalid dates gracefully', () => {
-      const invalidDate = new Date('invalid');
-      const validDate = new Date('2025-06-15');
+      const invalidDate = parseISO('invalid');
+      const validDate = parseISO('2025-06-15');
       
       // Manager doesn't validate input dates, proceeds with checks
       const result = manager.checkSelection(invalidDate, validDate);
@@ -537,7 +539,7 @@ describe('RestrictionManager', () => {
     it('should handle null/undefined dates', () => {
       // Manager doesn't validate input but doesn't throw either
       expect(() => {
-        manager.checkSelection(null as any, new Date('2025-06-15'));
+        manager.checkSelection(null as any, parseISO('2025-06-15'));
       }).not.toThrow();
     });
 
@@ -559,7 +561,7 @@ describe('RestrictionManager', () => {
       }).not.toThrow();
       
       // Should not crash with invalid config
-      const result = manager.checkSelection(new Date('2025-06-15'), new Date('2025-06-15'));
+      const result = manager.checkSelection(parseISO('2025-06-15'), parseISO('2025-06-15'));
       expect(result.allowed).toBe(true);
     });
 
@@ -575,7 +577,7 @@ describe('RestrictionManager', () => {
       };
       manager = new RestrictionManager(config);
 
-      const result = manager.checkSelection(new Date('2025-06-15'), new Date('2025-06-15'));
+      const result = manager.checkSelection(parseISO('2025-06-15'), parseISO('2025-06-15'));
       expect(result.allowed).toBe(true);
     });
   });
@@ -587,15 +589,15 @@ describe('RestrictionManager', () => {
     });
 
     it('should handle same start and end dates', () => {
-      const date = new Date('2025-06-15');
+      const date = parseISO('2025-06-15');
       const result = manager.checkSelection(date, date);
       
       expect(result.allowed).toBe(true);
     });
 
     it('should handle reversed date order', () => {
-      const laterDate = new Date('2025-06-20');
-      const earlierDate = new Date('2025-06-10');
+      const laterDate = parseISO('2025-06-20');
+      const earlierDate = parseISO('2025-06-10');
       
       // Manager should handle date order internally
       const result = manager.checkSelection(laterDate, earlierDate);
@@ -623,12 +625,13 @@ describe('RestrictionManager', () => {
       };
       manager = new RestrictionManager(config);
 
-      const start = new Date('2025-12-31');
-      const end = new Date('2026-01-01');
+      const start = parseISO('2025-12-31');
+      const end = parseISO('2026-01-01');
       const result = manager.checkSelection(start, end);
       
-      // Start date on boundary should fail 'before' check (start < boundaryDate)
-      expect(result.allowed).toBe(false);
+      // December 31st is the minimum allowed date, and Jan 1st is before the max (Jan 2nd)
+      // So this range should be allowed
+      expect(result.allowed).toBe(true);
     });
 
     it('should handle leap year dates', () => {
@@ -649,12 +652,12 @@ describe('RestrictionManager', () => {
       };
       manager = new RestrictionManager(config);
 
-      const leapDay = new Date('2024-02-29');
+      const leapDay = parseISO('2024-02-29');
       const result = manager.checkSelection(leapDay, leapDay);
       
-      // Known issue: date range restriction not working for this case
-      expect(result.allowed).toBe(true);
-      // expect(result.message).toBe('Leap day blocked');
+      // Leap day is in the blocked range, so it should be rejected
+      expect(result.allowed).toBe(false);
+      expect(result.message).toBe('Leap day blocked');
     });
 
     it('should handle timezone edge cases', () => {
@@ -679,8 +682,8 @@ describe('RestrictionManager', () => {
       manager = new RestrictionManager(config);
 
       // Test different times on the same day
-      const startOfDay = new Date('2025-06-15T00:00:00Z');
-      const endOfDay = new Date('2025-06-15T23:59:59Z');
+      const startOfDay = parseISO('2025-06-15T00:00:00Z');
+      const endOfDay = parseISO('2025-06-15T23:59:59Z');
       
       // Both restrictions target same date: before June 15th AND after June 15th
       // Implementation correctly blocks due to before restriction
@@ -712,7 +715,7 @@ describe('RestrictionManager', () => {
       const startTime = performance.now();
       
       manager = new RestrictionManager(config);
-      const result = manager.checkSelection(new Date('2025-06-15'), new Date('2025-06-15'));
+      const result = manager.checkSelection(parseISO('2025-06-15'), parseISO('2025-06-15'));
       
       const endTime = performance.now();
       

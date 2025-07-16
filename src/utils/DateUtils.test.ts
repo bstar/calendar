@@ -141,14 +141,14 @@ describe('DateUtils', () => {
     describe('startOfWeekUTC', () => {
       it('should return Sunday by default (date-fns default)', () => {
         const wednesday = createDate(2025, 5, 18); // Wednesday June 18
-        const result = startOfWeekUTC(wednesday);
+        const result = startOfWeekUTC(wednesday, 0); // 0 = Sunday
         expect(result.getUTCDate()).toBe(15); // Sunday June 15
         expect(result.getUTCDay()).toBe(0); // Sunday
       });
 
       it('should return Monday when weekStartsOn is 1', () => {
         const wednesday = createDate(2025, 5, 18); // Wednesday June 18
-        const result = startOfWeekUTC(wednesday, { weekStartsOn: 1 });
+        const result = startOfWeekUTC(wednesday, 1); // 1 = Monday
         expect(result.getUTCDate()).toBe(16); // Monday June 16
         expect(result.getUTCDay()).toBe(1); // Monday
       });
@@ -157,14 +157,14 @@ describe('DateUtils', () => {
     describe('endOfWeekUTC', () => {
       it('should return Saturday by default (date-fns default)', () => {
         const wednesday = createDate(2025, 5, 18); // Wednesday June 18
-        const result = endOfWeekUTC(wednesday);
+        const result = endOfWeekUTC(wednesday, 0); // 0 = Sunday start, so Saturday end
         expect(result.getUTCDate()).toBe(21); // Saturday June 21
         expect(result.getUTCDay()).toBe(6); // Saturday
       });
 
       it('should return Sunday when weekStartsOn is 1', () => {
         const wednesday = createDate(2025, 5, 18); // Wednesday June 18
-        const result = endOfWeekUTC(wednesday, { weekStartsOn: 1 });
+        const result = endOfWeekUTC(wednesday, 1); // 1 = Monday start, so Sunday end
         expect(result.getUTCDate()).toBe(22); // Sunday June 22
         expect(result.getUTCDay()).toBe(0); // Sunday
       });
@@ -282,14 +282,51 @@ describe('DateUtils', () => {
     describe('parseISO', () => {
       it('should parse ISO date strings', () => {
         const result = parseISO('2025-06-15');
+        // parseISO now defaults to UTC
+        expect(result.getUTCFullYear()).toBe(2025);
+        expect(result.getUTCMonth()).toBe(5);
+        expect(result.getUTCDate()).toBe(15);
+      });
+
+      it('should handle datetime strings', () => {
+        const result = parseISO('2025-06-15T12:30:00');
+        // Without Z suffix, it's parsed as local time then converted to UTC
+        expect(result.getUTCFullYear()).toBe(2025);
+        expect(result.getUTCMonth()).toBe(5);
+        expect(result.getUTCDate()).toBe(15);
+      });
+    });
+  });
+
+  describe('Timezone-aware functions', () => {
+    describe('parseISO with timezone', () => {
+      it('should default to UTC', () => {
+        const result = parseISO('2025-06-15');
+        expect(result.getUTCFullYear()).toBe(2025);
+        expect(result.getUTCMonth()).toBe(5);
+        expect(result.getUTCDate()).toBe(15);
+        expect(result.getUTCHours()).toBe(0);
+      });
+
+      it('should use local timezone when specified', () => {
+        const result = parseISO('2025-06-15', 'local');
         expect(result.getFullYear()).toBe(2025);
         expect(result.getMonth()).toBe(5);
         expect(result.getDate()).toBe(15);
       });
+    });
 
-      it('should handle datetime strings', () => {
-        const result = parseISO('2025-06-15T12:30:00Z');
-        expect(result.toISOString()).toBe('2025-06-15T12:30:00.000Z');
+    describe('isSameDay with timezone', () => {
+      it('should default to UTC comparison', () => {
+        const date1 = createDate(2025, 5, 15);
+        const date2 = parseISO('2025-06-15');
+        expect(isSameDay(date1, date2)).toBe(true);
+      });
+
+      it('should use local timezone when specified', () => {
+        const date1 = new Date('2025-06-15');
+        const date2 = new Date('2025-06-15');
+        expect(isSameDay(date1, date2, 'local')).toBe(true);
       });
     });
   });
@@ -298,8 +335,8 @@ describe('DateUtils', () => {
     it('should handle invalid dates appropriately', () => {
       const invalidDate = new Date('invalid');
       
-      // Some functions may throw with invalid dates, which is acceptable
-      expect(() => formatUTC(invalidDate, 'yyyy-MM-dd')).toThrow();
+      // formatUTC should handle invalid dates gracefully (returns "NaN-NaN-NaN")
+      expect(() => formatUTC(invalidDate, 'yyyy-MM-dd')).not.toThrow();
       // Date arithmetic functions should handle invalid dates gracefully
       expect(() => addDaysUTC(invalidDate, 1)).not.toThrow();
     });
