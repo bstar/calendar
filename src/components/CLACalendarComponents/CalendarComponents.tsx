@@ -596,28 +596,42 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, show, children }) => 
   useEffect(() => {
     // Update position handling function
     const updatePosition = () => {
-      if (!targetRef.current || !tooltipRef.current) return;
+      if (!targetRef.current || !tooltipRef.current || !show) return;
 
       try {
         const targetRect = targetRef.current.getBoundingClientRect();
         const tooltipRect = tooltipRef.current.getBoundingClientRect();
 
-      // Calculate initial position
-      // Position tooltip centered above the target element
-      let top = targetRect.top + window.scrollY - tooltipRect.height - 8;
-      let left = targetRect.left + window.scrollX + (targetRect.width - tooltipRect.width) / 2;
+        // Check if target is still visible in viewport
+        const isTargetVisible = 
+          targetRect.bottom > 0 &&
+          targetRect.top < window.innerHeight &&
+          targetRect.right > 0 &&
+          targetRect.left < window.innerWidth;
 
-      // Check if tooltip would go off-screen
-      if (left < 8) {
-        left = 8;
-      } else if (left + tooltipRect.width > window.innerWidth - 8) {
-        left = window.innerWidth - tooltipRect.width - 8;
-      }
+        // Hide tooltip if target is not visible
+        if (!isTargetVisible) {
+          setPosition({ top: -9999, left: -9999 });
+          return;
+        }
 
-      // If tooltip would go above the viewport, position it below the target
-      if (top < window.scrollY + 8) {
-        top = targetRect.bottom + window.scrollY + 8;
-      }
+        // Calculate initial position
+        // Since we're using a fixed position portal, we should use viewport coordinates
+        // Position tooltip centered above the target element
+        let top = targetRect.top - tooltipRect.height - 8;
+        let left = targetRect.left + (targetRect.width - tooltipRect.width) / 2;
+
+        // Check if tooltip would go off-screen
+        if (left < 8) {
+          left = 8;
+        } else if (left + tooltipRect.width > window.innerWidth - 8) {
+          left = window.innerWidth - tooltipRect.width - 8;
+        }
+
+        // If tooltip would go above the viewport, position it below the target
+        if (top < 8) {
+          top = targetRect.bottom + 8;
+        }
 
         // Update position
         setPosition({
@@ -630,8 +644,32 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, show, children }) => 
       }
     };
 
+    // Find all scrollable parents and attach listeners
+    const scrollableParents: Element[] = [];
+    const findScrollableParents = (element: Element | null) => {
+      if (!element || element === document.body) return;
+      
+      const style = window.getComputedStyle(element);
+      const isScrollable = 
+        style.overflow === 'auto' || 
+        style.overflow === 'scroll' ||
+        style.overflowY === 'auto' ||
+        style.overflowY === 'scroll' ||
+        style.overflowX === 'auto' ||
+        style.overflowX === 'scroll';
+      
+      if (isScrollable) {
+        scrollableParents.push(element);
+      }
+      
+      findScrollableParents(element.parentElement);
+    };
+
     // Need to wait for content to render before calculating position
-    if (show) {
+    if (show && targetRef.current) {
+      // Find all scrollable parents
+      findScrollableParents(targetRef.current);
+      
       // Initial positioning - delay to ensure content is rendered
       setTimeout(updatePosition, 0);
       
@@ -639,9 +677,19 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, show, children }) => 
       window.addEventListener('resize', updatePosition);
       window.addEventListener('scroll', updatePosition, true);
       
+      // Add scroll listeners to all scrollable parents
+      scrollableParents.forEach(parent => {
+        parent.addEventListener('scroll', updatePosition);
+      });
+      
       return () => {
         window.removeEventListener('resize', updatePosition);
         window.removeEventListener('scroll', updatePosition, true);
+        
+        // Remove scroll listeners from all scrollable parents
+        scrollableParents.forEach(parent => {
+          parent.removeEventListener('scroll', updatePosition);
+        });
       };
     }
   }, [show, content]);

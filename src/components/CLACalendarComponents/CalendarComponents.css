@@ -391,7 +391,7 @@
 
 /* Tooltip styles - use !important to ensure they can't be overridden */
 .tooltip {
-  position: absolute !important;
+  position: fixed !important;
   background: #333 !important;
   color: #fff !important;
   padding: 4px 8px !important;

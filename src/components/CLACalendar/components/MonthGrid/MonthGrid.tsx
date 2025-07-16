@@ -1,4 +1,4 @@
-import React, { useRef, useState, useMemo, useCallback } from 'react';
+import React, { useRef, useState, useMemo, useCallback, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import {
   startOfMonth,
@@ -87,6 +87,22 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
   const handleGridMouseLeave = () => {
     setHoveredDate(null);
   };
+
+  // Add scroll handler to hide tooltip on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      if (hoveredDate) {
+        setHoveredDate(null);
+      }
+    };
+
+    // Listen for scroll on window and capture phase for all parents
+    window.addEventListener('scroll', handleScroll, true);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll, true);
+    };
+  }, [hoveredDate]);
 
   // Only render tooltip when necessary
   const renderTooltip = useCallback((message: string, settings?: CalendarSettings) => {
