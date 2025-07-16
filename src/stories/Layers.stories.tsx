@@ -24,6 +24,7 @@ type Story = StoryObj<typeof meta>;
 export const BasicEventLayer: Story = {
   args: {
     ...defaultArgs,
+    showTooltips: true,
     showLayersNavigation: true,
     layers: [{
       name: 'meetings',
@@ -34,11 +35,14 @@ export const BasicEventLayer: Story = {
       color: '#0366d6',
       data: {
         events: [
-          { date: '2025-03-10', title: 'Sprint Planning', type: 'meeting', time: '10:00 AM', description: 'Plan next sprint tasks' },
-          { date: '2025-03-12', title: 'Design Review', type: 'meeting', time: '2:00 PM', description: 'Review new UI designs' },
-          { date: '2025-03-14', title: 'Retrospective', type: 'meeting', time: '3:00 PM', description: 'Sprint retrospective' },
-          { date: '2025-03-17', title: 'Daily Standup', type: 'meeting', time: '9:00 AM', description: 'Team sync' },
-          { date: '2025-03-19', title: 'Tech Talk', type: 'meeting', time: '4:00 PM', description: 'Frontend best practices' }
+          { date: '2025-07-21', title: 'Sprint Planning', type: 'meeting', time: '10:00 AM', description: 'Sprint 46 planning session. Review backlog items, estimate story points, and commit to sprint goals. Product owner will prioritize features. Dev team to provide capacity estimates.' },
+          { date: '2025-07-23', title: 'Design Review', type: 'meeting', time: '2:00 PM', description: 'UI/UX design review for dashboard v2. Design team presenting 3 concepts based on user research. Discussing accessibility compliance and mobile responsiveness. Feedback needed by EOD.' },
+          { date: '2025-07-25', title: 'Retrospective', type: 'meeting', time: '3:00 PM', description: 'Sprint 45 retrospective. Celebrating wins, discussing challenges, and identifying process improvements. Anonymous feedback collected. Action items will be tracked in Jira.' },
+          { date: '2025-07-28', title: 'Daily Standup', type: 'meeting', time: '9:00 AM', description: 'Team sync' },
+          { date: '2025-07-30', title: 'Tech Talk', type: 'meeting', time: '4:00 PM', description: 'Frontend best practices' },
+          { date: '2025-08-01', title: 'Monthly Planning', type: 'meeting', time: '9:00 AM', description: 'August monthly planning and Q3 check-in. Review July metrics, adjust August targets, and align on priorities. Marketing to present campaign results. Engineering to share velocity trends. Budget review included.' },
+          { date: '2025-08-04', title: 'Code Review', type: 'meeting', time: '2:00 PM', description: 'Weekly code review session. Focus on authentication service refactor (PR #1234) and new API endpoints (PR #1235-1240). Please review PRs beforehand. Discussing coding standards updates.' },
+          { date: '2025-08-06', title: 'Team Retro', type: 'meeting', time: '3:00 PM', description: 'Monthly retrospective' }
         ]
       }
     }]
@@ -56,6 +60,7 @@ export const BasicEventLayer: Story = {
 export const MultipleLayers: Story = {
   args: {
     ...defaultArgs,
+    showTooltips: true,
     showLayersNavigation: true,
     defaultLayer: 'holidays',
     layers: [
@@ -69,11 +74,9 @@ export const MultipleLayers: Story = {
         color: '#dc3545',
         data: {
           events: [
-            { date: '2025-01-01', title: 'New Year\'s Day', type: 'holiday', time: 'All day', description: 'Federal holiday' },
-            { date: '2025-01-20', title: 'MLK Day', type: 'holiday', time: 'All day', description: 'Federal holiday' },
-            { date: '2025-02-17', title: 'Presidents Day', type: 'holiday', time: 'All day', description: 'Federal holiday' },
-            { date: '2025-05-26', title: 'Memorial Day', type: 'holiday', time: 'All day', description: 'Federal holiday' },
-            { date: '2025-07-04', title: 'Independence Day', type: 'holiday', time: 'All day', description: 'Federal holiday' }
+            { date: '2025-07-04', title: 'Independence Day', type: 'holiday', time: 'All day', description: 'US Federal holiday - All offices closed. No meetings or deadlines scheduled. Emergency support available via on-call rotation.' },
+            { date: '2025-07-28', title: 'Summer Bank Holiday', type: 'holiday', time: 'All day', description: 'Company-wide summer break day. Offices closed globally. Automated systems remain operational. Enjoy your day off!' },
+            { date: '2025-08-15', title: 'Mid-August Holiday', type: 'holiday', time: 'All day', description: 'Regional holiday observed in EMEA region. US and APAC offices remain open with reduced staffing. Check team calendars for availability.' }
           ]
         }
       },
@@ -86,10 +89,12 @@ export const MultipleLayers: Story = {
         color: '#0366d6',
         data: {
           events: [
-            { date: '2025-01-06', title: 'Q1 Planning', type: 'meeting', time: '10:00 AM', description: 'Quarterly planning session' },
-            { date: '2025-01-13', title: 'Sprint Review', type: 'meeting', time: '2:00 PM', description: 'Demo new features' },
-            { date: '2025-01-27', title: 'All Hands', type: 'meeting', time: '1:00 PM', description: 'Company-wide meeting' },
-            { date: '2025-02-03', title: 'Design Sprint', type: 'meeting', time: '9:00 AM', description: '3-day design workshop' }
+            { date: '2025-07-14', title: 'Q3 Planning', type: 'meeting', time: '10:00 AM', description: 'Q3 2025 quarterly planning kickoff. Review Q2 performance metrics, set Q3 OKRs, and align on strategic initiatives. Executive team and all department heads required. Zoom link in calendar invite.' },
+            { date: '2025-07-18', title: 'Sprint Review', type: 'meeting', time: '2:00 PM', description: 'Sprint 45 review and demo session. Teams will present completed features including new authentication flow, performance improvements, and mobile UI updates. Stakeholders welcome. Recording available after.' },
+            { date: '2025-07-25', title: 'All Hands', type: 'meeting', time: '1:00 PM', description: 'Monthly all-hands meeting. CEO updates, Q2 financials review, new hire introductions, and team achievements. Submit questions via Slido. Catered lunch for in-office attendees.' },
+            { date: '2025-08-04', title: 'Design Sprint', type: 'meeting', time: '9:00 AM', description: '3-day design workshop' },
+            { date: '2025-08-08', title: 'Tech Sync', type: 'meeting', time: '11:00 AM', description: 'Engineering alignment' },
+            { date: '2025-08-12', title: 'Product Review', type: 'meeting', time: '2:00 PM', description: 'Product roadmap review' }
           ]
         }
       },
@@ -102,9 +107,11 @@ export const MultipleLayers: Story = {
         color: '#f6c23e',
         data: {
           events: [
-            { date: '2025-01-15', title: 'Feature Freeze', type: 'deadline', time: '5:00 PM', description: 'Code freeze for v2.0' },
-            { date: '2025-01-31', title: 'Release v2.0', type: 'deadline', time: 'EOD', description: 'Production deployment' },
-            { date: '2025-02-28', title: 'Q1 Report Due', type: 'deadline', time: '5:00 PM', description: 'Quarterly report submission' }
+            { date: '2025-07-15', title: 'Feature Freeze', type: 'deadline', time: '5:00 PM', description: 'v3.0 Feature Freeze - No new features after 5 PM EST. Only bug fixes and critical security patches allowed. QA team begins full regression testing tomorrow morning.' },
+            { date: '2025-07-31', title: 'Release v3.0', type: 'deadline', time: 'EOD', description: 'v3.0 Production Release - Deployment window 6-10 PM EST. Features include new dashboard, improved performance (40% faster), and enhanced security. Rollback plan ready.' },
+            { date: '2025-08-01', title: 'Q3 Kickoff', type: 'deadline', time: '9:00 AM', description: 'Quarter starts' },
+            { date: '2025-08-15', title: 'Beta Release', type: 'deadline', time: '12:00 PM', description: 'Beta version due' },
+            { date: '2025-08-29', title: 'Q2 Report Due', type: 'deadline', time: '5:00 PM', description: 'Quarterly report submission' }
           ]
         }
       }
@@ -123,6 +130,7 @@ export const MultipleLayers: Story = {
 export const BackgroundHighlights: Story = {
   args: {
     ...defaultArgs,
+    showTooltips: true,
     showLayersNavigation: true,
     layers: [{
       name: 'sprints',
@@ -133,15 +141,17 @@ export const BackgroundHighlights: Story = {
       color: '#20c997',
       data: {
         background: [
-          { startDate: '2025-03-03', endDate: '2025-03-14', color: '#e7f5ff' },
-          { startDate: '2025-03-17', endDate: '2025-03-28', color: '#fff0f6' },
-          { startDate: '2025-03-31', endDate: '2025-04-11', color: '#e7f5ff' }
+          { startDate: '2025-07-14', endDate: '2025-07-25', color: '#e7f5ff' },
+          { startDate: '2025-07-28', endDate: '2025-08-08', color: '#fff0f6' },
+          { startDate: '2025-08-11', endDate: '2025-08-22', color: '#e7f5ff' }
         ],
         events: [
-          { date: '2025-03-03', title: 'Sprint 23 Start', type: 'milestone', time: '9:00 AM', description: 'Sprint kickoff' },
-          { date: '2025-03-14', title: 'Sprint 23 End', type: 'milestone', time: '5:00 PM', description: 'Sprint review & retro' },
-          { date: '2025-03-17', title: 'Sprint 24 Start', type: 'milestone', time: '9:00 AM', description: 'Sprint kickoff' },
-          { date: '2025-03-28', title: 'Sprint 24 End', type: 'milestone', time: '5:00 PM', description: 'Sprint review & retro' }
+          { date: '2025-07-14', title: 'Sprint 45 Start', type: 'milestone', time: '9:00 AM', description: 'Sprint 45 begins - Focus areas: OAuth 2.0 implementation, database query optimization, and responsive design fixes. 26 story points committed. Daily standups at 9:15 AM.' },
+          { date: '2025-07-25', title: 'Sprint 45 End', type: 'milestone', time: '5:00 PM', description: 'Sprint 45 concludes - Demo at 2 PM, retrospective at 3 PM. Prepare demo environments and gather metrics. Submit peer feedback for sprint awards. Happy hour after!' },
+          { date: '2025-07-28', title: 'Sprint 46 Start', type: 'milestone', time: '9:00 AM', description: 'Sprint kickoff' },
+          { date: '2025-08-08', title: 'Sprint 46 End', type: 'milestone', time: '5:00 PM', description: 'Sprint 46 completion - 24 of 28 story points delivered. 2 stories carry over to Sprint 47. Velocity trending up! Demo highlights: New search feature and 50% faster page loads. Retro theme: Improving CI/CD pipeline.' },
+          { date: '2025-08-11', title: 'Sprint 47 Start', type: 'milestone', time: '9:00 AM', description: 'Sprint kickoff' },
+          { date: '2025-08-22', title: 'Sprint 47 End', type: 'milestone', time: '5:00 PM', description: 'Sprint review & retro' }
         ]
       }
     }]
@@ -159,6 +169,7 @@ export const BackgroundHighlights: Story = {
 export const CombinedEventsAndBackgrounds: Story = {
   args: {
     ...defaultArgs,
+    showTooltips: true,
     showLayersNavigation: true,
     visibleMonths: 2,
     layers: [
@@ -171,18 +182,16 @@ export const CombinedEventsAndBackgrounds: Story = {
         color: '#6f42c1',
         data: {
           background: [
-            { startDate: '2025-04-14', endDate: '2025-04-18', color: '#f3f0ff' },
-            { startDate: '2025-05-05', endDate: '2025-05-07', color: '#fff5f5' }
+            { startDate: '2025-07-21', endDate: '2025-07-23', color: '#f3f0ff' },
+            { startDate: '2025-08-18', endDate: '2025-08-20', color: '#fff5f5' }
           ],
           events: [
-            { date: '2025-04-14', title: 'ReactConf Day 1', type: 'conference', time: '9:00 AM', description: 'Opening keynote' },
-            { date: '2025-04-15', title: 'ReactConf Day 2', type: 'conference', time: '9:00 AM', description: 'Workshops' },
-            { date: '2025-04-16', title: 'ReactConf Day 3', type: 'conference', time: '9:00 AM', description: 'Advanced talks' },
-            { date: '2025-04-17', title: 'ReactConf Day 4', type: 'conference', time: '9:00 AM', description: 'Community day' },
-            { date: '2025-04-18', title: 'ReactConf Day 5', type: 'conference', time: '9:00 AM', description: 'Closing ceremony' },
-            { date: '2025-05-05', title: 'GraphQL Summit', type: 'conference', time: '10:00 AM', description: 'Day 1' },
-            { date: '2025-05-06', title: 'GraphQL Summit', type: 'conference', time: '10:00 AM', description: 'Day 2' },
-            { date: '2025-05-07', title: 'GraphQL Summit', type: 'conference', time: '10:00 AM', description: 'Day 3' }
+            { date: '2025-07-21', title: 'Tech Summit Day 1', type: 'conference', time: '9:00 AM', description: 'Tech Summit 2025 kicks off! Opening keynote by Sarah Chen (CTO) on AI in software development. Followed by tracks on cloud architecture, DevOps, and frontend innovations. Breakfast and lunch provided.' },
+            { date: '2025-07-22', title: 'Tech Summit Day 2', type: 'conference', time: '9:00 AM', description: 'Hands-on workshop day. Choose from: Kubernetes mastery, React performance optimization, or Machine Learning basics. Limited to 30 participants per workshop. Bring laptops!' },
+            { date: '2025-07-23', title: 'Tech Summit Day 3', type: 'conference', time: '9:00 AM', description: 'Final day featuring lightning talks, panel discussion on future of tech, and closing ceremony. Networking lunch at noon. Conference swag and certificates distributed at 4 PM.' },
+            { date: '2025-08-18', title: 'Frontend Conf', type: 'conference', time: '10:00 AM', description: 'Frontend Conference Day 1: React Deep Dive. Sessions include React 19 features, Server Components in production, and performance optimization techniques. Keynote by Dan Abramov. Virtual attendance available.' },
+            { date: '2025-08-19', title: 'Frontend Conf', type: 'conference', time: '10:00 AM', description: 'Day 2 - Vue' },
+            { date: '2025-08-20', title: 'Frontend Conf', type: 'conference', time: '10:00 AM', description: 'Day 3 - Angular' }
           ]
         }
       },
@@ -195,10 +204,10 @@ export const CombinedEventsAndBackgrounds: Story = {
         color: '#fd7e14',
         data: {
           events: [
-            { date: '2025-04-13', title: 'Flight to SF', type: 'travel', time: '6:00 AM', description: 'AA 2456' },
-            { date: '2025-04-19', title: 'Flight home', type: 'travel', time: '7:00 PM', description: 'AA 2457' },
-            { date: '2025-05-04', title: 'Flight to NYC', type: 'travel', time: '8:00 AM', description: 'DL 1234' },
-            { date: '2025-05-08', title: 'Flight home', type: 'travel', time: '6:00 PM', description: 'DL 1235' }
+            { date: '2025-07-20', title: 'Flight to SF', type: 'travel', time: '6:00 AM', description: 'American Airlines AA 2456 to San Francisco. Depart: JFK Terminal 8 at 6:00 AM. Arrive: SFO at 9:15 AM PST. Seat 14A confirmed. TSA PreCheck available. Uber to hotel booked.' },
+            { date: '2025-07-24', title: 'Flight home', type: 'travel', time: '7:00 PM', description: 'Return flight AA 2457 to New York. Depart: SFO at 7:00 PM PST. Arrive: JFK at 3:30 AM EST (red-eye). Remember to check out of hotel by noon. Airport shuttle at 4:30 PM.' },
+            { date: '2025-08-17', title: 'Flight to NYC', type: 'travel', time: '8:00 AM', description: 'DL 1234' },
+            { date: '2025-08-21', title: 'Flight home', type: 'travel', time: '6:00 PM', description: 'DL 1235' }
           ]
         }
       }
@@ -217,6 +226,7 @@ export const CombinedEventsAndBackgrounds: Story = {
 export const CustomColoredEvents: Story = {
   args: {
     ...defaultArgs,
+    showTooltips: true,
     showLayersNavigation: false,
     layers: [{
       name: 'tasks',
@@ -226,13 +236,15 @@ export const CustomColoredEvents: Story = {
       enabled: true,
       data: {
         events: [
-          { date: '2025-03-10', title: 'Critical Bug Fix', type: 'task', time: 'ASAP', description: 'Production issue', color: '#dc3545' },
-          { date: '2025-03-11', title: 'Feature Review', type: 'task', time: '2:00 PM', description: 'Review PR #123', color: '#f6c23e' },
-          { date: '2025-03-12', title: 'Documentation', type: 'task', time: 'Anytime', description: 'Update API docs', color: '#28a745' },
-          { date: '2025-03-13', title: 'Security Patch', type: 'task', time: '10:00 AM', description: 'Apply security updates', color: '#dc3545' },
-          { date: '2025-03-14', title: 'Code Refactor', type: 'task', time: 'Afternoon', description: 'Clean up legacy code', color: '#0366d6' },
-          { date: '2025-03-17', title: 'Performance Test', type: 'task', time: '11:00 AM', description: 'Load testing', color: '#f6c23e' },
-          { date: '2025-03-18', title: 'Deploy Staging', type: 'task', time: '4:00 PM', description: 'Stage deployment', color: '#28a745' }
+          { date: '2025-07-16', title: 'Critical Bug Fix', type: 'task', time: 'ASAP', description: 'URGENT: Payment gateway timeout affecting 15% of transactions. Root cause: Database connection pool exhaustion. Fix deployed to staging. Needs immediate production push. Incident Commander: David Liu.', color: '#dc3545' },
+          { date: '2025-07-17', title: 'Feature Review', type: 'task', time: '2:00 PM', description: 'Review PR #123: New user dashboard implementation. Check responsive design, accessibility (WCAG 2.1 AA), and performance benchmarks. Ensure unit test coverage > 80%. Approve by EOD if ready.', color: '#f6c23e' },
+          { date: '2025-07-18', title: 'Documentation', type: 'task', time: 'Anytime', description: 'Update API docs', color: '#28a745' },
+          { date: '2025-07-22', title: 'Security Patch', type: 'task', time: '10:00 AM', description: 'Apply security updates', color: '#dc3545' },
+          { date: '2025-07-24', title: 'Code Refactor', type: 'task', time: 'Afternoon', description: 'Clean up legacy code', color: '#0366d6' },
+          { date: '2025-07-29', title: 'Performance Test', type: 'task', time: '11:00 AM', description: 'Load testing', color: '#f6c23e' },
+          { date: '2025-07-31', title: 'Deploy Staging', type: 'task', time: '4:00 PM', description: 'Stage deployment', color: '#28a745' },
+          { date: '2025-08-05', title: 'API Updates', type: 'task', time: '10:00 AM', description: 'Begin migration of user service from REST to GraphQL. Phase 1: Define schema, implement resolvers for read operations. Maintain backwards compatibility. Documentation in Confluence. Pair with Jennifer.' },
+          { date: '2025-08-07', title: 'Security Audit', type: 'task', time: '2:00 PM', description: 'Quarterly audit', color: '#dc3545' }
         ]
       }
     }]
@@ -250,6 +262,7 @@ export const CustomColoredEvents: Story = {
 export const LayersWithRestrictions: Story = {
   args: {
     ...defaultArgs,
+    showTooltips: true,
     showLayersNavigation: true,
     layers: [{
       name: 'availability',
@@ -260,14 +273,14 @@ export const LayersWithRestrictions: Story = {
       color: '#e83e8c',
       data: {
         background: [
-          { startDate: '2025-03-24', endDate: '2025-03-28', color: '#ffe0e6' }
+          { startDate: '2025-08-11', endDate: '2025-08-15', color: '#ffe0e6' }
         ],
         events: [
-          { date: '2025-03-24', title: 'Sarah OOO', type: 'absence', time: 'All day', description: 'Vacation' },
-          { date: '2025-03-25', title: 'Sarah OOO', type: 'absence', time: 'All day', description: 'Vacation' },
-          { date: '2025-03-26', title: 'Sarah OOO', type: 'absence', time: 'All day', description: 'Vacation' },
-          { date: '2025-03-27', title: 'Sarah OOO', type: 'absence', time: 'All day', description: 'Vacation' },
-          { date: '2025-03-28', title: 'Sarah OOO', type: 'absence', time: 'All day', description: 'Vacation' }
+          { date: '2025-08-11', title: 'Sarah OOO', type: 'absence', time: 'All day', description: 'Sarah Johnson (Lead Backend Engineer) - On vacation in Hawaii 🏝️. For urgent backend issues contact Mike Chen. For code reviews, please assign to Tom Williams. Back in office Monday Aug 18.' },
+          { date: '2025-08-12', title: 'Sarah OOO', type: 'absence', time: 'All day', description: 'Sarah Johnson (Lead Backend Engineer) - Vacation day 2/5. Still in Hawaii enjoying the beach 🏖️. Coverage: Mike Chen (backend), Tom Williams (code reviews). Do not disturb unless critical.' },
+          { date: '2025-08-13', title: 'Sarah OOO', type: 'absence', time: 'All day', description: 'Vacation' },
+          { date: '2025-08-14', title: 'Sarah OOO', type: 'absence', time: 'All day', description: 'Vacation' },
+          { date: '2025-08-15', title: 'Sarah OOO', type: 'absence', time: 'All day', description: 'Vacation' }
         ]
       }
     }]
@@ -277,8 +290,8 @@ export const LayersWithRestrictions: Story = {
       type: 'daterange',
       enabled: true,
       ranges: [{
-        startDate: '2025-03-24',
-        endDate: '2025-03-28',
+        startDate: '2025-08-11',
+        endDate: '2025-08-15',
         message: 'Cannot schedule during team member absence'
       }]
     }]
@@ -293,9 +306,9 @@ export const LayersWithRestrictions: Story = {
           type: 'daterange',
           enabled: true,
           ranges: [{
-            startDate: '2025-03-24',
-            endDate: '2025-03-28',
-            message: 'Cannot schedule during team member absence'
+            startDate: '2025-08-11',
+            endDate: '2025-08-15',
+            message: 'Cannot schedule meetings - Sarah (Lead Backend Engineer) is on vacation. Please reschedule any backend-related discussions to the following week or contact Mike Chen for urgent matters.'
           }]
         }]
       })}
@@ -307,6 +320,7 @@ export const LayersWithRestrictions: Story = {
 export const EmptyLayer: Story = {
   args: {
     ...defaultArgs,
+    showTooltips: true,
     showLayersNavigation: true,
     layers: [{
       name: 'events',
@@ -333,8 +347,9 @@ export const EmptyLayer: Story = {
 export const DynamicLayerToggling: Story = {
   args: {
     ...defaultArgs,
+    showTooltips: true,
     showLayersNavigation: true,
-    visibleMonths: 1,
+    visibleMonths: 2,
     layers: [
       {
         name: 'weekends',
@@ -345,11 +360,15 @@ export const DynamicLayerToggling: Story = {
         color: '#20c997',
         data: {
           background: [
-            { startDate: '2025-03-01', endDate: '2025-03-02', color: '#e6fcf5' },
-            { startDate: '2025-03-08', endDate: '2025-03-09', color: '#e6fcf5' },
-            { startDate: '2025-03-15', endDate: '2025-03-16', color: '#e6fcf5' },
-            { startDate: '2025-03-22', endDate: '2025-03-23', color: '#e6fcf5' },
-            { startDate: '2025-03-29', endDate: '2025-03-30', color: '#e6fcf5' }
+            { startDate: '2025-07-05', endDate: '2025-07-06', color: '#e6fcf5' },
+            { startDate: '2025-07-12', endDate: '2025-07-13', color: '#e6fcf5' },
+            { startDate: '2025-07-19', endDate: '2025-07-20', color: '#e6fcf5' },
+            { startDate: '2025-07-26', endDate: '2025-07-27', color: '#e6fcf5' },
+            { startDate: '2025-08-02', endDate: '2025-08-03', color: '#e6fcf5' },
+            { startDate: '2025-08-09', endDate: '2025-08-10', color: '#e6fcf5' },
+            { startDate: '2025-08-16', endDate: '2025-08-17', color: '#e6fcf5' },
+            { startDate: '2025-08-23', endDate: '2025-08-24', color: '#e6fcf5' },
+            { startDate: '2025-08-30', endDate: '2025-08-31', color: '#e6fcf5' }
           ]
         }
       },
@@ -362,10 +381,14 @@ export const DynamicLayerToggling: Story = {
         color: '#0366d6',
         data: {
           background: [
-            { startDate: '2025-03-03', endDate: '2025-03-07', color: '#e7f5ff' },
-            { startDate: '2025-03-10', endDate: '2025-03-14', color: '#e7f5ff' },
-            { startDate: '2025-03-17', endDate: '2025-03-21', color: '#e7f5ff' },
-            { startDate: '2025-03-24', endDate: '2025-03-28', color: '#e7f5ff' }
+            { startDate: '2025-07-07', endDate: '2025-07-11', color: '#e7f5ff' },
+            { startDate: '2025-07-14', endDate: '2025-07-18', color: '#e7f5ff' },
+            { startDate: '2025-07-21', endDate: '2025-07-25', color: '#e7f5ff' },
+            { startDate: '2025-07-28', endDate: '2025-08-01', color: '#e7f5ff' },
+            { startDate: '2025-08-04', endDate: '2025-08-08', color: '#e7f5ff' },
+            { startDate: '2025-08-11', endDate: '2025-08-15', color: '#e7f5ff' },
+            { startDate: '2025-08-18', endDate: '2025-08-22', color: '#e7f5ff' },
+            { startDate: '2025-08-25', endDate: '2025-08-29', color: '#e7f5ff' }
           ]
         }
       },
@@ -378,7 +401,9 @@ export const DynamicLayerToggling: Story = {
         color: '#dc3545',
         data: {
           events: [
-            { date: '2025-03-17', title: 'St. Patrick\'s Day', type: 'holiday', time: 'All day', description: 'Irish holiday' }
+            { date: '2025-07-04', title: 'Independence Day', type: 'holiday', time: 'All day', description: 'US Federal holiday - All offices closed. No meetings or deadlines scheduled. Emergency support available via on-call rotation.' },
+            { date: '2025-07-28', title: 'Summer Bank Holiday', type: 'holiday', time: 'All day', description: 'Company-wide summer break day. Offices closed globally. Automated systems remain operational. Enjoy your day off!' },
+            { date: '2025-08-15', title: 'Mid-August Holiday', type: 'holiday', time: 'All day', description: 'Regional holiday observed in EMEA region. US and APAC offices remain open with reduced staffing. Check team calendars for availability.' }
           ]
         }
       }
