@@ -22,7 +22,7 @@ const preview: Preview = {
     },
     options: {
       storySort: {
-        order: ['Welcome', 'Overview', 'Getting Started', 'UTC Timezone Handling', 'Edge Cases', 'Examples', 'Features', 'Playground'],
+        order: ['Welcome', 'Overview', 'Getting Started', 'UTC Timezone Handling', 'Examples', 'Features', 'Playground', 'Edge Cases'],
       },
     },
   },

@@ -4,7 +4,7 @@ import { calendarArgTypes, defaultArgs } from './shared/storyControls';
 import { CalendarStoryWrapper } from './shared/CalendarStoryWrapper';
 
 const meta: Meta<typeof CLACalendar> = {
-  title: 'UTC Timezone Handling',
+  title: 'UTC Timezone Handling/Stories',
   component: CLACalendar,
   argTypes: calendarArgTypes,
   args: defaultArgs,

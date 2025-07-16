@@ -1,0 +1,324 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { CLACalendar } from '../components/CLACalendar';
+import { CalendarStoryWrapper } from './shared/CalendarStoryWrapper';
+import { getDefaultSettings } from '../components/CLACalendar.config';
+
+<Meta title="UTC Timezone Handling/Direct Rendering" />
+
+# UTC Timezone Handling
+
+The CLA Calendar uses UTC as the default timezone for all date operations to prevent the "day off bug" - a common issue where dates appear on the wrong calendar day due to timezone conversions.
+
+## What is the Day Off Bug?
+
+The day off bug occurs when:
+1. A date is stored or transmitted in one timezone (often UTC)
+2. It's displayed in a different timezone (usually the user's local time)
+3. The timezone conversion causes the date to shift to the previous or next day
+
+### Example Scenario
+
+Imagine a user in California (PST, UTC-8) selects December 25th:
+- Without proper handling, "December 25 00:00 PST" might be stored as "December 25 08:00 UTC"
+- When displayed in Tokyo (JST, UTC+9), this becomes "December 25 17:00 JST" - still December 25th
+- But if stored as "December 24 16:00 UTC" (a common bug), it displays as "December 24" in California!
+
+## How CLA Calendar Prevents This
+
+The calendar uses UTC for all internal date operations by default. This ensures:
+- Dates are parsed consistently regardless of user timezone
+- Calendar days remain stable across timezone boundaries
+- Date selections are preserved accurately
+
+## Visual Demonstration
+
+### UTC Mode (Default) - No Day Off Bug
+
+<CalendarStoryWrapper 
+  args={{
+    displayMode: 'embedded',
+    visibleMonths: 2,
+    monthWidth: 500,
+    selectionMode: 'range',
+    timezone: 'UTC',
+    defaultRange: {
+      start: '2025-12-25',
+      end: '2025-12-26'
+    },
+    showHeader: true,
+    showFooter: true,
+    showTooltips: true,
+    startWeekOnSunday: false,
+    dateRangeSeparator: ' - '
+  }}
+  title="UTC Mode (Default) - No Day Off Bug"
+  description="December 25th appears correctly on the 25th, regardless of your local timezone. This is because all date operations use UTC."
+/>
+
+Notice how December 25th appears on the 25th, not the 24th or 26th. This is consistent regardless of your browser's timezone.
+
+### Timezone Comparison
+
+The same date (December 25th) displayed with different timezone settings:
+
+<div>
+  <CalendarStoryWrapper 
+    args={{
+      displayMode: 'embedded',
+      visibleMonths: 1,
+      monthWidth: 500,
+      selectionMode: 'range',
+      timezone: 'UTC',
+      defaultRange: {
+        start: '2025-12-25',
+        end: '2025-12-25'
+      },
+      showHeader: true,
+      showFooter: true,
+      showTooltips: true,
+      startWeekOnSunday: false
+    }}
+    title="UTC Timezone"
+    description="December 25th always appears on the 25th"
+    showSelectedDate={false}
+  />
+  <CalendarStoryWrapper 
+    args={{
+      displayMode: 'embedded',
+      visibleMonths: 1,
+      monthWidth: 500,
+      selectionMode: 'range',
+      timezone: 'America/Los_Angeles',
+      defaultRange: {
+        start: '2025-12-25',
+        end: '2025-12-25'
+      },
+      showHeader: true,
+      showFooter: true,
+      showTooltips: true,
+      startWeekOnSunday: false
+    }}
+    title="Pacific Timezone"
+    description="Same date, but could shift if not handled properly"
+    showSelectedDate={false}
+  />
+  <CalendarStoryWrapper 
+    args={{
+      displayMode: 'embedded',
+      visibleMonths: 1,
+      monthWidth: 500,
+      selectionMode: 'range',
+      timezone: 'Asia/Tokyo',
+      defaultRange: {
+        start: '2025-12-25',
+        end: '2025-12-25'
+      },
+      showHeader: true,
+      showFooter: true,
+      showTooltips: true,
+      startWeekOnSunday: false
+    }}
+    title="Tokyo Timezone"
+    description="Significant timezone offset from UTC"
+    showSelectedDate={false}
+  />
+</div>
+
+All three calendars show December 25th on the same calendar cell, proving the date handling is correct.
+
+## Configuration
+
+<div className="settings-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Property</th>
+        <th>Type</th>
+        <th>Default</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>timezone</td>
+        <td>string</td>
+        <td>'UTC'</td>
+        <td>Timezone for all date operations</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+## Timezone Boundary Testing
+
+### Midnight UTC - Year Boundary
+
+Testing the critical boundary between years:
+
+<CalendarStoryWrapper 
+  args={{
+    displayMode: 'embedded',
+    visibleMonths: 1,
+    monthWidth: 500,
+    selectionMode: 'range',
+    timezone: 'UTC',
+    defaultRange: {
+      start: '2025-12-31',
+      end: '2026-01-01'
+    },
+    showHeader: true,
+    showFooter: true,
+    showTooltips: true,
+    startWeekOnSunday: false,
+    dateRangeSeparator: ' - '
+  }}
+  title="Midnight UTC - Year Boundary"
+  description="Testing December 31st to January 1st transition at midnight UTC. Both dates should appear on the correct days."
+/>
+
+Both December 31st and January 1st appear on the correct days.
+
+### Date Parsing Consistency
+
+Date strings are parsed consistently in UTC:
+
+<CalendarStoryWrapper 
+  args={{
+    displayMode: 'embedded',
+    visibleMonths: 1,
+    monthWidth: 500,
+    selectionMode: 'range',
+    timezone: 'UTC',
+    defaultRange: {
+      start: '2025-07-04',
+      end: '2025-07-04'
+    },
+    showHeader: true,
+    showFooter: true,
+    showTooltips: true,
+    startWeekOnSunday: false,
+    dateRangeSeparator: ' - '
+  }}
+  title="ISO Date String Parsing"
+  description="July 4th selected in UTC. The date should appear only on July 4th, demonstrating consistent date parsing."
+/>
+
+July 4th is selected and appears correctly on the calendar.
+
+## Interactive Testing
+
+### Test Different Timezones
+
+This example shows March 15-17 selected. Try changing timezone values to see how the calendar handles different timezones:
+
+<CalendarStoryWrapper 
+  args={{
+    displayMode: 'embedded',
+    visibleMonths: 1,
+    monthWidth: 500,
+    selectionMode: 'range',
+    timezone: 'UTC',
+    defaultRange: {
+      start: '2025-03-15',
+      end: '2025-03-17'
+    },
+    showHeader: true,
+    showFooter: true,
+    showTooltips: true,
+    startWeekOnSunday: false,
+    dateRangeSeparator: ' - '
+  }}
+  title="Interactive Timezone Test"
+  description="The selected dates (March 15-17) should remain consistent across different timezone settings."
+/>
+
+### Daylight Saving Time
+
+Even during DST transitions, dates remain stable:
+
+<CalendarStoryWrapper 
+  args={{
+    displayMode: 'embedded',
+    visibleMonths: 1,
+    monthWidth: 500,
+    selectionMode: 'range',
+    timezone: 'America/New_York',
+    defaultRange: {
+      start: '2025-03-08',
+      end: '2025-03-10'
+    },
+    showHeader: true,
+    showFooter: true,
+    showTooltips: true,
+    startWeekOnSunday: false,
+    dateRangeSeparator: ' - '
+  }}
+  title="Daylight Saving Time Transition"
+  description="March 9, 2025 is when DST begins in New York. The calendar should handle this 23-hour day correctly without date shifting."
+/>
+
+## Code Examples
+
+### Using UTC (Recommended)
+
+```typescript
+// Default configuration - uses UTC
+const settings = getDefaultSettings(); // timezone: 'UTC'
+
+// Or explicitly set UTC
+const settings = {
+  ...getDefaultSettings(),
+  timezone: 'UTC'
+};
+```
+
+### Using Other Timezones
+
+```typescript
+// Use a specific timezone
+const settings = {
+  ...getDefaultSettings(),
+  timezone: 'America/New_York'
+};
+
+// Use browser's local timezone
+const settings = {
+  ...getDefaultSettings(),
+  timezone: 'local'
+};
+```
+
+## Best Practices
+
+1. **Always use UTC for data storage and APIs** - Store and transmit dates in UTC to ensure consistency
+2. **Let the calendar handle timezone conversion** - The calendar's timezone setting manages display
+3. **Use ISO strings for date ranges** - Format: `YYYY-MM-DD` (assumes start of day in configured timezone)
+4. **Test timezone edge cases** - Especially midnight and DST transitions
+
+## Technical Implementation
+
+The calendar achieves timezone safety through:
+
+1. **UTC-aware date utilities** (`src/utils/DateUtils.ts`):
+   - `parseISO()` - Parses dates in specified timezone (default UTC)
+   - `format()` - Formats dates in specified timezone (default UTC)
+   - `isSameDay()` - Compares dates in specified timezone
+
+2. **Consistent date handling**:
+   - All date operations use the configured timezone
+   - Month grid generation uses UTC-aware functions
+   - Date comparisons respect timezone setting
+
+3. **Visual rendering**:
+   - Day cells use `format(date, 'd', timezone)` to display day numbers
+   - This ensures the visual day matches the logical day
+
+## Summary
+
+The CLA Calendar's UTC-first approach eliminates the day off bug by:
+- Defaulting to UTC for all operations
+- Providing consistent date handling across timezones
+- Allowing timezone override when needed
+- Ensuring visual and logical dates always match
+
+This makes the calendar reliable for international applications where users may be in different timezones but need to see consistent dates.

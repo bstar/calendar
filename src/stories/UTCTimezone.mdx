@@ -1,13 +1,12 @@
-import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
-import * as UTCTimezoneStories from './UTCTimezone.stories';
-import { CLACalendar } from '../components/CLACalendar';
-import { getDefaultSettings } from '../components/CLACalendar.config';
+import { Meta } from '@storybook/addon-docs/blocks';
 
-<Meta of={UTCTimezoneStories} />
+<Meta title="UTC Timezone Handling/Documentation" />
 
 # UTC Timezone Handling
 
 The CLA Calendar uses UTC as the default timezone for all date operations to prevent the "day off bug" - a common issue where dates appear on the wrong calendar day due to timezone conversions.
+
+> **Note**: To see live examples demonstrating UTC timezone handling, visit the "Stories" page under this section.
 
 ## What is the Day Off Bug?
 
@@ -32,23 +31,11 @@ The calendar uses UTC for all internal date operations by default. This ensures:
 
 ## Visual Demonstration
 
-### UTC Mode (Default) - No Day Off Bug
+The Stories page includes several demonstrations:
 
-<Canvas>
-  <Story of={UTCTimezoneStories.DefaultUTC} />
-</Canvas>
-
-Notice how December 25th appears on the 25th, not the 24th or 26th. This is consistent regardless of your browser's timezone.
-
-### Timezone Comparison
-
-The same date (December 25th) displayed with different timezone settings:
-
-<Canvas>
-  <Story of={UTCTimezoneStories.TimezoneComparison} />
-</Canvas>
-
-All three calendars show December 25th on the same calendar cell, proving the date handling is correct.
+- **UTC Mode (Default)** - Shows how December 25th appears correctly on the 25th, not the 24th or 26th, regardless of your browser's timezone
+- **Timezone Comparison** - The same date (December 25th) displayed with different timezone settings (UTC, Pacific, Tokyo)
+- **Interactive Examples** - Test different timezones and see how dates remain consistent
 
 ## Configuration
 
@@ -75,43 +62,12 @@ All three calendars show December 25th on the same calendar cell, proving the da
 
 ## Timezone Boundary Testing
 
-### Midnight UTC - Year Boundary
+The Stories page includes comprehensive boundary testing:
 
-Testing the critical boundary between years:
-
-<Canvas>
-  <Story of={UTCTimezoneStories.MidnightUTC} />
-</Canvas>
-
-Both December 31st and January 1st appear on the correct days.
-
-### Date Parsing Consistency
-
-Date strings are parsed consistently in UTC:
-
-<Canvas>
-  <Story of={UTCTimezoneStories.DateParsingConsistency} />
-</Canvas>
-
-July 4th is selected and appears correctly on the calendar.
-
-## Interactive Testing
-
-### Test Different Timezones
-
-Use the timezone control in the Storybook controls panel to test different timezones:
-
-<Canvas>
-  <Story of={UTCTimezoneStories.InteractiveTimezoneSwitcher} />
-</Canvas>
-
-### Daylight Saving Time
-
-Even during DST transitions, dates remain stable:
-
-<Canvas>
-  <Story of={UTCTimezoneStories.DaylightSavingTime} />
-</Canvas>
+- **Midnight UTC - Year Boundary** - Tests December 31st to January 1st transition
+- **Date Parsing Consistency** - Demonstrates consistent date parsing in UTC
+- **Interactive Testing** - Use the timezone control to test different timezones
+- **Daylight Saving Time** - Shows stability during DST transitions
 
 ## Code Examples
 
