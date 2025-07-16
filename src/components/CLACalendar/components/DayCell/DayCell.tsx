@@ -47,7 +47,8 @@ export const DayCell: React.FC<DayCellProps> = ({
         : false,
       // Use chronological ordering for range start/end determination
       isRangeStart: isSameDay(date, chronologicalStart),
-      isRangeEnd: chronologicalEnd && isSameDay(date, chronologicalEnd)
+      // For single day selection in range mode, treat it as both start and end for circular appearance
+      isRangeEnd: chronologicalEnd ? isSameDay(date, chronologicalEnd) : isSameDay(date, chronologicalStart)
     };
   }, [date, selectedRange]);
 
