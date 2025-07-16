@@ -86,6 +86,8 @@ When `timezone === 'UTC'`, these functions use UTC-specific implementations. For
 ## Important Development Notes
 
 ### UTC Date Handling
+**CRITICAL**: This project enforces UTC timezone by default for all date operations to prevent the "day off bug" where dates appear on wrong calendar days due to timezone conversions.
+
 **Always use the UTC utility functions from `src/utils/DateUtils.ts`** instead of date-fns directly:
 
 ```typescript
@@ -95,6 +97,20 @@ import { format } from 'date-fns';
 // DO THIS
 import { format, eachDayOfInterval } from './utils/DateUtils';
 ```
+
+#### Key UTC Functions
+- `parseISO(dateString, timezone = 'UTC')` - Parses ISO date strings with timezone support
+- `format(date, formatStr, timezone = 'UTC')` - Formats dates with timezone support
+- `isSameDay(date1, date2, timezone = 'UTC')` - Compares dates in specified timezone
+- `startOfMonth()`, `endOfMonth()`, `startOfWeek()`, `endOfWeek()` - All timezone-aware
+
+#### Why UTC by Default?
+The calendar defaults to UTC to ensure:
+1. Dates always appear on the correct calendar day regardless of user timezone
+2. Date selections are preserved accurately across timezone boundaries
+3. No "day off bug" where December 25th shows as December 24th or 26th
+
+See the "UTC Timezone Handling" section in Storybook for visual demonstrations.
 
 ### TypeScript Guidelines
 - Use strict type checking
@@ -463,12 +479,13 @@ When creating new stories:
 2. **Follow the naming convention**:
    - Story files: `FeatureName.stories.tsx`
    - MDX docs: `FeatureName.mdx`
+   - Direct rendering (optional): `FeatureNameDirect.mdx`
    - Place in `src/stories/` directory
 
 3. **Use consistent meta configuration**:
    ```typescript
    const meta: Meta<typeof CLACalendar> = {
-     title: 'Category/FeatureName',
+     title: 'Category/Stories',  // For category structure
      component: CLACalendar,
      argTypes: calendarArgTypes,
      args: defaultArgs
@@ -480,7 +497,87 @@ When creating new stories:
    - Keep rendering logic in CalendarStoryWrapper
    - Only override when absolutely necessary
 
-### Direct Rendering in MDX (Edge Cases)
+### Storybook Category Structure
+
+To create a proper dropdown category in Storybook (like Getting Started, UTC Timezone Handling, Edge Cases):
+
+1. **Create Three Files**:
+   - **Documentation page**: `CategoryName.mdx` with `<Meta title="Category Name/Documentation" />`
+   - **Stories page**: `CategoryName.stories.tsx` with `title: 'Category Name/Stories'`
+   - **Direct Rendering** (optional): `CategoryNameDirect.mdx` with `<Meta title="Category Name/Direct Rendering" />`
+
+2. **Documentation Page Pattern**:
+   ```mdx
+   import { Meta } from '@storybook/addon-docs/blocks';
+   
+   <Meta title="Category Name/Documentation" />
+   
+   # Category Name
+   
+   Overview content here...
+   
+   > **Note**: To see live examples, visit the "Stories" page under this section.
+   ```
+
+3. **Direct Rendering Page Pattern**:
+   ```mdx
+   import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+   import { CalendarStoryWrapper } from './shared/CalendarStoryWrapper';
+   
+   <Meta title="Category Name/Direct Rendering" />
+   
+   # Category Name - Live Examples
+   
+   <Canvas>
+     <CalendarStoryWrapper 
+       args={{
+         // Full configuration
+       }}
+       title="Example Title"
+       description="Example description"
+     />
+   </Canvas>
+   ```
+
+4. **Navigation Ordering**:
+   Configure in `.storybook/preview.tsx`:
+   ```typescript
+   options: {
+     storySort: {
+       order: ['Welcome', 'Overview', 'Getting Started', 'UTC Timezone Handling', 'Edge Cases'],
+     },
+   }
+
+### Direct Rendering in MDX
+
+Direct Rendering pages are used for demonstrating calendar configurations without relying on Storybook's controls. This is especially useful for edge cases and timezone demonstrations.
+
+#### Pattern for Direct Rendering Pages
+
+```mdx
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { CalendarStoryWrapper } from './shared/CalendarStoryWrapper';
+
+<Meta title="Category Name/Direct Rendering" />
+
+# Title
+
+<Canvas>
+  <CalendarStoryWrapper 
+    args={{
+      // Complete args configuration
+      displayMode: 'embedded',
+      visibleMonths: 2,
+      timezone: 'UTC',
+      // ... all other props
+    }}
+    title="Example Title"
+    description="Example description"
+  />
+</Canvas>
+```
+
+**Important**: Always import `Canvas` from `@storybook/addon-docs/blocks` when using CalendarStoryWrapper in MDX files. The Canvas component is required for proper rendering.
 
 When creating edge case tests or when Storybook's Story components don't properly pass args, use direct rendering in MDX files:
 
