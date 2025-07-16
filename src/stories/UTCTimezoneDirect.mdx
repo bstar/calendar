@@ -34,6 +34,26 @@ The calendar uses UTC for all internal date operations by default. This ensures:
 
 ### UTC Mode (Default) - No Day Off Bug
 
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: 2,
+  monthWidth: 500,
+  selectionMode: 'range',
+  timezone: 'UTC',
+  defaultRange: {
+    start: '2025-12-25',
+    end: '2025-12-26'
+  },
+  showHeader: true,
+  showFooter: true,
+  showTooltips: true,
+  startWeekOnSunday: false,
+  dateRangeSeparator: ' - '
+}
+```
+
 <CalendarStoryWrapper 
   args={{
     displayMode: 'embedded',
@@ -61,68 +81,131 @@ Notice how December 25th appears on the 25th, not the 24th or 26th. This is cons
 
 The same date (December 25th) displayed with different timezone settings:
 
-<div>
-  <CalendarStoryWrapper 
-    args={{
-      displayMode: 'embedded',
-      visibleMonths: 1,
-      monthWidth: 500,
-      selectionMode: 'range',
-      timezone: 'UTC',
-      defaultRange: {
-        start: '2025-12-25',
-        end: '2025-12-25'
-      },
-      showHeader: true,
-      showFooter: true,
-      showTooltips: true,
-      startWeekOnSunday: false
-    }}
-    title="UTC Timezone"
-    description="December 25th always appears on the 25th"
-    showSelectedDate={false}
-  />
-  <CalendarStoryWrapper 
-    args={{
-      displayMode: 'embedded',
-      visibleMonths: 1,
-      monthWidth: 500,
-      selectionMode: 'range',
-      timezone: 'America/Los_Angeles',
-      defaultRange: {
-        start: '2025-12-25',
-        end: '2025-12-25'
-      },
-      showHeader: true,
-      showFooter: true,
-      showTooltips: true,
-      startWeekOnSunday: false
-    }}
-    title="Pacific Timezone"
-    description="Same date, but could shift if not handled properly"
-    showSelectedDate={false}
-  />
-  <CalendarStoryWrapper 
-    args={{
-      displayMode: 'embedded',
-      visibleMonths: 1,
-      monthWidth: 500,
-      selectionMode: 'range',
-      timezone: 'Asia/Tokyo',
-      defaultRange: {
-        start: '2025-12-25',
-        end: '2025-12-25'
-      },
-      showHeader: true,
-      showFooter: true,
-      showTooltips: true,
-      startWeekOnSunday: false
-    }}
-    title="Tokyo Timezone"
-    description="Significant timezone offset from UTC"
-    showSelectedDate={false}
-  />
-</div>
+#### UTC Timezone
+
+**Configuration:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: 1,
+  monthWidth: 500,
+  selectionMode: 'range',
+  timezone: 'UTC',
+  defaultRange: {
+    start: '2025-12-25',
+    end: '2025-12-25'
+  },
+  showHeader: true,
+  showFooter: true,
+  showTooltips: true,
+  startWeekOnSunday: false
+}
+```
+
+<CalendarStoryWrapper 
+  args={{
+    displayMode: 'embedded',
+    visibleMonths: 1,
+    monthWidth: 500,
+    selectionMode: 'range',
+    timezone: 'UTC',
+    defaultRange: {
+      start: '2025-12-25',
+      end: '2025-12-25'
+    },
+    showHeader: true,
+    showFooter: true,
+    showTooltips: true,
+    startWeekOnSunday: false
+  }}
+  title="UTC Timezone"
+  description="December 25th always appears on the 25th"
+  showSelectedDate={false}
+/>
+
+#### Pacific Timezone
+
+**Configuration:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: 1,
+  monthWidth: 500,
+  selectionMode: 'range',
+  timezone: 'America/Los_Angeles',
+  defaultRange: {
+    start: '2025-12-25',
+    end: '2025-12-25'
+  },
+  showHeader: true,
+  showFooter: true,
+  showTooltips: true,
+  startWeekOnSunday: false
+}
+```
+
+<CalendarStoryWrapper 
+  args={{
+    displayMode: 'embedded',
+    visibleMonths: 1,
+    monthWidth: 500,
+    selectionMode: 'range',
+    timezone: 'America/Los_Angeles',
+    defaultRange: {
+      start: '2025-12-25',
+      end: '2025-12-25'
+    },
+    showHeader: true,
+    showFooter: true,
+    showTooltips: true,
+    startWeekOnSunday: false
+  }}
+  title="Pacific Timezone"
+  description="Same date, but could shift if not handled properly"
+  showSelectedDate={false}
+/>
+
+#### Tokyo Timezone
+
+**Configuration:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: 1,
+  monthWidth: 500,
+  selectionMode: 'range',
+  timezone: 'Asia/Tokyo',
+  defaultRange: {
+    start: '2025-12-25',
+    end: '2025-12-25'
+  },
+  showHeader: true,
+  showFooter: true,
+  showTooltips: true,
+  startWeekOnSunday: false
+}
+```
+
+<CalendarStoryWrapper 
+  args={{
+    displayMode: 'embedded',
+    visibleMonths: 1,
+    monthWidth: 500,
+    selectionMode: 'range',
+    timezone: 'Asia/Tokyo',
+    defaultRange: {
+      start: '2025-12-25',
+      end: '2025-12-25'
+    },
+    showHeader: true,
+    showFooter: true,
+    showTooltips: true,
+    startWeekOnSunday: false
+  }}
+  title="Tokyo Timezone"
+  description="Significant timezone offset from UTC"
+  showSelectedDate={false}
+/>
 
 All three calendars show December 25th on the same calendar cell, proving the date handling is correct.
 
@@ -155,6 +238,26 @@ All three calendars show December 25th on the same calendar cell, proving the da
 
 Testing the critical boundary between years:
 
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: 1,
+  monthWidth: 500,
+  selectionMode: 'range',
+  timezone: 'UTC',
+  defaultRange: {
+    start: '2025-12-31',
+    end: '2026-01-01'
+  },
+  showHeader: true,
+  showFooter: true,
+  showTooltips: true,
+  startWeekOnSunday: false,
+  dateRangeSeparator: ' - '
+}
+```
+
 <CalendarStoryWrapper 
   args={{
     displayMode: 'embedded',
@@ -181,6 +284,26 @@ Both December 31st and January 1st appear on the correct days.
 ### Date Parsing Consistency
 
 Date strings are parsed consistently in UTC:
+
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: 1,
+  monthWidth: 500,
+  selectionMode: 'range',
+  timezone: 'UTC',
+  defaultRange: {
+    start: '2025-07-04',
+    end: '2025-07-04'
+  },
+  showHeader: true,
+  showFooter: true,
+  showTooltips: true,
+  startWeekOnSunday: false,
+  dateRangeSeparator: ' - '
+}
+```
 
 <CalendarStoryWrapper 
   args={{
@@ -211,6 +334,26 @@ July 4th is selected and appears correctly on the calendar.
 
 This example shows March 15-17 selected. Try changing timezone values to see how the calendar handles different timezones:
 
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: 1,
+  monthWidth: 500,
+  selectionMode: 'range',
+  timezone: 'UTC',
+  defaultRange: {
+    start: '2025-03-15',
+    end: '2025-03-17'
+  },
+  showHeader: true,
+  showFooter: true,
+  showTooltips: true,
+  startWeekOnSunday: false,
+  dateRangeSeparator: ' - '
+}
+```
+
 <CalendarStoryWrapper 
   args={{
     displayMode: 'embedded',
@@ -235,6 +378,26 @@ This example shows March 15-17 selected. Try changing timezone values to see how
 ### Daylight Saving Time
 
 Even during DST transitions, dates remain stable:
+
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: 1,
+  monthWidth: 500,
+  selectionMode: 'range',
+  timezone: 'America/New_York',
+  defaultRange: {
+    start: '2025-03-08',
+    end: '2025-03-10'
+  },
+  showHeader: true,
+  showFooter: true,
+  showTooltips: true,
+  startWeekOnSunday: false,
+  dateRangeSeparator: ' - '
+}
+```
 
 <CalendarStoryWrapper 
   args={{
