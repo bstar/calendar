@@ -1,0 +1,339 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Layers/Documentation" />
+
+# Layers
+
+Layers provide a powerful way to display different types of data on the calendar. Each layer can contain events, background highlights, or both, and can be toggled on and off by users.
+
+> **Note**: To see live examples of layers in action, visit the "Stories" page under this section.
+
+## What are Layers?
+
+Layers are overlays of data that can be displayed on the calendar. Think of them as transparent sheets that can be stacked on top of the base calendar to show different types of information:
+
+- **Events**: Discrete items on specific dates (meetings, deadlines, holidays)
+- **Background Highlights**: Date ranges with colored backgrounds (sprints, vacation periods)
+- **Combined**: Both events and backgrounds in a single layer
+
+## Layer Structure
+
+Each layer has the following properties:
+
+<div className="settings-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Property</th>
+        <th>Type</th>
+        <th>Required</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>name</td>
+        <td>string</td>
+        <td>Yes</td>
+        <td>Unique identifier for the layer</td>
+      </tr>
+      <tr>
+        <td>title</td>
+        <td>string</td>
+        <td>Yes</td>
+        <td>Display name shown in the UI</td>
+      </tr>
+      <tr>
+        <td>description</td>
+        <td>string</td>
+        <td>Yes</td>
+        <td>Brief description of the layer's purpose</td>
+      </tr>
+      <tr>
+        <td>visible</td>
+        <td>boolean</td>
+        <td>No</td>
+        <td>Whether the layer is initially visible (default: true)</td>
+      </tr>
+      <tr>
+        <td>enabled</td>
+        <td>boolean</td>
+        <td>No</td>
+        <td>Whether the layer can be toggled (default: true)</td>
+      </tr>
+      <tr>
+        <td>required</td>
+        <td>boolean</td>
+        <td>No</td>
+        <td>Whether the layer must always be visible (default: false)</td>
+      </tr>
+      <tr>
+        <td>color</td>
+        <td>string</td>
+        <td>No</td>
+        <td>Theme color for the layer (hex format)</td>
+      </tr>
+      <tr>
+        <td>data</td>
+        <td>LayerData</td>
+        <td>No</td>
+        <td>The actual data to display (events and/or backgrounds)</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+## Event Data Structure
+
+Events are discrete items displayed on specific calendar dates:
+
+<div className="settings-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Property</th>
+        <th>Type</th>
+        <th>Required</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>date</td>
+        <td>string</td>
+        <td>Yes</td>
+        <td>Date in YYYY-MM-DD format</td>
+      </tr>
+      <tr>
+        <td>title</td>
+        <td>string</td>
+        <td>Yes</td>
+        <td>Event title displayed on the calendar</td>
+      </tr>
+      <tr>
+        <td>type</td>
+        <td>string</td>
+        <td>Yes</td>
+        <td>Event type for categorization</td>
+      </tr>
+      <tr>
+        <td>time</td>
+        <td>string</td>
+        <td>Yes</td>
+        <td>Time or duration of the event</td>
+      </tr>
+      <tr>
+        <td>description</td>
+        <td>string</td>
+        <td>Yes</td>
+        <td>Detailed description shown in tooltips</td>
+      </tr>
+      <tr>
+        <td>color</td>
+        <td>string</td>
+        <td>No</td>
+        <td>Custom color for this specific event</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+## Background Data Structure
+
+Background highlights color date ranges on the calendar:
+
+<div className="settings-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Property</th>
+        <th>Type</th>
+        <th>Required</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>startDate</td>
+        <td>string</td>
+        <td>Yes</td>
+        <td>Start date in YYYY-MM-DD format</td>
+      </tr>
+      <tr>
+        <td>endDate</td>
+        <td>string</td>
+        <td>Yes</td>
+        <td>End date in YYYY-MM-DD format (inclusive)</td>
+      </tr>
+      <tr>
+        <td>color</td>
+        <td>string</td>
+        <td>Yes</td>
+        <td>Background color (hex format, usually light/pastel)</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+## Usage Examples
+
+### Basic Event Layer
+
+```typescript
+const eventLayer = {
+  name: 'meetings',
+  title: 'Team Meetings',
+  description: 'Recurring team meetings and standups',
+  visible: true,
+  enabled: true,
+  color: '#0366d6',
+  data: {
+    events: [
+      {
+        date: '2025-03-10',
+        title: 'Sprint Planning',
+        type: 'meeting',
+        time: '10:00 AM',
+        description: 'Plan next sprint tasks'
+      },
+      {
+        date: '2025-03-12',
+        title: 'Design Review',
+        type: 'meeting',
+        time: '2:00 PM',
+        description: 'Review new UI designs'
+      }
+    ]
+  }
+};
+```
+
+### Background Highlight Layer
+
+```typescript
+const sprintLayer = {
+  name: 'sprints',
+  title: 'Sprint Schedule',
+  description: 'Two-week sprint cycles',
+  visible: true,
+  enabled: true,
+  color: '#20c997',
+  data: {
+    background: [
+      {
+        startDate: '2025-03-03',
+        endDate: '2025-03-14',
+        color: '#e7f5ff'
+      },
+      {
+        startDate: '2025-03-17',
+        endDate: '2025-03-28',
+        color: '#fff0f6'
+      }
+    ]
+  }
+};
+```
+
+### Combined Layer
+
+```typescript
+const conferenceLayer = {
+  name: 'conference',
+  title: 'ReactConf 2025',
+  description: 'Conference schedule and highlights',
+  visible: true,
+  enabled: true,
+  color: '#6f42c1',
+  data: {
+    background: [
+      {
+        startDate: '2025-04-14',
+        endDate: '2025-04-18',
+        color: '#f3f0ff'
+      }
+    ],
+    events: [
+      {
+        date: '2025-04-14',
+        title: 'Opening Keynote',
+        type: 'conference',
+        time: '9:00 AM',
+        description: 'Welcome and opening remarks'
+      },
+      {
+        date: '2025-04-15',
+        title: 'Workshop Day',
+        type: 'conference',
+        time: 'All day',
+        description: 'Hands-on React workshops'
+      }
+    ]
+  }
+};
+```
+
+## Layer Controls
+
+When `showLayersNavigation` is enabled, users can:
+
+1. **Toggle Visibility**: Click layer names to show/hide them
+2. **View Active Layers**: See which layers are currently visible
+3. **Required Layers**: Some layers marked as `required` cannot be hidden
+4. **Disabled Layers**: Layers with `enabled: false` cannot be toggled
+
+## Best Practices
+
+### 1. Use Clear Names
+Give layers descriptive names and titles that clearly indicate their content:
+- ✅ `holidays` - "Public Holidays"
+- ❌ `layer1` - "Layer 1"
+
+### 2. Choose Appropriate Colors
+- Use your brand colors for primary layers
+- Use light/pastel colors for backgrounds
+- Reserve red for critical items
+- Ensure sufficient contrast
+
+### 3. Group Related Data
+Keep related information in the same layer:
+- All holidays in a "holidays" layer
+- All meetings in a "meetings" layer
+- All deadlines in a "deadlines" layer
+
+### 4. Set Sensible Defaults
+- Make important layers `visible: true` by default
+- Hide optional layers with `visible: false`
+- Use `required: true` sparingly
+
+### 5. Provide Meaningful Descriptions
+Help users understand what each layer contains:
+- ✅ "Federal holidays and company observances"
+- ❌ "Days off"
+
+## Performance Considerations
+
+- **Limit Events**: Keep events to a reasonable number per month
+- **Optimize Backgrounds**: Merge adjacent date ranges when possible
+- **Lazy Loading**: Consider loading layer data on demand for large datasets
+- **Color Choices**: Use CSS-friendly colors to avoid rendering issues
+
+## Integration with Other Features
+
+Layers work seamlessly with other calendar features:
+
+- **Date Selection**: Layers don't interfere with date picking
+- **Restrictions**: Can be combined with date restrictions
+- **Tooltips**: Event details appear on hover
+- **Responsive**: Layers adapt to different calendar sizes
+- **Timezone Support**: All dates respect the calendar's timezone setting
+
+## Common Use Cases
+
+1. **Project Management**: Sprints, milestones, deadlines
+2. **HR Systems**: Holidays, time off, company events  
+3. **Event Planning**: Conferences, workshops, travel
+4. **Resource Scheduling**: Availability, bookings, maintenance
+5. **Educational**: School terms, exams, breaks
+
+Visit the Stories page to see these use cases in action with interactive examples.

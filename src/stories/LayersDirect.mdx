@@ -1,0 +1,560 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { CLACalendar } from '../components/CLACalendar';
+import { CalendarStoryWrapper } from './shared/CalendarStoryWrapper';
+import { defaultArgs } from './shared/storyControls';
+
+<Meta title="Layers/Direct Rendering" />
+
+# Layers - Live Examples
+
+This page shows working calendar instances with various layer configurations.
+
+## Basic Event Layer
+
+A single layer showing team meetings that can be toggled on and off.
+
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: 2,
+  monthWidth: 500,
+  selectionMode: 'range',
+  showLayersNavigation: true,
+  layers: [{
+    name: 'meetings',
+    title: 'Team Meetings',
+    description: 'Recurring team meetings and standups',
+    visible: true,
+    enabled: true,
+    color: '#0366d6',
+    data: {
+      events: [
+        { date: '2025-03-10', title: 'Sprint Planning', type: 'meeting', time: '10:00 AM', description: 'Plan next sprint tasks' },
+        { date: '2025-03-12', title: 'Design Review', type: 'meeting', time: '2:00 PM', description: 'Review new UI designs' },
+        { date: '2025-03-14', title: 'Retrospective', type: 'meeting', time: '3:00 PM', description: 'Sprint retrospective' },
+        { date: '2025-03-17', title: 'Daily Standup', type: 'meeting', time: '9:00 AM', description: 'Team sync' },
+        { date: '2025-03-19', title: 'Tech Talk', type: 'meeting', time: '4:00 PM', description: 'Frontend best practices' }
+      ]
+    }
+  }]
+}
+```
+
+<CalendarStoryWrapper 
+    args={{
+      displayMode: 'embedded',
+      visibleMonths: 2,
+      monthWidth: 500,
+      selectionMode: 'range',
+      showHeader: true,
+      showFooter: true,
+      showTooltips: true,
+      startWeekOnSunday: false,
+      timezone: 'UTC',
+      showLayersNavigation: true,
+      layers: [{
+        name: 'meetings',
+        title: 'Team Meetings',
+        description: 'Recurring team meetings and standups',
+        visible: true,
+        enabled: true,
+        color: '#0366d6',
+        data: {
+          events: [
+            { date: '2025-03-10', title: 'Sprint Planning', type: 'meeting', time: '10:00 AM', description: 'Plan next sprint tasks' },
+            { date: '2025-03-12', title: 'Design Review', type: 'meeting', time: '2:00 PM', description: 'Review new UI designs' },
+            { date: '2025-03-14', title: 'Retrospective', type: 'meeting', time: '3:00 PM', description: 'Sprint retrospective' },
+            { date: '2025-03-17', title: 'Daily Standup', type: 'meeting', time: '9:00 AM', description: 'Team sync' },
+            { date: '2025-03-19', title: 'Tech Talk', type: 'meeting', time: '4:00 PM', description: 'Frontend best practices' }
+          ]
+        }
+      }]
+    }}
+    title="Basic Event Layer"
+    description="Toggle the 'Team Meetings' layer on and off to see events appear and disappear."
+  />
+
+## Multiple Layers
+
+Three layers showing different types of calendar data. The holidays layer is required and cannot be hidden.
+
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: 2,
+  monthWidth: 500,
+  selectionMode: 'range',
+  showLayersNavigation: true,
+  defaultLayer: 'holidays',
+  layers: [
+    {
+      name: 'holidays',
+      title: 'Public Holidays',
+      description: 'Federal holidays and observances',
+      visible: true,
+      enabled: true,
+      required: true,
+      color: '#dc3545',
+      data: {
+        events: [
+          { date: '2025-01-01', title: 'New Year\'s Day', type: 'holiday', time: 'All day', description: 'Federal holiday' },
+          { date: '2025-01-20', title: 'MLK Day', type: 'holiday', time: 'All day', description: 'Federal holiday' },
+          { date: '2025-02-17', title: 'Presidents Day', type: 'holiday', time: 'All day', description: 'Federal holiday' }
+        ]
+      }
+    },
+    {
+      name: 'meetings',
+      title: 'Team Meetings',
+      description: 'Recurring team meetings',
+      visible: true,
+      enabled: true,
+      color: '#0366d6',
+      data: {
+        events: [
+          { date: '2025-01-06', title: 'Q1 Planning', type: 'meeting', time: '10:00 AM', description: 'Quarterly planning session' },
+          { date: '2025-01-13', title: 'Sprint Review', type: 'meeting', time: '2:00 PM', description: 'Demo new features' },
+          { date: '2025-01-27', title: 'All Hands', type: 'meeting', time: '1:00 PM', description: 'Company-wide meeting' },
+          { date: '2025-02-03', title: 'Design Sprint', type: 'meeting', time: '9:00 AM', description: '3-day design workshop' }
+        ]
+      }
+    },
+    {
+      name: 'deadlines',
+      title: 'Project Deadlines',
+      description: 'Important project milestones',
+      visible: false,
+      enabled: true,
+      color: '#f6c23e',
+      data: {
+        events: [
+          { date: '2025-01-15', title: 'Feature Freeze', type: 'deadline', time: '5:00 PM', description: 'Code freeze for v2.0' },
+          { date: '2025-01-31', title: 'Release v2.0', type: 'deadline', time: 'EOD', description: 'Production deployment' },
+          { date: '2025-02-28', title: 'Q1 Report Due', type: 'deadline', time: '5:00 PM', description: 'Quarterly report submission' }
+        ]
+      }
+    }
+  ]
+}
+```
+
+<CalendarStoryWrapper 
+    args={{
+      displayMode: 'embedded',
+      visibleMonths: 2,
+      monthWidth: 500,
+      selectionMode: 'range',
+      showHeader: true,
+      showFooter: true,
+      showTooltips: true,
+      startWeekOnSunday: false,
+      timezone: 'UTC',
+      showLayersNavigation: true,
+      defaultLayer: 'holidays',
+      layers: [
+        {
+          name: 'holidays',
+          title: 'Public Holidays',
+          description: 'Federal holidays and observances',
+          visible: true,
+          enabled: true,
+          required: true,
+          color: '#dc3545',
+          data: {
+            events: [
+              { date: '2025-01-01', title: 'New Year\'s Day', type: 'holiday', time: 'All day', description: 'Federal holiday' },
+              { date: '2025-01-20', title: 'MLK Day', type: 'holiday', time: 'All day', description: 'Federal holiday' },
+              { date: '2025-02-17', title: 'Presidents Day', type: 'holiday', time: 'All day', description: 'Federal holiday' }
+            ]
+          }
+        },
+        {
+          name: 'meetings',
+          title: 'Team Meetings',
+          description: 'Recurring team meetings',
+          visible: true,
+          enabled: true,
+          color: '#0366d6',
+          data: {
+            events: [
+              { date: '2025-01-06', title: 'Q1 Planning', type: 'meeting', time: '10:00 AM', description: 'Quarterly planning session' },
+              { date: '2025-01-13', title: 'Sprint Review', type: 'meeting', time: '2:00 PM', description: 'Demo new features' },
+              { date: '2025-01-27', title: 'All Hands', type: 'meeting', time: '1:00 PM', description: 'Company-wide meeting' },
+              { date: '2025-02-03', title: 'Design Sprint', type: 'meeting', time: '9:00 AM', description: '3-day design workshop' }
+            ]
+          }
+        },
+        {
+          name: 'deadlines',
+          title: 'Project Deadlines',
+          description: 'Important project milestones',
+          visible: false,
+          enabled: true,
+          color: '#f6c23e',
+          data: {
+            events: [
+              { date: '2025-01-15', title: 'Feature Freeze', type: 'deadline', time: '5:00 PM', description: 'Code freeze for v2.0' },
+              { date: '2025-01-31', title: 'Release v2.0', type: 'deadline', time: 'EOD', description: 'Production deployment' },
+              { date: '2025-02-28', title: 'Q1 Report Due', type: 'deadline', time: '5:00 PM', description: 'Quarterly report submission' }
+            ]
+          }
+        }
+      ]
+    }}
+    title="Multiple Layers Example"
+    description="Holidays (required - cannot be hidden), Meetings (visible), and Deadlines (hidden by default). Toggle layers to see different information."
+  />
+
+## Background Highlights
+
+Sprint cycles with colored backgrounds to distinguish different iterations.
+
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: 2,
+  monthWidth: 500,
+  selectionMode: 'range',
+  showLayersNavigation: true,
+  layers: [{
+    name: 'sprints',
+    title: 'Sprint Schedule',
+    description: 'Two-week sprint cycles',
+    visible: true,
+    enabled: true,
+    color: '#20c997',
+    data: {
+      background: [
+        { startDate: '2025-03-03', endDate: '2025-03-14', color: '#e7f5ff' },
+        { startDate: '2025-03-17', endDate: '2025-03-28', color: '#fff0f6' },
+        { startDate: '2025-03-31', endDate: '2025-04-11', color: '#e7f5ff' }
+      ],
+      events: [
+        { date: '2025-03-03', title: 'Sprint 23 Start', type: 'milestone', time: '9:00 AM', description: 'Sprint kickoff' },
+        { date: '2025-03-14', title: 'Sprint 23 End', type: 'milestone', time: '5:00 PM', description: 'Sprint review & retro' },
+        { date: '2025-03-17', title: 'Sprint 24 Start', type: 'milestone', time: '9:00 AM', description: 'Sprint kickoff' },
+        { date: '2025-03-28', title: 'Sprint 24 End', type: 'milestone', time: '5:00 PM', description: 'Sprint review & retro' }
+      ]
+    }
+  }]
+}
+```
+
+<CalendarStoryWrapper 
+    args={{
+      displayMode: 'embedded',
+      visibleMonths: 2,
+      monthWidth: 500,
+      selectionMode: 'range',
+      showHeader: true,
+      showFooter: true,
+      showTooltips: true,
+      startWeekOnSunday: false,
+      timezone: 'UTC',
+      showLayersNavigation: true,
+      layers: [{
+        name: 'sprints',
+        title: 'Sprint Schedule',
+        description: 'Two-week sprint cycles',
+        visible: true,
+        enabled: true,
+        color: '#20c997',
+        data: {
+          background: [
+            { startDate: '2025-03-03', endDate: '2025-03-14', color: '#e7f5ff' },
+            { startDate: '2025-03-17', endDate: '2025-03-28', color: '#fff0f6' },
+            { startDate: '2025-03-31', endDate: '2025-04-11', color: '#e7f5ff' }
+          ],
+          events: [
+            { date: '2025-03-03', title: 'Sprint 23 Start', type: 'milestone', time: '9:00 AM', description: 'Sprint kickoff' },
+            { date: '2025-03-14', title: 'Sprint 23 End', type: 'milestone', time: '5:00 PM', description: 'Sprint review & retro' },
+            { date: '2025-03-17', title: 'Sprint 24 Start', type: 'milestone', time: '9:00 AM', description: 'Sprint kickoff' },
+            { date: '2025-03-28', title: 'Sprint 24 End', type: 'milestone', time: '5:00 PM', description: 'Sprint review & retro' }
+          ]
+        }
+      }]
+    }}
+    title="Sprint Schedule with Backgrounds"
+    description="Each sprint has a different background color. Blue for odd sprints, pink for even sprints."
+  />
+
+## Combined Events and Backgrounds
+
+Conference schedule showing both the conference duration (background) and individual sessions (events).
+
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: 2,
+  monthWidth: 500,
+  selectionMode: 'range',
+  showLayersNavigation: true,
+  layers: [
+    {
+      name: 'conferences',
+      title: 'Conference Schedule',
+      description: 'Tech conferences and workshops',
+      visible: true,
+      enabled: true,
+      color: '#6f42c1',
+      data: {
+        background: [
+          { startDate: '2025-04-14', endDate: '2025-04-18', color: '#f3f0ff' },
+          { startDate: '2025-05-05', endDate: '2025-05-07', color: '#fff5f5' }
+        ],
+        events: [
+          { date: '2025-04-14', title: 'ReactConf Day 1', type: 'conference', time: '9:00 AM', description: 'Opening keynote' },
+          { date: '2025-04-15', title: 'ReactConf Day 2', type: 'conference', time: '9:00 AM', description: 'Workshops' },
+          { date: '2025-04-16', title: 'ReactConf Day 3', type: 'conference', time: '9:00 AM', description: 'Advanced talks' },
+          { date: '2025-04-17', title: 'ReactConf Day 4', type: 'conference', time: '9:00 AM', description: 'Community day' },
+          { date: '2025-04-18', title: 'ReactConf Day 5', type: 'conference', time: '9:00 AM', description: 'Closing ceremony' },
+          { date: '2025-05-05', title: 'GraphQL Summit', type: 'conference', time: '10:00 AM', description: 'Day 1' },
+          { date: '2025-05-06', title: 'GraphQL Summit', type: 'conference', time: '10:00 AM', description: 'Day 2' },
+          { date: '2025-05-07', title: 'GraphQL Summit', type: 'conference', time: '10:00 AM', description: 'Day 3' }
+        ]
+      }
+    },
+    {
+      name: 'travel',
+      title: 'Travel & Logistics',
+      description: 'Flight and hotel bookings',
+      visible: true,
+      enabled: true,
+      color: '#fd7e14',
+      data: {
+        events: [
+          { date: '2025-04-13', title: 'Flight to SF', type: 'travel', time: '6:00 AM', description: 'AA 2456' },
+          { date: '2025-04-19', title: 'Flight home', type: 'travel', time: '7:00 PM', description: 'AA 2457' },
+          { date: '2025-05-04', title: 'Flight to NYC', type: 'travel', time: '8:00 AM', description: 'DL 1234' },
+          { date: '2025-05-08', title: 'Flight home', type: 'travel', time: '6:00 PM', description: 'DL 1235' }
+        ]
+      }
+    }
+  ]
+}
+```
+
+<CalendarStoryWrapper 
+    args={{
+      displayMode: 'embedded',
+      visibleMonths: 2,
+      monthWidth: 500,
+      selectionMode: 'range',
+      showHeader: true,
+      showFooter: true,
+      showTooltips: true,
+      startWeekOnSunday: false,
+      timezone: 'UTC',
+      showLayersNavigation: true,
+      layers: [
+        {
+          name: 'conferences',
+          title: 'Conference Schedule',
+          description: 'Tech conferences and workshops',
+          visible: true,
+          enabled: true,
+          color: '#6f42c1',
+          data: {
+            background: [
+              { startDate: '2025-04-14', endDate: '2025-04-18', color: '#f3f0ff' },
+              { startDate: '2025-05-05', endDate: '2025-05-07', color: '#fff5f5' }
+            ],
+            events: [
+              { date: '2025-04-14', title: 'ReactConf Day 1', type: 'conference', time: '9:00 AM', description: 'Opening keynote' },
+              { date: '2025-04-15', title: 'ReactConf Day 2', type: 'conference', time: '9:00 AM', description: 'Workshops' },
+              { date: '2025-04-16', title: 'ReactConf Day 3', type: 'conference', time: '9:00 AM', description: 'Advanced talks' },
+              { date: '2025-04-17', title: 'ReactConf Day 4', type: 'conference', time: '9:00 AM', description: 'Community day' },
+              { date: '2025-04-18', title: 'ReactConf Day 5', type: 'conference', time: '9:00 AM', description: 'Closing ceremony' },
+              { date: '2025-05-05', title: 'GraphQL Summit', type: 'conference', time: '10:00 AM', description: 'Day 1' },
+              { date: '2025-05-06', title: 'GraphQL Summit', type: 'conference', time: '10:00 AM', description: 'Day 2' },
+              { date: '2025-05-07', title: 'GraphQL Summit', type: 'conference', time: '10:00 AM', description: 'Day 3' }
+            ]
+          }
+        },
+        {
+          name: 'travel',
+          title: 'Travel & Logistics',
+          description: 'Flight and hotel bookings',
+          visible: true,
+          enabled: true,
+          color: '#fd7e14',
+          data: {
+            events: [
+              { date: '2025-04-13', title: 'Flight to SF', type: 'travel', time: '6:00 AM', description: 'AA 2456' },
+              { date: '2025-04-19', title: 'Flight home', type: 'travel', time: '7:00 PM', description: 'AA 2457' },
+              { date: '2025-05-04', title: 'Flight to NYC', type: 'travel', time: '8:00 AM', description: 'DL 1234' },
+              { date: '2025-05-08', title: 'Flight home', type: 'travel', time: '6:00 PM', description: 'DL 1235' }
+            ]
+          }
+        }
+      ]
+    }}
+    title="Conference and Travel Layers"
+    description="Purple backgrounds show conference dates, with individual sessions as events. Orange travel layer shows logistics."
+  />
+
+## Custom Colored Events
+
+Events with individual colors based on priority or category.
+
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: 2,
+  monthWidth: 500,
+  selectionMode: 'range',
+  showLayersNavigation: false,
+  layers: [{
+    name: 'tasks',
+    title: 'Task Priorities',
+    description: 'Tasks colored by priority',
+    visible: true,
+    enabled: true,
+    data: {
+      events: [
+        { date: '2025-03-10', title: 'Critical Bug Fix', type: 'task', time: 'ASAP', description: 'Production issue', color: '#dc3545' },
+        { date: '2025-03-11', title: 'Feature Review', type: 'task', time: '2:00 PM', description: 'Review PR #123', color: '#f6c23e' },
+        { date: '2025-03-12', title: 'Documentation', type: 'task', time: 'Anytime', description: 'Update API docs', color: '#28a745' },
+        { date: '2025-03-13', title: 'Security Patch', type: 'task', time: '10:00 AM', description: 'Apply security updates', color: '#dc3545' },
+        { date: '2025-03-14', title: 'Code Refactor', type: 'task', time: 'Afternoon', description: 'Clean up legacy code', color: '#0366d6' },
+        { date: '2025-03-17', title: 'Performance Test', type: 'task', time: '11:00 AM', description: 'Load testing', color: '#f6c23e' },
+        { date: '2025-03-18', title: 'Deploy Staging', type: 'task', time: '4:00 PM', description: 'Stage deployment', color: '#28a745' }
+      ]
+    }
+  }]
+}
+```
+
+<CalendarStoryWrapper 
+    args={{
+      displayMode: 'embedded',
+      visibleMonths: 2,
+      monthWidth: 500,
+      selectionMode: 'range',
+      showHeader: true,
+      showFooter: true,
+      showTooltips: true,
+      startWeekOnSunday: false,
+      timezone: 'UTC',
+      showLayersNavigation: false,
+      layers: [{
+        name: 'tasks',
+        title: 'Task Priorities',
+        description: 'Tasks colored by priority',
+        visible: true,
+        enabled: true,
+        data: {
+          events: [
+            { date: '2025-03-10', title: 'Critical Bug Fix', type: 'task', time: 'ASAP', description: 'Production issue', color: '#dc3545' },
+            { date: '2025-03-11', title: 'Feature Review', type: 'task', time: '2:00 PM', description: 'Review PR #123', color: '#f6c23e' },
+            { date: '2025-03-12', title: 'Documentation', type: 'task', time: 'Anytime', description: 'Update API docs', color: '#28a745' },
+            { date: '2025-03-13', title: 'Security Patch', type: 'task', time: '10:00 AM', description: 'Apply security updates', color: '#dc3545' },
+            { date: '2025-03-14', title: 'Code Refactor', type: 'task', time: 'Afternoon', description: 'Clean up legacy code', color: '#0366d6' },
+            { date: '2025-03-17', title: 'Performance Test', type: 'task', time: '11:00 AM', description: 'Load testing', color: '#f6c23e' },
+            { date: '2025-03-18', title: 'Deploy Staging', type: 'task', time: '4:00 PM', description: 'Stage deployment', color: '#28a745' }
+          ]
+        }
+      }]
+    }}
+    title="Priority-Based Task Colors"
+    description="Red = Critical, Yellow = Important, Green = Normal, Blue = Informational. Hover over events to see details."
+  />
+
+## Layers with Restrictions
+
+Combining layers with date restrictions to prevent scheduling during certain periods.
+
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'embedded',
+  visibleMonths: 2,
+  monthWidth: 500,
+  selectionMode: 'range',
+  showLayersNavigation: true,
+  layers: [{
+    name: 'availability',
+    title: 'Team Availability',
+    description: 'When team members are out of office',
+    visible: true,
+    enabled: true,
+    color: '#e83e8c',
+    data: {
+      background: [
+        { startDate: '2025-03-24', endDate: '2025-03-28', color: '#ffe0e6' }
+      ],
+      events: [
+        { date: '2025-03-24', title: 'Sarah OOO', type: 'absence', time: 'All day', description: 'Vacation' },
+        { date: '2025-03-25', title: 'Sarah OOO', type: 'absence', time: 'All day', description: 'Vacation' },
+        { date: '2025-03-26', title: 'Sarah OOO', type: 'absence', time: 'All day', description: 'Vacation' },
+        { date: '2025-03-27', title: 'Sarah OOO', type: 'absence', time: 'All day', description: 'Vacation' },
+        { date: '2025-03-28', title: 'Sarah OOO', type: 'absence', time: 'All day', description: 'Vacation' }
+      ]
+    }
+  }],
+  restrictionConfig: {
+    restrictions: [{
+      type: 'daterange',
+      enabled: true,
+      ranges: [{
+        startDate: '2025-03-24',
+        endDate: '2025-03-28',
+        message: 'Cannot schedule during team member absence'
+      }]
+    }]
+  }
+}
+```
+
+<CalendarStoryWrapper 
+    args={{
+      displayMode: 'embedded',
+      visibleMonths: 2,
+      monthWidth: 500,
+      selectionMode: 'range',
+      showHeader: true,
+      showFooter: true,
+      showTooltips: true,
+      startWeekOnSunday: false,
+      timezone: 'UTC',
+      showLayersNavigation: true,
+      layers: [{
+        name: 'availability',
+        title: 'Team Availability',
+        description: 'When team members are out of office',
+        visible: true,
+        enabled: true,
+        color: '#e83e8c',
+        data: {
+          background: [
+            { startDate: '2025-03-24', endDate: '2025-03-28', color: '#ffe0e6' }
+          ],
+          events: [
+            { date: '2025-03-24', title: 'Sarah OOO', type: 'absence', time: 'All day', description: 'Vacation' },
+            { date: '2025-03-25', title: 'Sarah OOO', type: 'absence', time: 'All day', description: 'Vacation' },
+            { date: '2025-03-26', title: 'Sarah OOO', type: 'absence', time: 'All day', description: 'Vacation' },
+            { date: '2025-03-27', title: 'Sarah OOO', type: 'absence', time: 'All day', description: 'Vacation' },
+            { date: '2025-03-28', title: 'Sarah OOO', type: 'absence', time: 'All day', description: 'Vacation' }
+          ]
+        }
+      }]
+    }}
+    restrictionConfigFactory={() => ({
+      restrictions: [{
+        type: 'daterange',
+        enabled: true,
+        ranges: [{
+          startDate: '2025-03-24',
+          endDate: '2025-03-28',
+          message: 'Cannot schedule during team member absence'
+        }]
+      }]
+    })}
+    title="Team Availability with Restrictions"
+    description="Pink background shows team member absence. These dates are also restricted and cannot be selected."
+  />
