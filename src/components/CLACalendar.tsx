@@ -52,7 +52,6 @@ import './CLACalendarComponents/CalendarPortal.css';
 import { RestrictionConfig, RestrictedBoundaryRestriction } from './CLACalendarComponents/restrictions/types';
 
 // Import new extracted components
-import { Card } from './CLACalendar/components/Card';
 import { DayCell } from './CLACalendar/components/DayCell';
 import { MonthGrid } from './CLACalendar/components/MonthGrid';
 import { CalendarGrid } from './CLACalendar/components/CalendarGrid';
