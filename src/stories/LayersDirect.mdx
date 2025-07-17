@@ -562,17 +562,19 @@ Combining layers with date restrictions to prevent scheduling during certain per
         }
       }]
     }}
-    restrictionConfigFactory={() => ({
-      restrictions: [{
-        type: 'daterange',
-        enabled: true,
-        ranges: [{
-          startDate: '2025-08-11',
-          endDate: '2025-08-15',
-          message: 'Cannot schedule meetings - Sarah (Lead Backend Engineer) is on vacation. Please reschedule any backend-related discussions to the following week or contact Mike Chen for urgent matters.'
+    settingsOverrides={{
+      restrictionConfigFactory: () => ({
+        restrictions: [{
+          type: 'daterange',
+          enabled: true,
+          ranges: [{
+            startDate: '2025-08-11',
+            endDate: '2025-08-15',
+            message: 'Cannot schedule meetings - Sarah (Lead Backend Engineer) is on vacation. Please reschedule any backend-related discussions to the following week or contact Mike Chen for urgent matters.'
+          }]
         }]
-      }]
-    })}
+      })
+    }}
     title="Team Availability with Restrictions"
     description="Pink background shows team member absence. These dates are also restricted and cannot be selected."
   />

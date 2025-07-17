@@ -9,9 +9,7 @@ interface CalendarStoryWrapperProps {
   description?: string;
   showSelectedDate?: boolean;
   containerStyle?: React.CSSProperties;
-  restrictionConfigFactory?: () => any;
-  layersFactory?: () => any[];
-  initialActiveLayer?: string;
+  settingsOverrides?: any;
 }
 
 /**
@@ -24,16 +22,14 @@ export const CalendarStoryWrapper: React.FC<CalendarStoryWrapperProps> = ({
   description,
   showSelectedDate = true,
   containerStyle = {},
-  restrictionConfigFactory,
-  layersFactory,
-  initialActiveLayer
+  settingsOverrides = {}
 }) => {
   const [selectedDates, setSelectedDates] = useState<{
     start: string | null;
     end: string | null;
   }>({ start: null, end: null });
 
-  const handleSubmit = (start: string, end?: string) => {
+  const handleSubmit = (start: string | null, end: string | null) => {
     setSelectedDates({
       start: start,
       end: end || start
@@ -42,7 +38,9 @@ export const CalendarStoryWrapper: React.FC<CalendarStoryWrapperProps> = ({
 
   const settings = {
     ...getDefaultSettings(),
-    ...argsToSettings(args)
+    ...argsToSettings(args),
+    onSubmit: handleSubmit,
+    ...settingsOverrides
   };
 
   return (
@@ -55,11 +53,7 @@ export const CalendarStoryWrapper: React.FC<CalendarStoryWrapperProps> = ({
       
       <CLACalendar 
         settings={settings}
-        onSubmit={handleSubmit}
         _onSettingsChange={() => {}}
-        restrictionConfigFactory={restrictionConfigFactory}
-        layersFactory={layersFactory}
-        initialActiveLayer={initialActiveLayer}
       />
       
       {showSelectedDate && selectedDates.start && (

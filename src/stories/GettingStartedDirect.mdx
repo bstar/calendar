@@ -465,21 +465,23 @@ Calendar with date selection restrictions applied.
     dateRangeSeparator: ' - ',
     baseFontSize: '1rem'
   }}
-  restrictionConfigFactory={() => ({
-    restrictions: [
-      {
-        type: 'boundary',
-        enabled: true,
-        minDate: '2025-07-01',
-        maxDate: '2025-12-31'
-      },
-      {
-        type: 'weekday',
-        enabled: true,
-        days: [0, 6]
-      }
-    ]
-  })}
+  settingsOverrides={{
+    restrictionConfigFactory: () => ({
+      restrictions: [
+        {
+          type: 'boundary',
+          enabled: true,
+          minDate: '2025-07-01',
+          maxDate: '2025-12-31'
+        },
+        {
+          type: 'weekday',
+          enabled: true,
+          days: [0, 6]
+        }
+      ]
+    })
+  }}
   title="Calendar with Restrictions"
   description="Only July-December 2025 weekdays are selectable"
 />

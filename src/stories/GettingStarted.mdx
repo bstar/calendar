@@ -254,8 +254,10 @@ const restrictionConfig = {
 };
 
 <CLACalendar
-  settings={settings}
-  restrictionConfigFactory={() => restrictionConfig}
+  settings={{
+    ...settings,
+    restrictionConfigFactory: () => restrictionConfig
+  }}
 />
 ```
 

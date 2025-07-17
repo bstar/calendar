@@ -23,15 +23,9 @@ The CLACalendar is a flexible React date range picker component with support for
     <tbody>
       <tr>
         <td>settings</td>
-        <td>CalendarSettings</td>
-        <td>Yes</td>
-        <td>Configuration object for the calendar</td>
-      </tr>
-      <tr>
-        <td>onSubmit</td>
-        <td>Function</td>
+        <td>Partial&lt;CalendarSettings&gt;</td>
         <td>No</td>
-        <td>Callback when date(s) are selected</td>
+        <td>Configuration object for the calendar</td>
       </tr>
       <tr>
         <td>_onSettingsChange</td>
@@ -40,22 +34,10 @@ The CLACalendar is a flexible React date range picker component with support for
         <td>Callback when settings change</td>
       </tr>
       <tr>
-        <td>initialActiveLayer</td>
-        <td>string</td>
-        <td>No</td>
-        <td>Initial active layer name</td>
-      </tr>
-      <tr>
-        <td>layersFactory</td>
+        <td>onMonthChange</td>
         <td>Function</td>
         <td>No</td>
-        <td>Factory function for lazy-loading layers</td>
-      </tr>
-      <tr>
-        <td>restrictionConfigFactory</td>
-        <td>Function</td>
-        <td>No</td>
-        <td>Factory function for lazy-loading restrictions</td>
+        <td>Callback when visible months change</td>
       </tr>
     </tbody>
   </table>
@@ -247,9 +229,9 @@ function MyComponent() {
       settings={{
         displayMode: 'embedded',
         visibleMonths: 2,
-        selectionMode: 'range'
+        selectionMode: 'range',
+        onSubmit: handleDateSubmit
       }}
-      onSubmit={handleDateSubmit}
     />
   );
 }
@@ -263,9 +245,9 @@ function MyComponent() {
     displayMode: 'popup',
     position: 'top-right',
     useDynamicPosition: false,
-    selectionMode: 'single'
+    selectionMode: 'single',
+    onSubmit: (date) => console.log('Selected:', date)
   }}
-  onSubmit={(date) => console.log('Selected:', date)}
 />
 ```
 

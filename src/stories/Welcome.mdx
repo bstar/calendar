@@ -323,9 +323,9 @@ function DateSelector() {
       settings={{
         displayMode: 'popup',
         visibleMonths: 2,
-        selectionMode: 'range'
+        selectionMode: 'range',
+        onSubmit: handleDateSubmit
       }}
-      onSubmit={handleDateSubmit}
     />
   );
 }`}

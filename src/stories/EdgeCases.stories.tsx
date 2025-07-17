@@ -242,7 +242,7 @@ export const ConflictingRestrictions: Story = {
         }}
         title="Conflicting Restrictions"
         description="Boundary allows June 2025, but daterange blocks the entire month"
-        restrictionConfigFactory={() => restrictionConfig}
+        settingsOverrides={{ restrictionConfigFactory: () => restrictionConfig }}
       />
     );
   }

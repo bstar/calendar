@@ -301,17 +301,19 @@ export const LayersWithRestrictions: Story = {
       args={args}
       title="Layers with Restrictions"
       description="Team availability layer combined with date restrictions. The highlighted dates show when team members are out and cannot be selected."
-      restrictionConfigFactory={() => ({
-        restrictions: [{
-          type: 'daterange',
-          enabled: true,
-          ranges: [{
-            startDate: '2025-08-11',
-            endDate: '2025-08-15',
-            message: 'Cannot schedule meetings - Sarah (Lead Backend Engineer) is on vacation. Please reschedule any backend-related discussions to the following week or contact Mike Chen for urgent matters.'
+      settingsOverrides={{ 
+        restrictionConfigFactory: () => ({
+          restrictions: [{
+            type: 'daterange',
+            enabled: true,
+            ranges: [{
+              startDate: '2025-08-11',
+              endDate: '2025-08-15',
+              message: 'Cannot schedule meetings - Sarah (Lead Backend Engineer) is on vacation. Please reschedule any backend-related discussions to the following week or contact Mike Chen for urgent matters.'
+            }]
           }]
-        }]
-      })}
+        })
+      }}
     />
   )
 };

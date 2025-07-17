@@ -841,12 +841,9 @@ The DateRangePicker component (exported as both `DateRangePicker` and `CLACalend
 
 ```typescript
 interface CLACalendarProps {
-  settings: CalendarSettings;
-  _onSettingsChange: (settings: CalendarSettings) => void;
-  initialActiveLayer?: string;
-  onSubmit?: (startDate: string, endDate: string) => void;
-  layersFactory?: () => Layer[];
-  restrictionConfigFactory?: () => RestrictionConfig;
+  settings?: Partial<CalendarSettings>;
+  _onSettingsChange?: (settings: CalendarSettings) => void;
+  onMonthChange?: (visibleMonths: Date[]) => void;
 }
 ```
 
@@ -882,6 +879,12 @@ The `settings` prop contains all configuration options:
 - `dateRangeSeparator`: `string` - Separator for date ranges (default: " - ")
 - `defaultRange`: `{ start: string; end: string }` - Initial selection
 - `showDateInputs`: `boolean` - Show date input fields (default: true)
+
+#### Callback Settings
+- `onSubmit`: `(startDate: string | null, endDate: string | null) => void` - Callback when user submits selection
+- `initialActiveLayer`: `string` - Initial active layer to display
+- `layersFactory`: `() => Layer[]` - Factory function to generate layers dynamically
+- `restrictionConfigFactory`: `() => RestrictionConfig` - Factory function to generate restrictions dynamically
 
 #### Style Settings
 - `colors`: Color theme object with properties:
@@ -965,9 +968,9 @@ Use `getDefaultSettings()` to get the default configuration, which includes:
     displayMode: 'popup',
     selectionMode: 'single',
     visibleMonths: 1,
-    dateFormatter: (date) => format(date, 'MM/dd/yyyy')
+    dateFormatter: (date) => format(date, 'MM/dd/yyyy'),
+    onSubmit: (start, end) => console.log('Selected:', start, end)
   }}
-  onSubmit={(start, end) => console.log('Selected:', start, end)}
   _onSettingsChange={setSettings}
 />
 
@@ -984,16 +987,16 @@ Use `getDefaultSettings()` to get the default configuration, which includes:
           { date: '2025-12-25', title: 'Christmas', type: 'holiday', time: 'All day', description: 'Federal holiday' }
         ]
       }
-    }]
+    }],
+    restrictionConfigFactory: () => ({
+      restrictions: [{
+        type: 'boundary',
+        enabled: true,
+        minDate: '2025-01-01',
+        maxDate: '2025-12-31'
+      }]
+    })
   }}
-  restrictionConfigFactory={() => ({
-    restrictions: [{
-      type: 'boundary',
-      enabled: true,
-      minDate: '2025-01-01',
-      maxDate: '2025-12-31'
-    }]
-  })}
   _onSettingsChange={setSettings}
 />
 ```

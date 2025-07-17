@@ -275,6 +275,26 @@ export interface CalendarSettings {
    * Whether to show the Start/End Date input fields in the header. Defaults to true.
    */
   showDateInputs?: boolean;
+
+  /**
+   * Callback when user submits a date selection
+   */
+  onSubmit?: (startDate: string | null, endDate: string | null) => void;
+
+  /**
+   * Initial active layer to display
+   */
+  initialActiveLayer?: string;
+
+  /**
+   * Factory function to generate layers dynamically
+   */
+  layersFactory?: () => Layer[];
+
+  /**
+   * Factory function to generate restriction configuration dynamically
+   */
+  restrictionConfigFactory?: () => RestrictionConfig;
 }
 
 // Control Types for App.tsx

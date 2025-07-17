@@ -57,7 +57,7 @@ import { MonthGrid } from './CLACalendar/components/MonthGrid';
 import { CalendarGrid } from './CLACalendar/components/CalendarGrid';
 import { LayerControl } from './CLACalendar/components/LayerControl';
 import { getFontSize, isSameMonth } from './CLACalendar/utils/calendar.utils';
-import type { RenderResult, Renderer } from './CLACalendar/CLACalendar.types';
+import type { RenderResult, Renderer, CLACalendarProps } from './CLACalendar/CLACalendar.types';
 
 
 // Generate a unique ID for each calendar instance
@@ -230,25 +230,13 @@ const measurementCache = {
   }
 };
 
-interface CLACalendarProps {
-  settings?: Partial<CalendarSettings>;
-  _onSettingsChange?: (settings: CalendarSettings) => void;
-  initialActiveLayer?: string;
-  onSubmit?: (startDate: string | null, endDate: string | null) => void;
-  onMonthChange?: (visibleMonths: Date[]) => void;
-  layersFactory?: () => Layer[];
-  restrictionConfigFactory?: () => RestrictionConfig;
-}
+// This interface is now defined in CLACalendar.types.ts
 
 
 export const CLACalendar: React.FC<CLACalendarProps> = ({
   settings: userSettings = {},
   _onSettingsChange = () => {},
-  initialActiveLayer,
-  onSubmit,
-  onMonthChange,
-  layersFactory,
-  restrictionConfigFactory
+  onMonthChange
 }) => {
   // Create safe, complete settings with null handling
   const settings = useMemo(() => createCalendarSettings(userSettings), [userSettings]);
@@ -346,8 +334,8 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   useEffect(() => {
     if (everInitialized && !lazyDataLoaded) {
       // Load lazy layers if factory provided
-      if (layersFactory) {
-        const layers = layersFactory();
+      if (settings.layersFactory) {
+        const layers = settings.layersFactory();
         setLazyLayers(layers);
 
         // Initialize the LayerManager immediately with the layers
@@ -356,20 +344,20 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       }
 
       // Load lazy restriction config if factory provided
-      if (restrictionConfigFactory) {
-        const config = restrictionConfigFactory();
+      if (settings.restrictionConfigFactory) {
+        const config = settings.restrictionConfigFactory();
         setLazyRestrictionConfig(config);
       }
 
       setLazyDataLoaded(true);
     }
-  }, [everInitialized, lazyDataLoaded, layersFactory, restrictionConfigFactory]);
+  }, [everInitialized, lazyDataLoaded, settings.layersFactory, settings.restrictionConfigFactory]);
 
   // Get the effective layers to use - either from lazy loading or direct settings
   const effectiveLayers = useMemo(() => {
     let layers: Layer[] = [];
     
-    if (layersFactory && lazyLayers) {
+    if (settings.layersFactory && lazyLayers) {
       layers = Array.isArray(lazyLayers) ? lazyLayers : [];
     } else {
       layers = Array.isArray(settings.layers) ? settings.layers : [];
@@ -401,15 +389,15 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     }
     
     return validLayers;
-  }, [settings.layers, lazyLayers, layersFactory]);
+  }, [settings.layers, lazyLayers, settings.layersFactory]);
 
   // Get the effective restriction config to use - either from lazy loading or direct settings
   const effectiveRestrictionConfig = useMemo(() => {
-    if (restrictionConfigFactory && lazyRestrictionConfig) {
+    if (settings.restrictionConfigFactory && lazyRestrictionConfig) {
       return lazyRestrictionConfig;
     }
     return settings.restrictionConfig || null;
-  }, [settings.restrictionConfig, lazyRestrictionConfig, restrictionConfigFactory]);
+  }, [settings.restrictionConfig, lazyRestrictionConfig, settings.restrictionConfigFactory]);
 
   // These expensive operations only happen when the calendar is first opened
 
@@ -418,38 +406,38 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     if (!everInitialized) return null;
 
     // Only create manager when we have layers (either direct or lazy-loaded)
-    if (layersFactory && !lazyLayers) return null;
+    if (settings.layersFactory && !lazyLayers) return null;
 
     return new LayerManager(effectiveLayers);
-  }, [everInitialized, effectiveLayers, layersFactory, lazyLayers]);
+  }, [everInitialized, effectiveLayers, settings.layersFactory, lazyLayers]);
 
   // Initialize the selection manager only when first opened and restriction config is available
   const selectionManager = useMemo(() => {
     if (!everInitialized) return null;
 
     // Only create manager when we have restriction config (either direct or lazy-loaded)
-    if (restrictionConfigFactory && !lazyRestrictionConfig) return null;
+    if (settings.restrictionConfigFactory && !lazyRestrictionConfig) return null;
 
     return new DateRangeSelectionManager(
       effectiveRestrictionConfig,
       settings.selectionMode,
       settings.showSelectionAlert
     );
-  }, [everInitialized, effectiveRestrictionConfig, settings.selectionMode, settings.showSelectionAlert, restrictionConfigFactory, lazyRestrictionConfig]);
+  }, [everInitialized, effectiveRestrictionConfig, settings.selectionMode, settings.showSelectionAlert, settings.restrictionConfigFactory, lazyRestrictionConfig]);
 
   // Generate restriction background data only when first opened and restriction config is available
   const _restrictionBackgroundData = useMemo(() => {
     if (!everInitialized) return null;
 
     // Only generate data when we have restriction config (either direct or lazy-loaded)
-    if (restrictionConfigFactory && !lazyRestrictionConfig) return null;
+    if (settings.restrictionConfigFactory && !lazyRestrictionConfig) return null;
 
     return RestrictionBackgroundGenerator.generateBackgroundData(effectiveRestrictionConfig);
-  }, [everInitialized, effectiveRestrictionConfig, restrictionConfigFactory, lazyRestrictionConfig]);
+  }, [everInitialized, effectiveRestrictionConfig, settings.restrictionConfigFactory, lazyRestrictionConfig]);
 
-  // Use initialActiveLayer if provided, otherwise use settings.defaultLayer
+  // Use initialActiveLayer from settings if provided, otherwise use settings.defaultLayer
   const [activeLayer, setActiveLayer] = useState(
-    initialActiveLayer || settings.defaultLayer
+    settings.initialActiveLayer || settings.defaultLayer
   );
 
   // Initialize activeLayers only when first opened
@@ -567,10 +555,10 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
 
   // Add a useEffect to update activeLayer when initialActiveLayer changes
   useEffect(() => {
-    if (initialActiveLayer) {
-      setActiveLayer(initialActiveLayer);
+    if (settings.initialActiveLayer) {
+      setActiveLayer(settings.initialActiveLayer);
     }
-  }, [initialActiveLayer]);
+  }, [settings.initialActiveLayer]);
 
   // Effect for continuous month advancement - only when initialized
   useEffect(() => {
@@ -701,10 +689,10 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       setIsOpen,
       setActiveLayer,
       selectedRange,
-      onSubmit,
+      settings.onSubmit,
       settings.closeOnClickAway
     ),
-    [setSelectedRange, setDateInputContext, setIsSelecting, setValidationErrors, setCurrentMonth, setIsOpen, setActiveLayer, selectedRange, onSubmit, settings.closeOnClickAway]
+    [setSelectedRange, setDateInputContext, setIsSelecting, setValidationErrors, setCurrentMonth, setIsOpen, setActiveLayer, selectedRange, settings.onSubmit, settings.closeOnClickAway]
   );
 
   // Wrap the original handleSubmit to update displayRange
@@ -853,8 +841,8 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       }
 
       // Force immediate loading of lazy data
-      if (layersFactory && !lazyLayers) {
-        const layers = layersFactory();
+      if (settings.layersFactory && !lazyLayers) {
+        const layers = settings.layersFactory();
         setLazyLayers(layers);
 
         // Initialize activeLayers right away
@@ -900,7 +888,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
 
     // Make sure we have layers before attempting to render
     // This is crucial to prevent empty rendering
-    if ((layersFactory && !lazyLayers) || !activeLayers || activeLayers.length === 0) {
+    if ((settings.layersFactory && !lazyLayers) || !activeLayers || activeLayers.length === 0) {
       return <div>Loading calendar data...</div>;
     }
 

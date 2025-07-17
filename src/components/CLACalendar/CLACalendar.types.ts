@@ -3,11 +3,7 @@ import { CalendarSettings, Layer, RestrictionConfig } from '../CLACalendar.confi
 export interface CLACalendarProps {
   settings?: Partial<CalendarSettings>;
   _onSettingsChange?: (settings: CalendarSettings) => void;
-  initialActiveLayer?: string;
-  onSubmit?: (startDate: string | null, endDate: string | null) => void;
   onMonthChange?: (visibleMonths: Date[]) => void;
-  layersFactory?: () => Layer[];
-  restrictionConfigFactory?: () => RestrictionConfig;
 }
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
