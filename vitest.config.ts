@@ -19,7 +19,14 @@ export default defineConfig({
         '**/*.config.*',
         '**/mockData/**',
         'src/main.tsx',
-        'src/App.tsx'
+        'src/App.tsx',
+        'src/stories/**',
+        '.storybook/**',
+        '**/*.stories.*',
+        'storybook-static/**',
+        'src/examples/**',
+        'src/components/utils/storybook-*',
+        'src/components/DebugPopup.tsx'
       ]
     }
   },
