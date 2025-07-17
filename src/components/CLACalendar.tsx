@@ -516,13 +516,6 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     }
   }, [months, onMonthChange]);
 
-  // Only show tooltips when initialized
-  const shouldShowTooltips = useMemo(() => {
-    if (!everInitialized) return false;
-    if (!settings.showTooltips) return false;
-    if (settings.suppressTooltipsOnSelection && isSelecting) return false;
-    return true;
-  }, [everInitialized, settings.showTooltips, settings.suppressTooltipsOnSelection, isSelecting]);
 
   // Initialize during first open
   useEffect(() => {
@@ -739,7 +732,6 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
         isSelecting={isSelecting}
         visibleMonths={settings.visibleMonths}
         showMonthHeadings={settings.showMonthHeadings}
-        showTooltips={shouldShowTooltips}
         layer={layer}
         restrictionConfig={effectiveRestrictionConfig}
         startWeekOnSunday={settings.startWeekOnSunday}
@@ -747,7 +739,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
         activeLayer={activeLayer}
       />
     );
-  }, [everInitialized, months, selectedRange, handleSelectionStart, handleSelectionMove, isSelecting, settings, shouldShowTooltips, effectiveRestrictionConfig, activeLayer]);
+  }, [everInitialized, months, selectedRange, handleSelectionStart, handleSelectionMove, isSelecting, settings, effectiveRestrictionConfig, activeLayer]);
 
   // Register with the calendar coordinator 
   useEffect(() => {

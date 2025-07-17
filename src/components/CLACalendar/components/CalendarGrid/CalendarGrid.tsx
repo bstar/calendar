@@ -15,7 +15,6 @@ const MonthPair: React.FC<MonthPairProps> = ({
   isSelecting,
   visibleMonths,
   showMonthHeadings,
-  showTooltips,
   renderDay,
   layer,
   activeLayer,
@@ -24,6 +23,12 @@ const MonthPair: React.FC<MonthPairProps> = ({
   settings,
   months
 }) => {
+  // Calculate whether to show tooltips based on settings
+  const showTooltips = useMemo(() => {
+    if (!settings?.showTooltips) return false;
+    if (settings.suppressTooltipsOnSelection && isSelecting) return false;
+    return true;
+  }, [settings?.showTooltips, settings?.suppressTooltipsOnSelection, isSelecting]);
   // Use the months array directly if provided, otherwise calculate months
   const monthsToShow: Date[] = months || (() => {
     const result: Date[] = [];
@@ -56,7 +61,7 @@ const MonthPair: React.FC<MonthPairProps> = ({
           onSelectionMove={onSelectionMove}
           style={{ width: `${100 / visibleMonths}%` }}
           showMonthHeading={showMonthHeadings}
-          showTooltips={showTooltips && settings?.showTooltips}
+          showTooltips={showTooltips}
           renderDay={renderDay}
           layer={layer}
           restrictionConfig={restrictionConfig}
@@ -77,7 +82,6 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
   isSelecting,
   visibleMonths,
   showMonthHeadings,
-  showTooltips,
   layer,
   activeLayer,
   restrictionConfig,
@@ -141,7 +145,6 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
       isSelecting={isSelecting}
       visibleMonths={visibleMonths}
       showMonthHeadings={showMonthHeadings}
-      showTooltips={showTooltips}
       renderDay={renderDay}
       layer={layer}
       restrictionConfig={restrictionConfig}

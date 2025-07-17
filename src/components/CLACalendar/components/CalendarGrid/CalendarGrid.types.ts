@@ -10,7 +10,6 @@ export interface CalendarGridProps {
   isSelecting: boolean;
   visibleMonths: number;
   showMonthHeadings: boolean;
-  showTooltips: boolean;
   layer: Layer;
   activeLayer: string;
   restrictionConfig?: RestrictionConfig;
