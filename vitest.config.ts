@@ -13,9 +13,13 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
       exclude: [
-        'node_modules/',
-        'test/',
+        'node_modules/**',
+        'test/**',
         '**/*.d.ts',
+        '**/*.types.ts',
+        '**/*.types.tsx',
+        '**/types.ts',
+        '**/types.tsx',
         '**/*.config.*',
         '**/mockData/**',
         'src/main.tsx',
@@ -26,8 +30,12 @@ export default defineConfig({
         'storybook-static/**',
         'src/examples/**',
         'src/components/utils/storybook-*',
-        'src/components/DebugPopup.tsx'
-      ]
+        'src/components/DebugPopup.tsx',
+        '**/dist/**',
+        '**/.vite/**',
+        '**/index.ts'  // Often just re-exports
+      ],
+      include: ['src/**/*.{ts,tsx,js,jsx}']
     }
   },
   resolve: {
