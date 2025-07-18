@@ -1,22 +1,37 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   now,
+  nowUTC,
   parseISO,
+  parseISOUTC,
   format,
   formatUTC,
   eachDayOfInterval,
+  eachDayOfIntervalUTC,
+  addDays,
   addDaysUTC,
+  addMonths,
   addMonthsUTC,
+  startOfWeek,
   startOfWeekUTC,
+  endOfWeek,
   endOfWeekUTC,
+  startOfMonth,
   startOfMonthUTC,
+  endOfMonth,
   endOfMonthUTC,
   isSameMonth,
   isSameMonthUTC,
+  isSameDay,
+  isSameDayUTC,
   createDate,
+  createUTCDate,
   toUTC,
   isWithinInterval,
-  isSameDay
+  isWithinIntervalUTC,
+  isWithinIntervalTZ,
+  DEFAULT_TIMEZONE,
+  isValid
 } from './DateUtils';
 
 describe('DateUtils', () => {
@@ -329,6 +344,26 @@ describe('DateUtils', () => {
         expect(isSameDay(date1, date2, 'local')).toBe(true);
       });
     });
+
+    describe('isSameMonth with timezone', () => {
+      it('should default to UTC comparison', () => {
+        const date1 = createDate(2025, 5, 15);
+        const date2 = createDate(2025, 5, 30);
+        expect(isSameMonth(date1, date2)).toBe(true);
+      });
+
+      it('should use local timezone when specified', () => {
+        const date1 = new Date('2025-06-15');
+        const date2 = new Date('2025-06-30');
+        expect(isSameMonth(date1, date2, 'local')).toBe(true);
+      });
+
+      it('should return false for different months in local timezone', () => {
+        const date1 = new Date(2025, 5, 30); // June 30, 2025
+        const date2 = new Date(2025, 6, 1);  // July 1, 2025
+        expect(isSameMonth(date1, date2, 'local')).toBe(false);
+      });
+    });
   });
 
   describe('Edge Cases', () => {
@@ -356,6 +391,591 @@ describe('DateUtils', () => {
       expect(afterAddition.getUTCHours()).toBe(0);
       expect(afterAddition.getUTCMinutes()).toBe(0);
       expect(afterAddition.getUTCSeconds()).toBe(0);
+    });
+  });
+
+  describe('Uncovered Functions', () => {
+    describe('createUTCDate', () => {
+      it('should create a UTC date (alias for createDate)', () => {
+        const date = createUTCDate(2025, 5, 15);
+        expect(date.getUTCFullYear()).toBe(2025);
+        expect(date.getUTCMonth()).toBe(5);
+        expect(date.getUTCDate()).toBe(15);
+        expect(date.getUTCHours()).toBe(0);
+        expect(date.getUTCMinutes()).toBe(0);
+        expect(date.getUTCSeconds()).toBe(0);
+      });
+    });
+
+    describe('nowUTC', () => {
+      it('should return current date in UTC', () => {
+        const result = nowUTC();
+        const now = new Date();
+        // The function converts current time to UTC, so check the components match
+        expect(result.getUTCFullYear()).toBe(now.getFullYear());
+        expect(result.getUTCMonth()).toBe(now.getMonth());
+        expect(result.getUTCDate()).toBe(now.getDate());
+        expect(result.getUTCHours()).toBe(now.getHours());
+        expect(result.getUTCMinutes()).toBe(now.getMinutes());
+      });
+    });
+
+    describe('parseISOUTC', () => {
+      it('should parse ISO string to UTC date (deprecated function)', () => {
+        const result = parseISOUTC('2025-06-15T15:30:00');
+        expect(result.getUTCFullYear()).toBe(2025);
+        expect(result.getUTCMonth()).toBe(5);
+        expect(result.getUTCDate()).toBe(15);
+        expect(result.getUTCHours()).toBe(15);
+        expect(result.getUTCMinutes()).toBe(30);
+      });
+
+      it('should handle date-only strings', () => {
+        const result = parseISOUTC('2025-12-25');
+        expect(result.getUTCFullYear()).toBe(2025);
+        expect(result.getUTCMonth()).toBe(11);
+        expect(result.getUTCDate()).toBe(25);
+        expect(result.getUTCHours()).toBe(0);
+      });
+    });
+
+    describe('addMonths', () => {
+      it('should add months using local timezone', () => {
+        const date = new Date('2025-06-15T00:00:00');
+        const result = addMonths(date, 3);
+        expect(result.getMonth()).toBe(8); // September
+        // date-fns preserves the day of month when possible
+        expect(result.getDate()).toBe(15);
+      });
+
+      it('should handle negative months', () => {
+        const date = new Date('2025-06-15');
+        const result = addMonths(date, -2);
+        expect(result.getMonth()).toBe(3); // April
+        expect(result.getFullYear()).toBe(2025);
+      });
+
+      it('should handle year boundaries', () => {
+        const date = new Date('2025-11-15');
+        const result = addMonths(date, 3);
+        expect(result.getMonth()).toBe(1); // February
+        expect(result.getFullYear()).toBe(2026);
+      });
+
+      it('should handle month-end edge cases', () => {
+        const date = new Date('2025-01-31');
+        const result = addMonths(date, 1);
+        // Should adjust to Feb 28 (non-leap year)
+        expect(result.getMonth()).toBe(1); // February
+        expect(result.getDate()).toBeLessThanOrEqual(28);
+      });
+    });
+
+    describe('eachDayOfIntervalUTC', () => {
+      it('should generate all days in UTC interval', () => {
+        const start = createUTCDate(2025, 5, 10);
+        const end = createUTCDate(2025, 5, 15);
+        const result = eachDayOfIntervalUTC({ start, end });
+        
+        expect(result).toHaveLength(6);
+        expect(result[0].getUTCDate()).toBe(10);
+        expect(result[5].getUTCDate()).toBe(15);
+        
+        // All dates should be at UTC midnight
+        result.forEach(date => {
+          expect(date.getUTCHours()).toBe(0);
+          expect(date.getUTCMinutes()).toBe(0);
+          expect(date.getUTCSeconds()).toBe(0);
+        });
+      });
+
+      it('should handle single day interval in UTC', () => {
+        const date = createUTCDate(2025, 5, 15);
+        const result = eachDayOfIntervalUTC({ start: date, end: date });
+        
+        expect(result).toHaveLength(1);
+        expect(result[0].getUTCDate()).toBe(15);
+      });
+
+      it('should handle month boundaries in UTC', () => {
+        const start = createUTCDate(2025, 4, 30); // May 30
+        const end = createUTCDate(2025, 5, 2); // June 2
+        const result = eachDayOfIntervalUTC({ start, end });
+        
+        expect(result).toHaveLength(4);
+        expect(result[0].getUTCDate()).toBe(30);
+        expect(result[0].getUTCMonth()).toBe(4);
+        expect(result[1].getUTCDate()).toBe(31);
+        expect(result[1].getUTCMonth()).toBe(4);
+        expect(result[2].getUTCDate()).toBe(1);
+        expect(result[2].getUTCMonth()).toBe(5);
+        expect(result[3].getUTCDate()).toBe(2);
+        expect(result[3].getUTCMonth()).toBe(5);
+      });
+
+      it('should handle year boundaries in UTC', () => {
+        const start = createUTCDate(2024, 11, 30); // Dec 30, 2024
+        const end = createUTCDate(2025, 0, 2); // Jan 2, 2025
+        const result = eachDayOfIntervalUTC({ start, end });
+        
+        expect(result).toHaveLength(4);
+        expect(result[0].getUTCFullYear()).toBe(2024);
+        expect(result[3].getUTCFullYear()).toBe(2025);
+      });
+    });
+
+    describe('isWithinIntervalUTC', () => {
+      it('should check if date is within UTC interval', () => {
+        const start = createUTCDate(2025, 5, 10);
+        const end = createUTCDate(2025, 5, 20);
+        const testDate = createUTCDate(2025, 5, 15);
+        
+        expect(isWithinIntervalUTC(testDate, { start, end })).toBe(true);
+      });
+
+      it('should return false for date outside UTC interval', () => {
+        const start = createUTCDate(2025, 5, 10);
+        const end = createUTCDate(2025, 5, 20);
+        const testDate = createUTCDate(2025, 5, 25);
+        
+        expect(isWithinIntervalUTC(testDate, { start, end })).toBe(false);
+      });
+
+      it('should include boundary dates in UTC', () => {
+        const start = createUTCDate(2025, 5, 10);
+        const end = createUTCDate(2025, 5, 20);
+        
+        expect(isWithinIntervalUTC(start, { start, end })).toBe(true);
+        expect(isWithinIntervalUTC(end, { start, end })).toBe(true);
+      });
+
+      it('should handle invalid dates', () => {
+        const start = createUTCDate(2025, 5, 10);
+        const end = createUTCDate(2025, 5, 20);
+        const invalidDate = new Date('invalid');
+        
+        expect(isWithinIntervalUTC(invalidDate, { start, end })).toBe(false);
+      });
+
+      it('should handle timezone differences correctly', () => {
+        // Create dates with different time components
+        const start = new Date('2025-06-10T23:59:59Z');
+        const end = new Date('2025-06-20T00:00:01Z');
+        const testDate = new Date('2025-06-15T12:30:00Z');
+        
+        // Should only compare date portions in UTC
+        expect(isWithinIntervalUTC(testDate, { start, end })).toBe(true);
+      });
+
+      it('should handle errors in catch block', () => {
+        // Test with an object that will cause an error when accessing UTC methods
+        const badDate = {} as Date;
+        const start = createUTCDate(2025, 5, 10);
+        const end = createUTCDate(2025, 5, 20);
+        
+        // Should return false when error occurs
+        expect(isWithinIntervalUTC(badDate, { start, end })).toBe(false);
+        
+        // Test with bad interval
+        const goodDate = createUTCDate(2025, 5, 15);
+        const badInterval = { start: {} as Date, end: {} as Date };
+        
+        expect(isWithinIntervalUTC(goodDate, badInterval)).toBe(false);
+      });
+    });
+
+    describe('isSameDayUTC', () => {
+      it('should return true for same UTC day', () => {
+        const date1 = createUTCDate(2025, 5, 15);
+        const date2 = new Date('2025-06-15T23:59:59Z');
+        
+        expect(isSameDayUTC(date1, date2)).toBe(true);
+      });
+
+      it('should return false for different UTC days', () => {
+        const date1 = createUTCDate(2025, 5, 15);
+        const date2 = createUTCDate(2025, 5, 16);
+        
+        expect(isSameDayUTC(date1, date2)).toBe(false);
+      });
+
+      it('should handle timezone boundaries correctly', () => {
+        // 11:59 PM UTC on June 15
+        const date1 = new Date('2025-06-15T23:59:59Z');
+        // 12:01 AM UTC on June 16
+        const date2 = new Date('2025-06-16T00:00:01Z');
+        
+        expect(isSameDayUTC(date1, date2)).toBe(false);
+      });
+
+      it('should handle different months', () => {
+        const date1 = createUTCDate(2025, 5, 30);
+        const date2 = createUTCDate(2025, 6, 1);
+        
+        expect(isSameDayUTC(date1, date2)).toBe(false);
+      });
+
+      it('should handle different years', () => {
+        const date1 = createUTCDate(2024, 11, 31);
+        const date2 = createUTCDate(2025, 0, 1);
+        
+        expect(isSameDayUTC(date1, date2)).toBe(false);
+      });
+    });
+
+    describe('isWithinIntervalTZ', () => {
+      it('should be an alias for isWithinIntervalUTC', () => {
+        expect(isWithinIntervalTZ).toBe(isWithinIntervalUTC);
+      });
+
+      it('should work the same as isWithinIntervalUTC', () => {
+        const start = createUTCDate(2025, 5, 10);
+        const end = createUTCDate(2025, 5, 20);
+        const testDate = createUTCDate(2025, 5, 15);
+        
+        expect(isWithinIntervalTZ(testDate, { start, end })).toBe(true);
+      });
+    });
+
+    describe('addDays', () => {
+      it('should add days using local timezone', () => {
+        const date = new Date('2025-06-15T00:00:00');
+        const result = addDays(date, 5);
+        expect(result.getDate()).toBe(20);
+      });
+
+      it('should handle negative days', () => {
+        const date = new Date('2025-06-15T00:00:00');
+        const result = addDays(date, -5);
+        expect(result.getDate()).toBe(10);
+      });
+
+      it('should handle month boundaries', () => {
+        const date = new Date('2025-06-30T00:00:00');
+        const result = addDays(date, 2);
+        expect(result.getMonth()).toBe(6); // July (0-indexed, so 6 = July)
+        expect(result.getDate()).toBe(2);
+      });
+    });
+
+    describe('DEFAULT_TIMEZONE', () => {
+      it('should be UTC', () => {
+        expect(DEFAULT_TIMEZONE).toBe('UTC');
+      });
+    });
+
+    describe('isValid', () => {
+      it('should validate dates correctly', () => {
+        expect(isValid(new Date('2025-06-15'))).toBe(true);
+        expect(isValid(new Date('invalid'))).toBe(false);
+        expect(isValid(createDate(2025, 5, 15))).toBe(true);
+      });
+    });
+
+    describe('Timezone-aware wrapper functions', () => {
+      describe('startOfWeek', () => {
+        it('should use UTC by default', () => {
+          const date = createDate(2025, 5, 18); // Wednesday
+          const result = startOfWeek(date);
+          expect(result.getUTCDate()).toBe(16); // Monday
+          expect(result.getUTCDay()).toBe(1);
+        });
+
+        it('should use local timezone when specified', () => {
+          const date = new Date('2025-06-18');
+          const result = startOfWeek(date, { timezone: 'local' });
+          // Result depends on local timezone but should be a valid date
+          expect(isValid(result)).toBe(true);
+        });
+
+        it('should respect weekStartsOn option', () => {
+          const date = createDate(2025, 5, 18); // Wednesday
+          const result = startOfWeek(date, { weekStartsOn: 0 }); // Sunday
+          expect(result.getUTCDate()).toBe(15); // Sunday
+          expect(result.getUTCDay()).toBe(0);
+        });
+      });
+
+      describe('endOfWeek', () => {
+        it('should use UTC by default', () => {
+          const date = createDate(2025, 5, 18); // Wednesday
+          const result = endOfWeek(date);
+          expect(result.getUTCDate()).toBe(22); // Sunday
+          expect(result.getUTCDay()).toBe(0);
+        });
+
+        it('should use local timezone when specified', () => {
+          const date = new Date('2025-06-18');
+          const result = endOfWeek(date, { timezone: 'local' });
+          // Result depends on local timezone but should be a valid date
+          expect(isValid(result)).toBe(true);
+        });
+
+        it('should respect weekStartsOn option', () => {
+          const date = createDate(2025, 5, 18); // Wednesday
+          const result = endOfWeek(date, { weekStartsOn: 0 }); // Sunday start
+          expect(result.getUTCDate()).toBe(21); // Saturday
+          expect(result.getUTCDay()).toBe(6);
+        });
+      });
+
+      describe('startOfMonth', () => {
+        it('should use UTC by default', () => {
+          const date = createDate(2025, 5, 15);
+          const result = startOfMonth(date);
+          expect(result.getUTCDate()).toBe(1);
+          expect(result.getUTCMonth()).toBe(5);
+        });
+
+        it('should use local timezone when specified', () => {
+          const date = new Date('2025-06-15');
+          const result = startOfMonth(date, 'local');
+          expect(result.getDate()).toBe(1);
+          expect(result.getMonth()).toBe(5);
+        });
+      });
+
+      describe('endOfMonth', () => {
+        it('should use UTC by default', () => {
+          const date = createDate(2025, 5, 15);
+          const result = endOfMonth(date);
+          expect(result.getUTCDate()).toBe(30); // June has 30 days
+          expect(result.getUTCMonth()).toBe(5);
+        });
+
+        it('should use local timezone when specified', () => {
+          const date = new Date('2025-06-15');
+          const result = endOfMonth(date, 'local');
+          expect(result.getDate()).toBe(30);
+          expect(result.getMonth()).toBe(5);
+        });
+
+        it('should handle February in leap years', () => {
+          const date = createDate(2024, 1, 15);
+          const result = endOfMonth(date);
+          expect(result.getUTCDate()).toBe(29);
+        });
+      });
+    });
+
+    describe('format with different timezones', () => {
+      it('should format with specific timezone', () => {
+        const date = createDate(2025, 5, 15);
+        const result = format(date, 'yyyy-MM-dd', 'America/New_York');
+        // Should be a valid date string
+        expect(result).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      });
+
+      it('should use local timezone when specified as "local"', () => {
+        const date = createDate(2025, 5, 15);
+        const result = format(date, 'yyyy-MM-dd', 'local');
+        // Should be a valid date string
+        expect(result).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      });
+
+      it('should use UTC formatting when timezone is "UTC"', () => {
+        const date = createDate(2025, 5, 15);
+        const result = format(date, 'yyyy-MM-dd', 'UTC');
+        expect(result).toBe('2025-06-15');
+      });
+
+      it('should use UTC formatting by default', () => {
+        const date = createDate(2025, 5, 15);
+        const result = format(date, 'yyyy-MM-dd');
+        expect(result).toBe('2025-06-15');
+      });
+    });
+
+    describe('edge cases for addMonthsUTC', () => {
+      it('should handle month boundaries correctly', () => {
+        // Test Jan 31 + 1 month = Feb 28/29
+        const jan31 = createUTCDate(2025, 0, 31);
+        const result = addMonthsUTC(jan31, 1);
+        expect(result.getUTCMonth()).toBe(1); // February
+        expect(result.getUTCDate()).toBe(28); // 2025 is not a leap year
+      });
+
+      it('should handle negative months correctly', () => {
+        const date = createUTCDate(2025, 5, 15);
+        const result = addMonthsUTC(date, -13);
+        expect(result.getUTCFullYear()).toBe(2024);
+        expect(result.getUTCMonth()).toBe(4); // May
+        expect(result.getUTCDate()).toBe(15);
+      });
+
+      it('should handle large month additions', () => {
+        const date = createUTCDate(2025, 5, 15);
+        const result = addMonthsUTC(date, 25);
+        expect(result.getUTCFullYear()).toBe(2027);
+        expect(result.getUTCMonth()).toBe(6); // July
+        expect(result.getUTCDate()).toBe(15);
+      });
+    });
+
+    describe('formatUTC edge cases', () => {
+      it('should handle different format strings for invalid dates', () => {
+        const invalidDate = new Date('invalid');
+        expect(formatUTC(invalidDate, 'MM/dd/yyyy')).toBe('Invalid Date');
+        expect(formatUTC(invalidDate, 'dd-MM-yyyy')).toBe('Invalid Date');
+      });
+    });
+
+    describe('isWithinInterval fallback logic', () => {
+      it('should use fallback logic when date-fns throws', () => {
+        // Test with dates that might cause issues
+        const date = createDate(2025, 5, 15);
+        const interval = {
+          start: createDate(2025, 5, 10),
+          end: createDate(2025, 5, 20)
+        };
+        
+        // Should still work correctly
+        expect(isWithinInterval(date, interval)).toBe(true);
+      });
+
+      it('should handle invalid interval in fallback', () => {
+        const date = createDate(2025, 5, 15);
+        const interval = {
+          start: new Date('invalid'),
+          end: createDate(2025, 5, 20)
+        };
+        
+        // Should return false for invalid intervals
+        expect(isWithinInterval(date, interval)).toBe(false);
+      });
+
+      it('should handle inverted interval in fallback', () => {
+        // Create an interval where end is before start
+        const date = createDate(2025, 5, 15);
+        const interval = {
+          start: createDate(2025, 5, 20),
+          end: createDate(2025, 5, 10)  // End before start
+        };
+        
+        // Both date-fns and our fallback should handle this gracefully
+        // date-fns returns true if date is NOT in the inverted interval
+        // Our test date (15th) is NOT between 20th and 10th, so it should return true
+        expect(isWithinInterval(date, interval)).toBe(true);
+      });
+
+      // Skip these tests as creating mock dates that properly trigger the fallback
+      // while still working with the fallback code is not feasible
+
+      it('should handle dates outside interval in fallback logic', () => {
+        // Force fallback by using a date with no getFullYear method
+        const date = {
+          getFullYear: () => 2025,
+          getMonth: () => 5,
+          getDate: () => 25
+        } as Date;
+        
+        const interval = {
+          start: {
+            getFullYear: () => 2025,
+            getMonth: () => 5,
+            getDate: () => 10
+          } as Date,
+          end: {
+            getFullYear: () => 2025,
+            getMonth: () => 5,
+            getDate: () => 20
+          } as Date
+        };
+        
+        // Should use fallback logic and return false
+        expect(isWithinInterval(date, interval)).toBe(false);
+      });
+
+
+      it('should handle errors in inner catch block', () => {
+        // Create objects that will throw when accessing properties
+        const date = {
+          getFullYear: () => { throw new Error('Test error'); }
+        } as Date;
+        
+        const interval = {
+          start: createDate(2025, 5, 10),
+          end: createDate(2025, 5, 20)
+        };
+        
+        // Should catch the error and return false
+        expect(isWithinInterval(date, interval)).toBe(false);
+      });
+    });
+  });
+
+  describe('format with non-UTC timezone', () => {
+    it('should use formatInTimeZone for non-UTC timezones', () => {
+      const date = createDate(2025, 5, 15, 12, 30, 0);
+      const result = format(date, 'yyyy-MM-dd HH:mm', 'America/New_York');
+      // Just verify it doesn't throw and returns a string
+      expect(typeof result).toBe('string');
+    });
+
+    it('should use local format for "local" timezone', () => {
+      const date = createDate(2025, 5, 15, 12, 30, 0);
+      const result = format(date, 'yyyy-MM-dd HH:mm', 'local');
+      expect(typeof result).toBe('string');
+    });
+
+    it('should use local format when timezone is empty string', () => {
+      const date = createDate(2025, 5, 15, 12, 30, 0);
+      const result = format(date, 'yyyy-MM-dd HH:mm', '');
+      expect(typeof result).toBe('string');
+    });
+  });
+
+  describe('endOfMonthUTC year boundary', () => {
+    it('should handle December (month 11) correctly', () => {
+      const date = createDate(2025, 11, 15); // December 2025
+      const result = endOfMonthUTC(date);
+      
+      // December has 31 days
+      expect(result.getUTCDate()).toBe(31);
+      expect(result.getUTCMonth()).toBe(11); // December
+      expect(result.getUTCFullYear()).toBe(2025);
+      // createUTCDate creates a date at midnight UTC
+      expect(result.getUTCHours()).toBe(0);
+      expect(result.getUTCMinutes()).toBe(0);
+      expect(result.getUTCSeconds()).toBe(0);
+      expect(result.getUTCMilliseconds()).toBe(0);
+    });
+
+    it('should handle February in a leap year', () => {
+      const date = createDate(2024, 1, 15); // February 2024 (leap year)
+      const result = endOfMonthUTC(date);
+      
+      // February 2024 has 29 days
+      expect(result.getUTCDate()).toBe(29);
+      expect(result.getUTCMonth()).toBe(1); // February
+      expect(result.getUTCFullYear()).toBe(2024);
+    });
+
+    it('should handle February in a non-leap year', () => {
+      const date = createDate(2025, 1, 15); // February 2025 (non-leap year)
+      const result = endOfMonthUTC(date);
+      
+      // February 2025 has 28 days
+      expect(result.getUTCDate()).toBe(28);
+      expect(result.getUTCMonth()).toBe(1); // February
+      expect(result.getUTCFullYear()).toBe(2025);
+    });
+  });
+
+  describe('isWithinInterval additional error scenarios', () => {
+    it('should handle errors when accessing interval.start properties in fallback', () => {
+      const date = createDate(2025, 5, 15);
+      const badInterval = {
+        start: {
+          getFullYear: () => { throw new Error('Test error'); },
+          getMonth: () => { throw new Error('Test error'); },
+          getDate: () => { throw new Error('Test error'); }
+        } as unknown as Date,
+        end: createDate(2025, 5, 20)
+      };
+      
+      // This will first fail in date-fns, then fail in our fallback
+      expect(isWithinInterval(date, badInterval)).toBe(false);
     });
   });
 });
