@@ -14,6 +14,7 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
+    "coverage:serve": "npx http-server coverage -p 8080 -o",
     "prepare": "npm run build",
     "lint": "eslint --config eslint.config.js src/examples/CustomDateFormatterExample.tsx",
     "lint:all": "eslint --config eslint.config.js \"src/**/*.{js,ts,tsx}\"",
