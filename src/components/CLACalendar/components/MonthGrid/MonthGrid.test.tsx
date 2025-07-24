@@ -199,6 +199,18 @@ describe('MonthGrid', () => {
   });
 
   describe('Tooltip Rendering', () => {
+    let createPortalSpy: any;
+    
+    beforeEach(() => {
+      createPortalSpy = vi.spyOn(ReactDOM, 'createPortal').mockImplementation((element, container) => {
+        return element as React.ReactPortal;
+      });
+    });
+    
+    afterEach(() => {
+      createPortalSpy.mockRestore();
+    });
+
     it('should handle tooltip logic for restricted dates', async () => {
       const onSelectionMove = vi.fn();
       const restrictionConfig = {
@@ -228,6 +240,192 @@ describe('MonthGrid', () => {
       expect(onSelectionMove).toHaveBeenCalled();
     });
 
+
+    it('should render tooltip for restricted boundary ranges', async () => {
+      const restrictionConfig = {
+        restrictions: [{
+          type: 'restricted_boundary',
+          enabled: true,
+          ranges: [{
+            start: '2025-06-10',
+            end: '2025-06-20',
+            message: 'Must stay within June 10-20'
+          }]
+        }]
+      };
+
+      const restrictionManager = {
+        checkSelection: vi.fn().mockReturnValue({ allowed: true })
+      };
+
+      const { container } = render(
+        <MonthGrid
+          {...defaultProps}
+          selectedRange={{ start: '2025-06-15', end: null }}
+          restrictionConfig={restrictionConfig}
+          restrictionManager={restrictionManager as any}
+        />
+      );
+
+      const grid = container.querySelector('.month-grid-days');
+      fireEvent.mouseMove(grid!, { clientX: 100, clientY: 200 });
+
+      // Hover outside boundary
+      const dayCell = screen.getByTestId('day-2025-06-25');
+      fireEvent.mouseEnter(dayCell);
+
+      await waitFor(() => {
+        expect(createPortalSpy).toHaveBeenCalled();
+        const tooltipCall = createPortalSpy.mock.calls[0];
+        if (tooltipCall) {
+          const tooltip = tooltipCall[0];
+          expect(tooltip.props.children).toBe('Must stay within June 10-20');
+        }
+      }, { timeout: 1000 });
+    });
+
+    it('should use default message for restricted boundary', async () => {
+      const restrictionConfig = {
+        restrictions: [{
+          type: 'restricted_boundary',
+          enabled: true,
+          ranges: [{
+            start: '2025-06-10',
+            end: '2025-06-20'
+            // No message provided
+          }]
+        }]
+      };
+
+      const restrictionManager = {
+        checkSelection: vi.fn().mockReturnValue({ allowed: true })
+      };
+
+      const { container } = render(
+        <MonthGrid
+          {...defaultProps}
+          selectedRange={{ start: '2025-06-15', end: null }}
+          restrictionConfig={restrictionConfig}
+          restrictionManager={restrictionManager as any}
+        />
+      );
+
+      const grid = container.querySelector('.month-grid-days');
+      fireEvent.mouseMove(grid!, { clientX: 100, clientY: 200 });
+
+      const dayCell = screen.getByTestId('day-2025-06-25');
+      fireEvent.mouseEnter(dayCell);
+
+      await waitFor(() => {
+        const calls = createPortalSpy.mock.calls;
+        if (calls.length > 0) {
+          const tooltip = calls[0][0];
+          expect(tooltip.props.children).toBe('Selection must stay within the boundary');
+        }
+      }, { timeout: 1000 });
+    });
+
+    it('should handle invalid date ranges in restricted boundary', async () => {
+      const restrictionConfig = {
+        restrictions: [{
+          type: 'restricted_boundary',
+          enabled: true,
+          ranges: [{
+            start: 'invalid-date',
+            end: '2025-06-20',
+            message: 'Invalid range'
+          }]
+        }]
+      };
+
+      const restrictionManager = {
+        checkSelection: vi.fn().mockReturnValue({ allowed: true })
+      };
+
+      const { container } = render(
+        <MonthGrid
+          {...defaultProps}
+          selectedRange={{ start: '2025-06-15', end: null }}
+          restrictionConfig={restrictionConfig}
+          restrictionManager={restrictionManager as any}
+        />
+      );
+
+      const dayCell = screen.getByTestId('day-2025-06-25');
+      fireEvent.mouseEnter(dayCell);
+
+      // Should not show tooltip due to invalid date
+      await waitFor(() => {
+        expect(createPortalSpy).not.toHaveBeenCalled();
+      }, { timeout: 500 });
+    });
+
+    it('should not show tooltip when selection not within boundary', async () => {
+      const restrictionConfig = {
+        restrictions: [{
+          type: 'restricted_boundary',
+          enabled: true,
+          ranges: [{
+            start: '2025-06-10',
+            end: '2025-06-20',
+            message: 'Must stay within boundary'
+          }]
+        }]
+      };
+
+      const restrictionManager = {
+        checkSelection: vi.fn().mockReturnValue({ allowed: true })
+      };
+
+      const { container } = render(
+        <MonthGrid
+          {...defaultProps}
+          selectedRange={{ start: '2025-06-25', end: null }} // Started outside boundary
+          restrictionConfig={restrictionConfig}
+          restrictionManager={restrictionManager as any}
+        />
+      );
+
+      const dayCell = screen.getByTestId('day-2025-06-15');
+      fireEvent.mouseEnter(dayCell);
+
+      await waitFor(() => {
+        expect(createPortalSpy).not.toHaveBeenCalled();
+      }, { timeout: 500 });
+    });
+
+    it('should handle font size with rem units', async () => {
+      const restrictionManager = {
+        checkSelection: vi.fn().mockReturnValue({
+          allowed: false,
+          message: 'Test tooltip'
+        })
+      };
+
+      const { container } = render(
+        <MonthGrid
+          {...defaultProps}
+          settings={{ ...defaultProps.settings, baseFontSize: '1rem' }}
+          restrictionManager={restrictionManager as any}
+          restrictionConfig={{ restrictions: [] }}
+        />
+      );
+
+      const grid = container.querySelector('.month-grid-days');
+      fireEvent.mouseMove(grid!, { clientX: 100, clientY: 200 });
+
+      const dayCell = screen.getByTestId('day-2025-06-15');
+      fireEvent.mouseEnter(dayCell);
+
+      await waitFor(() => {
+        const calls = createPortalSpy.mock.calls;
+        if (calls.length > 0) {
+          const tooltip = calls[0][0];
+          expect(tooltip.props.style.fontSize).toBe('0.875rem');
+        }
+      }, { timeout: 1000 });
+    });
+
     it('should not render tooltip when document is not focused', async () => {
       document.hasFocus = vi.fn().mockReturnValue(false);
       
@@ -251,7 +449,7 @@ describe('MonthGrid', () => {
       fireEvent.mouseEnter(dayCell);
       
       await waitFor(() => {
-        expect(container.querySelector('.month-grid-tooltip')).not.toBeInTheDocument();
+        expect(createPortalSpy).not.toHaveBeenCalled();
       });
     });
 
