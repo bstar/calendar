@@ -1,0 +1,2199 @@
+
+ RUN  v3.2.4 /Users/bstar/projects/cla/calendar
+      Coverage enabled with v8
+
+ ✓ src/components/ErrorBoundary.test.tsx (22 tests) 425ms
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Basic Rendering > should not render when isOpen is false
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m0[39m, left: [33m0[39m, bottom: [33m0[39m, right: [33m0[39m }
+}
+[Portal] Applying position: { top: [33m8[39m, left: [33m0[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m0[39m, left: [33m0[39m, bottom: [33m0[39m, right: [33m0[39m }
+}
+[Portal] Applying position: { top: [33m8[39m, left: [33m0[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Basic Rendering > should render when isOpen is true
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m0[39m, left: [33m0[39m, bottom: [33m0[39m, right: [33m0[39m }
+}
+[Portal] Applying position: { top: [33m8[39m, left: [33m0[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m0[39m, left: [33m0[39m, bottom: [33m0[39m, right: [33m0[39m }
+}
+[Portal] Applying position: { top: [33m8[39m, left: [33m0[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Basic Rendering > should create portal element with correct class
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m0[39m, left: [33m0[39m, bottom: [33m0[39m, right: [33m0[39m }
+}
+[Portal] Applying position: { top: [33m8[39m, left: [33m0[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m0[39m, left: [33m0[39m, bottom: [33m0[39m, right: [33m0[39m }
+}
+[Portal] Applying position: { top: [33m8[39m, left: [33m0[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Positioning > should position portal at bottom-left by default
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m100[39m, left: [33m50[39m, bottom: [33m130[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m138[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m100[39m, left: [33m50[39m, bottom: [33m130[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m138[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Positioning > should position portal at bottom-right when specified
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Positioning > should position portal at bottom-right when specified
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m300[39m,
+  triggerRect: { top: [33m100[39m, left: [33m50[39m, bottom: [33m130[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m138[39m, left: [33m-50[39m }
+
+ ❯ src/components/CLACalendar/components/MonthGrid/MonthGrid.boundary.test.tsx (5 tests | 3 failed) 117ms
+   × MonthGrid Restricted Boundary Tooltip Tests > should show tooltip when hovering outside restricted boundary during selection 34ms
+     → expected null to be truthy
+   × MonthGrid Restricted Boundary Tooltip Tests > should show default message when range has no message 34ms
+     → expected null to be truthy
+   ✓ MonthGrid Restricted Boundary Tooltip Tests > should not show tooltip when hovering within boundary 25ms
+   ✓ MonthGrid Restricted Boundary Tooltip Tests > should skip invalid date ranges 14ms
+   × MonthGrid Restricted Boundary Tooltip Tests > should handle multiple boundary ranges 8ms
+     → expected null to be truthy
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Positioning > should position portal at bottom-right when specified
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Positioning > should position portal at top-left when specified
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m100[39m, left: [33m50[39m, bottom: [33m130[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m-308[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m100[39m, left: [33m50[39m, bottom: [33m130[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m-308[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Positioning > should use dynamic positioning when enabled
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Event Handling > should close on click outside when onClose is provided
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Event Handling > should not close when clicking inside the portal
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Event Handling > should not close when clicking on trigger element
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Event Handling > should close on ESC key press
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Event Handling > should not respond to other keys
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Window Events > should update position on window resize
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Window Events > should update position on window scroll
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Window Events > should update position on window scroll
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Intersection Observer > should reposition when portal is partially cut off
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Intersection Observer > should reposition when portal is partially cut off
+[Portal] Calendar partially cut off, repositioning
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Intersection Observer > should not reposition when fully visible
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Style Application > should apply custom portal styles
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: { width: [32m'500px'[39m, backgroundColor: [32m'red'[39m, padding: [32m'20px'[39m }
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: { width: [32m'500px'[39m, backgroundColor: [32m'red'[39m, padding: [32m'20px'[39m }
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Style Application > should preserve fixed positioning despite custom styles
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: { position: [32m'absolute'[39m, zIndex: [32m'100'[39m }
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: { position: [32m'absolute'[39m, zIndex: [32m'100'[39m }
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Style Application > should apply visibility style when positioned
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: { visibility: [32m'visible'[39m }
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: { visibility: [32m'visible'[39m }
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Style Application > should apply all supported CSS properties
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {
+  display: [32m'block'[39m,
+  pointerEvents: [32m'none'[39m,
+  right: [32m'10px'[39m,
+  bottom: [32m'20px'[39m,
+  margin: [32m'5px'[39m,
+  border: [32m'1px solid red'[39m,
+  borderRadius: [32m'8px'[39m,
+  boxShadow: [32m'0 2px 4px rgba(0,0,0,0.1)'[39m,
+  color: [32m'blue'[39m,
+  opacity: [32m'0.9'[39m,
+  transition: [32m'all 0.3s'[39m,
+  transform: [32m'scale(0.95)'[39m
+}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {
+  display: [32m'block'[39m,
+  pointerEvents: [32m'none'[39m,
+  right: [32m'10px'[39m,
+  bottom: [32m'20px'[39m,
+  margin: [32m'5px'[39m,
+  border: [32m'1px solid red'[39m,
+  borderRadius: [32m'8px'[39m,
+  boxShadow: [32m'0 2px 4px rgba(0,0,0,0.1)'[39m,
+  color: [32m'blue'[39m,
+  opacity: [32m'0.9'[39m,
+  transition: [32m'all 0.3s'[39m,
+  transform: [32m'scale(0.95)'[39m
+}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Lifecycle > should clean up portal element on unmount
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Lifecycle > should remove event listeners on unmount
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+ ✓ src/components/CLACalendar/components/MonthGrid/MonthGrid.test.tsx (25 tests) 248ms
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Lifecycle > should handle rapid open/close cycles
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Edge Cases > should handle missing triggerRef gracefully
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mfalse[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mfalse[39m
+[Portal] Early return - missing element or ref
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Edge Cases > should handle portal style updates
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: { width: [32m'300px'[39m }
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: { width: [32m'300px'[39m }
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: { width: [32m'500px'[39m }
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Edge Cases > should show fallback content when no children provided
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+ ✓ src/components/CLACalendarComponents/CalendarPortal.test.tsx (29 tests | 3 skipped) 267ms
+stdout | src/components/CLACalendar.test.tsx > CLACalendar > Error Boundary > should handle errors gracefully
+🚨 Calendar Error [calendar-error-1753288977463-dgxydtfmx]
+  ┌───────────┬──────────────────────────────────────────┐
+  │ (index)   │ Values                                   │
+  ├───────────┼──────────────────────────────────────────┤
+  │ Error ID  │ [32m'calendar-error-1753288977463-dgxydtfmx'[39m │
+  │ Component │ [32m'Calendar'[39m                               │
+  │ Message   │ [32m'Test error'[39m                             │
+  │ Timestamp │ [32m'2025-07-23T16:42:57.463Z'[39m               │
+  │ URL       │ [32m'http://localhost:3000/'[39m                 │
+  └───────────┴──────────────────────────────────────────┘
+  📋 Full Error Details
+    {
+      "errorId": "calendar-error-1753288977463-dgxydtfmx",
+      "timestamp": "2025-07-23T16:42:57.463Z",
+      "component": "Calendar",
+      "message": "Test error",
+      "stack": "Error: Test error\n    at ErrorComponent (/Users/bstar/projects/cla/calendar/src/components/CLACalendar.test.tsx:561:15)\n    at renderWithHooks (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:15486:18)\n    at mountIndeterminateComponent (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:20103:13)\n    at beginWork (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:21626:16)\n    at beginWork$1 (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:27465:14)\n    at performUnitOfWork (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:26599:12)\n    at workLoopSync (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:26505:5)\n    at renderRootSync (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:26473:7)\n    at recoverFromConcurrentError (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:25889:20)\n    at performSyncWorkOnRoot (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:26135:20)",
+      "componentStack": "\n    at ErrorComponent (/Users/bstar/projects/cla/calendar/src/components/CLACalendar.test.tsx:647:15)\n    at CalendarErrorBoundary (/Users/bstar/projects/cla/calendar/src/components/ErrorBoundary.tsx:10:5)",
+      "userAgent": "Mozilla/5.0 (darwin) AppleWebKit/537.36 (KHTML, like Gecko) jsdom/26.1.0",
+      "url": "http://localhost:3000/",
+      "props": {
+        "children": "React component"
+      },
+      "state": {
+        "hasError": true,
+        "errorId": "calendar-error-1753288977463-dgxydtfmx",
+        "errorMessage": "Test error"
+      }
+    }
+
+ ✓ src/components/CLACalendar.test.tsx (22 tests) 975ms
+ ✓ src/components/CLACalendar.restrictions.test.tsx (23 tests) 1055ms
+ ✓ src/components/CLACalendarComponents/Notification.test.tsx (16 tests) 140ms
+ ✓ src/components/CLACalendarComponents/CalendarCoordinator.test.ts (21 tests) 69ms
+ ✓ src/components/CLACalendar.config-features.test.tsx (36 tests) 2101ms
+   ✓ CLACalendar Configuration Features > Position and Layout Configuration > should handle different visible month configurations  784ms
+ ✓ src/components/CLACalendar/components/CalendarGrid/CalendarGrid.test.tsx (24 tests) 133ms
+ ✓ src/components/CLACalendar.multiple-instances.test.tsx (3 tests) 242ms
+ ✓ src/components/CLACalendarComponents/CalendarPortal.hook.test.tsx (14 tests) 28ms
+ ✓ src/components/CLACalendarComponents/CalendarComponents.test.tsx (9 tests) 105ms
+ ✓ src/components/CLACalendar.config.test.ts (46 tests) 8ms
+ ✓ src/components/CLACalendarComponents/PortalCalendar.test.tsx (18 tests) 54ms
+ ✓ src/components/CLACalendar/components/DayCell/DayCell.test.tsx (10 tests) 96ms
+ ✓ src/components/CLACalendarComponents/selection/DateRangeSelectionManager.test.ts (36 tests) 19ms
+ ❯ src/components/CLACalendar/components/MonthGrid/MonthGrid.tooltip.test.tsx (6 tests | 4 failed) 4110ms
+   × MonthGrid Tooltip Tests > Tooltip rendering > should render tooltip with restriction message 1038ms
+     → expected "createPortal$1" to be called at least once
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div[39m
+      [33mid[39m=[32m"portal-root"[39m
+    [36m/>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"month-grid-container"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"month-grid-weekdays"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"month-grid-weekday"[39m
+            [33mstyle[39m=[32m"font-size: 14px;"[39m
+          [36m>[39m
+            [0mMon[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"month-grid-weekday"[39m
+            [33mstyle[39m=[32m"font-size: 14px;"[39m
+          [36m>[39m
+            [0mTue[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"month-grid-weekday"[39m
+            [33mstyle[39m=[32m"font-size: 14px;"[39m
+          [36m>[39m
+            [0mWed[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"month-grid-weekday"[39m
+            [33mstyle[39m=[32m"font-size: 14px;"[39m
+          [36m>[39m
+            [0mThu[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"month-grid-weekday"[39m
+            [33mstyle[39m=[32m"font-size: 14px;"[39m
+          [36m>[39m
+            [0mFri[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"month-grid-weekday"[39m
+            [33mstyle[39m=[32m"font-size: 14px;"[39m
+          [36m>[39m
+            [0mSat[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"month-grid-weekday"[39m
+            [33mstyle[39m=[32m"font-size: 14px;"[39m
+          [36m>[39m
+            [0mSun[0m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"month-grid-days"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-05-26"[39m
+          [36m>[39m
+            [0m26[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-05-27"[39m
+          [36m>[39m
+            [0m27[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-05-28"[39m
+          [36m>[39m
+            [0m28[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-05-29"[39m
+          [36m>[39m
+            [0m29[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-05-30"[39m
+          [36m>[39m
+            [0m30[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-05-31"[39m
+          [36m>[39m
+            [0m31[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-01"[39m
+          [36m>[39m
+            [0m1[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-02"[39m
+          [36m>[39m
+            [0m2[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-03"[39m
+          [36m>[39m
+            [0m3[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-04"[39m
+          [36m>[39m
+            [0m4[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-05"[39m
+          [36m>[39m
+            [0m5[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-06"[39m
+          [36m>[39m
+            [0m6[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-07"[39m
+          [36m>[39m
+            [0m7[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-08"[39m
+          [36m>[39m
+            [0m8[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-09"[39m
+          [36m>[39m
+            [0m9[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-10"[39m
+          [36m>[39m
+            [0m10[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-11"[39m
+          [36m>[39m
+            [0m11[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-12"[39m
+          [36m>[39m
+            [0m12[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-13"[39m
+          [36m>[39m
+            [0m13[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-14"[39m
+          [36m>[39m
+            [0m14[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-15"[39m
+          [36m>[39m
+            [0m15[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-16"[39m
+          [36m>[39m
+            [0m16[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-17"[39m
+          [36m>[39m
+            [0m17[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-18"[39m
+          [36m>[39m
+            [0m18[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-19"[39m
+          [36m>[39m
+            [0m19[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-20"[39m
+          [36m>[39m
+            [0m20[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-21"[39m
+          [36m>[39m
+            [0m21[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-22"[39m
+          [36m>[39m
+            [0m22[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-23"[39m
+          [36m>[39m
+            [0m23[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-24"[39m
+          [36m>[39m
+            [0m24[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-25"[39m
+          [36m>[39m
+            [0m25[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-26"[39m
+          [36m>[39m
+            [0m26[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-27"[39m
+          [36m>[39m
+            [0m27[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-28"[39m
+          [36m>[39m
+            [0m28[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-29"[39m
+          [36m>[39m
+            [0m29[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-30"[39m
+          [36m>[39m
+            [0m30[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-07-01"[39m
+          [36m>[39m
+            [0m1[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-07-02"[39m
+          [36m>[39m
+            [0m2[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-07-03"[39m
+          [36m>[39m
+            [0m3[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-07-04"[39m
+          [36m>[39m
+            [0m4[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-07-05"[39m
+          [36m>[39m
+            [0m5[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-07-06"[39m
+          [36m>[39m
+            [0m6[0m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m
+   × MonthGrid Tooltip Tests > Tooltip rendering > should render tooltip for restricted boundary ranges 1017ms
+     → expected "createPortal$1" to be called at least once
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div[39m
+      [33mid[39m=[32m"portal-root"[39m
+    [36m/>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"month-grid-container"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"month-grid-weekdays"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"month-grid-weekday"[39m
+            [33mstyle[39m=[32m"font-size: 14px;"[39m
+          [36m>[39m
+            [0mMon[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"month-grid-weekday"[39m
+            [33mstyle[39m=[32m"font-size: 14px;"[39m
+          [36m>[39m
+            [0mTue[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"month-grid-weekday"[39m
+            [33mstyle[39m=[32m"font-size: 14px;"[39m
+          [36m>[39m
+            [0mWed[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"month-grid-weekday"[39m
+            [33mstyle[39m=[32m"font-size: 14px;"[39m
+          [36m>[39m
+            [0mThu[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"month-grid-weekday"[39m
+            [33mstyle[39m=[32m"font-size: 14px;"[39m
+          [36m>[39m
+            [0mFri[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"month-grid-weekday"[39m
+            [33mstyle[39m=[32m"font-size: 14px;"[39m
+          [36m>[39m
+            [0mSat[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"month-grid-weekday"[39m
+            [33mstyle[39m=[32m"font-size: 14px;"[39m
+          [36m>[39m
+            [0mSun[0m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"month-grid-days"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-05-26"[39m
+          [36m>[39m
+            [0m26[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-05-27"[39m
+          [36m>[39m
+            [0m27[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-05-28"[39m
+          [36m>[39m
+            [0m28[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-05-29"[39m
+          [36m>[39m
+            [0m29[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-05-30"[39m
+          [36m>[39m
+            [0m30[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-05-31"[39m
+          [36m>[39m
+            [0m31[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-01"[39m
+          [36m>[39m
+            [0m1[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-02"[39m
+          [36m>[39m
+            [0m2[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-03"[39m
+          [36m>[39m
+            [0m3[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-04"[39m
+          [36m>[39m
+            [0m4[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-05"[39m
+          [36m>[39m
+            [0m5[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-06"[39m
+          [36m>[39m
+            [0m6[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-07"[39m
+          [36m>[39m
+            [0m7[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-08"[39m
+          [36m>[39m
+            [0m8[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-09"[39m
+          [36m>[39m
+            [0m9[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-10"[39m
+          [36m>[39m
+            [0m10[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-11"[39m
+          [36m>[39m
+            [0m11[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-12"[39m
+          [36m>[39m
+            [0m12[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-13"[39m
+          [36m>[39m
+            [0m13[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-14"[39m
+          [36m>[39m
+            [0m14[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-15"[39m
+          [36m>[39m
+            [0m15[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-16"[39m
+          [36m>[39m
+            [0m16[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-17"[39m
+          [36m>[39m
+            [0m17[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-18"[39m
+          [36m>[39m
+            [0m18[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-19"[39m
+          [36m>[39m
+            [0m19[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-20"[39m
+          [36m>[39m
+            [0m20[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-21"[39m
+          [36m>[39m
+            [0m21[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-22"[39m
+          [36m>[39m
+            [0m22[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-23"[39m
+          [36m>[39m
+            [0m23[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-24"[39m
+          [36m>[39m
+            [0m24[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-25"[39m
+          [36m>[39m
+            [0m25[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-26"[39m
+          [36m>[39m
+            [0m26[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-27"[39m
+          [36m>[39m
+            [0m27[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-28"[39m
+          [36m>[39m
+            [0m28[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-29"[39m
+          [36m>[39m
+            [0m29[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-30"[39m
+          [36m>[39m
+            [0m30[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-07-01"[39m
+          [36m>[39m
+            [0m1[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-07-02"[39m
+          [36m>[39m
+            [0m2[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-07-03"[39m
+          [36m>[39m
+            [0m3[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-07-04"[39m
+          [36m>[39m
+            [0m4[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-07-05"[39m
+          [36m>[39m
+            [0m5[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-07-06"[39m
+          [36m>[39m
+            [0m6[0m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m
+   ✓ MonthGrid Tooltip Tests > Tooltip rendering > should handle invalid date ranges in restrictions 10ms
+   × MonthGrid Tooltip Tests > Tooltip rendering > should use default message when range message is not provided 1022ms
+     → expected "createPortal$1" to be called at least once
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div[39m
+      [33mid[39m=[32m"portal-root"[39m
+    [36m/>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"month-grid-container"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"month-grid-weekdays"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"month-grid-weekday"[39m
+            [33mstyle[39m=[32m"font-size: 14px;"[39m
+          [36m>[39m
+            [0mMon[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"month-grid-weekday"[39m
+            [33mstyle[39m=[32m"font-size: 14px;"[39m
+          [36m>[39m
+            [0mTue[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"month-grid-weekday"[39m
+            [33mstyle[39m=[32m"font-size: 14px;"[39m
+          [36m>[39m
+            [0mWed[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"month-grid-weekday"[39m
+            [33mstyle[39m=[32m"font-size: 14px;"[39m
+          [36m>[39m
+            [0mThu[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"month-grid-weekday"[39m
+            [33mstyle[39m=[32m"font-size: 14px;"[39m
+          [36m>[39m
+            [0mFri[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"month-grid-weekday"[39m
+            [33mstyle[39m=[32m"font-size: 14px;"[39m
+          [36m>[39m
+            [0mSat[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"month-grid-weekday"[39m
+            [33mstyle[39m=[32m"font-size: 14px;"[39m
+          [36m>[39m
+            [0mSun[0m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"month-grid-days"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-05-26"[39m
+          [36m>[39m
+            [0m26[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-05-27"[39m
+          [36m>[39m
+            [0m27[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-05-28"[39m
+          [36m>[39m
+            [0m28[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-05-29"[39m
+          [36m>[39m
+            [0m29[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-05-30"[39m
+          [36m>[39m
+            [0m30[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-05-31"[39m
+          [36m>[39m
+            [0m31[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-01"[39m
+          [36m>[39m
+            [0m1[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-02"[39m
+          [36m>[39m
+            [0m2[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-03"[39m
+          [36m>[39m
+            [0m3[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-04"[39m
+          [36m>[39m
+            [0m4[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-05"[39m
+          [36m>[39m
+            [0m5[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-06"[39m
+          [36m>[39m
+            [0m6[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-07"[39m
+          [36m>[39m
+            [0m7[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-08"[39m
+          [36m>[39m
+            [0m8[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-09"[39m
+          [36m>[39m
+            [0m9[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-10"[39m
+          [36m>[39m
+            [0m10[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-11"[39m
+          [36m>[39m
+            [0m11[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-12"[39m
+          [36m>[39m
+            [0m12[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-13"[39m
+          [36m>[39m
+            [0m13[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-14"[39m
+          [36m>[39m
+            [0m14[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-15"[39m
+          [36m>[39m
+            [0m15[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-16"[39m
+          [36m>[39m
+            [0m16[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-17"[39m
+          [36m>[39m
+            [0m17[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-18"[39m
+          [36m>[39m
+            [0m18[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-19"[39m
+          [36m>[39m
+            [0m19[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-20"[39m
+          [36m>[39m
+            [0m20[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-21"[39m
+          [36m>[39m
+            [0m21[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-22"[39m
+          [36m>[39m
+            [0m22[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-23"[39m
+          [36m>[39m
+            [0m23[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-24"[39m
+          [36m>[39m
+            [0m24[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-25"[39m
+          [36m>[39m
+            [0m25[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-26"[39m
+          [36m>[39m
+            [0m26[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-27"[39m
+          [36m>[39m
+            [0m27[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-28"[39m
+          [36m>[39m
+            [0m28[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-29"[39m
+          [36m>[39m
+            [0m29[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-30"[39m
+          [36m>[39m
+            [0m30[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-07-01"[39m
+          [36m>[39m
+            [0m1[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-07-02"[39m
+          [36m>[39m
+            [0m2[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-07-03"[39m
+          [36m>[39m
+            [0m3[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-07-04"[39m
+          [36m>[39m
+            [0m4[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-07-05"[39m
+          [36m>[39m
+            [0m5[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-07-06"[39m
+          [36m>[39m
+            [0m6[0m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m
+   × MonthGrid Tooltip Tests > Tooltip rendering > should position tooltip based on mouse position 1013ms
+     → expected "createPortal$1" to be called at least once
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div[39m
+      [33mid[39m=[32m"portal-root"[39m
+    [36m/>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"month-grid-container"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"month-grid-weekdays"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"month-grid-weekday"[39m
+            [33mstyle[39m=[32m"font-size: 14px;"[39m
+          [36m>[39m
+            [0mMon[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"month-grid-weekday"[39m
+            [33mstyle[39m=[32m"font-size: 14px;"[39m
+          [36m>[39m
+            [0mTue[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"month-grid-weekday"[39m
+            [33mstyle[39m=[32m"font-size: 14px;"[39m
+          [36m>[39m
+            [0mWed[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"month-grid-weekday"[39m
+            [33mstyle[39m=[32m"font-size: 14px;"[39m
+          [36m>[39m
+            [0mThu[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"month-grid-weekday"[39m
+            [33mstyle[39m=[32m"font-size: 14px;"[39m
+          [36m>[39m
+            [0mFri[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"month-grid-weekday"[39m
+            [33mstyle[39m=[32m"font-size: 14px;"[39m
+          [36m>[39m
+            [0mSat[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"month-grid-weekday"[39m
+            [33mstyle[39m=[32m"font-size: 14px;"[39m
+          [36m>[39m
+            [0mSun[0m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"month-grid-days"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-05-26"[39m
+          [36m>[39m
+            [0m26[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-05-27"[39m
+          [36m>[39m
+            [0m27[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-05-28"[39m
+          [36m>[39m
+            [0m28[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-05-29"[39m
+          [36m>[39m
+            [0m29[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-05-30"[39m
+          [36m>[39m
+            [0m30[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-05-31"[39m
+          [36m>[39m
+            [0m31[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-01"[39m
+          [36m>[39m
+            [0m1[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-02"[39m
+          [36m>[39m
+            [0m2[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-03"[39m
+          [36m>[39m
+            [0m3[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-04"[39m
+          [36m>[39m
+            [0m4[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-05"[39m
+          [36m>[39m
+            [0m5[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-06"[39m
+          [36m>[39m
+            [0m6[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-07"[39m
+          [36m>[39m
+            [0m7[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-08"[39m
+          [36m>[39m
+            [0m8[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-09"[39m
+          [36m>[39m
+            [0m9[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-10"[39m
+          [36m>[39m
+            [0m10[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-11"[39m
+          [36m>[39m
+            [0m11[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-12"[39m
+          [36m>[39m
+            [0m12[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-13"[39m
+          [36m>[39m
+            [0m13[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-14"[39m
+          [36m>[39m
+            [0m14[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-15"[39m
+          [36m>[39m
+            [0m15[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-16"[39m
+          [36m>[39m
+            [0m16[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-17"[39m
+          [36m>[39m
+            [0m17[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-18"[39m
+          [36m>[39m
+            [0m18[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-19"[39m
+          [36m>[39m
+            [0m19[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-20"[39m
+          [36m>[39m
+            [0m20[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-21"[39m
+          [36m>[39m
+            [0m21[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-22"[39m
+          [36m>[39m
+            [0m22[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-23"[39m
+          [36m>[39m
+            [0m23[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-24"[39m
+          [36m>[39m
+            [0m24[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-25"[39m
+          [36m>[39m
+            [0m25[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-26"[39m
+          [36m>[39m
+            [0m26[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-27"[39m
+          [36m>[39m
+            [0m27[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-28"[39m
+          [36m>[39m
+            [0m28[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-29"[39m
+          [36m>[39m
+            [0m29[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-06-30"[39m
+          [36m>[39m
+            [0m30[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-07-01"[39m
+          [36m>[39m
+            [0m1[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-07-02"[39m
+          [36m>[39m
+            [0m2[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-07-03"[39m
+          [36m>[39m
+            [0m3[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-07-04"[39m
+          [36m>[39m
+            [0m4[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-07-05"[39m
+          [36m>[39m
+            [0m5[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"day-2025-07-06"[39m
+          [36m>[39m
+            [0m6[0m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m
+   ✓ MonthGrid Tooltip Tests > Tooltip rendering > should not show tooltip when showTooltips is false 7ms
+ ✓ src/components/CLACalendarComponents/CalendarPortalCoordination.test.ts (18 tests) 50ms
+ ✓ src/components/CLACalendar/components/MonthGrid/MonthGrid.renderTooltip.test.tsx (3 tests) 61ms
+ ✓ src/components/CLACalendarComponents/selection/DateRangeSelectionManager.edge.test.ts (16 tests) 13ms
+ ✓ src/components/CLACalendarComponents/handlers/CLACalendarHandlers.test.ts (37 tests) 19ms
+ ✓ src/components/CLACalendarComponents/restrictions/RestrictionManager.test.ts (40 tests) 77ms
+ ✓ src/utils/DateUtils.test.ts (101 tests) 38ms
+ ✓ src/components/CLACalendarComponents/restrictions/RestrictionManager.edge.test.ts (29 tests) 16ms
+ ✓ src/components/CLACalendarComponents/restrictions/RestrictionBackgroundGenerator.test.ts (34 tests) 9ms
+ ✓ src/components/CLACalendarComponents/layers/LayerManager.test.ts (22 tests) 13ms
+ ✓ src/components/CLACalendar/utils/calendar.utils.test.ts (18 tests) 4ms
+ ✓ src/components/CLACalendarComponents/layers/LayerRenderer.test.tsx (16 tests) 5ms
+ ✓ src/components/CLACalendar/components/DayCell/DayCell.utils.test.ts (33 tests) 4ms
+
+ Test Files  2 failed | 28 passed (30)
+      Tests  7 failed | 722 passed | 3 skipped (732)
+   Start at  12:42:53
+   Duration  9.68s (transform 1.17s, setup 6.01s, collect 25.09s, tests 10.50s, environment 11.02s, prepare 2.27s)
+
