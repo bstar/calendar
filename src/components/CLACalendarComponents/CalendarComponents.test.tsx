@@ -1024,23 +1024,3 @@ describe('SideChevronIndicator', () => {
   });
 });
 
-describe('_MonthPair', () => {
-  // Import the private component
-  const MonthPairComponent = (() => {
-    // We need to access the private _MonthPair component
-    // Since it's not exported, we'll test it through the module
-    const moduleExports = require('./CalendarComponents');
-    // Find the _MonthPair component in the module
-    const components = Object.values(moduleExports);
-    return components.find((comp: any) => comp?.name === '_MonthPair') || null;
-  })();
-
-  // Since _MonthPair is not exported, we'll test it indirectly by importing the file
-  // and accessing the component through other means
-  it('should test _MonthPair coverage through MonthGrid', () => {
-    // The _MonthPair component is used internally by other components
-    // We're adding this test to acknowledge its existence
-    // Real coverage comes from testing the components that use it
-    expect(true).toBe(true);
-  });
-});

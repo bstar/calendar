@@ -1,39 +1,1344 @@
- % Coverage report from v8
--------------------|---------|----------|---------|---------|-------------------
-File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
--------------------|---------|----------|---------|---------|-------------------
-All files          |   85.48 |    90.07 |   80.69 |   85.48 |                   
- components        |   77.08 |    86.02 |   34.09 |   77.08 |                   
-  CLACalendar.tsx  |   70.83 |     84.5 |   15.15 |   70.83 | ...1108,1115-1119 
-  ...rBoundary.tsx |   99.53 |    96.55 |    90.9 |   99.53 | 121               
- ...s/CalendarGrid |   90.07 |    88.88 |     100 |   90.07 |                   
-  CalendarGrid.tsx |   90.07 |    88.88 |     100 |   90.07 | 34-47,128,134     
- ...onents/DayCell |    95.4 |    93.07 |     100 |    95.4 |                   
-  DayCell.tsx      |   93.75 |    90.52 |     100 |   93.75 | ...-92,97-101,110 
-  DayCell.utils.ts |     100 |      100 |     100 |     100 |                   
- ...s/LayerControl |     100 |      100 |     100 |     100 |                   
-  LayerControl.tsx |     100 |      100 |     100 |     100 |                   
- ...ents/MonthGrid |   76.16 |     90.9 |     100 |   76.16 |                   
-  MonthGrid.tsx    |   76.16 |     90.9 |     100 |   76.16 | ...10-124,198-236 
- ...Calendar/utils |    64.7 |    58.33 |     100 |    64.7 |                   
-  ...ndar.utils.ts |    64.7 |    58.33 |     100 |    64.7 | 19-23,29,31-35,38 
- ...ndarComponents |   79.29 |     88.8 |   78.72 |   79.29 |                   
-  ...omponents.tsx |   66.88 |    80.39 |   60.86 |   66.88 | ...82,691,799-850 
-  ...oordinator.ts |     100 |      100 |     100 |     100 |                   
-  ...darPortal.tsx |   91.45 |     93.8 |      90 |   91.45 | ...17-219,262-264 
-  Notification.tsx |     100 |      100 |     100 |     100 |                   
-  ...lCalendar.tsx |   96.07 |    88.23 |     100 |   96.07 | 60-61             
- ...nents/handlers |   98.09 |     96.2 |     100 |   98.09 |                   
-  ...arHandlers.ts |   98.09 |     96.2 |     100 |   98.09 | 172-173,227-229   
- ...ponents/layers |     100 |       96 |     100 |     100 |                   
-  LayerManager.ts  |     100 |     92.3 |     100 |     100 | 75-77             
-  ...rRenderer.tsx |     100 |      100 |     100 |     100 |                   
- ...s/restrictions |     100 |     90.5 |     100 |     100 |                   
-  ...dGenerator.ts |     100 |    88.46 |     100 |     100 | ...61,230,250,275 
-  ...ionManager.ts |     100 |     92.3 |     100 |     100 | ...60,175,197,238 
-  utils.ts         |     100 |      100 |     100 |     100 |                   
- ...ents/selection |   95.96 |    86.84 |     100 |   95.96 |                   
-  ...ionManager.ts |   95.96 |    86.84 |     100 |   95.96 | ...,88-93,135-137 
- utils             |   91.21 |    98.57 |     100 |   91.21 |                   
-  DateUtils.ts     |   91.21 |    98.57 |     100 |   91.21 | 141-167           
--------------------|---------|----------|---------|---------|-------------------
+
+> cla-calendar@0.1.0 test:coverage
+> vitest --coverage --run
+
+
+ RUN  v3.2.4 /Users/bstar/projects/cla/calendar
+      Coverage enabled with v8
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Basic Rendering > should not render when isOpen is false
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m0[39m, left: [33m0[39m, bottom: [33m0[39m, right: [33m0[39m }
+}
+[Portal] Applying position: { top: [33m8[39m, left: [33m0[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m0[39m, left: [33m0[39m, bottom: [33m0[39m, right: [33m0[39m }
+}
+[Portal] Applying position: { top: [33m8[39m, left: [33m0[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Basic Rendering > should render when isOpen is true
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m0[39m, left: [33m0[39m, bottom: [33m0[39m, right: [33m0[39m }
+}
+[Portal] Applying position: { top: [33m8[39m, left: [33m0[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m0[39m, left: [33m0[39m, bottom: [33m0[39m, right: [33m0[39m }
+}
+[Portal] Applying position: { top: [33m8[39m, left: [33m0[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Basic Rendering > should create portal element with correct class
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m0[39m, left: [33m0[39m, bottom: [33m0[39m, right: [33m0[39m }
+}
+[Portal] Applying position: { top: [33m8[39m, left: [33m0[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m0[39m, left: [33m0[39m, bottom: [33m0[39m, right: [33m0[39m }
+}
+[Portal] Applying position: { top: [33m8[39m, left: [33m0[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Positioning > should position portal at bottom-left by default
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m100[39m, left: [33m50[39m, bottom: [33m130[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m138[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m100[39m, left: [33m50[39m, bottom: [33m130[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m138[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Positioning > should position portal at bottom-right when specified
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Positioning > should position portal at bottom-right when specified
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m300[39m,
+  triggerRect: { top: [33m100[39m, left: [33m50[39m, bottom: [33m130[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m138[39m, left: [33m-50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Positioning > should position portal at bottom-right when specified
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Positioning > should position portal at top-left when specified
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m100[39m, left: [33m50[39m, bottom: [33m130[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m-308[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m100[39m, left: [33m50[39m, bottom: [33m130[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m-308[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Positioning > should use dynamic positioning when enabled
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Event Handling > should close on click outside when onClose is provided
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Event Handling > should not close when clicking inside the portal
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Event Handling > should not close when clicking on trigger element
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Event Handling > should close on ESC key press
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Event Handling > should not respond to other keys
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Window Events > should update position on window resize
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Window Events > should update position on window scroll
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Window Events > should update position on window scroll
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Intersection Observer > should reposition when portal is partially cut off
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Intersection Observer > should reposition when portal is partially cut off
+[Portal] Calendar partially cut off, repositioning
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Intersection Observer > should not reposition when fully visible
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Style Application > should apply custom portal styles
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: { width: [32m'500px'[39m, backgroundColor: [32m'red'[39m, padding: [32m'20px'[39m }
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: { width: [32m'500px'[39m, backgroundColor: [32m'red'[39m, padding: [32m'20px'[39m }
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Style Application > should preserve fixed positioning despite custom styles
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: { position: [32m'absolute'[39m, zIndex: [32m'100'[39m }
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: { position: [32m'absolute'[39m, zIndex: [32m'100'[39m }
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Style Application > should apply visibility style when positioned
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: { visibility: [32m'visible'[39m }
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: { visibility: [32m'visible'[39m }
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Style Application > should apply all supported CSS properties
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {
+  display: [32m'block'[39m,
+  pointerEvents: [32m'none'[39m,
+  right: [32m'10px'[39m,
+  bottom: [32m'20px'[39m,
+  margin: [32m'5px'[39m,
+  border: [32m'1px solid red'[39m,
+  borderRadius: [32m'8px'[39m,
+  boxShadow: [32m'0 2px 4px rgba(0,0,0,0.1)'[39m,
+  color: [32m'blue'[39m,
+  opacity: [32m'0.9'[39m,
+  transition: [32m'all 0.3s'[39m,
+  transform: [32m'scale(0.95)'[39m
+}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {
+  display: [32m'block'[39m,
+  pointerEvents: [32m'none'[39m,
+  right: [32m'10px'[39m,
+  bottom: [32m'20px'[39m,
+  margin: [32m'5px'[39m,
+  border: [32m'1px solid red'[39m,
+  borderRadius: [32m'8px'[39m,
+  boxShadow: [32m'0 2px 4px rgba(0,0,0,0.1)'[39m,
+  color: [32m'blue'[39m,
+  opacity: [32m'0.9'[39m,
+  transition: [32m'all 0.3s'[39m,
+  transform: [32m'scale(0.95)'[39m
+}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Lifecycle > should clean up portal element on unmount
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Lifecycle > should remove event listeners on unmount
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Lifecycle > should handle rapid open/close cycles
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Edge Cases > should handle missing triggerRef gracefully
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mfalse[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mfalse[39m
+[Portal] Early return - missing element or ref
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Edge Cases > should handle portal style updates
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: { width: [32m'300px'[39m }
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: { width: [32m'300px'[39m }
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: { width: [32m'500px'[39m }
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+stdout | src/components/CLACalendarComponents/CalendarPortal.test.tsx > CalendarPortal > Edge Cases > should show fallback content when no children provided
+[Portal] Creating portal element
+[Portal] Portal element created and added to DOM
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mfalse[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Early return - missing element or ref
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+[Portal] Position update effect triggered
+[Portal] portalStyle: {}
+[Portal] Should update position? [33mtrue[39m
+[Portal] updatePosition called
+[Portal] portalElement exists: [33mtrue[39m
+[Portal] triggerRef.current exists: [33mtrue[39m
+[Portal] Dimensions: {
+  portalHeight: [33m400[39m,
+  portalWidth: [33m500[39m,
+  triggerRect: { top: [33m700[39m, left: [33m50[39m, bottom: [33m730[39m, right: [33m250[39m }
+}
+[Portal] Applying position: { top: [33m292[39m, left: [33m50[39m }
+
+ ✓ src/components/CLACalendarComponents/CalendarPortal.test.tsx (29 tests | 3 skipped) 376ms
+ ✓ src/components/ErrorBoundary.test.tsx (22 tests) 828ms
+ ✓ src/components/CLACalendar/components/MonthGrid/MonthGrid.test.tsx (30 tests) 465ms
+ ✓ src/components/CLACalendarComponents/Notification.test.tsx (16 tests) 242ms
+ ✓ src/components/CLACalendarComponents/CalendarComponents.test.tsx (65 tests) 491ms
+stdout | src/components/CLACalendar.test.tsx > CLACalendar > Error Boundary > should handle errors gracefully
+🚨 Calendar Error [calendar-error-1753466191023-2ge8abnp5]
+  ┌───────────┬──────────────────────────────────────────┐
+  │ (index)   │ Values                                   │
+  ├───────────┼──────────────────────────────────────────┤
+  │ Error ID  │ [32m'calendar-error-1753466191023-2ge8abnp5'[39m │
+  │ Component │ [32m'Calendar'[39m                               │
+  │ Message   │ [32m'Test error'[39m                             │
+  │ Timestamp │ [32m'2025-07-25T17:56:31.023Z'[39m               │
+  │ URL       │ [32m'http://localhost:3000/'[39m                 │
+  └───────────┴──────────────────────────────────────────┘
+  📋 Full Error Details
+    {
+      "errorId": "calendar-error-1753466191023-2ge8abnp5",
+      "timestamp": "2025-07-25T17:56:31.023Z",
+      "component": "Calendar",
+      "message": "Test error",
+      "stack": "Error: Test error\n    at ErrorComponent (/Users/bstar/projects/cla/calendar/src/components/CLACalendar.test.tsx:717:15)\n    at renderWithHooks (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:15486:18)\n    at mountIndeterminateComponent (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:20103:13)\n    at beginWork (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:21626:16)\n    at beginWork$1 (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:27465:14)\n    at performUnitOfWork (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:26599:12)\n    at workLoopSync (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:26505:5)\n    at renderRootSync (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:26473:7)\n    at recoverFromConcurrentError (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:25889:20)\n    at performSyncWorkOnRoot (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:26135:20)",
+      "componentStack": "\n    at ErrorComponent (/Users/bstar/projects/cla/calendar/src/components/CLACalendar.test.tsx:816:15)\n    at CalendarErrorBoundary (/Users/bstar/projects/cla/calendar/src/components/ErrorBoundary.tsx:10:5)",
+      "userAgent": "Mozilla/5.0 (darwin) AppleWebKit/537.36 (KHTML, like Gecko) jsdom/26.1.0",
+      "url": "http://localhost:3000/",
+      "props": {
+        "children": "React component"
+      },
+      "state": {
+        "hasError": true,
+        "errorId": "calendar-error-1753466191023-2ge8abnp5",
+        "errorMessage": "Test error"
+      }
+    }
+
+stdout | src/components/CLACalendar.test.tsx > CLACalendar > Error Boundary > should trigger error handler with error details
+🚨 CLACalendar Error [calendar-error-1753466191104-dhvyg4rou]
+  ┌───────────┬──────────────────────────────────────────┐
+  │ (index)   │ Values                                   │
+  ├───────────┼──────────────────────────────────────────┤
+  │ Error ID  │ [32m'calendar-error-1753466191104-dhvyg4rou'[39m │
+  │ Component │ [32m'CLACalendar'[39m                            │
+  │ Message   │ [32m'Test calendar error'[39m                    │
+  │ Timestamp │ [32m'2025-07-25T17:56:31.104Z'[39m               │
+  │ URL       │ [32m'http://localhost:3000/'[39m                 │
+  └───────────┴──────────────────────────────────────────┘
+  📋 Full Error Details
+    {
+      "errorId": "calendar-error-1753466191104-dhvyg4rou",
+      "timestamp": "2025-07-25T17:56:31.104Z",
+      "component": "CLACalendar",
+      "message": "Test calendar error",
+      "stack": "Error: Test calendar error\n    at ErrorComponent (/Users/bstar/projects/cla/calendar/src/components/CLACalendar.test.tsx:764:15)\n    at renderWithHooks (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:15486:18)\n    at mountIndeterminateComponent (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:20103:13)\n    at beginWork (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:21626:16)\n    at beginWork$1 (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:27465:14)\n    at performUnitOfWork (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:26599:12)\n    at workLoopSync (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:26505:5)\n    at renderRootSync (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:26473:7)\n    at recoverFromConcurrentError (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:25889:20)\n    at performSyncWorkOnRoot (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:26135:20)",
+      "componentStack": "\n    at ErrorComponent (/Users/bstar/projects/cla/calendar/src/components/CLACalendar.test.tsx:865:15)\n    at CalendarErrorBoundary (/Users/bstar/projects/cla/calendar/src/components/ErrorBoundary.tsx:10:5)\n    at TestWrapper (/Users/bstar/projects/cla/calendar/src/components/CLACalendar.test.tsx:868:59)",
+      "userAgent": "Mozilla/5.0 (darwin) AppleWebKit/537.36 (KHTML, like Gecko) jsdom/26.1.0",
+      "url": "http://localhost:3000/",
+      "props": {
+        "componentName": "CLACalendar",
+        "onError": "Custom error handler provided",
+        "children": "React component"
+      },
+      "state": {
+        "hasError": true,
+        "errorId": "calendar-error-1753466191104-dhvyg4rou",
+        "errorMessage": "Test calendar error"
+      }
+    }
+
+ ✓ src/components/CLACalendarComponents/CalendarPortalCoordination.test.ts (18 tests) 107ms
+ ✓ src/components/CLACalendar.multiple-instances.test.tsx (3 tests) 400ms
+ ✓ src/components/CLACalendar.restrictions.test.tsx (23 tests) 1728ms
+ ✓ src/components/CLACalendarComponents/PortalCalendar.test.tsx (18 tests) 202ms
+ ✓ src/components/CLACalendar.config-features.test.tsx (36 tests) 3153ms
+   ✓ CLACalendar Configuration Features > Position and Layout Configuration > should handle different visible month configurations  1042ms
+ ✓ src/components/CLACalendar.config.test.ts (46 tests) 8ms
+stdout | src/components/CLACalendar.test.tsx > CLACalendar > Additional Features Coverage > should handle error boundary onError callback
+🚨 TestCalendar Error [calendar-error-1753466193180-xd3pdoofi]
+  ┌───────────┬──────────────────────────────────────────┐
+  │ (index)   │ Values                                   │
+  ├───────────┼──────────────────────────────────────────┤
+  │ Error ID  │ [32m'calendar-error-1753466193180-xd3pdoofi'[39m │
+  │ Component │ [32m'TestCalendar'[39m                           │
+  │ Message   │ [32m'Test error'[39m                             │
+  │ Timestamp │ [32m'2025-07-25T17:56:33.180Z'[39m               │
+  │ URL       │ [32m'http://localhost:3000/'[39m                 │
+  └───────────┴──────────────────────────────────────────┘
+  📋 Full Error Details
+    {
+      "errorId": "calendar-error-1753466193180-xd3pdoofi",
+      "timestamp": "2025-07-25T17:56:33.180Z",
+      "component": "TestCalendar",
+      "message": "Test error",
+      "stack": "Error: Test error\n    at ThrowingComponent (/Users/bstar/projects/cla/calendar/src/components/CLACalendar.test.tsx:1628:15)\n    at renderWithHooks (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:15486:18)\n    at mountIndeterminateComponent (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:20103:13)\n    at beginWork (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:21626:16)\n    at beginWork$1 (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:27465:14)\n    at performUnitOfWork (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:26599:12)\n    at workLoopSync (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:26505:5)\n    at renderRootSync (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:26473:7)\n    at recoverFromConcurrentError (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:25889:20)\n    at performSyncWorkOnRoot (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:26135:20)",
+      "componentStack": "\n    at ThrowingComponent (/Users/bstar/projects/cla/calendar/src/components/CLACalendar.test.tsx:1835:15)\n    at CalendarErrorBoundary (/Users/bstar/projects/cla/calendar/src/components/ErrorBoundary.tsx:10:5)",
+      "userAgent": "Mozilla/5.0 (darwin) AppleWebKit/537.36 (KHTML, like Gecko) jsdom/26.1.0",
+      "url": "http://localhost:3000/",
+      "props": {
+        "componentName": "TestCalendar",
+        "onError": "Custom error handler provided",
+        "children": "React component"
+      },
+      "state": {
+        "hasError": true,
+        "errorId": "calendar-error-1753466193180-xd3pdoofi",
+        "errorMessage": "Test error"
+      }
+    }
+
+stdout | src/components/CLACalendar.test.tsx > CLACalendar > Additional Features Coverage > should handle CLACalendar error boundary logging
+🚨 CLACalendar Error [calendar-error-1753466193194-0qsnwy6g8]
+  ┌───────────┬──────────────────────────────────────────┐
+  │ (index)   │ Values                                   │
+  ├───────────┼──────────────────────────────────────────┤
+  │ Error ID  │ [32m'calendar-error-1753466193194-0qsnwy6g8'[39m │
+  │ Component │ [32m'CLACalendar'[39m                            │
+  │ Message   │ [32m'Test calendar error'[39m                    │
+  │ Timestamp │ [32m'2025-07-25T17:56:33.194Z'[39m               │
+  │ URL       │ [32m'http://localhost:3000/'[39m                 │
+  └───────────┴──────────────────────────────────────────┘
+  📋 Full Error Details
+    {
+      "errorId": "calendar-error-1753466193194-0qsnwy6g8",
+      "timestamp": "2025-07-25T17:56:33.194Z",
+      "component": "CLACalendar",
+      "message": "Test calendar error",
+      "stack": "Error: Test calendar error\n    at ThrowingComponent (/Users/bstar/projects/cla/calendar/src/components/CLACalendar.test.tsx:1649:15)\n    at renderWithHooks (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:15486:18)\n    at mountIndeterminateComponent (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:20103:13)\n    at beginWork (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:21626:16)\n    at beginWork$1 (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:27465:14)\n    at performUnitOfWork (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:26599:12)\n    at workLoopSync (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:26505:5)\n    at renderRootSync (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:26473:7)\n    at recoverFromConcurrentError (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:25889:20)\n    at performSyncWorkOnRoot (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:26135:20)",
+      "componentStack": "\n    at ThrowingComponent (/Users/bstar/projects/cla/calendar/src/components/CLACalendar.test.tsx:1856:15)\n    at CalendarErrorBoundary (/Users/bstar/projects/cla/calendar/src/components/ErrorBoundary.tsx:10:5)",
+      "userAgent": "Mozilla/5.0 (darwin) AppleWebKit/537.36 (KHTML, like Gecko) jsdom/26.1.0",
+      "url": "http://localhost:3000/",
+      "props": {
+        "componentName": "CLACalendar",
+        "onError": "Custom error handler provided",
+        "children": "React component"
+      },
+      "state": {
+        "hasError": true,
+        "errorId": "calendar-error-1753466193194-0qsnwy6g8",
+        "errorMessage": "Test calendar error"
+      }
+    }
+
+ ✓ src/components/CLACalendar/components/CalendarGrid/CalendarGrid.test.tsx (24 tests) 331ms
+ ✓ src/components/CLACalendarComponents/CalendarCoordinator.test.ts (21 tests) 157ms
+ ✓ src/components/CLACalendar/components/DayCell/DayCell.test.tsx (10 tests) 278ms
+stdout | src/components/CLACalendar.test.tsx > CLACalendar > Additional Function Coverage > should handle error boundary console logging
+🚨 CLACalendar Error [calendar-error-1753466194213-pcy6nhn0q]
+  ┌───────────┬──────────────────────────────────────────┐
+  │ (index)   │ Values                                   │
+  ├───────────┼──────────────────────────────────────────┤
+  │ Error ID  │ [32m'calendar-error-1753466194213-pcy6nhn0q'[39m │
+  │ Component │ [32m'CLACalendar'[39m                            │
+  │ Message   │ [32m'Test error for console'[39m                 │
+  │ Timestamp │ [32m'2025-07-25T17:56:34.213Z'[39m               │
+  │ URL       │ [32m'http://localhost:3000/'[39m                 │
+  └───────────┴──────────────────────────────────────────┘
+  📋 Full Error Details
+    {
+      "errorId": "calendar-error-1753466194213-pcy6nhn0q",
+      "timestamp": "2025-07-25T17:56:34.213Z",
+      "component": "CLACalendar",
+      "message": "Test error for console",
+      "stack": "Error: Test error for console\n    at ErrorComponent (/Users/bstar/projects/cla/calendar/src/components/CLACalendar.test.tsx:2112:15)\n    at renderWithHooks (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:15486:18)\n    at mountIndeterminateComponent (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:20103:13)\n    at beginWork (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:21626:16)\n    at beginWork$1 (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:27465:14)\n    at performUnitOfWork (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:26599:12)\n    at workLoopSync (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:26505:5)\n    at renderRootSync (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:26473:7)\n    at recoverFromConcurrentError (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:25889:20)\n    at performSyncWorkOnRoot (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:26135:20)",
+      "componentStack": "\n    at ErrorComponent (/Users/bstar/projects/cla/calendar/src/components/CLACalendar.test.tsx:2403:15)\n    at CalendarErrorBoundary (/Users/bstar/projects/cla/calendar/src/components/ErrorBoundary.tsx:10:5)\n    at TestWrapper (/Users/bstar/projects/cla/calendar/src/components/CLACalendar.test.tsx:2406:59)",
+      "userAgent": "Mozilla/5.0 (darwin) AppleWebKit/537.36 (KHTML, like Gecko) jsdom/26.1.0",
+      "url": "http://localhost:3000/",
+      "props": {
+        "componentName": "CLACalendar",
+        "onError": "Custom error handler provided",
+        "children": "React component"
+      },
+      "state": {
+        "hasError": true,
+        "errorId": "calendar-error-1753466194213-pcy6nhn0q",
+        "errorMessage": "Test error for console"
+      }
+    }
+
+ ✓ src/components/CLACalendarComponents/CalendarPortal.hook.test.tsx (14 tests) 156ms
+ ✓ src/components/CLACalendar/components/MonthGrid/MonthGrid.renderTooltip.test.tsx (3 tests) 113ms
+stdout | src/components/CLACalendar.test.tsx > CLACalendar > Additional Function Coverage > should handle console error in error boundary
+🚨 CLACalendar Error [calendar-error-1753466196080-6f14y428c]
+  ┌───────────┬──────────────────────────────────────────┐
+  │ (index)   │ Values                                   │
+  ├───────────┼──────────────────────────────────────────┤
+  │ Error ID  │ [32m'calendar-error-1753466196080-6f14y428c'[39m │
+  │ Component │ [32m'CLACalendar'[39m                            │
+  │ Message   │ [32m'Test console error'[39m                     │
+  │ Timestamp │ [32m'2025-07-25T17:56:36.080Z'[39m               │
+  │ URL       │ [32m'http://localhost:3000/'[39m                 │
+  └───────────┴──────────────────────────────────────────┘
+  📋 Full Error Details
+    {
+      "errorId": "calendar-error-1753466196080-6f14y428c",
+      "timestamp": "2025-07-25T17:56:36.080Z",
+      "component": "CLACalendar",
+      "message": "Test console error",
+      "stack": "Error: Test console error\n    at ThrowingComponent (/Users/bstar/projects/cla/calendar/src/components/CLACalendar.test.tsx:2650:15)\n    at renderWithHooks (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:15486:18)\n    at mountIndeterminateComponent (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:20103:13)\n    at beginWork (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:21626:16)\n    at beginWork$1 (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:27465:14)\n    at performUnitOfWork (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:26599:12)\n    at workLoopSync (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:26505:5)\n    at renderRootSync (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:26473:7)\n    at recoverFromConcurrentError (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:25889:20)\n    at performSyncWorkOnRoot (/Users/bstar/projects/cla/calendar/node_modules/react-dom/cjs/react-dom.development.js:26135:20)",
+      "componentStack": "\n    at ThrowingComponent (/Users/bstar/projects/cla/calendar/src/components/CLACalendar.test.tsx:3105:15)\n    at CalendarErrorBoundary (/Users/bstar/projects/cla/calendar/src/components/ErrorBoundary.tsx:10:5)",
+      "userAgent": "Mozilla/5.0 (darwin) AppleWebKit/537.36 (KHTML, like Gecko) jsdom/26.1.0",
+      "url": "http://localhost:3000/",
+      "props": {
+        "componentName": "CLACalendar",
+        "onError": "Custom error handler provided",
+        "children": "React component"
+      },
+      "state": {
+        "hasError": true,
+        "errorId": "calendar-error-1753466196080-6f14y428c",
+        "errorMessage": "Test console error"
+      }
+    }
+
+ ✓ src/components/CLACalendarComponents/handlers/CLACalendarHandlers.test.ts (37 tests) 26ms
+ ✓ src/components/CLACalendarComponents/selection/DateRangeSelectionManager.test.ts (36 tests) 29ms
+ ✓ src/components/CLACalendarComponents/restrictions/RestrictionManager.edge.test.ts (29 tests) 27ms
+ ✓ src/utils/DateUtils.test.ts (101 tests) 52ms
+ ✓ src/components/CLACalendarComponents/selection/DateRangeSelectionManager.edge.test.ts (16 tests) 50ms
+ ✓ src/components/CLACalendarComponents/restrictions/RestrictionManager.test.ts (40 tests) 24ms
+ ✓ src/components/CLACalendarComponents/layers/LayerManager.test.ts (22 tests) 10ms
+ ✓ src/components/CLACalendar/utils/calendar.utils.test.ts (18 tests) 3ms
+ ✓ src/components/CLACalendarComponents/layers/LayerRenderer.test.tsx (16 tests) 9ms
+ ✓ src/components/CLACalendar/components/DayCell/DayCell.utils.test.ts (33 tests) 6ms
+ ✓ src/components/CLACalendarComponents/restrictions/RestrictionBackgroundGenerator.test.ts (34 tests) 11ms
+ ❯ src/components/CLACalendar.test.tsx (98 tests | 1 failed) 11980ms
+   ✓ Date Input Validation > should handle date input in various formats 265ms
+   ✓ CLACalendar > Component Initialization > should render embedded calendar immediately 19ms
+   ✓ CLACalendar > Component Initialization > should not render popup calendar until opened 6ms
+   ✓ CLACalendar > Component Initialization > should lazy load layers when calendar is first opened 85ms
+   ✓ CLACalendar > Component Initialization > should lazy load restriction config when calendar is first opened 72ms
+   ✓ CLACalendar > Component Initialization > should initialize with default range when provided 35ms
+   ✓ CLACalendar > Component Initialization > should call onMonthChange when months change 64ms
+   ✓ CLACalendar > Calendar Open/Close Behavior > should open calendar when input is clicked 69ms
+   ✓ CLACalendar > Calendar Open/Close Behavior > should close calendar on scroll when in popup mode 33ms
+   ✓ CLACalendar > Calendar Open/Close Behavior > should handle closeOnClickAway setting 59ms
+   ✓ CLACalendar > Date Selection > should handle date selection in single mode 66ms
+   ✓ CLACalendar > Date Selection > should handle date range selection 115ms
+   ✓ CLACalendar > Date Selection > should handle clear button 60ms
+   ✓ CLACalendar > Out of Bounds Scrolling > should handle out of bounds scrolling when enabled 89ms
+   ✓ CLACalendar > Out of Bounds Scrolling > should trigger mouse handlers when enableOutOfBoundsScroll is true 30ms
+   ✓ CLACalendar > Out of Bounds Scrolling > should not attach mouse handlers when enableOutOfBoundsScroll is false 28ms
+   ✓ CLACalendar > Layer Management > should render layer navigation when enabled 52ms
+   ✓ CLACalendar > Layer Management > should handle layer change 39ms
+   ✓ CLACalendar > Custom Date Formatter > should use custom date formatter when provided 20ms
+   ✓ CLACalendar > Input Styling > should apply custom input styles when provided 2ms
+   ✓ CLACalendar > Input Styling > should not render style element when no inputStyle is provided 1ms
+   ✓ CLACalendar > Settings Validation > should handle invalid settings gracefully 40ms
+   ✓ CLACalendar > Settings Validation > should create safe settings with createCalendarSettings 0ms
+   ✓ CLACalendar > Height Measurement > should measure calendar height when requested 42ms
+   ✓ CLACalendar > Error Boundary > should handle errors gracefully 81ms
+   ✓ CLACalendar > Error Boundary > should trigger error handler with error details 125ms
+   ✓ CLACalendar > Month Navigation > should navigate to previous and next months 77ms
+   ✓ CLACalendar > Month Navigation > should handle month navigation with restrictions 102ms
+   ✓ CLACalendar > Month Navigation > should debounce rapid month navigation 122ms
+   ✓ CLACalendar > Click Outside Handling > should close calendar on click outside when closeOnClickAway is true 47ms
+   ✓ CLACalendar > Click Outside Handling > should not close calendar when clicking inside 51ms
+   ✓ CLACalendar > Handler Functions Coverage > should handle selection start and move 68ms
+   ✓ CLACalendar > Handler Functions Coverage > should handle date change from input 61ms
+   ✓ CLACalendar > Handler Functions Coverage > should handle layer change events 177ms
+   ✓ CLACalendar > Popup Mode Behaviors > should handle popup open and close properly 120ms
+   ✓ CLACalendar > Popup Mode Behaviors > should handle popup portal rendering with mouse handlers 22ms
+   ✓ CLACalendar > Additional Coverage Tests > should handle moveToMonth with restrictions 50ms
+   ✓ CLACalendar > Additional Coverage Tests > should handle date validation and formatting 59ms
+   ✓ CLACalendar > Additional Coverage Tests > should handle scroll event on window 139ms
+   ✓ CLACalendar > Additional Coverage Tests > should handle input class name 1ms
+   ✓ CLACalendar > Additional Coverage Tests > should handle display text function 3ms
+   ✓ CLACalendar > Additional Coverage Tests > should handle restriction check for date selection 45ms
+   ✓ CLACalendar > Additional Coverage Tests > should handle layers factory returning empty array 45ms
+   ✓ CLACalendar > Additional Coverage Tests > should handle restriction config factory returning null 33ms
+   ✓ CLACalendar > Notification System > should show notifications when enabled 72ms
+   ✓ CLACalendar > Notification System > should dismiss notifications 217ms
+   ✓ CLACalendar > Notification System > should render notification component when notification state is set 105ms
+   ✓ CLACalendar > Additional Features Coverage > should render footer when showFooter is true 86ms
+   ✓ CLACalendar > Additional Features Coverage > should render side chevron indicator when enableOutOfBoundsScroll is true 26ms
+   ✓ CLACalendar > Additional Features Coverage > should render layer navigation when showLayersNavigation is true 63ms
+   ✓ CLACalendar > Additional Features Coverage > should handle showDateInputs when false 69ms
+   ✓ CLACalendar > Additional Features Coverage > should handle lazy layers initialization in popup mode 86ms
+   ✓ CLACalendar > Additional Features Coverage > should handle error boundary onError callback 15ms
+   ✓ CLACalendar > Additional Features Coverage > should handle CLACalendar error boundary logging 47ms
+   ✓ CLACalendar > Additional Features Coverage > should render notification when showSelectionAlert is true 61ms
+   ✓ CLACalendar > Additional Features Coverage > should handle coordinator open when calendar opens 54ms
+   ✓ CLACalendar > Additional Features Coverage > should handle enableOutOfBoundsScroll mouse events 71ms
+   ✓ CLACalendar > Additional Function Coverage > should handle calendar initialization with default range 79ms
+   ✓ CLACalendar > Additional Function Coverage > should handle initialActiveLayer setting 56ms
+   ✓ CLACalendar > Additional Function Coverage > should handle continuous month advancement with out of bounds scroll 140ms
+   ✓ CLACalendar > Additional Function Coverage > should handle date validation with different formats 50ms
+   ✓ CLACalendar > Additional Function Coverage > should handle document mouse events when not initialized 1ms
+   ✓ CLACalendar > Additional Function Coverage > should handle calendar clear with display range update 82ms
+   ✓ CLACalendar > Additional Function Coverage > should handle submit with display range update 102ms
+   ✓ CLACalendar > Additional Function Coverage > should handle coordinator state changes 48ms
+   ✓ CLACalendar > Additional Function Coverage > should handle date restriction checks 25ms
+   ✓ CLACalendar > Additional Function Coverage > should cleanup coordinator on unmount 8ms
+   ✓ CLACalendar > Additional Function Coverage > should handle coordinator state changes when open 193ms
+   ✓ CLACalendar > Additional Function Coverage > should handle renderLayer with uninitialized calendar 1ms
+   ✓ CLACalendar > Additional Function Coverage > should handle error boundary console logging 260ms
+   ✓ CLACalendar > Additional Function Coverage > should handle disabled popup mode interactions 242ms
+   ✓ CLACalendar > Additional Function Coverage > should handle inputStyle with various CSS properties 30ms
+   ✓ CLACalendar > Additional Function Coverage > should handle date input with dot notation validation 64ms
+   ✓ CLACalendar > Additional Function Coverage > should handle date input context initialization with default range 68ms
+   ✓ CLACalendar > Additional Function Coverage > should handle popup input click to open calendar 100ms
+   ✓ CLACalendar > Additional Function Coverage > should handle mouse event listeners cleanup 83ms
+   ✓ CLACalendar > Additional Function Coverage > should handle popup input className function 10ms
+   ✓ CLACalendar > Additional Function Coverage > should handle document mouse events during selection 66ms
+   ✓ CLACalendar > Additional Function Coverage > should handle date validator parseDotNotation function 300ms
+   ✓ CLACalendar > Additional Function Coverage > should handle layer validation filter 44ms
+   ✓ CLACalendar > Additional Function Coverage > should handle effective layers initialization 133ms
+   ✓ CLACalendar > Additional Function Coverage > should handle calendar layer search in updated layers 52ms
+   ✓ CLACalendar > Additional Function Coverage > should handle formatDateString in date input context 28ms
+   ✓ CLACalendar > Additional Function Coverage > should handle advanceMonth timer function 54ms
+   ✓ CLACalendar > Additional Function Coverage > should handle input onMouseDown event 3ms
+   ✓ CLACalendar > Additional Function Coverage > should handle popup calendar portal click events 40ms
+   ✓ CLACalendar > Additional Function Coverage > should handle display text formatting 9ms
+   ✓ CLACalendar > Additional Function Coverage > should handle notification dismiss callback 92ms
+   ✓ CLACalendar > Additional Function Coverage > should handle coordinator handleStateChange when another calendar opens 76ms
+   ✓ CLACalendar > Additional Function Coverage > should handle coordinator sync when closing popup 47ms
+   ✓ CLACalendar > Additional Function Coverage > should handle coordinator when coordinator ref is not set 65ms
+   ✓ CLACalendar > Additional Function Coverage > should handle console error in error boundary 12ms
+   ✓ CLACalendar > Additional Function Coverage > should handle error boundary without onError callback 63ms
+   ✓ CLACalendar > Additional Function Coverage > should handle popup calendar portal mouse events 210ms
+   ✓ CLACalendar > Additional Function Coverage > should test coordinator close when isActive and calendar closes 124ms
+   ✓ CLACalendar > Additional Function Coverage > should handle multiple coordinators and state changes 122ms
+   ✓ CLACalendar > Additional Function Coverage > should handle coordinator cleanup on unmount 88ms
+   × CLACalendar > Additional Function Coverage > should handle notification onDismiss with actual notification component 5010ms
+     → Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+
+ Test Files  1 failed | 27 passed (28)
+      Tests  1 failed | 854 passed | 3 skipped (858)
+   Start at  13:56:24
+   Duration  17.96s (transform 2.09s, setup 10.77s, collect 40.22s, tests 21.26s, environment 19.84s, prepare 2.71s)
+

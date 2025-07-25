@@ -752,23 +752,6 @@ export interface MonthGridProps {
   startWeekOnSunday?: boolean;
 }
 
-export interface MonthPairProps extends Omit<MonthGridProps, 'baseDate' | 'style'> {
-  firstMonth: Date;
-  secondMonth: Date | null;
-  visibleMonths: number;
-  showMonthHeadings: boolean;
-  restrictionConfig?: RestrictionConfig;
-  _selectedRange?: DateRange;
-  _onSelectionStart?: (date: Date) => void;
-  _onSelectionMove?: (date: Date) => void;
-  _isSelecting?: boolean;
-  _showTooltips?: boolean;
-  _renderDay?: (date: Date) => RenderResult | null;
-  _layer?: Layer;
-  _activeLayer?: string;
-  _restrictionConfig?: RestrictionConfig;
-}
-
 export interface CalendarGridProps {
   months: Date[];
   selectedRange: DateRange;
@@ -792,59 +775,4 @@ export interface LayerControlProps {
 
 // Add these types
 export type DocumentMouseHandler = (e: MouseEvent) => void;
-export type ReactMouseHandler = (e: React.MouseEvent<HTMLDivElement>) => void;
-
-// Rename MonthPair to _MonthPair
-const _MonthPair: React.FC<MonthPairProps> = ({
-  firstMonth,
-  secondMonth,
-  _selectedRange,
-  _onSelectionStart,
-  _onSelectionMove,
-  _isSelecting,
-  visibleMonths,
-  showMonthHeadings,
-  _showTooltips,
-  _renderDay,
-  _layer,
-  _activeLayer,
-  _restrictionConfig,
-  startWeekOnSunday
-}) => {
-  // Create an array of months to show based on firstMonth and secondMonth
-  const monthsToRender = secondMonth ? [firstMonth, secondMonth] : [firstMonth];
-  
-  // Week day abbreviations
-  const weekDays = startWeekOnSunday 
-    ? ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
-    : ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
-  
-  return (
-    <div className="month-pair-container">
-      {monthsToRender.map((month, _index) => (
-        <div 
-          key={month.toISOString()}
-          className={`month-pair-item ${visibleMonths === 1 ? 'single' : 'multiple'}`}
-        >
-          {showMonthHeadings && (
-            <div className="month-pair-heading">
-              {format(month, 'MMMM yyyy', 'UTC')}
-            </div>
-          )}
-          <div className="month-pair-grid">
-            {/* Day header row with weekday abbreviations */}
-            {weekDays.map(day => (
-              <div key={day} className="month-pair-weekday">
-                {day}
-              </div>
-            ))}
-            
-            {/* Generate the actual calendar grid here */}
-            {/* This would be implemented with the specific date calculation logic */}
-            {/* Placeholder for now */}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}; 
+export type ReactMouseHandler = (e: React.MouseEvent<HTMLDivElement>) => void; 
