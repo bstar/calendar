@@ -280,6 +280,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const calendarIdRef = useRef<string>(`calendar-${++calendarCounter}`);
   const coordinatorRef = useRef<ReturnType<typeof registerCalendar> | null>(null);
+  const [externalInputRef, setExternalInputRef] = useState<HTMLInputElement | null>(null);
 
   // These states will only be initialized when calendar is first opened
   const [currentMonth, setCurrentMonth] = useState<Date | null>(() => {
@@ -329,6 +330,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
 
   // Store mouse position in a ref to avoid re-renders
   const mousePositionRef = useRef({ x: 0, y: 0 });
+
 
   // Load lazy data when calendar is first opened
   useEffect(() => {
@@ -442,6 +444,107 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
 
   // Initialize activeLayers only when first opened
   const [activeLayers, setActiveLayers] = useState<Layer[]>([]);
+
+  // Effect to handle external input setup
+  useEffect(() => {
+    let element: HTMLInputElement | null = null;
+
+    // Try to get external input from ref or direct element
+    if (settings.externalInput) {
+      if ('current' in settings.externalInput) {
+        // It's a React ref
+        element = settings.externalInput.current;
+      } else {
+        // It's a direct HTMLInputElement
+        element = settings.externalInput;
+      }
+    } 
+    // Try to get external input from selector
+    else if (settings.externalInputSelector) {
+      element = document.querySelector(settings.externalInputSelector) as HTMLInputElement;
+    }
+
+    setExternalInputRef(element);
+  }, [settings.externalInput, settings.externalInputSelector]);
+
+  // Effect to bind events to external input
+  useEffect(() => {
+    if (!externalInputRef || settings.bindExternalInputEvents === false) return;
+
+    const handleClick = () => {
+      if (!isOpen && settings.displayMode === 'popup') {
+        setIsOpen(true);
+        
+        // Ensure the calendar is initialized when first opened
+        if (!everInitialized) {
+          setEverInitialized(true);
+
+          // If settings has a defaultRange, use it; otherwise use current date
+          if (settings.defaultRange) {
+            setCurrentMonth(new Date(settings.defaultRange.start));
+          } else {
+            setCurrentMonth(new Date());
+          }
+
+          // Load lazy data if needed
+          if (!lazyDataLoaded) {
+            setLazyDataLoaded(true);
+            
+            if (settings.restrictionConfigFactory) {
+              const config = settings.restrictionConfigFactory();
+              setLazyRestrictionConfig(config);
+            }
+            
+            if (settings.layersFactory) {
+              const layers = settings.layersFactory();
+              setLazyLayers(layers);
+
+              // Initialize activeLayers right away
+              const tempLayerManager = new LayerManager(layers);
+              setActiveLayers(tempLayerManager.getLayers());
+
+              // Make sure we have a valid activeLayer
+              if (layers.length > 0) {
+                const validLayer = layers.find(l => l.name === activeLayer) || layers[0];
+                setActiveLayer(validLayer.name);
+              }
+            }
+          }
+
+          // Force the coordinator to register this calendar as active
+          if (coordinatorRef.current) {
+            coordinatorRef.current.open();
+          }
+        }
+      }
+    };
+
+    externalInputRef.addEventListener('click', handleClick);
+    externalInputRef.addEventListener('focus', handleClick);
+
+    return () => {
+      externalInputRef.removeEventListener('click', handleClick);
+      externalInputRef.removeEventListener('focus', handleClick);
+    };
+  }, [externalInputRef, settings.bindExternalInputEvents, settings.displayMode, isOpen, everInitialized, settings.defaultRange, lazyDataLoaded, settings.restrictionConfigFactory, settings.layersFactory, activeLayer]);
+
+  // Effect to update external input value when display range changes
+  useEffect(() => {
+    if (externalInputRef && settings.updateExternalInput !== false) {
+      const displayText = CLACalendarHandlers.createDisplayTextFormatter(
+        displayRange,
+        settings.selectionMode,
+        settings.dateFormatter,
+        settings.dateRangeSeparator
+      )();
+      
+      externalInputRef.value = displayText;
+      
+      // Dispatch input event for form libraries that listen to it
+      const event = new Event('input', { bubbles: true });
+      externalInputRef.dispatchEvent(event);
+    }
+  }, [displayRange, externalInputRef, settings.updateExternalInput, settings.selectionMode, settings.dateFormatter, settings.dateRangeSeparator]);
 
   // Update active layers when layerManager and initialization state changes
   useEffect(() => {
@@ -1046,7 +1149,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
             `}
           </style>
         )}
-        {settings.displayMode !== 'embedded' && (
+        {settings.displayMode !== 'embedded' && !externalInputRef && (
           <input
             ref={inputRef}
             id={`${calendarIdRef.current}-input`}
@@ -1079,7 +1182,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
           ) : (
             <CalendarPortal
               isOpen={true}
-              triggerRef={inputRef}
+              triggerRef={externalInputRef ? { current: externalInputRef } : inputRef}
               onClose={settings.closeOnClickAway ? () => setIsOpen(false) : undefined}
               portalClassName={`cla-calendar-portal cla-calendar-portal-${calendarIdRef.current}`}
               position={settings.position}

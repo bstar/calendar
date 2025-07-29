@@ -1,0 +1,795 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { CalendarStoryWrapper } from './shared/CalendarStoryWrapper';
+import { useRef, useState, useEffect } from 'react';
+import CLACalendar from '../components/CLACalendar';
+import { createCalendarSettings } from '../components/CLACalendar.config';
+
+<Meta title="External Input/Direct Rendering" />
+
+# External Input - Live Examples
+
+This page shows working calendar instances with external input binding for the configurations described in the External Input documentation.
+
+## Basic External Input with Range Selection
+
+A calendar bound to an external input element using React ref with range selection and submit functionality.
+
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'popup',
+  externalInput: externalInputRef,  // React ref to input element
+  selectionMode: 'range',
+  showSubmitButton: true,
+  showFooter: true,
+  onSubmit: handleSubmit,
+  visibleMonths: 2,
+  monthWidth: 500,
+  position: 'bottom-left',
+  useDynamicPosition: true,
+  showHeader: true,
+  showTooltips: true,
+  showLayersNavigation: false,
+  showDateInputs: true,
+  closeOnClickAway: true,
+  startWeekOnSunday: false,
+  timezone: 'UTC',
+  dateRangeSeparator: ' - ',
+  updateExternalInput: true,      // Update input value on selection
+  bindExternalInputEvents: true   // Bind click/focus events
+}
+```
+
+**Input Element Setup:**
+```typescript
+const externalInputRef = useRef<HTMLInputElement>(null);
+
+<input
+  ref={externalInputRef}
+  id="basic-external-input"
+  type="text"
+  placeholder="Click to select date range"
+  style={{
+    padding: '8px 12px',
+    border: '2px solid #ccc',
+    borderRadius: '4px',
+    fontSize: '16px',
+    width: '400px'
+  }}
+/>
+```
+
+{(() => {
+    const ExternalInputExample = () => {
+      const externalInputRef = useRef(null);
+      const [submittedDates, setSubmittedDates] = useState(null);
+      
+      const handleSubmit = (start, end) => {
+        setSubmittedDates({ start, end });
+      };
+      
+      return (
+        <div style={{ padding: '20px' }}>
+          <div style={{ marginBottom: '20px' }}>
+            <label htmlFor="basic-external-input" style={{ display: 'block', marginBottom: '5px' }}>
+              Select Date Range:
+            </label>
+            <input
+              ref={externalInputRef}
+              id="basic-external-input"
+              type="text"
+              placeholder="Click to select date range"
+              style={{
+                padding: '8px 12px',
+                border: '2px solid #ccc',
+                borderRadius: '4px',
+                fontSize: '16px',
+                width: '400px'
+              }}
+            />
+          </div>
+          
+          <CLACalendar
+            settings={createCalendarSettings({
+              displayMode: 'popup',
+              externalInput: externalInputRef,
+              selectionMode: 'range',
+              showSubmitButton: true,
+              showFooter: true,
+              onSubmit: handleSubmit,
+              visibleMonths: 2,
+              monthWidth: 500,
+              position: 'bottom-left',
+              useDynamicPosition: true,
+              showHeader: true,
+              showTooltips: true,
+              showLayersNavigation: false,
+              showDateInputs: true,
+              closeOnClickAway: true,
+              startWeekOnSunday: false,
+              timezone: 'UTC',
+              dateRangeSeparator: ' - '
+            })}
+          />
+          
+          {submittedDates && (
+            <div style={{
+              marginTop: '20px',
+              padding: '10px',
+              backgroundColor: '#f0f8ff',
+              borderRadius: '4px',
+              border: '1px solid #0366d6'
+            }}>
+              <strong>Submitted Date Range:</strong>
+              <div>Start: {submittedDates.start || 'Not selected'}</div>
+              <div>End: {submittedDates.end || 'Not selected'}</div>
+            </div>
+          )}
+        </div>
+      );
+    };
+    
+    return <ExternalInputExample />;
+  })()}
+
+## External Input with Validation
+
+This example shows date range validation with warnings for dates too far in the past or future.
+
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'popup',
+  externalInput: externalInputRef,
+  selectionMode: 'range',
+  showSubmitButton: true,
+  showFooter: true,
+  onSubmit: handleSubmit,
+  visibleMonths: 2,
+  monthWidth: 500,
+  position: 'bottom-left',
+  useDynamicPosition: true,
+  showHeader: true,
+  showTooltips: true,
+  showLayersNavigation: false,
+  showDateInputs: true,
+  closeOnClickAway: true,
+  startWeekOnSunday: false,
+  timezone: 'UTC',
+  dateRangeSeparator: ' - ',
+  updateExternalInput: true,
+  bindExternalInputEvents: true
+}
+```
+
+**Validation Logic:**
+```typescript
+useEffect(() => {
+  const handleInput = () => {
+    const value = externalInputRef.current?.value || '';
+    const dates = value.split(' - ').map(d => d.trim());
+    const messages = [];
+    
+    dates.forEach((dateStr, index) => {
+      const date = new Date(dateStr);
+      const daysDiff = // ... calculate days difference
+      
+      if (daysDiff > 90) {
+        messages.push(`⚠️ ${dateLabel} is ${daysDiff} days in the future`);
+      } else if (daysDiff < -90) {
+        messages.push(`⚠️ ${dateLabel} is ${Math.abs(daysDiff)} days in the past`);
+      }
+    });
+    
+    // Check if end is before start
+    if (dates.length === 2) {
+      if (endDate < startDate) {
+        messages.push('❌ End date is before start date');
+      }
+    }
+    
+    setValidationMessages(messages);
+  };
+  
+  externalInputRef.current?.addEventListener('input', handleInput);
+}, []);
+```
+
+{(() => {
+    const ValidatedInputExample = () => {
+      const externalInputRef = useRef(null);
+      const [validationMessages, setValidationMessages] = useState([]);
+      const [validationType, setValidationType] = useState('');
+      const [submittedDates, setSubmittedDates] = useState(null);
+      
+      useEffect(() => {
+        if (!externalInputRef.current) return;
+        
+        const handleInput = () => {
+          const value = externalInputRef.current?.value || '';
+          
+          if (!value) {
+            setValidationMessages([]);
+            setValidationType('');
+            return;
+          }
+          
+          const dates = value.split(' - ').map(d => d.trim());
+          const messages = [];
+          let overallType = 'info';
+          
+          dates.forEach((dateStr, index) => {
+            try {
+              const date = new Date(dateStr);
+              if (isNaN(date.getTime())) return;
+              
+              const today = new Date();
+              today.setHours(0, 0, 0, 0);
+              const selectedDate = new Date(date);
+              selectedDate.setHours(0, 0, 0, 0);
+              
+              const daysDiff = Math.floor((selectedDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+              const dateLabel = index === 0 ? 'Start date' : 'End date';
+              
+              if (daysDiff > 90) {
+                messages.push(`⚠️ ${dateLabel} is ${daysDiff} days in the future`);
+                overallType = 'warning';
+              } else if (daysDiff < -90) {
+                messages.push(`⚠️ ${dateLabel} is ${Math.abs(daysDiff)} days in the past`);
+                overallType = 'warning';
+              } else if (daysDiff < 0) {
+                messages.push(`ℹ️ ${dateLabel} is in the past`);
+              }
+            } catch (e) {
+              // Invalid date format
+            }
+          });
+          
+          if (dates.length === 2) {
+            try {
+              const startDate = new Date(dates[0]);
+              const endDate = new Date(dates[1]);
+              if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+                if (endDate < startDate) {
+                  messages.push('❌ End date is before start date');
+                  overallType = 'error';
+                } else {
+                  const rangeDays = Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+                  messages.push(`✓ Range spans ${rangeDays + 1} days`);
+                }
+              }
+            } catch (e) {
+              // Invalid date format
+            }
+          }
+          
+          setValidationMessages(messages);
+          setValidationType(overallType);
+        };
+        
+        const input = externalInputRef.current;
+        input.addEventListener('input', handleInput);
+        
+        return () => {
+          input.removeEventListener('input', handleInput);
+        };
+      }, []);
+      
+      const getValidationColor = () => {
+        switch (validationType) {
+          case 'warning': return '#f6c23e';
+          case 'error': return '#dc3545';
+          case 'info': return '#0366d6';
+          default: return '#666';
+        }
+      };
+      
+      const handleSubmit = (start, end) => {
+        setSubmittedDates({ start, end });
+      };
+      
+      return (
+        <div style={{ padding: '20px' }}>
+          <div style={{ marginBottom: '20px' }}>
+            <label htmlFor="validated-external-input" style={{ display: 'block', marginBottom: '5px' }}>
+              Select Date Range:
+            </label>
+            <input
+              ref={externalInputRef}
+              id="validated-external-input"
+              type="text"
+              placeholder="Click to select date range"
+              style={{
+                padding: '8px 12px',
+                border: `2px solid ${validationMessages.length ? getValidationColor() : '#ccc'}`,
+                borderRadius: '4px',
+                fontSize: '16px',
+                width: '400px',
+                transition: 'border-color 0.3s'
+              }}
+            />
+            {validationMessages.length > 0 && (
+              <div style={{
+                marginTop: '5px',
+                fontSize: '14px'
+              }}>
+                {validationMessages.map((msg, index) => (
+                  <div key={index} style={{ color: getValidationColor(), marginTop: '2px' }}>
+                    {msg}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          
+          <CLACalendar
+            settings={createCalendarSettings({
+              displayMode: 'popup',
+              externalInput: externalInputRef,
+              selectionMode: 'range',
+              showSubmitButton: true,
+              showFooter: true,
+              onSubmit: handleSubmit,
+              visibleMonths: 2,
+              monthWidth: 500,
+              position: 'bottom-left',
+              useDynamicPosition: true,
+              showHeader: true,
+              showTooltips: true,
+              showLayersNavigation: false,
+              showDateInputs: true,
+              closeOnClickAway: true,
+              startWeekOnSunday: false,
+              timezone: 'UTC',
+              dateRangeSeparator: ' - '
+            })}
+          />
+          
+          {submittedDates && (
+            <div style={{
+              marginTop: '20px',
+              padding: '10px',
+              backgroundColor: '#f0f8ff',
+              borderRadius: '4px',
+              border: '1px solid #0366d6'
+            }}>
+              <strong>Submitted Date Range:</strong>
+              <div>Start: {submittedDates.start || 'Not selected'}</div>
+              <div>End: {submittedDates.end || 'Not selected'}</div>
+            </div>
+          )}
+        </div>
+      );
+    };
+    
+    return <ValidatedInputExample />;
+  })()}
+
+## Form Integration Example
+
+Complete form integration showing how external inputs work with form submission.
+
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'popup',
+  externalInput: dateRangeRef,
+  selectionMode: 'range',
+  showSubmitButton: true,
+  showFooter: true,
+  visibleMonths: 2,
+  monthWidth: 500,
+  position: 'bottom-left',
+  useDynamicPosition: true,
+  showHeader: true,
+  showTooltips: true,
+  showLayersNavigation: false,
+  showDateInputs: true,
+  closeOnClickAway: true,
+  startWeekOnSunday: false,
+  timezone: 'UTC',
+  dateRangeSeparator: ' - '
+}
+```
+
+**Form Structure:**
+```typescript
+<form onSubmit={handleFormSubmit}>
+  <input
+    name="eventName"
+    type="text"
+    required
+  />
+  
+  <input
+    ref={dateRangeRef}
+    name="dateRange"
+    type="text"
+    required
+    placeholder="Select date range"
+  />
+  
+  <CLACalendar
+    settings={{
+      displayMode: 'popup',
+      externalInput: dateRangeRef,
+      selectionMode: 'range',
+      // ... other settings
+    }}
+  />
+  
+  <button type="submit">Submit Event</button>
+</form>
+```
+
+**Form Handler:**
+```typescript
+const handleFormSubmit = (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const data = Object.fromEntries(formData);
+  // data.dateRange contains the selected date range
+  setFormData(data);
+};
+```
+
+{(() => {
+    const FormIntegrationExample = () => {
+      const dateRangeRef = useRef(null);
+      const [formData, setFormData] = useState(null);
+      
+      const handleFormSubmit = (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData);
+        setFormData(data);
+      };
+      
+      return (
+        <div style={{ padding: '20px' }}>
+          <form onSubmit={handleFormSubmit}>
+            <div style={{ marginBottom: '15px' }}>
+              <label htmlFor="event-name" style={{ display: 'block', marginBottom: '5px' }}>
+                Event Name:
+              </label>
+              <input
+                id="event-name"
+                name="eventName"
+                type="text"
+                required
+                style={{
+                  padding: '8px 12px',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  fontSize: '16px',
+                  width: '400px'
+                }}
+              />
+            </div>
+            
+            <div style={{ marginBottom: '15px' }}>
+              <label htmlFor="date-range" style={{ display: 'block', marginBottom: '5px' }}>
+                Event Dates:
+              </label>
+              <input
+                ref={dateRangeRef}
+                id="date-range"
+                name="dateRange"
+                type="text"
+                required
+                placeholder="Select date range"
+                style={{
+                  padding: '8px 12px',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  fontSize: '16px',
+                  width: '400px'
+                }}
+              />
+              <CLACalendar
+                settings={createCalendarSettings({
+                  displayMode: 'popup',
+                  externalInput: dateRangeRef,
+                  selectionMode: 'range',
+                  showSubmitButton: true,
+                  showFooter: true,
+                  visibleMonths: 2,
+                  monthWidth: 500,
+                  position: 'bottom-left',
+                  useDynamicPosition: true,
+                  showHeader: true,
+                  showTooltips: true,
+                  showLayersNavigation: false,
+                  showDateInputs: true,
+                  closeOnClickAway: true,
+                  startWeekOnSunday: false,
+                  timezone: 'UTC',
+                  dateRangeSeparator: ' - '
+                })}
+              />
+            </div>
+            
+            <button
+              type="submit"
+              style={{
+                padding: '10px 20px',
+                backgroundColor: '#28a745',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '16px'
+              }}
+            >
+              Submit Event
+            </button>
+          </form>
+          
+          {formData && (
+            <div style={{
+              marginTop: '20px',
+              padding: '15px',
+              backgroundColor: '#d4edda',
+              borderRadius: '4px',
+              border: '1px solid #c3e6cb'
+            }}>
+              <strong>Form Submitted Successfully!</strong>
+              <div style={{ marginTop: '10px' }}>
+                <div>Event Name: {formData.eventName}</div>
+                <div>Date Range: {formData.dateRange}</div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    };
+    
+    return <FormIntegrationExample />;
+  })()}
+
+## CSS Selector Binding
+
+Calendar bound to an input using a CSS selector instead of a ref.
+
+**Full Configuration:**
+```javascript
+{
+  displayMode: 'popup',
+  externalInputSelector: '#selector-calendar-input',  // CSS selector
+  selectionMode: 'range',
+  showSubmitButton: true,
+  showFooter: true,
+  onSubmit: handleSubmit,
+  visibleMonths: 2,
+  monthWidth: 500,
+  position: 'bottom-left',
+  useDynamicPosition: true,
+  showHeader: true,
+  showTooltips: true,
+  showLayersNavigation: false,
+  showDateInputs: true,
+  closeOnClickAway: true,
+  startWeekOnSunday: false,
+  timezone: 'UTC',
+  dateRangeSeparator: ' - '
+}
+```
+
+**Dynamic Input Creation:**
+```typescript
+useEffect(() => {
+  const container = document.getElementById('selector-input-container');
+  if (!container) return;
+  
+  // Check if input already exists
+  let input = document.getElementById('selector-calendar-input');
+  
+  if (!input) {
+    // Create input dynamically
+    input = document.createElement('input');
+    input.id = 'selector-calendar-input';
+    input.type = 'text';
+    input.placeholder = 'Click to select date range';
+    input.style.cssText = `
+      padding: 8px 12px;
+      border: 2px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+      width: 400px;
+    `;
+    container.appendChild(input);
+  }
+  
+  return () => {
+    // Cleanup
+    const existingInput = document.getElementById('selector-calendar-input');
+    if (existingInput && existingInput.parentElement === container) {
+      existingInput.remove();
+    }
+  };
+}, []);
+```
+
+{(() => {
+    const SelectorExample = () => {
+      const [submittedDates, setSubmittedDates] = useState(null);
+      
+      useEffect(() => {
+        const container = document.getElementById('selector-input-container');
+        if (!container) return;
+        
+        let input = document.getElementById('selector-calendar-input');
+        
+        if (!input) {
+          input = document.createElement('input');
+          input.id = 'selector-calendar-input';
+          input.type = 'text';
+          input.placeholder = 'Click to select date range';
+          input.style.cssText = `
+            padding: 8px 12px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            width: 400px;
+          `;
+          container.appendChild(input);
+        }
+        
+        return () => {
+          const existingInput = document.getElementById('selector-calendar-input');
+          if (existingInput && existingInput.parentElement === container) {
+            existingInput.remove();
+          }
+        };
+      }, []);
+      
+      const handleSubmit = (start, end) => {
+        setSubmittedDates({ start, end });
+      };
+      
+      return (
+        <div style={{ padding: '20px' }}>
+          <div id="selector-input-container" style={{ marginBottom: '20px' }}>
+            <label htmlFor="selector-calendar-input" style={{ display: 'block', marginBottom: '5px' }}>
+              Select Date Range:
+            </label>
+          </div>
+          
+          <CLACalendar
+            settings={createCalendarSettings({
+              displayMode: 'popup',
+              externalInputSelector: '#selector-calendar-input',
+              selectionMode: 'range',
+              showSubmitButton: true,
+              showFooter: true,
+              onSubmit: handleSubmit,
+              visibleMonths: 2,
+              monthWidth: 500,
+              position: 'bottom-left',
+              useDynamicPosition: true,
+              showHeader: true,
+              showTooltips: true,
+              showLayersNavigation: false,
+              showDateInputs: true,
+              closeOnClickAway: true,
+              startWeekOnSunday: false,
+              timezone: 'UTC',
+              dateRangeSeparator: ' - '
+            })}
+          />
+          
+          {submittedDates && (
+            <div style={{
+              marginTop: '20px',
+              padding: '10px',
+              backgroundColor: '#f0f8ff',
+              borderRadius: '4px',
+              border: '1px solid #0366d6'
+            }}>
+              <strong>Submitted Date Range:</strong>
+              <div>Start: {submittedDates.start || 'Not selected'}</div>
+              <div>End: {submittedDates.end || 'Not selected'}</div>
+            </div>
+          )}
+        </div>
+      );
+    };
+    
+    return <SelectorExample />;
+  })()}
+
+## Configuration Reference
+
+### Base Configuration
+
+All examples above use the following base configuration:
+
+```javascript
+{
+  // Display settings
+  displayMode: 'popup',              // Calendar appears as popup
+  visibleMonths: 2,                  // Show 2 months side by side
+  monthWidth: 500,                   // Width of each month in pixels
+  position: 'bottom-left',           // Popup position relative to input
+  useDynamicPosition: true,          // Auto-adjust if not enough space
+  
+  // Selection settings  
+  selectionMode: 'range',            // Allow date range selection
+  dateRangeSeparator: ' - ',         // Separator between dates
+  timezone: 'UTC',                   // Use UTC for consistency
+  
+  // UI features
+  showHeader: true,                  // Show calendar header
+  showFooter: true,                  // Show calendar footer
+  showSubmitButton: true,            // Show submit button in footer
+  showTooltips: true,                // Enable hover tooltips
+  showLayersNavigation: false,       // Hide layer controls
+  showDateInputs: true,              // Show date inputs in header
+  closeOnClickAway: true,            // Close on outside click
+  startWeekOnSunday: false,          // Week starts on Monday
+  
+  // External input settings
+  externalInput: externalInputRef,   // React ref to input element
+  // OR
+  externalInputSelector: '#input-id', // CSS selector to find input
+  updateExternalInput: true,         // Update input value on selection
+  bindExternalInputEvents: true,     // Bind click/focus to open calendar
+  
+  // Callbacks
+  onSubmit: handleSubmit             // Called when user clicks submit
+}
+```
+
+### External Input Properties
+
+#### Using React Ref
+```typescript
+const inputRef = useRef<HTMLInputElement>(null);
+
+settings: {
+  externalInput: inputRef,
+  // Calendar will bind to this ref
+}
+```
+
+#### Using CSS Selector
+```typescript
+settings: {
+  externalInputSelector: '#date-picker',
+  // Calendar will find element via querySelector
+}
+```
+
+#### Using Direct Element
+```typescript
+const element = document.getElementById('my-input');
+
+settings: {
+  externalInput: element,
+  // Calendar will bind to this element
+}
+```
+
+### Event Handling
+
+When a date is selected, the calendar:
+1. Updates the input's `value` property
+2. Dispatches an `input` event
+3. Dispatches a `change` event
+
+This ensures compatibility with:
+- Form validation libraries
+- React controlled components
+- Vue v-model
+- Angular ngModel
+- Vanilla JavaScript event listeners
+
+### Submit Callback
+
+```typescript
+const handleSubmit = (startDate: string | null, endDate: string | null) => {
+  console.log('Date range selected:', { startDate, endDate });
+  // startDate: "2025-07-15" (ISO format)
+  // endDate: "2025-07-20" (ISO format)
+};
+```

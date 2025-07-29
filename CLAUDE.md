@@ -737,6 +737,128 @@ backgroundColors: {
 }
 ```
 
+### External Input Element Support
+The calendar can bind to existing input elements in your application, making it easy to migrate from other calendar systems or integrate with existing forms. This feature allows you to provide your own input element while CLACalendar handles all the calendar functionality.
+
+#### Configuration Options
+
+**Via React Ref**:
+```typescript
+const dateInputRef = useRef<HTMLInputElement>(null);
+
+<input ref={dateInputRef} type="text" placeholder="Select date" />
+<CLACalendar
+  settings={{
+    displayMode: 'popup',
+    externalInput: dateInputRef
+  }}
+/>
+```
+
+**Via Direct HTMLElement**:
+```typescript
+const existingInput = document.getElementById('date-input');
+<CLACalendar
+  settings={{
+    displayMode: 'popup',
+    externalInput: existingInput
+  }}
+/>
+```
+
+**Via CSS Selector**:
+```typescript
+<CLACalendar
+  settings={{
+    displayMode: 'popup',
+    externalInputSelector: '#date-picker'
+  }}
+/>
+```
+
+#### External Input Settings
+
+- `externalInput`: `HTMLInputElement | React.RefObject<HTMLInputElement>` - Direct reference to the input element
+- `externalInputSelector`: `string` - CSS selector to find the input element (e.g., '#date-input', '.date-field')
+- `updateExternalInput`: `boolean` - Whether to update the input's value when dates are selected (default: true)
+- `bindExternalInputEvents`: `boolean` - Whether to bind click/focus events to open the calendar (default: true)
+
+#### Migration Example
+
+This feature is particularly useful when migrating from other calendar libraries:
+
+```typescript
+// Existing form with date input
+<form>
+  <label>Event Date:</label>
+  <input id="event-date" type="text" name="eventDate" />
+</form>
+
+// Add CLACalendar without changing the form structure
+<CLACalendar
+  settings={{
+    displayMode: 'popup',
+    externalInputSelector: '#event-date',
+    selectionMode: 'single',
+    onSubmit: (start, end) => {
+      // Handle date selection
+    }
+  }}
+/>
+```
+
+#### Key Benefits
+
+1. **No HTML Changes Required**: Keep your existing form structure intact
+2. **Form Integration**: Works seamlessly with form libraries and validation
+3. **Event Handling**: Dispatches proper input events for form library compatibility
+4. **Flexible Binding**: Multiple ways to connect to your input element
+5. **Easy A/B Testing**: Switch between calendar implementations without UI changes
+
+#### Advanced Usage with External Validation
+
+```typescript
+const ExternalValidationExample = () => {
+  const dateInputRef = useRef<HTMLInputElement>(null);
+  const [validationMessage, setValidationMessage] = useState('');
+
+  useEffect(() => {
+    if (!dateInputRef.current) return;
+    
+    const validateDate = () => {
+      const value = dateInputRef.current?.value || '';
+      const date = new Date(value);
+      
+      if (date > new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)) {
+        setValidationMessage('Warning: Date is more than 30 days in the future');
+      } else {
+        setValidationMessage('');
+      }
+    };
+    
+    dateInputRef.current.addEventListener('input', validateDate);
+    return () => {
+      dateInputRef.current?.removeEventListener('input', validateDate);
+    };
+  }, []);
+
+  return (
+    <>
+      <input ref={dateInputRef} type="text" />
+      {validationMessage && <div className="warning">{validationMessage}</div>}
+      <CLACalendar
+        settings={{
+          displayMode: 'popup',
+          externalInput: dateInputRef
+        }}
+      />
+    </>
+  );
+};
+```
+
+See the "External Input" stories in Storybook for live examples and additional use cases.
+
 ## Testing
 
 ### Test Framework
@@ -886,6 +1008,12 @@ The `settings` prop contains all configuration options:
 - `layersFactory`: `() => Layer[]` - Factory function to generate layers dynamically
 - `restrictionConfigFactory`: `() => RestrictionConfig` - Factory function to generate restrictions dynamically
 
+#### External Input Settings
+- `externalInput`: `HTMLInputElement | React.RefObject<HTMLInputElement>` - External input element to bind the calendar to
+- `externalInputSelector`: `string` - CSS selector to find the external input element (e.g., '#date-input')
+- `updateExternalInput`: `boolean` - Whether to update the external input's value when dates are selected (default: true)
+- `bindExternalInputEvents`: `boolean` - Whether to bind click/focus events to the external input (default: true)
+
 #### Style Settings
 - `colors`: Color theme object with properties:
   - `primary`: `string` (default: '#0366d6')
@@ -999,4 +1127,25 @@ Use `getDefaultSettings()` to get the default configuration, which includes:
   }}
   _onSettingsChange={setSettings}
 />
+
+// With external input element
+const dateInputRef = useRef<HTMLInputElement>(null);
+
+<>
+  <input 
+    ref={dateInputRef} 
+    type="text" 
+    placeholder="Select date" 
+    className="form-control"
+  />
+  <DateRangePicker
+    settings={{
+      ...getDefaultSettings(),
+      displayMode: 'popup',
+      externalInput: dateInputRef,
+      selectionMode: 'single'
+    }}
+    _onSettingsChange={setSettings}
+  />
+</>
 ```

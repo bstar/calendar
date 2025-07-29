@@ -295,6 +295,32 @@ export interface CalendarSettings {
    * Factory function to generate restriction configuration dynamically
    */
   restrictionConfigFactory?: () => RestrictionConfig;
+
+  /**
+   * External input element to bind the calendar to.
+   * Can be an HTMLInputElement or a React ref to an input element.
+   * When provided, the calendar will use this input instead of rendering its own.
+   */
+  externalInput?: HTMLInputElement | React.RefObject<HTMLInputElement>;
+
+  /**
+   * CSS selector to find the external input element.
+   * Alternative to providing externalInput directly.
+   * Example: '#date-input' or '.date-picker-input'
+   */
+  externalInputSelector?: string;
+
+  /**
+   * Whether the calendar should update the external input's value when dates are selected.
+   * Default: true
+   */
+  updateExternalInput?: boolean;
+
+  /**
+   * Whether to bind click/focus events to the external input to open the calendar.
+   * Default: true
+   */
+  bindExternalInputEvents?: boolean;
 }
 
 // Control Types for App.tsx
@@ -372,7 +398,9 @@ const CORE_DEFAULTS = {
   defaultLayer: '',
   colors: DEFAULT_COLORS,
   position: 'bottom-left' as const,
-  useDynamicPosition: true
+  useDynamicPosition: true,
+  updateExternalInput: true,
+  bindExternalInputEvents: true
 };
 
 /**

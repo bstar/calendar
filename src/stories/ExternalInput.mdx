@@ -1,0 +1,269 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import * as ExternalInputStories from './ExternalInput.stories';
+
+<Meta of={ExternalInputStories} />
+
+# External Input Integration
+
+The CLA Calendar can bind to existing input elements in your application, making it easy to migrate from other calendar systems or integrate with existing forms. This feature allows you to provide your own input element while CLACalendar handles all the calendar functionality.
+
+> **Note**: To see live examples of these configurations, visit the "Stories" page under this section.
+
+## Overview
+
+External input binding allows you to:
+- Use existing form inputs without changing HTML structure
+- Migrate from legacy calendar systems seamlessly
+- Integrate with form libraries and validation frameworks
+- Maintain full control over input styling and behavior
+
+## Configuration Options
+
+### Via React Ref
+
+The most common method for React applications:
+
+```typescript
+const dateInputRef = useRef<HTMLInputElement>(null);
+
+<input ref={dateInputRef} type="text" placeholder="Select date range" />
+<CLACalendar
+  settings={{
+    displayMode: 'popup',
+    externalInput: dateInputRef,
+    selectionMode: 'range'
+  }}
+/>
+```
+
+### Via Direct HTMLElement
+
+For cases where you have a direct reference to an input element:
+
+```typescript
+const existingInput = document.getElementById('date-input');
+
+<CLACalendar
+  settings={{
+    displayMode: 'popup',
+    externalInput: existingInput
+  }}
+/>
+```
+
+### Via CSS Selector
+
+Useful for integrating with existing markup or third-party systems:
+
+```typescript
+<CLACalendar
+  settings={{
+    displayMode: 'popup',
+    externalInputSelector: '#date-picker'
+  }}
+/>
+```
+
+## Configuration Properties
+
+<div className="props-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Property</th>
+        <th>Type</th>
+        <th>Default</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>externalInput</td>
+        <td>HTMLInputElement or React.RefObject</td>
+        <td>undefined</td>
+        <td>Direct reference to the input element</td>
+      </tr>
+      <tr>
+        <td>externalInputSelector</td>
+        <td>string</td>
+        <td>undefined</td>
+        <td>CSS selector to find the input element</td>
+      </tr>
+      <tr>
+        <td>updateExternalInput</td>
+        <td>boolean</td>
+        <td>true</td>
+        <td>Whether to update the input's value when dates are selected</td>
+      </tr>
+      <tr>
+        <td>bindExternalInputEvents</td>
+        <td>boolean</td>
+        <td>true</td>
+        <td>Whether to bind click/focus events to open the calendar</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+## Common Use Cases
+
+### Form Integration
+
+External inputs work seamlessly with form submissions:
+
+```typescript
+<form onSubmit={handleFormSubmit}>
+  <input 
+    ref={dateInputRef} 
+    name="dateRange" 
+    type="text" 
+    required 
+  />
+  <CLACalendar
+    settings={{
+      displayMode: 'popup',
+      externalInput: dateInputRef,
+      selectionMode: 'range'
+    }}
+  />
+  <button type="submit">Submit</button>
+</form>
+```
+
+### External Validation
+
+Monitor and validate the external input independently:
+
+```typescript
+useEffect(() => {
+  const validateDate = () => {
+    const value = dateInputRef.current?.value || '';
+    // Perform validation logic
+    setValidationMessage(validateResult);
+  };
+  
+  dateInputRef.current?.addEventListener('input', validateDate);
+  return () => {
+    dateInputRef.current?.removeEventListener('input', validateDate);
+  };
+}, []);
+```
+
+### Multiple Date Inputs
+
+Use separate calendars for start and end dates:
+
+```typescript
+<input ref={startDateRef} placeholder="Start date" />
+<CLACalendar
+  settings={{
+    displayMode: 'popup',
+    externalInput: startDateRef,
+    selectionMode: 'single'
+  }}
+/>
+
+<input ref={endDateRef} placeholder="End date" />
+<CLACalendar
+  settings={{
+    displayMode: 'popup',
+    externalInput: endDateRef,
+    selectionMode: 'single'
+  }}
+/>
+```
+
+## Migration Guide
+
+### From Legacy Calendar Systems
+
+1. **Keep your existing input element**:
+   ```html
+   <input id="date-picker" type="text" class="form-control" />
+   ```
+
+2. **Add CLACalendar without changing HTML**:
+   ```typescript
+   <CLACalendar
+     settings={{
+       displayMode: 'popup',
+       externalInputSelector: '#date-picker',
+       selectionMode: 'range'
+     }}
+   />
+   ```
+
+3. **Your form validation continues to work** because the input element remains unchanged
+
+### Key Migration Benefits
+
+- **No HTML changes required**: Reuse existing form structure
+- **Form validation preserved**: Existing validation rules continue to work
+- **Event compatibility**: Input events are properly dispatched for form libraries
+- **Easy A/B testing**: Switch between implementations without UI changes
+- **Gradual rollout**: Enable for specific users or forms
+
+## Best Practices
+
+### 1. Event Handling
+The calendar automatically dispatches `input` and `change` events on the external input when dates are selected, ensuring compatibility with form libraries and validation frameworks.
+
+### 2. Styling
+External inputs retain their original styling. The calendar only manages the value and events, not the appearance.
+
+### 3. Accessibility
+External inputs maintain their original accessibility attributes. Add appropriate ARIA labels to your inputs:
+
+```html
+<label for="date-range">Select dates:</label>
+<input 
+  id="date-range" 
+  ref={dateInputRef}
+  aria-label="Date range selection"
+  aria-describedby="date-help"
+/>
+<span id="date-help">Click to open calendar</span>
+```
+
+### 4. Form Library Integration
+Works seamlessly with popular form libraries:
+
+```typescript
+// React Hook Form
+<Controller
+  name="dateRange"
+  control={control}
+  render={({ field }) => (
+    <>
+      <input {...field} ref={dateInputRef} />
+      <CLACalendar
+        settings={{
+          displayMode: 'popup',
+          externalInput: dateInputRef
+        }}
+      />
+    </>
+  )}
+/>
+```
+
+## Troubleshooting
+
+### Calendar doesn't open
+- Verify the input element exists when CLACalendar mounts
+- Check that `bindExternalInputEvents` is not set to `false`
+- Ensure the selector matches exactly one input element
+
+### Input value not updating
+- Verify `updateExternalInput` is not set to `false`
+- Check that the input is not read-only or disabled
+
+### Multiple calendars on same input
+- Ensure only one CLACalendar instance targets each input
+- Use unique selectors or refs for each input
+
+## See Also
+
+- **Stories**: Interactive examples with all external input patterns
+- **API Reference**: Complete settings documentation
+- **Migration Examples**: Step-by-step migration guides
