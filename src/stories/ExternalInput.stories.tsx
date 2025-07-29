@@ -12,6 +12,7 @@ const meta: Meta<typeof CLACalendar> = {
   args: defaultArgs,
   parameters: {
     docs: {
+      page: null, // Hide the default docs page since we have a custom Documentation page
       description: {
         component: 'Examples of using CLACalendar with external input elements'
       }
