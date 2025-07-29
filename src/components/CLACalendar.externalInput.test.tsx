@@ -519,4 +519,280 @@ describe('CLACalendar External Input', () => {
       expect(externalInput.value).toContain('Jul 20');
     });
   });
+
+  describe('Range Selection with External Input', () => {
+    it('should update external input with range selection and format correctly', () => {
+      const ExternalInputTest = () => {
+        const externalInputRef = useRef<HTMLInputElement>(null);
+        
+        return (
+          <div>
+            <input ref={externalInputRef} data-testid="external-input" />
+            <CLACalendar
+              {...defaultProps}
+              settings={createCalendarSettings({
+                displayMode: 'popup',
+                externalInput: externalInputRef,
+                selectionMode: 'range',
+                dateRangeSeparator: ' - '
+              })}
+            />
+          </div>
+        );
+      };
+
+      const { container } = render(<ExternalInputTest />);
+      
+      const externalInput = screen.getByTestId('external-input') as HTMLInputElement;
+      
+      // Open calendar
+      fireEvent.click(externalInput);
+      
+      // Select date range
+      const dates = container.querySelectorAll('.day-cell');
+      const startDate = Array.from(dates).find(cell => cell.textContent === '10');
+      const endDate = Array.from(dates).find(cell => cell.textContent === '15');
+      
+      if (startDate && endDate) {
+        fireEvent.mouseDown(startDate);
+        fireEvent.mouseEnter(endDate);
+        fireEvent.mouseUp(endDate);
+        
+        // External input should show range with separator
+        expect(externalInput.value).toContain('10');
+        expect(externalInput.value).toContain('15');
+        expect(externalInput.value).toContain(' - ');
+      }
+    });
+
+    it('should handle submit button with external input in range mode', () => {
+      const handleSubmit = vi.fn();
+      
+      const ExternalInputTest = () => {
+        const externalInputRef = useRef<HTMLInputElement>(null);
+        
+        return (
+          <div>
+            <input ref={externalInputRef} data-testid="external-input" />
+            <CLACalendar
+              {...defaultProps}
+              settings={createCalendarSettings({
+                displayMode: 'popup',
+                externalInput: externalInputRef,
+                selectionMode: 'range',
+                showSubmitButton: true,
+                showFooter: true,
+                onSubmit: handleSubmit
+              })}
+            />
+          </div>
+        );
+      };
+
+      const { container } = render(<ExternalInputTest />);
+      
+      const externalInput = screen.getByTestId('external-input');
+      
+      // Open calendar
+      fireEvent.click(externalInput);
+      
+      // Select date range
+      const dates = container.querySelectorAll('.day-cell');
+      const startDate = Array.from(dates).find(cell => cell.textContent === '10');
+      const endDate = Array.from(dates).find(cell => cell.textContent === '15');
+      
+      if (startDate && endDate) {
+        fireEvent.mouseDown(startDate);
+        fireEvent.mouseEnter(endDate);
+        fireEvent.mouseUp(endDate);
+        
+        // Find and click submit button
+        const submitButton = screen.getByText('Submit');
+        fireEvent.click(submitButton);
+        
+        // Submit handler should be called with dates
+        expect(handleSubmit).toHaveBeenCalled();
+        const [start, end] = handleSubmit.mock.calls[0];
+        expect(start).toBeTruthy();
+        expect(end).toBeTruthy();
+      }
+    });
+  });
+
+  describe('External Input with Custom Settings', () => {
+    it('should respect updateExternalInput setting when false', () => {
+      const ExternalInputTest = () => {
+        const externalInputRef = useRef<HTMLInputElement>(null);
+        
+        return (
+          <div>
+            <input ref={externalInputRef} data-testid="external-input" value="" onChange={() => {}} />
+            <CLACalendar
+              {...defaultProps}
+              settings={createCalendarSettings({
+                displayMode: 'popup',
+                externalInput: externalInputRef,
+                updateExternalInput: false,
+                selectionMode: 'range'
+              })}
+            />
+          </div>
+        );
+      };
+
+      const { container } = render(<ExternalInputTest />);
+      
+      const externalInput = screen.getByTestId('external-input') as HTMLInputElement;
+      const initialValue = externalInput.value;
+      
+      // Open calendar
+      fireEvent.click(externalInput);
+      
+      // Select a date
+      const dates = container.querySelectorAll('.day-cell');
+      const dateToSelect = Array.from(dates).find(cell => cell.textContent === '15');
+      
+      if (dateToSelect) {
+        fireEvent.mouseDown(dateToSelect);
+        fireEvent.mouseUp(dateToSelect);
+        
+        // External input should not be updated
+        expect(externalInput.value).toBe(initialValue);
+      }
+    });
+
+    it('should work with custom date range separator', () => {
+      const ExternalInputTest = () => {
+        const externalInputRef = useRef<HTMLInputElement>(null);
+        
+        return (
+          <div>
+            <input ref={externalInputRef} data-testid="external-input" />
+            <CLACalendar
+              {...defaultProps}
+              settings={createCalendarSettings({
+                displayMode: 'popup',
+                externalInput: externalInputRef,
+                selectionMode: 'range',
+                dateRangeSeparator: ' to '
+              })}
+            />
+          </div>
+        );
+      };
+
+      const { container } = render(<ExternalInputTest />);
+      
+      const externalInput = screen.getByTestId('external-input') as HTMLInputElement;
+      
+      // Open calendar
+      fireEvent.click(externalInput);
+      
+      // Select date range
+      const dates = container.querySelectorAll('.day-cell');
+      const startDate = Array.from(dates).find(cell => cell.textContent === '10');
+      const endDate = Array.from(dates).find(cell => cell.textContent === '15');
+      
+      if (startDate && endDate) {
+        fireEvent.mouseDown(startDate);
+        fireEvent.mouseEnter(endDate);
+        fireEvent.mouseUp(endDate);
+        
+        // Should use custom separator
+        expect(externalInput.value).toContain(' to ');
+        expect(externalInput.value).not.toContain(' - ');
+      }
+    });
+  });
+
+  describe('Multiple External Inputs', () => {
+    it('should handle multiple calendar instances with different external inputs', () => {
+      const MultipleInputsTest = () => {
+        const startInputRef = useRef<HTMLInputElement>(null);
+        const endInputRef = useRef<HTMLInputElement>(null);
+        
+        return (
+          <div>
+            <input ref={startInputRef} data-testid="start-input" />
+            <CLACalendar
+              {...defaultProps}
+              settings={createCalendarSettings({
+                displayMode: 'popup',
+                externalInput: startInputRef,
+                selectionMode: 'single'
+              })}
+            />
+            
+            <input ref={endInputRef} data-testid="end-input" />
+            <CLACalendar
+              {...defaultProps}
+              settings={createCalendarSettings({
+                displayMode: 'popup',
+                externalInput: endInputRef,
+                selectionMode: 'single'
+              })}
+            />
+          </div>
+        );
+      };
+
+      const { container } = render(<MultipleInputsTest />);
+      
+      const startInput = screen.getByTestId('start-input');
+      const endInput = screen.getByTestId('end-input');
+      
+      // Both inputs should exist and be independent
+      expect(startInput).toBeInTheDocument();
+      expect(endInput).toBeInTheDocument();
+      
+      // Click start input
+      fireEvent.click(startInput);
+      
+      // Select a date in the first calendar
+      const dates = container.querySelectorAll('.day-cell');
+      const dateToSelect = Array.from(dates).find(cell => cell.textContent === '10');
+      
+      if (dateToSelect) {
+        fireEvent.mouseDown(dateToSelect);
+        
+        // Only start input should be updated
+        expect((startInput as HTMLInputElement).value).toContain('10');
+        expect((endInput as HTMLInputElement).value).toBe('');
+      }
+    });
+  });
+
+  describe('External Input Error Handling', () => {
+    it('should handle null external input gracefully', () => {
+      const { container } = render(
+        <CLACalendar
+          {...defaultProps}
+          settings={createCalendarSettings({
+            displayMode: 'popup',
+            externalInput: null as any
+          })}
+        />
+      );
+      
+      // Should render internal input as fallback
+      const internalInput = container.querySelector('.cla-input-custom');
+      expect(internalInput).toBeInTheDocument();
+    });
+
+    it('should handle external input selector that finds no elements', () => {
+      const { container } = render(
+        <CLACalendar
+          {...defaultProps}
+          settings={createCalendarSettings({
+            displayMode: 'popup',
+            externalInputSelector: '#non-existent-element'
+          })}
+        />
+      );
+      
+      // Should render internal input as fallback
+      const internalInput = container.querySelector('.cla-input-custom');
+      expect(internalInput).toBeInTheDocument();
+    });
+  });
 });
