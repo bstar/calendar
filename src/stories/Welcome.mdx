@@ -228,7 +228,7 @@ import { Meta } from '@storybook/addon-docs/blocks';
 <div className="welcome-container">
   <div className="welcome-header">
     <h1>CLA Calendar</h1>
-    <p>React date picker component with range selection, restrictions, and layer support</p>
+    <p>Advanced React date picker with range selection, external input binding, restrictions, and layer support</p>
   </div>
 
   <h2 className="section-header">Component Overview</h2>
@@ -240,6 +240,7 @@ import { Meta } from '@storybook/addon-docs/blocks';
         <li>Single date and date range selection</li>
         <li>Drag-to-select interaction</li>
         <li>Embedded and popup display modes</li>
+        <li>External input binding</li>
         <li>1-12 month view configuration</li>
         <li>UTC-first date handling</li>
         <li>TypeScript support</li>
@@ -311,9 +312,17 @@ import { Meta } from '@storybook/addon-docs/blocks';
   <h2 className="section-header">Implementation Example</h2>
   
   <div className="code-example">
-{`import { CLACalendar } from 'cla-calendar';
+{`import { CLACalendar, getDefaultSettings } from 'cla-calendar';
+import { useState } from 'react';
 
 function DateSelector() {
+  const [settings, setSettings] = useState({
+    ...getDefaultSettings(),
+    displayMode: 'popup',
+    visibleMonths: 2,
+    selectionMode: 'range'
+  });
+  
   const handleDateSubmit = (start, end) => {
     console.log('Selected:', { start, end });
   };
@@ -321,11 +330,10 @@ function DateSelector() {
   return (
     <CLACalendar 
       settings={{
-        displayMode: 'popup',
-        visibleMonths: 2,
-        selectionMode: 'range',
+        ...settings,
         onSubmit: handleDateSubmit
       }}
+      _onSettingsChange={setSettings}
     />
   );
 }`}
@@ -367,6 +375,14 @@ function DateSelector() {
     </div>
     <div className="feature-item">
       <span className="feature-icon">•</span>
+      <span className="feature-text">External input binding via ref or CSS selector</span>
+    </div>
+    <div className="feature-item">
+      <span className="feature-icon">•</span>
+      <span className="feature-text">Form library integration support</span>
+    </div>
+    <div className="feature-item">
+      <span className="feature-icon">•</span>
       <span className="feature-text">Keyboard navigation with accessibility support</span>
     </div>
     <div className="feature-item">
@@ -375,11 +391,11 @@ function DateSelector() {
     </div>
     <div className="feature-item">
       <span className="feature-icon">•</span>
-      <span className="feature-text">Lazy loading support for performance</span>
+      <span className="feature-text">Data layer visualization system</span>
     </div>
     <div className="feature-item">
       <span className="feature-icon">•</span>
-      <span className="feature-text">Server-side rendering compatibility</span>
+      <span className="feature-text">Comprehensive restriction system</span>
     </div>
     <div className="feature-item">
       <span className="feature-icon">•</span>
@@ -388,11 +404,11 @@ function DateSelector() {
   </div>
 
   <div className="nav-section">
-    <a href="?path=/docs/overview--docs" className="nav-button">
+    <a href="?path=/docs/overview--documentation" className="nav-button">
       API Reference
     </a>
-    <a href="?path=/docs/getting-started--docs" className="nav-button secondary">
-      Examples
+    <a href="?path=/docs/getting-started-documentation--docs" className="nav-button secondary">
+      Getting Started
     </a>
   </div>
 </div>
