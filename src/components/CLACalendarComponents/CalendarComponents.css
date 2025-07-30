@@ -380,6 +380,11 @@
   border-radius: 0px 6px 6px 0px;
 }
 
+/* Make chevrons white when inside out-of-bounds indicator */
+.side-chevron-indicator .cla-chevron {
+  color: white;
+}
+
 /* Tooltip container styles */
 .tooltip-container {
   position: relative !important;
