@@ -566,6 +566,7 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, show, children }) => 
   }
 
   const [position, setPosition] = useState({ top: 0, left: 0 });
+  const [arrowOffset, setArrowOffset] = useState<number | null>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const targetRef = useRef<HTMLDivElement>(null);
   const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
@@ -621,11 +622,25 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, show, children }) => 
         let top = targetRect.top - tooltipRect.height - 8;
         let left = targetRect.left + (targetRect.width - tooltipRect.width) / 2;
 
-        // Check if tooltip would go off-screen
+        // Calculate the center of the target element
+        const targetCenterX = targetRect.left + targetRect.width / 2;
+        
+        // Calculate arrow offset based on final tooltip position
+        let calculatedArrowOffset: number | null = null;
+
+        // Check if tooltip would go off-screen and adjust
         if (left < 8) {
           left = 8;
+          // Calculate where the arrow should be to point to the target
+          calculatedArrowOffset = targetCenterX - left;
+          // Ensure arrow stays within tooltip bounds (with some margin)
+          calculatedArrowOffset = Math.max(10, Math.min(calculatedArrowOffset, tooltipRect.width - 10));
         } else if (left + tooltipRect.width > window.innerWidth - 8) {
           left = window.innerWidth - tooltipRect.width - 8;
+          // Calculate where the arrow should be to point to the target
+          calculatedArrowOffset = targetCenterX - left;
+          // Ensure arrow stays within tooltip bounds (with some margin)
+          calculatedArrowOffset = Math.max(10, Math.min(calculatedArrowOffset, tooltipRect.width - 10));
         }
 
         // If tooltip would go above the viewport, position it below the target
@@ -633,11 +648,12 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, show, children }) => 
           top = targetRect.bottom + 8;
         }
 
-        // Update position
+        // Update position and arrow offset
         setPosition({
           top: Math.round(top),
           left: Math.round(left)
         });
+        setArrowOffset(calculatedArrowOffset);
       } catch (error) {
         // Ignore positioning errors during unmount/story transitions
         console.debug('Tooltip positioning error (safe to ignore):', error);
@@ -705,8 +721,9 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, show, children }) => 
           className="tooltip"
           style={{
             top: `${position.top}px`,
-            left: `${position.left}px`
-          }}
+            left: `${position.left}px`,
+            '--arrow-offset': arrowOffset ? `${arrowOffset}px` : '50%'
+          } as React.CSSProperties}
         >
           {content}
         </div>,
