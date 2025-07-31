@@ -362,4 +362,11 @@ export class DateRangeSelectionManager {
   updateRestrictions(restrictionConfig?: RestrictionConfig): void {
     this.restrictionManager = new RestrictionManager(restrictionConfig ?? { restrictions: [] });
   }
+
+  /**
+   * Gets the current selection mode
+   */
+  getSelectionMode(): 'single' | 'range' {
+    return this.selectionMode;
+  }
 } 

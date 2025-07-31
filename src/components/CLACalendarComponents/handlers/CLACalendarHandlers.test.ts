@@ -498,7 +498,8 @@ describe('CLACalendarHandlers', () => {
     beforeEach(() => {
       mockSelectionManager = {
         startSelection: vi.fn(),
-        updateSelection: vi.fn()
+        updateSelection: vi.fn(),
+        getSelectionMode: vi.fn().mockReturnValue('range')
       };
       mockSetIsSelecting = vi.fn();
       mockSetSelectedRange = vi.fn();
@@ -546,6 +547,25 @@ describe('CLACalendarHandlers', () => {
 
       expect(mockSetIsSelecting).not.toHaveBeenCalled();
       expect(mockSetSelectedRange).not.toHaveBeenCalled();
+    });
+
+    it('should not set isSelecting for single selection mode', () => {
+      mockSelectionManager.getSelectionMode.mockReturnValue('single');
+      const date = createDate(2025, 5, 15);
+      mockSelectionManager.startSelection.mockReturnValue({
+        success: true,
+        range: { start: date.toISOString(), end: date.toISOString() },
+        message: null
+      });
+
+      handlers.handleSelectionStart(date);
+
+      expect(mockSetIsSelecting).not.toHaveBeenCalled();
+      expect(mockSetSelectedRange).toHaveBeenCalledWith({
+        start: date.toISOString(),
+        end: date.toISOString()
+      });
+      expect(mockSetNotification).toHaveBeenCalledWith(null);
     });
 
     it('should show notification on failed selection with out of bounds', () => {

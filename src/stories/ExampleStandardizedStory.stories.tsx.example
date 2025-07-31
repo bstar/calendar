@@ -1,0 +1,80 @@
+// This is an EXAMPLE file showing how to use the standardized story pattern
+// Copy this pattern when creating new story files
+
+import { createCalendarMeta, createCalendarStory, createCustomCalendarStory, type CalendarStory } from './shared/storyHelpers';
+import { CalendarStoryWrapper } from './shared/CalendarStoryWrapper';
+import type { RestrictionConfig } from '../components/CLACalendar.config';
+
+// Step 1: Create the meta using the standardized helper
+const meta = createCalendarMeta({
+  title: 'Category Name/Stories',
+  description: 'Description of what this story category demonstrates'
+});
+
+export default meta;
+
+// Step 2: Create simple stories for straightforward cases
+export const SimpleExample: CalendarStory = createCalendarStory({
+  name: 'Simple Example',
+  description: 'This story shows a simple configuration change',
+  args: {
+    // Only specify the properties that differ from defaults
+    visibleMonths: 3,
+    selectionMode: 'single',
+    showLayersNavigation: true
+  }
+});
+
+// Step 3: Create custom stories for complex cases
+export const ComplexExample: CalendarStory = createCustomCalendarStory({
+  name: 'Complex Example with Restrictions',
+  render: (args) => {
+    // Define any complex configuration here
+    const restrictionConfig: RestrictionConfig = {
+      restrictions: [{
+        type: 'weekday',
+        enabled: true,
+        days: [0, 6],
+        message: 'Weekends are not available'
+      }]
+    };
+
+    // Always use CalendarStoryWrapper and pass args
+    return (
+      <CalendarStoryWrapper
+        args={args}
+        title="Complex Example"
+        description="This example shows weekend restrictions"
+        settingsOverrides={{ 
+          restrictionConfigFactory: () => restrictionConfig 
+        }}
+      />
+    );
+  }
+});
+
+// Step 4: For multiple calendars in one story
+export const MultipleCalendars: CalendarStory = createCustomCalendarStory({
+  name: 'Multiple Calendar Configurations',
+  render: (args) => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+      <CalendarStoryWrapper
+        args={{ ...args, visibleMonths: 1 }}
+        title="Single Month View"
+        description="Compact calendar showing one month"
+      />
+      <CalendarStoryWrapper
+        args={{ ...args, visibleMonths: 4 }}
+        title="Quarterly View"
+        description="Extended calendar showing four months"
+      />
+    </div>
+  )
+});
+
+// Benefits of this pattern:
+// 1. Consistent structure across all stories
+// 2. Args are ALWAYS passed correctly (no more render: () => issues)
+// 3. Type safety with CalendarStory type
+// 4. Less boilerplate code
+// 5. Easier to maintain and update

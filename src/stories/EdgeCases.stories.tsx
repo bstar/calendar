@@ -24,7 +24,7 @@ type Story = StoryObj<typeof meta>;
 
 export const NegativeVisibleMonths: Story = {
   name: 'Negative Visible Months',
-  render: () => (
+  render: (args) => (
     <CalendarStoryWrapper 
       args={{
         displayMode: 'embedded',
@@ -57,7 +57,7 @@ export const NegativeVisibleMonths: Story = {
 
 export const ExcessiveVisibleMonths: Story = {
   name: 'Excessive Visible Months (100)',
-  render: () => (
+  render: (args) => (
     <CalendarStoryWrapper 
       args={{
         displayMode: 'embedded',
@@ -90,7 +90,7 @@ export const ExcessiveVisibleMonths: Story = {
 
 export const ZeroVisibleMonths: Story = {
   name: 'Zero Visible Months',
-  render: () => (
+  render: (args) => (
     <CalendarStoryWrapper 
       args={{
         displayMode: 'embedded',
@@ -123,7 +123,7 @@ export const ZeroVisibleMonths: Story = {
 
 export const InvalidDateRange: Story = {
   name: 'Invalid Date Range (End Before Start)',
-  render: () => (
+  render: (args) => (
     <CalendarStoryWrapper 
       args={{
         displayMode: 'embedded',
@@ -160,7 +160,7 @@ export const InvalidDateRange: Story = {
 
 export const MalformedDates: Story = {
   name: 'Malformed Date Strings',
-  render: () => (
+  render: (args) => (
     <CalendarStoryWrapper 
       args={{
         displayMode: 'embedded',
@@ -197,7 +197,7 @@ export const MalformedDates: Story = {
 
 export const ConflictingRestrictions: Story = {
   name: 'Conflicting Restrictions',
-  render: () => {
+  render: (args) => {
     const restrictionConfig = {
       restrictions: [
         {
@@ -250,7 +250,7 @@ export const ConflictingRestrictions: Story = {
 
 export const NegativeMonthWidth: Story = {
   name: 'Negative Month Width',
-  render: () => (
+  render: (args) => (
     <CalendarStoryWrapper 
       args={{
         displayMode: 'embedded',
@@ -283,7 +283,7 @@ export const NegativeMonthWidth: Story = {
 
 export const ExtremelySmallMonthWidth: Story = {
   name: 'Extremely Small Month Width',
-  render: () => (
+  render: (args) => (
     <CalendarStoryWrapper 
       args={{
         displayMode: 'embedded',
@@ -316,7 +316,7 @@ export const ExtremelySmallMonthWidth: Story = {
 
 export const InvalidTimezone: Story = {
   name: 'Invalid Timezone',
-  render: () => (
+  render: (args) => (
     <CalendarStoryWrapper 
       args={{
         displayMode: 'embedded',
@@ -349,7 +349,7 @@ export const InvalidTimezone: Story = {
 
 export const EmptyLayersWithNavigation: Story = {
   name: 'Empty Layers with Navigation Enabled',
-  render: () => (
+  render: (args) => (
     <CalendarStoryWrapper 
       args={{
         displayMode: 'embedded',
@@ -383,7 +383,7 @@ export const EmptyLayersWithNavigation: Story = {
 
 export const DuplicateLayerNames: Story = {
   name: 'Duplicate Layer Names',
-  render: () => (
+  render: (args) => (
     <CalendarStoryWrapper 
       args={{
         displayMode: 'embedded',
@@ -432,7 +432,7 @@ export const DuplicateLayerNames: Story = {
 
 export const InvalidColorValues: Story = {
   name: 'Invalid Color Values',
-  render: () => (
+  render: (args) => (
     <CalendarStoryWrapper 
       args={{
         displayMode: 'embedded',
@@ -471,7 +471,7 @@ export const InvalidColorValues: Story = {
 
 export const CircularDateFormatter: Story = {
   name: 'Throwing Date Formatter',
-  render: () => (
+  render: (args) => (
     <CalendarStoryWrapper 
       args={{
         displayMode: 'embedded',
@@ -507,7 +507,7 @@ export const CircularDateFormatter: Story = {
 
 export const NullAndUndefinedValues: Story = {
   name: 'Null and Undefined Values',
-  render: () => (
+  render: (args) => (
     <CalendarStoryWrapper 
       args={{
         displayMode: 'embedded',
@@ -543,7 +543,7 @@ export const NullAndUndefinedValues: Story = {
 
 export const ExtremeFontSize: Story = {
   name: 'Extreme Font Sizes',
-  render: () => (
+  render: (args) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       <CalendarStoryWrapper 
         args={{

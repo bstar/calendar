@@ -293,9 +293,15 @@ export class CLACalendarHandlers {
         return;
       }
 
-      setIsSelecting(true);
-      setSelectedRange(result.range);
-      setNotification(null);
+      // For single selection mode, don't enter selecting state
+      if (selectionManager.getSelectionMode() === 'single') {
+        setSelectedRange(result.range);
+        setNotification(null);
+      } else {
+        setIsSelecting(true);
+        setSelectedRange(result.range);
+        setNotification(null);
+      }
     };
 
     const handleSelectionMove = (date: Date): DateRange => {

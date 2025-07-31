@@ -66,9 +66,9 @@ export const CalendarStoryWrapper: React.FC<CalendarStoryWrapperProps> = ({
           color: '#0366d6'
         }}>
           <strong>Selected:</strong> {
-            args.selectionMode === 'single' 
+            settings.selectionMode === 'single' 
               ? selectedDates.start
-              : `${selectedDates.start} ${args.dateRangeSeparator} ${selectedDates.end}`
+              : `${selectedDates.start} ${settings.dateRangeSeparator || ' - '} ${selectedDates.end}`
           }
         </div>
       )}

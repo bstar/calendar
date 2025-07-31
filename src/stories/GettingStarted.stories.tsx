@@ -27,7 +27,6 @@ type Story = StoryObj<typeof meta>;
 export const BasicCalendar: Story = {
   name: 'Basic Calendar',
   args: {
-    ...defaultArgs,
     displayMode: 'embedded',
     visibleMonths: 2,
     selectionMode: 'range'
@@ -45,7 +44,6 @@ export const BasicCalendar: Story = {
 export const PopupCalendar: Story = {
   name: 'Popup Calendar',
   args: {
-    ...defaultArgs,
     displayMode: 'popup',
     selectionMode: 'single',
     visibleMonths: 1,

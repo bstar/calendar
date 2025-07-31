@@ -86,7 +86,7 @@ export const calendarArgTypes: ArgTypes = {
     description: 'Show submit button in footer',
     table: {
       category: 'Features',
-      defaultValue: { summary: false }
+      defaultValue: { summary: true }
     }
   },
   showTooltips: {
@@ -206,7 +206,7 @@ export const defaultArgs = {
   useDynamicPosition: true,
   showHeader: true,
   showFooter: true,
-  showSubmitButton: false,
+  showSubmitButton: true,
   showTooltips: true,
   showLayersNavigation: false,
   showDateInputs: true,

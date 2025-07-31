@@ -31,7 +31,7 @@ describe('CLACalendar Configuration', () => {
       expect(settings.showTooltips).toBe(true);
       expect(settings.showHeader).toBe(true);
       expect(settings.closeOnClickAway).toBe(true);
-      expect(settings.showSubmitButton).toBe(false);
+      expect(settings.showSubmitButton).toBe(true);
       expect(settings.showFooter).toBe(true);
       expect(settings.enableOutOfBoundsScroll).toBe(true);
       expect(settings.suppressTooltipsOnSelection).toBe(false);
@@ -120,8 +120,8 @@ describe('CLACalendar Configuration', () => {
       expect(settings.showHeader).toBe(true);
       expect(settings.showFooter).toBe(true);
       
-      // These should be false by default
-      expect(settings.showSubmitButton).toBe(false);
+      // Submit button is now enabled by default for better UX
+      expect(settings.showSubmitButton).toBe(true);
       expect(settings.suppressTooltipsOnSelection).toBe(false);
       expect(settings.showSelectionAlert).toBe(false);
       expect(settings.startWeekOnSunday).toBe(false);

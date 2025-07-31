@@ -36,7 +36,7 @@ describe('MonthGrid renderTooltip functionality', () => {
               fontSize: `${parseFloat(settings.baseFontSize) * 0.875}px`
             }}
           >
-            {message}
+            {message}test:test:test:test:test:test:test:test:test:test:test:test:test:test:test:
           </div>,
           document.body
         );

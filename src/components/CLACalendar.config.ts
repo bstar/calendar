@@ -386,7 +386,7 @@ const CORE_DEFAULTS = {
   showTooltips: true,
   showHeader: true,
   closeOnClickAway: true,
-  showSubmitButton: false,
+  showSubmitButton: true,
   showFooter: true,
   enableOutOfBoundsScroll: true,
   suppressTooltipsOnSelection: false,

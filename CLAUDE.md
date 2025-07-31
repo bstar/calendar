@@ -141,6 +141,18 @@ ESLint is configured with TypeScript support:
 
 The project supports custom date formatting through the `dateFormatter` function in settings. This allows flexible date display formats while maintaining UTC consistency internally.
 
+## Specialized Agents
+
+### Storybook Expert
+For Storybook-specific tasks, refer to the "Storybook Expert" which will load the CLAUDE_STORYBOOK.md documentation. This provides:
+- Expert guidance on Storybook v9.0.16 implementations
+- Story controls troubleshooting
+- MDX documentation standards
+- Performance optimization strategies
+- Common issues and solutions
+
+Use by asking: "As the Storybook Expert, help me with..."
+
 ## Storybook Development
 
 ### Storybook v9 Best Practices

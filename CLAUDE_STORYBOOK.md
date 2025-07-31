@@ -1,6 +1,16 @@
-# CLAUDE_STORYBOOK.md
+# CLAUDE_STORYBOOK.md - Storybook Expert
 
-This file provides guidance to Claude for maintaining and developing Storybook documentation in the CLA Calendar project. This specialized agent focuses on ensuring consistent, high-quality Storybook implementations.
+**Role**: Storybook Expert Agent for CLA Calendar Project
+
+This file provides specialized guidance to Claude for maintaining and developing Storybook documentation in the CLA Calendar project. When you refer to the "Storybook Expert", this documentation will be loaded to provide expert-level guidance on Storybook implementations, troubleshooting, and best practices.
+
+## Expert Capabilities
+- Storybook v9.0.16 specific knowledge and import paths
+- Story controls validation and troubleshooting
+- MDX documentation standards and table formatting
+- Performance optimization for complex stories
+- Three-file pattern implementation
+- Control synchronization and testing
 
 ## Storybook Version and Critical Information
 
@@ -225,6 +235,196 @@ options: {
 }
 ```
 
+## Story Controls Validation
+
+### Critical Control Requirements
+
+**ALL stories MUST use the shared control infrastructure**. If controls aren't working, it's likely due to:
+
+1. **Not using shared argTypes**: Every story must import and use `calendarArgTypes` from `./shared/storyControls`
+2. **Overriding args incorrectly**: Don't override the entire args object, only specific properties
+3. **Props not being passed through**: Ensure CalendarStoryWrapper receives and applies all args
+4. **Settings object structure**: The calendar expects settings in a specific nested structure
+
+### Maintaining Control Defaults
+
+When changing default values in the calendar:
+
+1. **Update THREE places to maintain consistency**:
+   - `src/components/CLACalendar.config.ts` - The CORE_DEFAULTS object
+   - `src/stories/shared/storyControls.ts` - Both defaultArgs AND the control's defaultValue.summary
+   - Any relevant tests that assert the default values
+
+2. **Example: Changing showSubmitButton default**:
+   ```typescript
+   // 1. In CLACalendar.config.ts
+   export const CORE_DEFAULTS = {
+     showSubmitButton: true, // Changed from false
+     // ...
+   };
+   
+   // 2. In storyControls.ts
+   export const defaultArgs = {
+     showSubmitButton: true, // Changed from false
+     // ...
+   };
+   
+   // AND in calendarArgTypes:
+   showSubmitButton: {
+     control: 'boolean',
+     table: {
+       defaultValue: { summary: true } // Changed from false
+     }
+   }
+   
+   // 3. Update tests
+   expect(settings.showSubmitButton).toBe(true); // Changed from false
+   ```
+
+3. **Run tests after changes** to catch any mismatches
+
+### Standardized Story Pattern (RECOMMENDED)
+
+Use the helper functions from `./shared/storyHelpers` for perfect consistency:
+
+```typescript
+import { createCalendarMeta, createCalendarStory, createCustomCalendarStory, type CalendarStory } from './shared/storyHelpers';
+
+// 1. Create meta using the helper
+const meta = createCalendarMeta({
+  title: 'Category/Stories',
+  description: 'Optional description of this story category'
+});
+
+export default meta;
+
+// 2. Simple stories - just specify what's different
+export const SimpleStory: CalendarStory = createCalendarStory({
+  name: 'Story Name',
+  description: 'What this story demonstrates',
+  args: {
+    // Only specify the args that differ from defaults
+    visibleMonths: 3,
+    selectionMode: 'single'
+  }
+});
+
+// 3. Complex stories with custom logic
+export const ComplexStory: CalendarStory = createCustomCalendarStory({
+  name: 'Complex Story',
+  render: (args) => {
+    // Custom setup logic here
+    const customConfig = { /* ... */ };
+    
+    return (
+      <CalendarStoryWrapper
+        args={args}
+        title="Complex Story"
+        description="Description"
+        settingsOverrides={customConfig}
+      />
+    );
+  }
+});
+```
+
+### Manual Pattern (if not using helpers)
+
+```typescript
+// ALWAYS start with this exact pattern
+import { calendarArgTypes, defaultArgs } from './shared/storyControls';
+import { CalendarStoryWrapper } from './shared/CalendarStoryWrapper';
+
+const meta: Meta<typeof CLACalendar> = {
+  title: 'Category/Stories',
+  component: CLACalendar,
+  argTypes: calendarArgTypes,  // NEVER define custom argTypes
+  args: defaultArgs,           // ALWAYS use shared defaults
+};
+
+// CRITICAL: Never spread defaultArgs in story args!
+export const YourStory: Story = {
+  render: (args) => <CalendarStoryWrapper args={args} />,
+  args: {
+    // WRONG: ...defaultArgs, // This breaks controls!
+    // RIGHT: Only override specific properties
+    visibleMonths: 3,
+    selectionMode: 'single'
+  }
+};
+```
+
+### Common Control Issues and Fixes
+
+1. **Control shows but doesn't update the calendar**
+   - Check: Is the story using `render: (args) =>` and passing args?
+   - Fix: Ensure args are passed to CalendarStoryWrapper
+   - Check: Is the story spreading `...defaultArgs` in its args?
+   - Fix: Remove `...defaultArgs` - only specify overrides
+
+2. **Control is missing from the UI**
+   - Check: Is the story using custom argTypes?
+   - Fix: Use shared `calendarArgTypes`
+
+3. **Control value doesn't match calendar behavior**
+   - Check: Is there a mismatch between control name and settings property?
+   - Fix: Verify mapping in storyControls.ts
+
+4. **Color controls not working**
+   - Check: Are colors nested under settings.colors?
+   - Fix: Ensure proper nesting: `settings.colors.primary`
+
+5. **Selection mode not switching properly**
+   - Check: Is the component properly recreating handlers when mode changes?
+   - Fix: Ensure selection handlers depend on the selection manager
+
+6. **Controls work in some stories but not others**
+   - Check: Are stories using `render: () =>` instead of `render: (args) =>`?
+   - Fix: Always use `render: (args) =>` to receive control values
+
+### Control Validation Script
+
+Add this to your package.json:
+```json
+{
+  "scripts": {
+    "storybook:validate-controls": "node scripts/validate-story-controls.js"
+  }
+}
+```
+
+Create `scripts/validate-story-controls.js`:
+```javascript
+const fs = require('fs');
+const path = require('path');
+
+function validateStoryControls() {
+  const storyFiles = glob.sync('src/stories/**/*.stories.tsx');
+  const issues = [];
+
+  storyFiles.forEach(file => {
+    const content = fs.readFileSync(file, 'utf8');
+    
+    // Check for shared imports
+    if (!content.includes("from './shared/storyControls'")) {
+      issues.push(`${file}: Missing shared storyControls import`);
+    }
+    
+    // Check for custom argTypes
+    if (content.match(/argTypes\s*:\s*{[^}]+}/)) {
+      issues.push(`${file}: Custom argTypes detected - should use calendarArgTypes`);
+    }
+    
+    // Check for render function with args
+    if (!content.includes('render: (args)')) {
+      issues.push(`${file}: Story may not be passing args to render`);
+    }
+  });
+  
+  return issues;
+}
+```
+
 ## Testing Storybook Implementations
 
 ### Validation Checklist
@@ -237,7 +437,9 @@ options: {
 - [ ] Navigation appears correctly in sidebar
 - [ ] No horizontal scrollbars in docs view
 - [ ] All examples render without errors
-- [ ] ArgTypes controls work properly
+- [ ] **ALL ArgTypes controls update the calendar when changed**
+- [ ] **Controls are consistent across ALL stories**
+- [ ] **No story has custom argTypes defined**
 
 ### Build Commands
 ```bash
@@ -331,5 +533,59 @@ npm run storybook -- --docs
 3. Reduce restriction ranges
 4. Use React.memo where appropriate
 5. Profile with React DevTools
+
+## Troubleshooting Guide
+
+### Issue: Controls Not Working After Adding New Feature
+
+**Symptoms**: 
+- Control appears in Storybook but doesn't affect the component
+- Control works in some stories but not others
+- Selection mode stays in range even when set to single
+
+**Root Causes & Fixes**:
+
+1. **Story args spreading defaultArgs**
+   ```typescript
+   // WRONG - This overrides control values
+   args: {
+     ...defaultArgs,
+     visibleMonths: 2
+   }
+   
+   // RIGHT - Only specify overrides
+   args: {
+     visibleMonths: 2
+   }
+   ```
+
+2. **Using render: () => instead of render: (args) =>**
+   ```typescript
+   // WRONG - Args not received
+   render: () => <CalendarStoryWrapper args={{...}} />
+   
+   // RIGHT - Args passed through
+   render: (args) => <CalendarStoryWrapper args={args} />
+   ```
+
+3. **Component not responding to prop changes**
+   - Check if handlers/managers are properly memoized with dependencies
+   - Ensure settings changes trigger re-renders
+   - For selection mode: verify handlers check current mode
+
+### Issue: Tests Failing After Changing Defaults
+
+**Always update in three places**:
+1. Component config (CORE_DEFAULTS)
+2. Storybook controls (defaultArgs & argTypes)
+3. Test expectations
+
+**Example PR Checklist**:
+- [ ] Updated CORE_DEFAULTS in config
+- [ ] Updated defaultArgs in storyControls
+- [ ] Updated argTypes defaultValue.summary
+- [ ] Updated test expectations
+- [ ] Ran all tests
+- [ ] Verified in Storybook UI
 
 Remember: Consistency is key. Always follow established patterns rather than creating new ones.
