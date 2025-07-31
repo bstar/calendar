@@ -420,21 +420,6 @@
 .tooltip::before {
   content: '' !important;
   position: absolute !important;
-  bottom: -5px !important;
-  left: var(--arrow-offset, 50%) !important;
-  transform: translateX(-50%) !important;
-  width: 0 !important;
-  height: 0 !important;
-  border-left: 5px solid transparent !important;
-  border-right: 5px solid transparent !important;
-  border-top: 5px solid #333 !important;
-  z-index: 1 !important;
-}
-
-/* Add a subtle shadow effect for the arrow */
-.tooltip::after {
-  content: '' !important;
-  position: absolute !important;
   bottom: -6px !important;
   left: var(--arrow-offset, 50%) !important;
   transform: translateX(-50%) !important;
@@ -442,7 +427,22 @@
   height: 0 !important;
   border-left: 6px solid transparent !important;
   border-right: 6px solid transparent !important;
-  border-top: 6px solid rgba(0,0,0,0.1) !important;
+  border-top: 6px solid #333 !important;
+  z-index: 1 !important;
+}
+
+/* Add a subtle shadow effect for the arrow */
+.tooltip::after {
+  content: '' !important;
+  position: absolute !important;
+  bottom: -7px !important;
+  left: var(--arrow-offset, 50%) !important;
+  transform: translateX(-50%) !important;
+  width: 0 !important;
+  height: 0 !important;
+  border-left: 7px solid transparent !important;
+  border-right: 7px solid transparent !important;
+  border-top: 7px solid rgba(0,0,0,0.1) !important;
   z-index: -1 !important;
 }
 

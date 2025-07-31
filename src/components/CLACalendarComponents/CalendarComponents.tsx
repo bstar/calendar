@@ -618,8 +618,8 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, show, children }) => 
 
         // Calculate initial position
         // Since we're using a fixed position portal, we should use viewport coordinates
-        // Position tooltip centered above the target element
-        let top = targetRect.top - tooltipRect.height - 8;
+        // Position tooltip centered above the target element with gap
+        let top = targetRect.top - tooltipRect.height - 14; // Increased gap from 8 to 14
         let left = targetRect.left + (targetRect.width - tooltipRect.width) / 2;
 
         // Calculate the center of the target element
@@ -645,7 +645,7 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, show, children }) => 
 
         // If tooltip would go above the viewport, position it below the target
         if (top < 8) {
-          top = targetRect.bottom + 8;
+          top = targetRect.bottom + 14; // Increased gap from 8 to 14
         }
 
         // Update position and arrow offset
