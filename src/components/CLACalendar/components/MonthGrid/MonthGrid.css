@@ -55,7 +55,9 @@
   z-index: 2147483647;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   max-width: 250px;
-  white-space: pre-line;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
   margin: 0;
   transform: none;
 }

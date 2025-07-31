@@ -28,11 +28,16 @@
   color: #ffffff;
   border-radius: 4px;
   position: relative;
+  max-width: 250px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 /* Event tooltip item */
 .layer-event-tooltip-item {
-  white-space: nowrap;
+  white-space: normal;
+  word-wrap: break-word;
+  max-width: 250px;
 }
 
 .layer-event-tooltip-item:not(:last-child) {
@@ -42,16 +47,23 @@
 /* Event tooltip title */
 .layer-event-tooltip-title {
   font-weight: bold;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 /* Event tooltip time */
 .layer-event-tooltip-time {
   font-size: 0.9em;
   color: #adb5bd;
+  white-space: normal;
 }
 
 /* Event tooltip description */
 .layer-event-tooltip-description {
   font-size: 0.9em;
   color: #e9ecef;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
