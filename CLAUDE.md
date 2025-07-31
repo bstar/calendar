@@ -504,7 +504,7 @@ To create a proper dropdown category in Storybook (like Getting Started, UTC Tim
 1. **Create Three Files**:
    - **Documentation page**: `CategoryName.mdx` with `<Meta title="Category Name/Documentation" />`
    - **Stories page**: `CategoryName.stories.tsx` with `title: 'Category Name/Stories'`
-   - **Direct Rendering** (optional): `CategoryNameDirect.mdx` with `<Meta title="Category Name/Direct Rendering" />`
+   - **Integrated Examples** (optional): `CategoryNameDirect.mdx` with `<Meta title="Category Name/Integrated Examples" />`
 
 2. **Documentation Page Pattern**:
    ```mdx
@@ -519,14 +519,14 @@ To create a proper dropdown category in Storybook (like Getting Started, UTC Tim
    > **Note**: To see live examples, visit the "Stories" page under this section.
    ```
 
-3. **Direct Rendering Page Pattern**:
+3. **Integrated Examples Page Pattern**:
    ```mdx
    import { Meta, Canvas } from '@storybook/addon-docs/blocks';
    import { CalendarStoryWrapper } from './shared/CalendarStoryWrapper';
    
-   <Meta title="Category Name/Direct Rendering" />
+   <Meta title="Category Name/Integrated Examples" />
    
-   # Category Name - Live Examples
+   # Category Name - Integrated Examples
    
    <Canvas>
      <CalendarStoryWrapper 
@@ -548,17 +548,17 @@ To create a proper dropdown category in Storybook (like Getting Started, UTC Tim
      },
    }
 
-### Direct Rendering in MDX
+### Integrated Examples in MDX
 
-Direct Rendering pages are used for demonstrating calendar configurations without relying on Storybook's controls. This is especially useful for edge cases and timezone demonstrations.
+Integrated Examples pages are used for demonstrating calendar configurations without relying on Storybook's controls. This is especially useful for edge cases and timezone demonstrations.
 
-#### Pattern for Direct Rendering Pages
+#### Pattern for Integrated Examples Pages
 
 ```mdx
 import { Meta, Canvas } from '@storybook/addon-docs/blocks';
 import { CalendarStoryWrapper } from './shared/CalendarStoryWrapper';
 
-<Meta title="Category Name/Direct Rendering" />
+<Meta title="Category Name/Integrated Examples" />
 
 # Title
 
@@ -579,7 +579,7 @@ import { CalendarStoryWrapper } from './shared/CalendarStoryWrapper';
 
 **Important**: Always import `Canvas` from `@storybook/addon-docs/blocks` when using CalendarStoryWrapper in MDX files. The Canvas component is required for proper rendering.
 
-When creating edge case tests or when Storybook's Story components don't properly pass args, use direct rendering in MDX files:
+When creating edge case tests or when Storybook's Story components don't properly pass args, use integrated examples in MDX files:
 
 #### Example: Edge Case Testing
 
@@ -587,9 +587,9 @@ When creating edge case tests or when Storybook's Story components don't properl
 import { Meta } from '@storybook/addon-docs/blocks';
 import { CalendarStoryWrapper } from './shared/CalendarStoryWrapper';
 
-<Meta title="Edge Cases/Direct Rendering Test" />
+<Meta title="Edge Cases/Integrated Examples Test" />
 
-# Direct Rendering Test
+# Integrated Examples Test
 
 ## Negative Visible Months (-5)
 
@@ -633,7 +633,7 @@ import { CalendarStoryWrapper } from './shared/CalendarStoryWrapper';
 />
 ```
 
-#### Key Points for Direct Rendering:
+#### Key Points for Integrated Examples:
 
 1. **No Canvas/Story components**: Render CalendarStoryWrapper directly in MDX
 2. **Full configuration**: List every property explicitly (no spreading defaultArgs)
