@@ -19,6 +19,9 @@ export function isAnchorInAnyBoundary(anchor: Date, restrictionConfig?: Restrict
     const boundaryWithRanges = restriction as RestrictedBoundaryRestriction;
     if (boundaryWithRanges.ranges) {
       for (const range of boundaryWithRanges.ranges) {
+        // Check for undefined dates before parsing
+        if (!range.startDate || !range.endDate) continue;
+        
         const rangeStart = parseISO(range.startDate);
         const rangeEnd = parseISO(range.endDate);
 
@@ -51,6 +54,9 @@ export function isDateInAnyBoundary(checkDate: Date, restrictionConfig?: Restric
     const boundaryWithRanges = restriction as RestrictedBoundaryRestriction;
     if (boundaryWithRanges.ranges) {
       for (const range of boundaryWithRanges.ranges) {
+        // Check for undefined dates before parsing
+        if (!range.startDate || !range.endDate) continue;
+        
         const rangeStart = parseISO(range.startDate);
         const rangeEnd = parseISO(range.endDate);
 

@@ -77,9 +77,10 @@ export const DayCell: React.FC<DayCellProps> = ({
 
     // From here, we're dealing with a selection in progress
     // Get the anchor date - the fixed point of the selection
+    // selectedRange.start is guaranteed to exist at this point due to the check above
     const anchorDate = selectedRange.anchorDate
       ? parseISO(selectedRange.anchorDate, settings?.timezone)
-      : parseISO(selectedRange.start, settings?.timezone);
+      : parseISO(selectedRange.start!, settings?.timezone);
 
     // Check if the anchor is in a boundary - this is the key to determine if we need
     // to apply boundary restrictions

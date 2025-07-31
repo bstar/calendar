@@ -1,8 +1,17 @@
 import { Meta } from '@storybook/addon-docs/blocks';
-import { CalendarStoryWrapper } from './shared/CalendarStoryWrapper';
 import { useState } from 'react';
 import CLACalendar from '../components/CLACalendar';
 import { createCalendarSettings } from '../components/CLACalendar.config';
+import {
+  BoundaryExample,
+  WeekdayExample,
+  DateRangeExample,
+  AllowedRangesExample,
+  BusinessDaysExample,
+  ComplexExample,
+  MonthBoundaryExample,
+  SingleDateExample
+} from './RestrictionsExamples';
 
 <Meta title="Restrictions/Direct Rendering" />
 
@@ -54,74 +63,7 @@ Calendar restricted to the year 2025 only. Dates before January 1, 2025 and afte
 }
 ```
 
-{(() => {
-    const BoundaryExample = () => {
-      const [submittedDates, setSubmittedDates] = useState(null);
-      
-      const handleSubmit = (start, end) => {
-        setSubmittedDates({ start, end });
-      };
-      
-      return (
-        <div style={{ padding: '20px' }}>
-          <CLACalendar
-            settings={createCalendarSettings({
-              displayMode: 'embedded',
-              selectionMode: 'range',
-              visibleMonths: 2,
-              monthWidth: 500,
-              showSubmitButton: true,
-              showFooter: true,
-              onSubmit: handleSubmit,
-              restrictionConfigFactory: () => ({
-                restrictions: [{
-                  type: 'boundary',
-                  enabled: true,
-                  date: '2025-01-01',
-                  direction: 'before',
-                  inclusive: false,
-                  message: 'Please select dates in 2025 or later'
-                }, {
-                  type: 'boundary',
-                  enabled: true,
-                  date: '2025-12-31',
-                  direction: 'after',
-                  inclusive: true,
-                  message: 'Please select dates in 2025 or earlier'
-                }]
-              }),
-              position: 'bottom-left',
-              useDynamicPosition: true,
-              showHeader: true,
-              showTooltips: true,
-              showLayersNavigation: false,
-              showDateInputs: true,
-              closeOnClickAway: true,
-              startWeekOnSunday: false,
-              timezone: 'UTC',
-              dateRangeSeparator: ' - '
-            })}
-          />
-          
-          {submittedDates && (
-            <div style={{
-              marginTop: '20px',
-              padding: '10px',
-              backgroundColor: '#f0f8ff',
-              borderRadius: '4px',
-              border: '1px solid #0366d6'
-            }}>
-              <strong>Selected Date Range:</strong>
-              <div>Start: {submittedDates.start || 'Not selected'}</div>
-              <div>End: {submittedDates.end || 'Not selected'}</div>
-            </div>
-          )}
-        </div>
-      );
-    };
-    
-    return <BoundaryExample />;
-  })()}
+<BoundaryExample />
 
 ## Weekday Restrictions
 
@@ -149,65 +91,7 @@ This calendar blocks weekends (Saturday and Sunday) from selection.
 }
 ```
 
-{(() => {
-    const WeekdayExample = () => {
-      const [submittedDates, setSubmittedDates] = useState(null);
-      
-      const handleSubmit = (start, end) => {
-        setSubmittedDates({ start, end });
-      };
-      
-      return (
-        <div style={{ padding: '20px' }}>
-          <CLACalendar
-            settings={createCalendarSettings({
-              displayMode: 'embedded',
-              selectionMode: 'range',
-              visibleMonths: 2,
-              monthWidth: 500,
-              showSubmitButton: true,
-              showFooter: true,
-              onSubmit: handleSubmit,
-              restrictionConfigFactory: () => ({
-                restrictions: [{
-                  type: 'weekday',
-                  enabled: true,
-                  days: [0, 6],
-                  message: 'Weekends are not available for booking'
-                }]
-              }),
-              position: 'bottom-left',
-              useDynamicPosition: true,
-              showHeader: true,
-              showTooltips: true,
-              showLayersNavigation: false,
-              showDateInputs: true,
-              closeOnClickAway: true,
-              startWeekOnSunday: false,
-              timezone: 'UTC',
-              dateRangeSeparator: ' - '
-            })}
-          />
-          
-          {submittedDates && (
-            <div style={{
-              marginTop: '20px',
-              padding: '10px',
-              backgroundColor: '#f0f8ff',
-              borderRadius: '4px',
-              border: '1px solid #0366d6'
-            }}>
-              <strong>Selected Date Range:</strong>
-              <div>Start: {submittedDates.start || 'Not selected'}</div>
-              <div>End: {submittedDates.end || 'Not selected'}</div>
-            </div>
-          )}
-        </div>
-      );
-    };
-    
-    return <WeekdayExample />;
-  })()}
+<WeekdayExample />
 
 ## Date Range Restrictions
 
@@ -251,96 +135,7 @@ Specific date ranges blocked for holidays and maintenance periods.
 }
 ```
 
-{(() => {
-    const DateRangeExample = () => {
-      const [submittedDates, setSubmittedDates] = useState(null);
-      
-      const handleSubmit = (start, end) => {
-        setSubmittedDates({ start, end });
-      };
-      
-      return (
-        <div style={{ padding: '20px' }}>
-          <div style={{
-            marginBottom: '20px',
-            padding: '10px',
-            backgroundColor: '#fff3cd',
-            borderRadius: '4px',
-            border: '1px solid #ffeaa7'
-          }}>
-            <strong>Blocked Periods:</strong>
-            <ul style={{ margin: '5px 0 0 20px' }}>
-              <li>July 1-7: Company retreat</li>
-              <li>August 15-20: System maintenance</li>
-              <li>December 24-26: Christmas holidays</li>
-            </ul>
-          </div>
-          
-          <CLACalendar
-            settings={createCalendarSettings({
-              displayMode: 'embedded',
-              selectionMode: 'range',
-              visibleMonths: 2,
-              monthWidth: 500,
-              showSubmitButton: true,
-              showFooter: true,
-              onSubmit: handleSubmit,
-              restrictionConfigFactory: () => ({
-                restrictions: [{
-                  type: 'daterange',
-                  enabled: true,
-                  ranges: [
-                    {
-                      startDate: '2025-07-01',
-                      endDate: '2025-07-07',
-                      message: 'Company retreat - office closed'
-                    },
-                    {
-                      startDate: '2025-08-15',
-                      endDate: '2025-08-20',
-                      message: 'System maintenance period'
-                    },
-                    {
-                      startDate: '2025-12-24',
-                      endDate: '2025-12-26',
-                      message: 'Christmas holidays'
-                    }
-                  ],
-                  message: 'This period is not available'
-                }]
-              }),
-              position: 'bottom-left',
-              useDynamicPosition: true,
-              showHeader: true,
-              showTooltips: true,
-              showLayersNavigation: false,
-              showDateInputs: true,
-              closeOnClickAway: true,
-              startWeekOnSunday: false,
-              timezone: 'UTC',
-              dateRangeSeparator: ' - '
-            })}
-          />
-          
-          {submittedDates && (
-            <div style={{
-              marginTop: '20px',
-              padding: '10px',
-              backgroundColor: '#f0f8ff',
-              borderRadius: '4px',
-              border: '1px solid #0366d6'
-            }}>
-              <strong>Selected Date Range:</strong>
-              <div>Start: {submittedDates.start || 'Not selected'}</div>
-              <div>End: {submittedDates.end || 'Not selected'}</div>
-            </div>
-          )}
-        </div>
-      );
-    };
-    
-    return <DateRangeExample />;
-  })()}
+<DateRangeExample />
 
 ## Allowed Ranges (Whitelist)
 
@@ -379,90 +174,7 @@ Only specific date ranges are selectable - useful for seasonal availability.
 }
 ```
 
-{(() => {
-    const AllowedRangesExample = () => {
-      const [submittedDates, setSubmittedDates] = useState(null);
-      
-      const handleSubmit = (start, end) => {
-        setSubmittedDates({ start, end });
-      };
-      
-      return (
-        <div style={{ padding: '20px' }}>
-          <div style={{
-            marginBottom: '20px',
-            padding: '10px',
-            backgroundColor: '#d4edda',
-            borderRadius: '4px',
-            border: '1px solid #c3e6cb'
-          }}>
-            <strong>Available Periods:</strong>
-            <ul style={{ margin: '5px 0 0 20px' }}>
-              <li>July 1-31: Summer availability</li>
-              <li>December 15-31: Winter holiday season</li>
-            </ul>
-          </div>
-          
-          <CLACalendar
-            settings={createCalendarSettings({
-              displayMode: 'embedded',
-              selectionMode: 'range',
-              visibleMonths: 2,
-              monthWidth: 500,
-              showSubmitButton: true,
-              showFooter: true,
-              onSubmit: handleSubmit,
-              restrictionConfigFactory: () => ({
-                restrictions: [{
-                  type: 'allowedranges',
-                  enabled: true,
-                  ranges: [
-                    {
-                      startDate: '2025-07-01',
-                      endDate: '2025-07-31',
-                      message: 'Summer availability'
-                    },
-                    {
-                      startDate: '2025-12-15',
-                      endDate: '2025-12-31',
-                      message: 'Winter holiday season'
-                    }
-                  ],
-                  message: 'Please select dates within the available periods'
-                }]
-              }),
-              position: 'bottom-left',
-              useDynamicPosition: true,
-              showHeader: true,
-              showTooltips: true,
-              showLayersNavigation: false,
-              showDateInputs: true,
-              closeOnClickAway: true,
-              startWeekOnSunday: false,
-              timezone: 'UTC',
-              dateRangeSeparator: ' - '
-            })}
-          />
-          
-          {submittedDates && (
-            <div style={{
-              marginTop: '20px',
-              padding: '10px',
-              backgroundColor: '#f0f8ff',
-              borderRadius: '4px',
-              border: '1px solid #0366d6'
-            }}>
-              <strong>Selected Date Range:</strong>
-              <div>Start: {submittedDates.start || 'Not selected'}</div>
-              <div>End: {submittedDates.end || 'Not selected'}</div>
-            </div>
-          )}
-        </div>
-      );
-    };
-    
-    return <AllowedRangesExample />;
-  })()}
+<AllowedRangesExample />
 
 ## Business Days Pattern
 
@@ -519,109 +231,7 @@ Common business application pattern: weekdays only with holidays blocked.
 }
 ```
 
-{(() => {
-    const BusinessDaysExample = () => {
-      const [submittedDates, setSubmittedDates] = useState(null);
-      
-      const handleSubmit = (start, end) => {
-        setSubmittedDates({ start, end });
-      };
-      
-      return (
-        <div style={{ padding: '20px' }}>
-          <div style={{
-            marginBottom: '20px',
-            padding: '10px',
-            backgroundColor: '#e3f2fd',
-            borderRadius: '4px',
-            border: '1px solid #90caf9'
-          }}>
-            <strong>💼 Business Hours Calendar</strong>
-            <div style={{ marginTop: '5px', fontSize: '14px' }}>
-              • Open Monday - Friday
-              <br />
-              • Closed weekends and federal holidays
-            </div>
-          </div>
-          
-          <CLACalendar
-            settings={createCalendarSettings({
-              displayMode: 'embedded',
-              selectionMode: 'range',
-              visibleMonths: 2,
-              monthWidth: 500,
-              showSubmitButton: true,
-              showFooter: true,
-              onSubmit: handleSubmit,
-              restrictionConfigFactory: () => ({
-                restrictions: [
-                  {
-                    type: 'weekday',
-                    enabled: true,
-                    days: [0, 6],
-                    message: 'Please select a business day (Monday-Friday)'
-                  },
-                  {
-                    type: 'daterange',
-                    enabled: true,
-                    ranges: [
-                      {
-                        startDate: '2025-07-04',
-                        endDate: '2025-07-04',
-                        message: 'Independence Day'
-                      },
-                      {
-                        startDate: '2025-09-01',
-                        endDate: '2025-09-01',
-                        message: 'Labor Day'
-                      },
-                      {
-                        startDate: '2025-11-27',
-                        endDate: '2025-11-28',
-                        message: 'Thanksgiving Holiday'
-                      },
-                      {
-                        startDate: '2025-12-24',
-                        endDate: '2025-12-25',
-                        message: 'Christmas Holiday'
-                      }
-                    ],
-                    message: 'Federal holiday - office closed'
-                  }
-                ]
-              }),
-              position: 'bottom-left',
-              useDynamicPosition: true,
-              showHeader: true,
-              showTooltips: true,
-              showLayersNavigation: false,
-              showDateInputs: true,
-              closeOnClickAway: true,
-              startWeekOnSunday: false,
-              timezone: 'UTC',
-              dateRangeSeparator: ' - '
-            })}
-          />
-          
-          {submittedDates && (
-            <div style={{
-              marginTop: '20px',
-              padding: '10px',
-              backgroundColor: '#f0f8ff',
-              borderRadius: '4px',
-              border: '1px solid #0366d6'
-            }}>
-              <strong>Selected Business Days:</strong>
-              <div>Start: {submittedDates.start || 'Not selected'}</div>
-              <div>End: {submittedDates.end || 'Not selected'}</div>
-            </div>
-          )}
-        </div>
-      );
-    };
-    
-    return <BusinessDaysExample />;
-  })()}
+<BusinessDaysExample />
 
 ## Complex Restrictions Example
 
@@ -691,122 +301,7 @@ Multiple restriction types combined with boundaries, weekdays, and specific date
 }
 ```
 
-{(() => {
-    const ComplexExample = () => {
-      const [submittedDates, setSubmittedDates] = useState(null);
-      
-      const handleSubmit = (start, end) => {
-        setSubmittedDates({ start, end });
-      };
-      
-      return (
-        <div style={{ padding: '20px' }}>
-          <div style={{
-            marginBottom: '20px',
-            padding: '10px',
-            backgroundColor: '#f8f9fa',
-            borderRadius: '4px',
-            border: '1px solid #dee2e6'
-          }}>
-            <strong>Active Restrictions:</strong>
-            <ul style={{ margin: '5px 0 0 20px' }}>
-              <li>Booking window: July 1 - December 31, 2025</li>
-              <li>Business days only (no weekends)</li>
-              <li>Closed on major holidays</li>
-            </ul>
-          </div>
-          
-          <CLACalendar
-            settings={createCalendarSettings({
-              displayMode: 'embedded',
-              selectionMode: 'range',
-              visibleMonths: 2,
-              monthWidth: 500,
-              showSubmitButton: true,
-              showFooter: true,
-              onSubmit: handleSubmit,
-              restrictionConfigFactory: () => ({
-                restrictions: [
-                  {
-                    type: 'boundary',
-                    enabled: true,
-                    date: '2025-07-01',
-                    direction: 'before',
-                    message: 'Bookings open July 1st, 2025'
-                  },
-                  {
-                    type: 'boundary',
-                    enabled: true,
-                    date: '2025-12-31',
-                    direction: 'after',
-                    message: 'Cannot book beyond 2025'
-                  },
-                  {
-                    type: 'weekday',
-                    enabled: true,
-                    days: [0, 6],
-                    message: 'Service not available on weekends'
-                  },
-                  {
-                    type: 'daterange',
-                    enabled: true,
-                    ranges: [
-                      {
-                        startDate: '2025-07-04',
-                        endDate: '2025-07-04',
-                        message: 'Closed for Independence Day'
-                      },
-                      {
-                        startDate: '2025-09-01',
-                        endDate: '2025-09-01',
-                        message: 'Closed for Labor Day'
-                      },
-                      {
-                        startDate: '2025-11-27',
-                        endDate: '2025-11-28',
-                        message: 'Closed for Thanksgiving'
-                      },
-                      {
-                        startDate: '2025-12-24',
-                        endDate: '2025-12-26',
-                        message: 'Closed for Christmas'
-                      }
-                    ]
-                  }
-                ]
-              }),
-              position: 'bottom-left',
-              useDynamicPosition: true,
-              showHeader: true,
-              showTooltips: true,
-              showLayersNavigation: false,
-              showDateInputs: true,
-              closeOnClickAway: true,
-              startWeekOnSunday: false,
-              timezone: 'UTC',
-              dateRangeSeparator: ' - '
-            })}
-          />
-          
-          {submittedDates && (
-            <div style={{
-              marginTop: '20px',
-              padding: '10px',
-              backgroundColor: '#f0f8ff',
-              borderRadius: '4px',
-              border: '1px solid #0366d6'
-            }}>
-              <strong>Selected Date Range:</strong>
-              <div>Start: {submittedDates.start || 'Not selected'}</div>
-              <div>End: {submittedDates.end || 'Not selected'}</div>
-            </div>
-          )}
-        </div>
-      );
-    };
-    
-    return <ComplexExample />;
-  })()}
+<ComplexExample />
 
 ## Month Boundary Restriction
 
@@ -839,7 +334,12 @@ This example demonstrates the calendar's built-in boundary behavior. When you st
           restricted: false,  // This range is ALLOWED
           message: 'August 2025'
         },
-        // ... more months
+        {
+          startDate: '2025-09-01',
+          endDate: '2025-09-30',
+          restricted: false,  // This range is ALLOWED
+          message: 'September 2025'
+        }
       ],
       message: 'Selection must stay within the same month'
     }]
@@ -847,131 +347,7 @@ This example demonstrates the calendar's built-in boundary behavior. When you st
 }
 ```
 
-{(() => {
-  const MonthBoundaryExample = () => {
-    const [submittedDates, setSubmittedDates] = useState(null);
-    
-    const handleSubmit = (start, end) => {
-      setSubmittedDates({ start, end });
-    };
-    
-    // Static configuration that shows month boundaries
-    const restrictionConfig = {
-      restrictions: [{
-        type: 'restricted_boundary',
-        enabled: true,
-        ranges: [
-          {
-            startDate: '2025-07-01',
-            endDate: '2025-07-31',
-            restricted: false,
-            message: 'July 2025'
-          },
-          {
-            startDate: '2025-08-01',
-            endDate: '2025-08-31',
-            restricted: false,
-            message: 'August 2025'
-          },
-          {
-            startDate: '2025-09-01',
-            endDate: '2025-09-30',
-            restricted: false,
-            message: 'September 2025'
-          },
-          {
-            startDate: '2025-10-01',
-            endDate: '2025-10-31',
-            restricted: false,
-            message: 'October 2025'
-          },
-          {
-            startDate: '2025-11-01',
-            endDate: '2025-11-30',
-            restricted: false,
-            message: 'November 2025'
-          },
-          {
-            startDate: '2025-12-01',
-            endDate: '2025-12-31',
-            restricted: false,
-            message: 'December 2025'
-          }
-        ],
-        message: 'Selection must stay within the same month'
-      }]
-    };
-    
-    return (
-      <div style={{ padding: '20px' }}>
-        <p style={{ marginBottom: '20px', fontSize: '16px' }}>
-          📅 Try selecting a date range. Notice how the calendar automatically restricts your selection to stay within the month where you started.
-        </p>
-        
-        <div style={{
-          marginBottom: '20px',
-          padding: '15px',
-          backgroundColor: '#e3f2fd',
-          borderRadius: '4px',
-          border: '1px solid #90caf9'
-        }}>
-          <strong>🗓️ How Month Boundaries Work:</strong>
-          <ol style={{ margin: '10px 0 0 20px', fontSize: '14px' }}>
-            <li>Start selecting a date in any month (e.g., July 15)</li>
-            <li>As you drag to select more dates, you'll see that you can only select within July</li>
-            <li>All dates in other months become grayed out automatically</li>
-            <li>This happens because the calendar detects your selection started within a boundary</li>
-          </ol>
-          <div style={{ marginTop: '10px', fontSize: '14px', fontStyle: 'italic' }}>
-            💡 This is useful for billing periods, monthly reports, or any scenario where selections should not cross month boundaries.
-          </div>
-        </div>
-        
-        <CLACalendar
-          settings={createCalendarSettings({
-            displayMode: 'embedded',
-            selectionMode: 'range',
-            visibleMonths: 2,
-            monthWidth: 500,
-            showSubmitButton: true,
-            showFooter: true,
-            onSubmit: handleSubmit,
-            restrictionConfigFactory: () => restrictionConfig,
-            position: 'bottom-left',
-            useDynamicPosition: true,
-            showHeader: true,
-            showTooltips: true,
-            showLayersNavigation: false,
-            showDateInputs: true,
-            closeOnClickAway: true,
-            startWeekOnSunday: false,
-            timezone: 'UTC',
-            dateRangeSeparator: ' - '
-          })}
-        />
-        
-        {submittedDates && (
-          <div style={{
-            marginTop: '20px',
-            padding: '10px',
-            backgroundColor: '#f0f8ff',
-            borderRadius: '4px',
-            border: '1px solid #0366d6'
-          }}>
-            <strong>Selected Date Range:</strong>
-            <div>Start: {submittedDates.start || 'Not selected'}</div>
-            <div>End: {submittedDates.end || 'Not selected'}</div>
-            <div style={{ marginTop: '5px', fontSize: '14px', color: '#0366d6' }}>
-              ✓ Notice how the selection was constrained to a single month
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  };
-  
-  return <MonthBoundaryExample />;
-})()}
+<MonthBoundaryExample />
 
 ## Single Date Selection with Restrictions
 
@@ -1008,90 +384,7 @@ Appointment scheduling example with specific days available.
 }
 ```
 
-{(() => {
-    const SingleDateExample = () => {
-      const [submittedDate, setSubmittedDate] = useState(null);
-      
-      const handleSubmit = (start) => {
-        setSubmittedDate(start);
-      };
-      
-      return (
-        <div style={{ padding: '20px' }}>
-          <div style={{
-            marginBottom: '20px',
-            padding: '10px',
-            backgroundColor: '#e8f5e9',
-            borderRadius: '4px',
-            border: '1px solid #a5d6a7'
-          }}>
-            <strong>📅 Appointment Availability</strong>
-            <div style={{ marginTop: '5px', fontSize: '14px' }}>
-              • Tuesday & Thursday: Regular appointments
-              <br />
-              • Saturday & Sunday: Weekend appointments
-              <br />
-              • No appointments on Monday, Wednesday, or Friday
-            </div>
-          </div>
-          
-          <CLACalendar
-            settings={createCalendarSettings({
-              displayMode: 'embedded',
-              selectionMode: 'single',
-              visibleMonths: 2,
-              monthWidth: 500,
-              showSubmitButton: true,
-              showFooter: true,
-              onSubmit: handleSubmit,
-              restrictionConfigFactory: () => ({
-                restrictions: [
-                  {
-                    type: 'weekday',
-                    enabled: true,
-                    days: [1, 3, 5],
-                    message: 'Available on Tuesday, Thursday, and weekends only'
-                  },
-                  {
-                    type: 'boundary',
-                    enabled: true,
-                    date: new Date().toISOString().split('T')[0],
-                    direction: 'before',
-                    message: 'Please select a future date'
-                  }
-                ]
-              }),
-              position: 'bottom-left',
-              useDynamicPosition: true,
-              showHeader: true,
-              showTooltips: true,
-              showLayersNavigation: false,
-              showDateInputs: true,
-              closeOnClickAway: true,
-              startWeekOnSunday: false,
-              timezone: 'UTC',
-              dateRangeSeparator: ' - '
-            })}
-          />
-          
-          {submittedDate && (
-            <div style={{
-              marginTop: '20px',
-              padding: '10px',
-              backgroundColor: '#f0f8ff',
-              borderRadius: '4px',
-              border: '1px solid #0366d6'
-            }}>
-              <strong>Selected Appointment Date:</strong>
-              <div>{submittedDate}</div>
-            </div>
-          )}
-        </div>
-      );
-    };
-    
-    return <SingleDateExample />;
-  })()}
+<SingleDateExample />
 
 ## Configuration Reference
 
@@ -1198,6 +491,7 @@ Restricted dates are visually indicated with:
 2. **Minimize Computations**: Keep the factory function lightweight
 3. **Use Memoization**: For complex calculations, memoize results
 4. **Batch Updates**: When changing multiple restrictions, update them together
+5. **Limit Boundary Ranges**: For `restricted_boundary` type, limit ranges to what's needed. Each day cell checks all boundaries, so 6 ranges × 60 day cells = 360 checks per render
 
 ### Testing Restrictions
 

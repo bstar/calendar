@@ -75,6 +75,11 @@ export const nowUTC = (): Date => {
  * @returns Date object in the specified timezone
  */
 export const parseISO = (dateString: string, timezone: string = 'UTC'): Date => {
+  // Guard against undefined or null dateString
+  if (!dateString) {
+    throw new Error('parseISO: dateString is required');
+  }
+  
   if (timezone === 'UTC') {
     // For UTC, parse and convert to UTC
     const parsed = dateFnsParseISO(dateString);

@@ -153,6 +153,8 @@ Complex boundaries with exceptions and specific ranges.
 - Special handling periods
 - **Month boundary restrictions** - Restrict selections to stay within the same month (see MonthBoundaryRestriction example in Stories)
 
+**Performance Note**: When using `restricted_boundary` with many ranges, be aware that each day cell checks all boundaries during render. For optimal performance, limit the number of ranges to those actually visible or needed. If you need many boundaries (e.g., every month for a year), consider generating ranges dynamically based on the visible months or implementing pagination.
+
 ### Relative Date Restrictions
 
 While not a built-in type, you can create relative date restrictions using the `restricted_boundary` type with dynamic date calculations:
