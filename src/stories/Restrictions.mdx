@@ -1,0 +1,485 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Restrictions/Documentation" />
+
+# Date Restrictions
+
+The CLA Calendar provides a powerful restriction system to control which dates can be selected. This allows you to enforce business rules, block unavailable dates, and guide users to valid date selections.
+
+> **Note**: To see live examples of these configurations, visit the "Stories" page under this section.
+
+## Overview
+
+Restrictions allow you to:
+- Set minimum and maximum selectable dates (boundaries)
+- Block specific date ranges (holidays, maintenance periods)
+- Restrict selections to specific weekdays
+- Define allowed date ranges (whitelisting)
+- Create complex rules with exceptions
+
+## Restriction Types
+
+### 1. Boundary Restrictions
+
+Set minimum and/or maximum dates that can be selected.
+
+```typescript
+{
+  type: 'boundary',
+  enabled: true,
+  date: '2025-12-31',
+  direction: 'after',  // 'before' or 'after'
+  inclusive: false,    // Whether the boundary date itself is selectable
+  message: 'Please select a date before 2026'
+}
+```
+
+**Use Cases:**
+- Prevent booking too far in advance
+- Block past dates
+- Enforce fiscal year boundaries
+- Limit selection to current period
+
+### 2. Date Range Restrictions
+
+Block specific date ranges from being selected.
+
+```typescript
+{
+  type: 'daterange',
+  enabled: true,
+  ranges: [{
+    startDate: '2025-12-24',
+    endDate: '2025-12-26',
+    message: 'Office closed for holidays'
+  }, {
+    startDate: '2025-07-04',
+    endDate: '2025-07-04',
+    message: 'Independence Day'
+  }],
+  message: 'Default message for all ranges'
+}
+```
+
+**Use Cases:**
+- Block holiday periods
+- Maintenance windows
+- Vacation periods
+- Special events
+
+### 3. Weekday Restrictions
+
+Restrict selection to specific days of the week.
+
+```typescript
+{
+  type: 'weekday',
+  enabled: true,
+  days: [0, 6],  // 0 = Sunday, 6 = Saturday
+  message: 'Weekends are not available'
+}
+```
+
+**Day Values:**
+- 0 = Sunday
+- 1 = Monday
+- 2 = Tuesday
+- 3 = Wednesday
+- 4 = Thursday
+- 5 = Friday
+- 6 = Saturday
+
+**Use Cases:**
+- Business days only
+- Weekend-only events
+- Specific service days
+- Delivery schedules
+
+### 4. Allowed Ranges Restrictions
+
+Define specific date ranges that ARE allowed (whitelist approach).
+
+```typescript
+{
+  type: 'allowedranges',
+  enabled: true,
+  ranges: [{
+    startDate: '2025-07-01',
+    endDate: '2025-07-31',
+    message: 'Summer availability'
+  }, {
+    startDate: '2025-12-01',
+    endDate: '2025-12-31',
+    message: 'Winter availability'
+  }],
+  message: 'Please select dates within available periods'
+}
+```
+
+**Use Cases:**
+- Seasonal availability
+- Limited booking windows
+- Campaign periods
+- Special offer dates
+
+### 5. Restricted Boundary Restrictions
+
+Complex boundaries with exceptions and specific ranges.
+
+```typescript
+{
+  type: 'restricted_boundary',
+  enabled: true,
+  minDate: '2025-01-01',
+  maxDate: '2025-12-31',
+  ranges: [{
+    startDate: '2025-06-01',
+    endDate: '2025-08-31',
+    restricted: false,  // This range is allowed
+    message: 'Summer season available',
+    exceptions: [{
+      startDate: '2025-07-04',
+      endDate: '2025-07-04',
+      message: 'Closed for Independence Day'
+    }]
+  }]
+}
+```
+
+**Use Cases:**
+- Complex availability rules
+- Seasonal operations with exceptions
+- Multi-tier restriction logic
+- Special handling periods
+- **Month boundary restrictions** - Restrict selections to stay within the same month (see MonthBoundaryRestriction example in Stories)
+
+### Relative Date Restrictions
+
+While not a built-in type, you can create relative date restrictions using the `restricted_boundary` type with dynamic date calculations:
+
+```typescript
+// Example: Allow selection only within 5 days of an anchor date
+const anchorDate = '2025-07-15';
+const bufferDays = 5;
+
+const bufferStart = new Date(anchorDate);
+bufferStart.setDate(bufferStart.getDate() - bufferDays);
+
+const bufferEnd = new Date(anchorDate);
+bufferEnd.setDate(bufferEnd.getDate() + bufferDays);
+
+{
+  type: 'restricted_boundary',
+  enabled: true,
+  ranges: [{
+    startDate: bufferStart.toISOString().split('T')[0],
+    endDate: bufferEnd.toISOString().split('T')[0],
+    restricted: false,  // This is the ALLOWED range
+    message: `Within ${bufferDays} days of anchor date`
+  }],
+  message: 'Must select within buffer zone'
+}
+```
+
+**Use Cases:**
+- Follow-up appointment scheduling
+- Related event booking
+- Time-sensitive selections
+- Proximity-based restrictions
+
+## Configuration
+
+### Basic Setup
+
+```typescript
+const settings = {
+  // ... other settings
+  restrictionConfigFactory: () => ({
+    restrictions: [
+      {
+        type: 'boundary',
+        enabled: true,
+        date: '2025-01-01',
+        direction: 'before',
+        message: 'Please select a date in 2025 or later'
+      },
+      {
+        type: 'weekday',
+        enabled: true,
+        days: [0, 6],
+        message: 'Weekends are not available'
+      }
+    ]
+  })
+};
+```
+
+### Dynamic Restrictions
+
+Restrictions can be generated dynamically based on external data:
+
+```typescript
+const settings = {
+  restrictionConfigFactory: () => {
+    const holidays = fetchHolidays();
+    const maintenanceDates = fetchMaintenancePeriods();
+    
+    return {
+      restrictions: [
+        {
+          type: 'daterange',
+          enabled: true,
+          ranges: [
+            ...holidays.map(h => ({
+              startDate: h.date,
+              endDate: h.date,
+              message: h.name
+            })),
+            ...maintenanceDates.map(m => ({
+              startDate: m.start,
+              endDate: m.end,
+              message: 'System maintenance'
+            }))
+          ]
+        }
+      ]
+    };
+  }
+};
+```
+
+## Restriction Properties
+
+### Common Properties
+
+<div className="props-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Property</th>
+        <th>Type</th>
+        <th>Required</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>type</td>
+        <td>string</td>
+        <td>Yes</td>
+        <td>The restriction type</td>
+      </tr>
+      <tr>
+        <td>enabled</td>
+        <td>boolean</td>
+        <td>Yes</td>
+        <td>Whether the restriction is active</td>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>string</td>
+        <td>No</td>
+        <td>Message shown when restriction blocks selection</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+### Type-Specific Properties
+
+#### Boundary Restriction
+
+<div className="props-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Property</th>
+        <th>Type</th>
+        <th>Required</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>date</td>
+        <td>string</td>
+        <td>Yes</td>
+        <td>Boundary date in YYYY-MM-DD format</td>
+      </tr>
+      <tr>
+        <td>direction</td>
+        <td>'before' or 'after'</td>
+        <td>Yes</td>
+        <td>Which side of the date to restrict</td>
+      </tr>
+      <tr>
+        <td>inclusive</td>
+        <td>boolean</td>
+        <td>No</td>
+        <td>Whether boundary date is selectable (default: false)</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+#### Weekday Restriction
+
+<div className="props-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Property</th>
+        <th>Type</th>
+        <th>Required</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>days</td>
+        <td>number[]</td>
+        <td>Yes</td>
+        <td>Array of weekday numbers to restrict (0-6)</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+## Visual Feedback
+
+The calendar provides clear visual feedback for restrictions:
+
+- **Restricted dates**: Grayed out with strikethrough
+- **Hover state**: Shows restriction message in tooltip
+- **Selection attempt**: Displays restriction message
+- **Background highlight**: Optional visual indicator for restricted periods
+
+## Best Practices
+
+### 1. Clear Messaging
+Always provide descriptive messages explaining why dates are restricted:
+
+```typescript
+// Good
+message: 'Closed for Christmas holidays (Dec 24-26)'
+
+// Not helpful
+message: 'Date not available'
+```
+
+### 2. Combine Restrictions
+Use multiple restriction types together for complex rules:
+
+```typescript
+restrictions: [
+  // Base boundary
+  {
+    type: 'boundary',
+    enabled: true,
+    date: '2025-01-01',
+    direction: 'before',
+    message: 'Please select dates in 2025'
+  },
+  // Block weekends
+  {
+    type: 'weekday',
+    enabled: true,
+    days: [0, 6],
+    message: 'Service not available on weekends'
+  },
+  // Block holidays
+  {
+    type: 'daterange',
+    enabled: true,
+    ranges: holidayList
+  }
+]
+```
+
+### 3. Performance Considerations
+- Use `restrictionConfigFactory` for dynamic restrictions
+- Cache restriction data when possible
+- Minimize complex calculations in the factory function
+
+### 4. User Experience
+- Provide alternative suggestions when dates are restricted
+- Consider showing next available date
+- Use colors consistently (red for restricted, green for available)
+
+## Common Patterns
+
+### Business Days Only
+```typescript
+{
+  type: 'weekday',
+  enabled: true,
+  days: [0, 6],  // Block Sunday and Saturday
+  message: 'Please select a business day (Mon-Fri)'
+}
+```
+
+### Booking Window
+```typescript
+restrictions: [
+  {
+    type: 'boundary',
+    enabled: true,
+    date: new Date().toISOString().split('T')[0],
+    direction: 'before',
+    message: 'Cannot book past dates'
+  },
+  {
+    type: 'boundary',
+    enabled: true,
+    date: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    direction: 'after',
+    message: 'Cannot book more than 90 days in advance'
+  }
+]
+```
+
+### Seasonal Availability
+```typescript
+{
+  type: 'allowedranges',
+  enabled: true,
+  ranges: [
+    {
+      startDate: '2025-06-01',
+      endDate: '2025-08-31',
+      message: 'Summer season'
+    },
+    {
+      startDate: '2025-12-15',
+      endDate: '2026-01-15',
+      message: 'Winter season'
+    }
+  ],
+  message: 'Only available during summer and winter seasons'
+}
+```
+
+## Troubleshooting
+
+### Restrictions Not Working
+- Verify `enabled: true` is set
+- Check date format is YYYY-MM-DD
+- Ensure `restrictionConfigFactory` returns proper structure
+- Confirm restriction type matches expected values
+
+### Conflicting Restrictions
+When multiple restrictions overlap:
+- More restrictive rules take precedence
+- All restrictions must pass for a date to be selectable
+- Use console logging in factory to debug
+
+### Performance Issues
+- Avoid heavy computations in `restrictionConfigFactory`
+- Cache external data when possible
+- Consider using memoization for complex calculations
+
+## See Also
+
+- **Stories**: Interactive examples with all restriction types
+- **API Reference**: Complete restriction configuration options
+- **Layers**: Combine restrictions with visual layers for enhanced UX
