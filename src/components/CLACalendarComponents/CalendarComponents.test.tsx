@@ -117,8 +117,8 @@ describe('Tooltip', () => {
       const tooltip = screen.getByText('Test tooltip');
       const style = window.getComputedStyle(tooltip);
       
-      // Should be positioned above the target element (200 - 30 - 8 = 162)
-      expect(tooltip.style.top).toBe('162px');
+      // Should be positioned above the target element (200 - 30 - 14 = 156)
+      expect(tooltip.style.top).toBe('156px');
       // Should be centered horizontally (100 + (100 - 80) / 2 = 110)
       expect(tooltip.style.left).toBe('110px');
     });
@@ -247,8 +247,8 @@ describe('Tooltip', () => {
     
     await waitFor(() => {
       const tooltip = screen.getByText('Test tooltip');
-      // Should be repositioned above the new target position (300 - 30 - 8 = 262)
-      expect(tooltip.style.top).toBe('262px');
+      // Should be repositioned above the new target position (300 - 30 - 14 = 256)
+      expect(tooltip.style.top).toBe('256px');
     });
   });
 
@@ -276,8 +276,8 @@ describe('Tooltip', () => {
     
     await waitFor(() => {
       const tooltip = screen.getByText('Test tooltip');
-      // Should be positioned below the target (30 + 8 = 38)
-      expect(tooltip.style.top).toBe('38px');
+      // Should be positioned below the target (30 + 14 = 44)
+      expect(tooltip.style.top).toBe('44px');
     });
   });
 
