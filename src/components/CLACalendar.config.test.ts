@@ -20,7 +20,7 @@ describe('CLACalendar Configuration', () => {
       expect(settings.displayMode).toBe('embedded');
       expect(settings.timezone).toBe('UTC');
       expect(settings.visibleMonths).toBe(2);
-      expect(settings.monthWidth).toBe(500);
+      expect(settings.monthWidth).toBe(400);
       expect(settings.showMonthHeadings).toBe(true);
       expect(settings.baseFontSize).toBeUndefined();
       expect(settings.position).toBe('bottom-left');
@@ -265,7 +265,7 @@ describe('CLACalendar Configuration', () => {
           monthWidth: 50
         });
         expect(settings.visibleMonths).toBe(2); // Should reset to default
-        expect(settings.monthWidth).toBe(500); // Should reset to default
+        expect(settings.monthWidth).toBe(400); // Should reset to default
       });
 
       it('should handle null layers safely', () => {
@@ -499,7 +499,7 @@ describe('CLACalendar Configuration', () => {
           monthWidth: Number.MAX_SAFE_INTEGER
         });
         expect(settings.visibleMonths).toBe(2); // Should reset to default
-        expect(settings.monthWidth).toBe(500); // Should reset to default
+        expect(settings.monthWidth).toBe(400); // Should reset to default
       });
 
       it('should handle string numbers', () => {
@@ -509,7 +509,7 @@ describe('CLACalendar Configuration', () => {
         });
         // Should use defaults since they're not proper numbers
         expect(settings.visibleMonths).toBe(2);
-        expect(settings.monthWidth).toBe(500);
+        expect(settings.monthWidth).toBe(400);
       });
 
       it('should handle malformed default range', () => {

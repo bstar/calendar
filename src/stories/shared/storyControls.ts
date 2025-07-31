@@ -200,7 +200,7 @@ export const calendarArgTypes: ArgTypes = {
 export const defaultArgs = {
   displayMode: 'embedded',
   visibleMonths: 2,
-  monthWidth: 500,
+  monthWidth: 400,
   selectionMode: 'range',
   position: 'bottom-left',
   useDynamicPosition: true,

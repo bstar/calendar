@@ -380,7 +380,7 @@ const CORE_DEFAULTS = {
   displayMode: 'embedded' as const,
   timezone: 'UTC',
   visibleMonths: 2,
-  monthWidth: 500,
+  monthWidth: 400,
   showMonthHeadings: true,
   selectionMode: 'range' as const,
   showTooltips: true,
@@ -475,7 +475,7 @@ export function createCalendarSettings(userSettings: Partial<CalendarSettings> =
   }
   
   if (typeof settings.monthWidth !== 'number' || settings.monthWidth < 200 || settings.monthWidth > 800) {
-    settings.monthWidth = 500;
+    settings.monthWidth = 400;
   }
   
   return settings;
@@ -647,7 +647,7 @@ export const SETTINGS: SettingsConfig = {
       type: 'number',
       label: 'Month Width',
       description: 'Width of a single month in pixels',
-      default: 500,
+      default: 400,
       min: 200,
       max: 800
     },
