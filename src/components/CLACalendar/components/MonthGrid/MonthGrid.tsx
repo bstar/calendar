@@ -9,13 +9,14 @@ import {
   format,
   parseISO,
   isValid,
-  isWithinInterval
+  isWithinInterval,
+  isSameMonth
 } from '../../../../utils/DateUtils';
 import { RestrictionManager } from '../../../CLACalendarComponents/restrictions/RestrictionManager';
 import { RestrictedBoundaryRestriction } from '../../../CLACalendarComponents/restrictions/types';
 import { DayCell } from '../DayCell';
 import { MonthGridProps } from './MonthGrid.types';
-import { isSameMonth, getFontSize } from '../../utils/calendar.utils';
+import { getFontSize } from '../../utils/calendar.utils';
 import './MonthGrid.css';
 
 export const MonthGrid: React.FC<MonthGridProps> = ({

@@ -1,5 +1,5 @@
 import { RefObject } from 'react';
-import { format, parseISO, startOfMonth, addMonths } from '../../../utils/DateUtils';
+import { format, parseISO, startOfMonth, addMonthsUTC } from '../../../utils/DateUtils';
 import { DateRange, DateRangeSelectionManager } from '../selection/DateRangeSelectionManager';
 
 export interface ValidationError {
@@ -90,7 +90,7 @@ export class CLACalendarHandlers {
           setCurrentMonth(newBaseMonth);
         } else {
           // For end date, we want it in the rightmost month
-          const newBaseMonth = addMonths(startOfMonth(date), -(validVisibleMonths - 1));
+          const newBaseMonth = addMonthsUTC(startOfMonth(date), -(validVisibleMonths - 1));
           setCurrentMonth(newBaseMonth);
         }
       }

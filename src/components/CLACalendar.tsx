@@ -8,6 +8,7 @@ import {
   startOfWeek,
   endOfWeek,
   addMonths,
+  addMonthsUTC,
   isSameDay,
   isWithinInterval,
   parseISO,
@@ -595,8 +596,10 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     const validVisibleMonths = Math.min(6, Math.max(1, settings.visibleMonths));
     const result: Date[] = [];
     for (let i = 0; i < validVisibleMonths; i++) {
-      result.push(addMonths(currentMonth, i));
+      result.push(addMonthsUTC(currentMonth, i));
     }
+    
+    
     return result;
   }, [currentMonth, settings.visibleMonths, everInitialized]);
 
