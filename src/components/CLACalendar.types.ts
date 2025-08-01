@@ -18,8 +18,8 @@
  */
 
 // Re-export types from their source locations for easier imports
-export type { Layer, Event } from './CLACalendar.config';
-export type { CalendarSettings } from './CLACalendar/CLACalendar.types';
+export type { Layer, Event, CalendarSettings } from './CLACalendar.config';
+export type { RenderResult } from './CLACalendarComponents/CalendarComponents';
 
 // Define restriction types here for clarity
 /**

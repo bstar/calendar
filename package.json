@@ -23,7 +23,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-org/cla-calendar.git"
+    "url": "git+https://github.com/your-org/cla-calendar.git"
   },
   "homepage": "https://github.com/your-org/cla-calendar#readme",
   "bugs": {
@@ -37,6 +37,7 @@
     "test:coverage": "vitest --coverage",
     "test:coverage:serve": "npx http-server coverage -p 8080 -o",
     "prepare": "npm run build",
+    "prepublishOnly": "npm test -- --run && npm run build",
     "lint": "eslint --config eslint.config.js src/examples/CustomDateFormatterExample.tsx",
     "lint:all": "eslint --config eslint.config.js \"src/**/*.{js,ts,tsx}\"",
     "lint:fix": "eslint --config eslint.config.js --fix \"src/**/*.{js,ts,tsx}\"",

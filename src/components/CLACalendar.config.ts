@@ -37,7 +37,7 @@ export interface SimpleCalendarSettings {
   selectionMode?: 'single' | 'range';
   
   /** Default date range to initialize with */
-  defaultRange?: { start?: string; end?: string };
+  defaultRange?: { start: string; end: string };
   
   /** Callback when user submits a date selection */
   onSubmit?: (startDate: string | null, endDate: string | null) => void;
@@ -610,10 +610,15 @@ export function createMinimalCalendar(config: {
   defaultRange?: { start?: string; end?: string };
   displayMode?: 'popup' | 'embedded';
 } = {}): CalendarSettings {
+  // Convert partial defaultRange to full defaultRange if both values are present
+  const fullDefaultRange = config.defaultRange && config.defaultRange.start && config.defaultRange.end
+    ? { start: config.defaultRange.start, end: config.defaultRange.end }
+    : undefined;
+
   return createCalendarSettings({
     displayMode: config.displayMode || 'embedded',
     showSubmitButton: !!config.onSubmit,
-    defaultRange: config.defaultRange,
+    defaultRange: fullDefaultRange,
     visibleMonths: 1, // Minimal setup uses 1 month
     showLayersNavigation: false,
     showHeader: true,

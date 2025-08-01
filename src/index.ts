@@ -34,5 +34,5 @@ export {
 
 // Export types
 export type { CalendarSettings, Layer, Event } from './components/CLACalendar.config';
-export type { CLACalendarProps } from './components/CLACalendar.types';
+export type { CLACalendarProps } from './components/CLACalendar/CLACalendar.types';
 export type { RestrictionConfig, Restriction } from './components/CLACalendar.types'; 

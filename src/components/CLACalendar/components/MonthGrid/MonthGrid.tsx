@@ -14,6 +14,7 @@ import {
 } from '../../../../utils/DateUtils';
 import { RestrictionManager } from '../../../CLACalendarComponents/restrictions/RestrictionManager';
 import { RestrictedBoundaryRestriction } from '../../../CLACalendarComponents/restrictions/types';
+import { CalendarSettings } from '../../../CLACalendar.config';
 import { DayCell } from '../DayCell';
 import { MonthGridProps } from './MonthGrid.types';
 import { getFontSize } from '../../utils/calendar.utils';
@@ -217,8 +218,11 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
             const boundaryWithRanges = boundaryRestriction as RestrictedBoundaryRestriction;
             if (boundaryWithRanges.ranges) {
               for (const range of boundaryWithRanges.ranges) {
-                const rangeStart = parseISO(range.start);
-                const rangeEnd = parseISO(range.end);
+                // Skip if dates are missing
+                if (!range.startDate || !range.endDate) continue;
+
+                const rangeStart = parseISO(range.startDate);
+                const rangeEnd = parseISO(range.endDate);
 
                 if (!isValid(rangeStart) || !isValid(rangeEnd)) continue;
 

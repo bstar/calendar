@@ -29,3 +29,6 @@ storybook-static
 # Test coverage
 coverage/
 *.txt
+
+# npm pack output
+*.tgz

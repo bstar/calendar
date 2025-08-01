@@ -46,4 +46,5 @@ export interface Renderer {
 }
 
 // Import RenderResult from CalendarComponents since it's already defined there
-export type { RenderResult } from '../CLACalendarComponents/CalendarComponents';
+import type { RenderResult } from '../CLACalendarComponents/CalendarComponents';
+export type { RenderResult };

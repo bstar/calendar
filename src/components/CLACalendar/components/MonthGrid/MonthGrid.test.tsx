@@ -247,8 +247,8 @@ describe('MonthGrid', () => {
           type: 'restricted_boundary',
           enabled: true,
           ranges: [{
-            start: '2025-06-10',
-            end: '2025-06-20',
+            startDate: '2025-06-10',
+            endDate: '2025-06-20',
             message: 'Must stay within June 10-20'
           }]
         }]
@@ -331,8 +331,8 @@ describe('MonthGrid', () => {
           type: 'restricted_boundary',
           enabled: true,
           ranges: [{
-            start: 'invalid-date',
-            end: '2025-06-20',
+            startDate: 'invalid-date',
+            endDate: '2025-06-20',
             message: 'Invalid range'
           }]
         }]

@@ -45,7 +45,7 @@ export default [js.configs.recommended, ...tseslint.configs.recommended, {
   languageOptions: {
     parser: tseslint.parser,
     parserOptions: {
-      project: ['./tsconfig.json'],
+      project: ['./tsconfig.eslint.json'],
     },
   },
 }, ...storybook.configs["flat/recommended"], ...storybook.configs["flat/recommended"]]; 
