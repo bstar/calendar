@@ -24,11 +24,15 @@
 export { default as CLACalendar } from './components/CLACalendar';
 export { CalendarErrorBoundary, withCalendarErrorBoundary, useErrorHandler } from './components/ErrorBoundary';
 export {
-  CalendarSettings,
   createCalendarSettings,
   createMinimalCalendar,
   validateCalendarSettings,
   getDefaultSettings,
   DEFAULT_COLORS,
   DEFAULT_CONTAINER_STYLES
-} from './components/CLACalendar.config'; 
+} from './components/CLACalendar.config';
+
+// Export types
+export type { CalendarSettings, Layer, Event } from './components/CLACalendar.config';
+export type { CLACalendarProps } from './components/CLACalendar.types';
+export type { RestrictionConfig, Restriction } from './components/CLACalendar.types'; 

@@ -1,5 +1,5 @@
 /* Base styles for CLA Calendar - namespaced to avoid conflicts */
-/* All classes are prefixed with cla-cal- to prevent collisions with Bootstrap or other frameworks */
+/* All classes are prefixed with cla-cal- to prevent collisions with other CSS frameworks */
 
 /* Reset and Base Styles - Applied to demo wrapper */
 .cla-cal-wrapper {

@@ -1,147 +1,315 @@
-# React + Vite
+# CLA Calendar
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-# CLA Calendar Widget
-
-A flexible date range picker component for React with drag selection support.
+A flexible and feature-rich date range picker component for React with drag selection support.
 
 ## Features
 
-- Date range selection with drag support
-- Flexible date restrictions
-- Multiple calendar layouts
-- UTC timezone enforcement for consistent date handling
+- 📅 **Date Range Selection**: Support for both single date and date range selection modes
+- 🎯 **Drag Selection**: Intuitive drag-to-select functionality for date ranges
+- 🌍 **UTC-First Design**: Built-in UTC timezone handling to prevent date display issues
+- 🎨 **Customizable**: Extensive theming options and style customization
+- 📱 **Responsive**: Works seamlessly across different screen sizes
+- 🚀 **TypeScript**: Full TypeScript support with comprehensive type definitions
+- 🔒 **Date Restrictions**: Multiple restriction types (boundary, date ranges, weekdays)
+- 📊 **Data Layers**: Support for events, backgrounds, and custom visualizations
+- 🪟 **Display Modes**: Both embedded and popup calendar modes
+- ♿ **Accessible**: Keyboard navigation and screen reader support
+
+## Installation
+
+```bash
+npm install cla-calendar
+# or
+yarn add cla-calendar
+# or
+pnpm add cla-calendar
+```
+
+## Peer Dependencies
+
+This package requires the following peer dependencies:
+
+```json
+{
+  "react": "^18.0.0",
+  "react-dom": "^18.0.0",
+  "date-fns": "^4.1.0",
+  "date-fns-tz": "^3.2.0",
+  "lodash-es": "^4.17.0"
+}
+```
+
+## Quick Start
+
+```tsx
+import { CLACalendar, getDefaultSettings } from 'cla-calendar';
+import 'cla-calendar/dist/index.css';
+
+function App() {
+  const handleDateSubmit = (start: string | null, end: string | null) => {
+    console.log('Selected dates:', start, end);
+  };
+
+  return (
+    <CLACalendar 
+      settings={{
+        ...getDefaultSettings(),
+        onSubmit: handleDateSubmit
+      }}
+    />
+  );
+}
+```
+
+## Basic Usage
+
+### Single Date Selection
+
+```tsx
+<CLACalendar 
+  settings={{
+    ...getDefaultSettings(),
+    selectionMode: 'single',
+    onSubmit: (start, end) => {
+      console.log('Selected date:', start);
+    }
+  }}
+/>
+```
+
+### Date Range Selection
+
+```tsx
+<CLACalendar 
+  settings={{
+    ...getDefaultSettings(),
+    selectionMode: 'range',
+    onSubmit: (start, end) => {
+      console.log('Date range:', start, 'to', end);
+    }
+  }}
+/>
+```
+
+### Popup Mode
+
+```tsx
+<CLACalendar 
+  settings={{
+    ...getDefaultSettings(),
+    displayMode: 'popup',
+    position: 'bottom-left',
+    onSubmit: (start, end) => {
+      console.log('Selected:', start, end);
+    }
+  }}
+/>
+```
+
+## Advanced Features
+
+### Date Restrictions
+
+```tsx
+<CLACalendar 
+  settings={{
+    ...getDefaultSettings(),
+    restrictionConfigFactory: () => ({
+      restrictions: [
+        {
+          type: 'boundary',
+          enabled: true,
+          direction: 'before',
+          date: '2024-01-01',
+          message: 'Please select a date after January 1, 2024'
+        },
+        {
+          type: 'weekday',
+          enabled: true,
+          days: [0, 6], // Disable weekends
+          message: 'Weekends are not available'
+        }
+      ]
+    })
+  }}
+/>
+```
+
+### Custom Theming
+
+```tsx
+<CLACalendar 
+  settings={{
+    ...getDefaultSettings(),
+    colors: {
+      primary: '#007bff',
+      success: '#28a745',
+      warning: '#ffc107',
+      danger: '#dc3545'
+    },
+    monthWidth: 350,
+    baseFontSize: '16px'
+  }}
+/>
+```
+
+### Event Layers
+
+```tsx
+<CLACalendar 
+  settings={{
+    ...getDefaultSettings(),
+    layers: [
+      {
+        name: 'holidays',
+        title: 'Public Holidays',
+        description: 'Federal holidays',
+        visible: true,
+        data: {
+          events: [
+            {
+              date: '2024-12-25',
+              title: 'Christmas',
+              type: 'holiday',
+              time: 'All day',
+              description: 'Federal holiday',
+              color: '#dc3545'
+            }
+          ]
+        }
+      }
+    ]
+  }}
+/>
+```
+
+### External Input Binding
+
+```tsx
+const dateInputRef = useRef<HTMLInputElement>(null);
+
+return (
+  <>
+    <input 
+      ref={dateInputRef} 
+      type="text" 
+      placeholder="Select date"
+    />
+    <CLACalendar 
+      settings={{
+        ...getDefaultSettings(),
+        displayMode: 'popup',
+        externalInput: dateInputRef
+      }}
+    />
+  </>
+);
+```
+
+## Configuration Options
+
+The calendar accepts a comprehensive settings object. Here are the key options:
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `displayMode` | `'embedded' \| 'popup'` | `'embedded'` | How the calendar is displayed |
+| `selectionMode` | `'single' \| 'range'` | `'range'` | Date selection mode |
+| `visibleMonths` | `number` | `2` | Number of months to display (1-12) |
+| `monthWidth` | `number` | `500` | Width of each month in pixels |
+| `timezone` | `string` | `'UTC'` | Timezone for date operations |
+| `showHeader` | `boolean` | `true` | Show calendar header |
+| `showFooter` | `boolean` | `true` | Show calendar footer |
+| `showTooltips` | `boolean` | `true` | Show hover tooltips |
+| `startWeekOnSunday` | `boolean` | `false` | Start week on Sunday vs Monday |
+| `onSubmit` | `function` | - | Callback when dates are submitted |
+
+For a complete list of options, see the TypeScript definitions.
+
+## Restriction Types
+
+The calendar supports five types of date restrictions:
+
+1. **Boundary**: Set minimum/maximum selectable dates
+2. **Date Range**: Block specific date ranges
+3. **Allowed Ranges**: Only allow selection within specific ranges
+4. **Restricted Boundary**: Complex rules with exceptions
+5. **Weekday**: Block specific days of the week
 
 ## UTC Date Handling
 
-The application enforces UTC timezone for all date operations through a dedicated utility layer:
+The calendar enforces UTC timezone by default for all date operations to ensure consistent behavior across different timezones. This prevents the "day off bug" where dates appear on wrong calendar days due to timezone conversions.
 
-- All dates are handled in UTC timezone regardless of the user's local timezone
-- Date creation, parsing, and formatting operations are wrapped with UTC handling
-- The utility prevents timezone-related issues where the user's local timezone might affect date selection
+Key benefits:
+- Dates always appear on the correct calendar day regardless of user timezone
+- Date selections are preserved accurately across timezone boundaries
+- No daylight saving time transition issues
 
-### Technical Implementation
+The calendar can be configured to use other timezones by setting the `timezone` property in settings.
 
-The UTC date handling approach in this application addresses several critical issues that can occur when working with dates in JavaScript:
+## CSS Customization
 
-1. **Timezone Inconsistencies**: JavaScript Date objects are affected by the user's local timezone, which can lead to inconsistent behavior across different timezones.
+The calendar uses CSS classes that can be overridden for custom styling:
 
-2. **DST Transitions**: Date calculations that span Daylight Saving Time transitions can introduce errors when days are skipped or duplicated.
+```css
+/* Calendar container */
+.cla-calendar-wrapper { }
 
-3. **Calendar Display Issues**: When generating calendar days, timezone issues can result in showing too few days or missing days altogether.
+/* Month grid */
+.calendar-month { }
 
-Our solution employs several key techniques:
+/* Day cells */
+.calendar-day { }
+.calendar-day.selected { }
+.calendar-day.restricted { }
+.calendar-day.today { }
 
-- **Clean Date Objects**: We create dates with only year/month/day components to avoid time-related timezone complications.
-- **Manual Day Iteration**: For generating days in a date range, we use a custom implementation that ensures all days are properly included.
-- **UTC Date Construction**: We consistently use `Date.UTC()` to create dates in UTC timezone.
-- **Direct Component Comparison**: Functions like `isSameMonth()` compare the actual components (year, month) rather than relying on date equality.
-
-The core implementation resides in `src/utils/UTCDateUtils.ts`, which provides UTC-aware versions of common date-fns functions:
-
-```typescript
-// Example of our robust date interval function that fixed calendar display issues
-export const eachDayOfInterval = (interval: { start: Date; end: Date }): Date[] => {
-  // Create clean dates without time components to avoid timezone issues
-  const startDate = new Date(
-    interval.start.getFullYear(),
-    interval.start.getMonth(),
-    interval.start.getDate()
-  );
-  
-  const endDate = new Date(
-    interval.end.getFullYear(),
-    interval.end.getMonth(),
-    interval.end.getDate()
-  );
-  
-  // Manual day-by-day iteration ensures reliable results
-  const days = [];
-  const currentDate = new Date(startDate);
-  
-  while (currentDate <= endDate) {
-    days.push(new Date(currentDate)); // Clone to avoid mutation
-    currentDate.setDate(currentDate.getDate() + 1);
-  }
-  
-  return days;
-};
+/* Popup mode */
+.cla-calendar-portal { }
 ```
 
-## Usage
+## TypeScript Support
 
-```jsx
-import { CLACalendar } from 'cla-calendar';
+This package includes comprehensive TypeScript definitions. Import types as needed:
 
-function App() {
-  const [dateRange, setDateRange] = useState({ start: null, end: null });
-  
-  return (
-    <CLACalendar 
-      onChange={setDateRange} 
-      value={dateRange}
-    />
-  );
-}
+```tsx
+import type { 
+  CalendarSettings, 
+  Layer, 
+  Event,
+  RestrictionConfig 
+} from 'cla-calendar';
 ```
 
-### Custom Date Formatting
+## Browser Support
 
-You can customize how dates are displayed in the calendar input field by providing a `dateFormatter` function in the settings:
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
 
-```jsx
-import { CLACalendar } from 'cla-calendar';
-import { getDefaultSettings } from 'cla-calendar';
+## Development
 
-function CustomFormattingExample() {
-  const [settings, setSettings] = useState({
-    ...getDefaultSettings(),
-    // Custom formatter that displays dates in YYYY-MM-DD format
-    dateFormatter: (date) => {
-      const pad = (num) => String(num).padStart(2, '0');
-      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-    }
-  });
-  
-  return (
-    <CLACalendar 
-      settings={settings}
-      onSettingsChange={setSettings}
-    />
-  );
-}
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Run tests
+npm test
+
+# Build library
+npm run build
+
+# Run Storybook
+npm run storybook
 ```
 
-The `dateFormatter` function receives a Date object and should return a formatted string. This allows you to implement any custom date formatting logic you need, such as:
+## Contributing
 
-- Different date formats (YYYY-MM-DD, DD/MM/YYYY, etc.)
-- Localized date formats
-- Custom date representations with additional context
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-## Date Functions
+## Support
 
-To ensure UTC timezone handling, all date operations should use the utility functions from `src/utils/UTCDateUtils.ts` instead of directly using date-fns:
-
-```js
-// Import from the utility layer instead of date-fns directly
-import { 
-  format, 
-  parseISO, 
-  addDaysUTC 
-} from '../utils/UTCDateUtils';
-
-// Creates a date in UTC
-const today = now();
-
-// Format a date in UTC
-const formattedDate = format(today, 'yyyy-MM-dd');
-
-// Parse an ISO string to a UTC date
-const parsedDate = parseISO('2023-12-31');
-```
+For issues and feature requests, please use the [GitHub issue tracker](https://github.com/your-org/cla-calendar/issues).

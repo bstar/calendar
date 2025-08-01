@@ -25,9 +25,11 @@ export default {
       extensions: ['.js', '.jsx', '.ts', '.tsx']
     }),
     typescript({
-      tsconfig: './tsconfig.json',
+      tsconfig: './tsconfig.build.json',
       sourceMap: true,
-      inlineSources: true
+      inlineSources: true,
+      declaration: true,
+      declarationDir: 'dist/types'
     }),
     babel({
       exclude: 'node_modules/**',
@@ -36,7 +38,10 @@ export default {
     }),
     commonjs(),
     postcss({
-      extensions: ['.css']
+      extensions: ['.css'],
+      extract: 'index.css',
+      minimize: true,
+      modules: false
     })
   ],
   external: ['react', 'react-dom', 'date-fns', 'date-fns-tz', 'lodash-es']
