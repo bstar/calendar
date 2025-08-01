@@ -1,6 +1,30 @@
+/**
+ * @fileoverview Error boundary component for CLACalendar
+ * 
+ * This component provides robust error handling for the calendar component,
+ * catching JavaScript errors in the component tree and displaying a fallback UI.
+ * 
+ * Features:
+ * - Catches and logs errors with unique error IDs for tracking
+ * - Displays detailed error information in development mode
+ * - Shows user-friendly error messages in production
+ * - Provides retry functionality to recover from errors
+ * - Includes error reporting utilities (copy to clipboard, external service integration)
+ * - Offers a higher-order component wrapper for easy integration
+ * 
+ * The error boundary helps prevent the entire application from crashing when
+ * the calendar encounters an error, providing graceful degradation instead.
+ * 
+ * @module ErrorBoundary
+ */
+
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import './ErrorBoundary.css';
 
+/**
+ * State interface for the error boundary component
+ * @interface ErrorBoundaryState
+ */
 interface ErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
@@ -8,6 +32,15 @@ interface ErrorBoundaryState {
   errorId: string;
 }
 
+/**
+ * Props interface for the error boundary component
+ * @interface ErrorBoundaryProps
+ * @property children - React component tree to wrap with error handling
+ * @property fallback - Optional custom fallback UI to render on error
+ * @property onError - Optional callback function called when an error is caught
+ * @property showDetails - Whether to show detailed error info (defaults to true in development)
+ * @property componentName - Name of the component for error reporting (defaults to 'Calendar')
+ */
 interface ErrorBoundaryProps {
   children: ReactNode;
   fallback?: ReactNode;

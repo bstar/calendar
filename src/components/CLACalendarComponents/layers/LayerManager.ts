@@ -1,5 +1,28 @@
+/**
+ * @fileoverview Layer management system for the calendar component
+ * 
+ * This class manages the data layers that can be displayed on the calendar,
+ * including events, background highlights, and custom data visualizations.
+ * 
+ * Features:
+ * - Dynamic layer management (add, remove, update)
+ * - Layer visibility toggling
+ * - Data retrieval for specific dates
+ * - Support for multiple layer types (events, backgrounds)
+ * - Protection for required layers that cannot be removed
+ * 
+ * Layers allow the calendar to display additional information beyond just dates,
+ * such as holidays, appointments, blocked periods, or any custom data visualization.
+ * 
+ * @module LayerManager
+ */
+
 import { Layer, LayerData, BackgroundData, EventData } from '../../CLACalendar.config';
 
+/**
+ * Manages calendar data layers for events and background highlights
+ * @class LayerManager
+ */
 export class LayerManager {
   private layers: Layer[];
 

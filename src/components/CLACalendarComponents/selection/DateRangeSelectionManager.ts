@@ -1,8 +1,33 @@
+/**
+ * @fileoverview Date range selection manager for the calendar component
+ * 
+ * This class manages the date selection logic for both single date and date range
+ * selection modes. It handles:
+ * - Validation of date selections against restrictions
+ * - Range expansion for restricted dates
+ * - Backward selection support (selecting from future to past)
+ * - Integration with the RestrictionManager for date validation
+ * - Smart range adjustment to skip over restricted dates
+ * 
+ * The manager ensures that selected dates comply with all active restrictions
+ * and provides feedback when selections are invalid.
+ * 
+ * @module DateRangeSelectionManager
+ */
+
 import { isValid, isBefore, isAfter, addDays } from 'date-fns';
 import { format, parseISO } from '../../../utils/DateUtils';
 import { RestrictionManager } from '../restrictions/RestrictionManager';
 import { RestrictionConfig } from '../restrictions/types';
 
+/**
+ * Represents a date range selection
+ * @interface DateRange
+ * @property start - Start date in YYYY-MM-DD format or null
+ * @property end - End date in YYYY-MM-DD format or null
+ * @property isBackwardSelection - Whether the selection was made from future to past
+ * @property anchorDate - The original anchor point of the selection
+ */
 export interface DateRange {
   start: string | null;
   end: string | null;
@@ -12,6 +37,10 @@ export interface DateRange {
   anchorDate?: string | null;
 }
 
+/**
+ * Manages date selection logic with restriction validation
+ * @class DateRangeSelectionManager
+ */
 export class DateRangeSelectionManager {
   private restrictionManager: RestrictionManager;
   private selectionMode: 'single' | 'range';

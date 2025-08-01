@@ -1,6 +1,36 @@
+/**
+ * @fileoverview Calendar portal component for rendering popup calendars
+ * 
+ * This component creates a React portal that renders the calendar outside of the
+ * normal DOM hierarchy, attached directly to document.body. This approach solves
+ * several common issues:
+ * - Prevents CSS inheritance issues from parent components
+ * - Avoids z-index stacking context problems
+ * - Ensures the calendar can overflow container boundaries
+ * - Provides better positioning control for popup mode
+ * 
+ * The portal automatically positions itself relative to a trigger element and
+ * includes smart positioning logic to keep the calendar visible within the viewport.
+ * 
+ * @module CalendarPortal
+ */
+
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 
+/**
+ * Props interface for the CalendarPortal component
+ * @interface PortalProps
+ * @property children - React nodes to render inside the portal
+ * @property isOpen - Controls the visibility of the portal
+ * @property triggerRef - Reference to the element that triggers the portal (e.g., input field)
+ * @property onClose - Optional callback fired when the portal should close
+ * @property portalClassName - CSS class name for the portal container
+ * @property portalStyle - Inline styles for the portal container
+ * @property position - Preferred position relative to the trigger element
+ * @property dynamicPosition - Whether to automatically adjust position to fit in viewport
+ * @property expectedWidth - Expected width of the portal content for positioning calculations
+ */
 interface PortalProps {
   children: React.ReactNode;
   isOpen: boolean;

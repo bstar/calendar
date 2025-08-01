@@ -1,3 +1,26 @@
+/**
+ * @fileoverview Demo application for the CLA Calendar component
+ * 
+ * This file contains a comprehensive demonstration application that showcases
+ * various features and configurations of the CLA Calendar component. It includes:
+ * 
+ * - Basic calendar usage with default settings
+ * - Single date vs date range selection modes
+ * - Multiple month displays
+ * - Custom theming and colors
+ * - Popup mode with different positioning options
+ * - Dynamic positioning based on viewport
+ * - Null-safe configuration handling
+ * - External input binding
+ * - Date restrictions and validation
+ * - Event layers and custom data
+ * 
+ * The demo app serves as both a development testbed and a reference
+ * implementation for developers integrating the calendar into their applications.
+ * 
+ * @module App
+ */
+
 import React, { useState } from 'react';
 import './cla-base.css';
 import './docStyles.css';

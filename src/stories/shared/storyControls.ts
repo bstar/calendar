@@ -1,3 +1,20 @@
+/**
+ * @fileoverview Shared Storybook controls configuration for calendar stories
+ * 
+ * This file centralizes the ArgTypes configuration used across all calendar
+ * stories to ensure consistency in the Storybook controls panel. It defines:
+ * 
+ * - Control types and options for each calendar setting
+ * - Descriptions and default values
+ * - Category groupings for better organization
+ * - Comprehensive coverage of all calendar features
+ * 
+ * By using these shared controls, all stories present a uniform interface
+ * for testing and demonstrating calendar functionality.
+ * 
+ * @module storyControls
+ */
+
 import type { ArgTypes } from '@storybook/react';
 
 /**

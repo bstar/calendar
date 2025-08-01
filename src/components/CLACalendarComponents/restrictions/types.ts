@@ -1,5 +1,33 @@
+/**
+ * @fileoverview Type definitions for the calendar restriction system
+ * 
+ * This file defines the interfaces and types used by the restriction system
+ * to control which dates can be selected in the calendar. The restriction
+ * system supports multiple strategies for date validation:
+ * 
+ * - Date range restrictions: Block specific date ranges
+ * - Boundary restrictions: Set min/max selectable dates
+ * - Allowed ranges: Only permit selection within specific ranges
+ * - Restricted boundary: Complex rules with exceptions
+ * - Weekday restrictions: Block specific days of the week
+ * 
+ * Each restriction type can be individually enabled/disabled and can provide
+ * custom error messages to display when dates are restricted.
+ * 
+ * @module restrictions/types
+ */
+
+/**
+ * Available restriction types in the system
+ */
 export type RestrictionType = 'daterange' | 'boundary' | 'allowedranges' | 'restricted_boundary' | 'weekday';
 
+/**
+ * Base interface that all restriction types extend
+ * @interface BaseRestriction
+ * @property type - The type of restriction
+ * @property enabled - Whether this restriction is currently active
+ */
 export interface BaseRestriction {
   type: RestrictionType;
   enabled: boolean;

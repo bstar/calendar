@@ -1,10 +1,31 @@
+/**
+ * @fileoverview Configuration system for CLACalendar component
+ * 
+ * This file defines the configuration interfaces and default settings for the
+ * CLACalendar component. It provides:
+ * - Type definitions for calendar settings
+ * - Default configuration values
+ * - Color scheme definitions
+ * - Layer and event data structures
+ * - Helper functions for settings management
+ * 
+ * The configuration system supports both simple and advanced use cases,
+ * with sensible defaults that can be overridden as needed.
+ * 
+ * @module CLACalendar.config
+ */
+
 import React, { CSSProperties } from 'react';
 import { RestrictionConfig } from './CLACalendarComponents/restrictions/types';
 
 // Re-export RestrictionConfig for external use
 export type { RestrictionConfig };
 
-// Simple configuration interface for basic use cases
+/**
+ * Simplified configuration interface for basic calendar use cases
+ * This interface provides the most commonly used settings with sensible defaults
+ * @interface SimpleCalendarSettings
+ */
 export interface SimpleCalendarSettings {
   /** How the calendar should be displayed */
   displayMode?: 'popup' | 'embedded';

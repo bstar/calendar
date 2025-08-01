@@ -1,3 +1,24 @@
+/**
+ * @fileoverview Date utility functions for CLA Calendar with UTC-first approach
+ * 
+ * This file provides a comprehensive set of date manipulation and comparison utilities
+ * that prioritize UTC timezone operations to ensure consistent behavior across different
+ * timezones and prevent the "day off bug" where dates appear on wrong calendar days.
+ * 
+ * Key features:
+ * - UTC-first design: All functions default to UTC timezone for consistency
+ * - Timezone-aware wrappers: Support for both UTC and other timezones via optional parameter
+ * - Date creation utilities: Create dates with specific components in UTC
+ * - Comparison functions: Compare dates for same day/month with timezone awareness
+ * - Calendar utilities: Month/week boundaries, date arithmetic
+ * - Interval operations: Check if dates fall within ranges, generate date sequences
+ * 
+ * The utilities wrap date-fns functions to provide UTC behavior by default while
+ * maintaining compatibility with applications that need local timezone support.
+ * 
+ * @module DateUtils
+ */
+
 import {
   parseISO as dateFnsParseISO,
   isWithinInterval as dateFnsIsWithinInterval,

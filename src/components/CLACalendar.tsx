@@ -1,3 +1,26 @@
+/**
+ * @fileoverview Main CLACalendar component - A flexible React date range picker
+ * 
+ * This is the primary component that provides date range selection functionality
+ * with support for:
+ * - Single date and date range selection modes
+ * - Embedded and popup display modes
+ * - External input element binding
+ * - Customizable restrictions and validation
+ * - Data layers for events and background highlights
+ * - UTC-first date handling for timezone consistency
+ * - Keyboard navigation and accessibility features
+ * - Responsive design with configurable month display
+ * 
+ * The component uses a modular architecture with separate managers for:
+ * - Date selection (DateRangeSelectionManager)
+ * - Restrictions (RestrictionManager)
+ * - Layers (LayerManager)
+ * - Event handling (CLACalendarHandlers)
+ * 
+ * @module CLACalendar
+ */
+
 import React, { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import debounce from "lodash-es/debounce";
 import { parse, isValid, eachDayOfInterval } from "date-fns"; // Remove unused imports

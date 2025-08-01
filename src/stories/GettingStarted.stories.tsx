@@ -1,3 +1,21 @@
+/**
+ * @fileoverview Getting Started stories for the CLA Calendar component
+ * 
+ * This file contains the introductory Storybook stories that demonstrate
+ * basic usage patterns and common configurations of the CLA Calendar:
+ * 
+ * - Basic embedded calendar with date range selection
+ * - Popup calendar with single date selection
+ * - Multiple month displays
+ * - Custom themed calendars
+ * - Various selection modes and behaviors
+ * 
+ * These stories serve as a starting point for developers learning to use
+ * the calendar component, showcasing the most common use cases.
+ * 
+ * @module GettingStarted.stories
+ */
+
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { CLACalendar } from '../components/CLACalendar';

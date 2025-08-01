@@ -1,58 +1,41 @@
 /**
- * RestrictionManager.ts
+ * @fileoverview Date restriction system implementation for the calendar component
  * 
  * This file implements the date restriction system for the calendar component.
  * It handles validation of date selections against configured rules and restrictions.
  * 
  * Architecture:
  * - The RestrictionManager is part of a larger date picker system where:
- *   1. RestrictionConfig defines the rules (boundary dates, restricted ranges, allowed ranges)
+ *   1. RestrictionConfig defines the rules (boundary dates, restricted ranges, allowed ranges, etc.)
  *   2. RestrictionManager validates selections against these rules
  *   3. RestrictionBackgroundGenerator uses these rules to visually indicate restrictions
  *   4. LayerRenderer uses the validation results to control user interactions
  * 
- * The restriction system supports three types of rules:
+ * The restriction system supports five types of rules:
  * 1. Boundary - Prevents selection before/after a specific date
  * 2. DateRange - Blocks specific date ranges from being selected
  * 3. AllowedRanges - Only permits selections within specified date ranges
+ * 4. RestrictedBoundary - Complex rules with min/max dates and restricted ranges
+ * 5. Weekday - Blocks specific days of the week (0-6 for Sunday-Saturday)
  * 
  * Each restriction can have its own custom error message and can be individually enabled/disabled.
  * Multiple restrictions can be combined to create complex selection rules.
  * 
  * Implementation:
  * - Each restriction type has its own checker function (e.g., checkBoundaryRestriction)
- * - All checkers follow the same interface: (start: Date, end: Date, restriction: any) => string | null
+ * - All checkers follow the same interface: (start: Date, end: Date, restriction: RestrictionType) => string | null
  * - The restrictionCheckers map connects restriction types to their checker functions
+ * - All date comparisons use UTC to ensure timezone consistency
  * 
  * Extending with New Restrictions:
- * 1. Add new restriction type to RestrictionConfig type in ./types.ts
- * 2. Create a new checker function following the checker interface
- * 3. Add the checker to restrictionCheckers map
- * 4. Update RestrictionBackgroundGenerator to visualize the new restriction
+ * 1. Add new restriction type to RestrictionType in ./types.ts
+ * 2. Create the restriction interface extending BaseRestriction in ./types.ts
+ * 3. Add to the Restriction union type in ./types.ts
+ * 4. Create a new checker function following the checker interface
+ * 5. Add the checker to restrictionCheckers map
+ * 6. Update RestrictionBackgroundGenerator to visualize the new restriction (optional)
  * 
- * Example of adding a "weekday" restriction:
- * 
- * // 1. Add to types.ts
- * type RestrictionType = ... | 'weekday';
- * interface WeekdayRestriction extends BaseRestriction {
- *   type: 'weekday';
- *   days: number[]; // 0-6 for Sunday-Saturday
- * }
- * 
- * // 2. Create checker function
- * private checkWeekdayRestriction(start: Date, end: Date, restriction: any): string | null {
- *   const day = start.getDay();
- *   if (!restriction.days.includes(day)) {
- *     return restriction.message || 'Invalid weekday selected';
- *   }
- *   return null;
- * }
- * 
- * // 3. Add to restrictionCheckers
- * private restrictionCheckers = {
- *   ...
- *   weekday: this.checkWeekdayRestriction.bind(this)
- * };
+ * @module RestrictionManager
  */
 
 import { parseISO } from '../../../utils/DateUtils';

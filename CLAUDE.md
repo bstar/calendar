@@ -56,17 +56,19 @@ When `timezone === 'UTC'`, these functions use UTC-specific implementations. For
 
 ### Component Architecture
 
-#### Legacy Component (Being Replaced)
-- `src/components/DateRangePicker.jsx` - Original monolithic component
-- `src/components/DateRangePicker.config.ts` - Configuration system
+#### Current Architecture
+The calendar component has been fully migrated to TypeScript with a modular architecture:
 
-#### New Architecture (In Progress)
-`src/components/DateRangePickerNew/` - Modular TypeScript implementation:
+- **Main Component**: `src/components/CLACalendar.tsx` - Primary calendar component
+- **Configuration**: `src/components/CLACalendar.config.ts` - Settings and configuration system
+- **Type Definitions**: `src/components/CLACalendar.types.ts` - TypeScript interfaces
+
+#### Modular Systems in `src/components/CLACalendarComponents/`:
 - **Layer System**: `layers/` - Data visualization layers with visibility controls
-- **Restrictions**: `restrictions/` - Date validation and restriction management
-- **Selection**: `selection/` - Date range selection logic
+- **Restrictions**: `restrictions/` - Date validation and restriction management (supports 5 types: boundary, daterange, allowedranges, restricted_boundary, weekday)
+- **Selection**: `selection/` - Date range selection logic with backward selection support
 - **Handlers**: `handlers/` - Event handling separation
-- **Portal System**: `CalendarPortal.tsx`, `PortalCalendar.tsx` - Popup rendering
+- **Portal System**: `CalendarPortal.tsx`, `PortalCalendar.tsx` - Popup rendering with smart positioning
 
 ### Build System
 - **Development**: Vite with TypeScript support
@@ -119,16 +121,17 @@ See the "UTC Timezone Handling" section in Storybook for visual demonstrations.
 - Unused variables should be prefixed with `_`
 
 ### Component Development
-When working on the new architecture:
-1. Check existing layers in `DateRangePickerNew/layers/`
+When working on the calendar component:
+1. Check existing layers in `CLACalendarComponents/layers/`
 2. Follow the LayerManager pattern for new features
-3. Use the restriction system for date validations
+3. Use the restriction system for date validations (5 types supported)
 4. Implement handlers separately from components
 
 ### Testing
-- Jest configured with TypeScript support (`ts-jest`)
+- Vitest configured with TypeScript support
 - Place tests adjacent to components or in `test/` directory
 - Focus on UTC date handling edge cases
+- Run with `npm test`, `npm run test:ui`, or `npm run test:coverage`
 
 ### Linting
 ESLint is configured with TypeScript support:

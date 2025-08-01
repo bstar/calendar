@@ -1,3 +1,22 @@
+/**
+ * @fileoverview Test suite for DateUtils module
+ * 
+ * This file contains comprehensive tests for the UTC date utility functions,
+ * ensuring correct behavior for:
+ * - Date creation and conversion to UTC
+ * - Date parsing with timezone support
+ * - Date formatting and display
+ * - Date arithmetic (adding days/months)
+ * - Calendar boundaries (week/month start/end)
+ * - Date comparisons (same day/month)
+ * - Interval operations
+ * - Edge cases including leap years, timezone transitions, and invalid dates
+ * 
+ * Tests use mocked system time to ensure consistent behavior across environments.
+ * 
+ * @module DateUtils.test
+ */
+
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   now,

@@ -1,5 +1,5 @@
 /**
- * RestrictionBackgroundGenerator.ts
+ * @fileoverview Visual indicator generator for date restrictions in the calendar
  * 
  * This file is responsible for generating visual indicators for date restrictions in the calendar.
  * It works in conjunction with the RestrictionManager and LayerRenderer to provide visual feedback
@@ -26,6 +26,8 @@
  * 1. Boundary - Prevents selection before/after a specific date
  * 2. DateRange - Blocks specific date ranges from being selected
  * 3. AllowedRanges - Only permits selections within specified date ranges
+ * 4. RestrictedBoundary - Complex rules with min/max dates and restricted ranges
+ * 5. Weekday - Blocks specific days of the week
  * 
  * Extending with new restrictions:
  * 1. Add new restriction type to types.ts
@@ -48,6 +50,8 @@
  *   startDate: '2024-01-01',
  *   endDate: '2024-01-15',
  *   color: '#ffe6e6'  // Light red background for restricted ranges
+ * 
+ * @module RestrictionBackgroundGenerator
  * }]
  *
  * 2. Individual Date Styling:
