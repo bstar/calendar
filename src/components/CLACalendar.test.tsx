@@ -79,6 +79,8 @@ describe('CLACalendar', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.useFakeTimers();
+    // Set a consistent date for tests to ensure predictable calendar display
+    vi.setSystemTime(new Date('2025-07-15T12:00:00Z'));
   });
 
   afterEach(() => {
