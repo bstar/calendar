@@ -85,28 +85,111 @@
   z-index: 10;
 }
 
-/* Restricted date pattern styles moved from CLACalendar.css */
+/* Professional diagonal restriction pattern optimized for 36px square cells */
 .restricted-date-pattern {
-  background: repeating-linear-gradient(
-    -45deg,
-    transparent,
-    transparent 10px,
-    rgba(128, 128, 128, 0.1) 10px,
-    rgba(128, 128, 128, 0.1) 20px
+  position: relative;
+  /* Primary diagonal pattern with enhanced contrast and crisp lines */
+  background-image: 
+    repeating-linear-gradient(
+      45deg,
+      rgba(220, 53, 69, 0.25) 0px,
+      rgba(220, 53, 69, 0.25) 1.5px,
+      transparent 1.5px,
+      transparent 4.5px
+    );
+  /* Perfect diagonal repeat: 6px * √2 ≈ 8.485px ensures clean alignment */
+  background-size: 8.485px 8.485px;
+  /* Position based on global grid coordinates for seamless pattern */
+  background-position: calc(36px * var(--col-index, 0)) calc(38px * var(--row-index, 0));
+  background-attachment: local;
+  z-index: 1;
+}
+
+/* Enhanced pattern for better visibility when overlaid with selection */
+.restricted-date-pattern.selected,
+.restricted-date-pattern.range-start,
+.restricted-date-pattern.range-end {
+  /* Stronger pattern when overlaid with blue selection background */
+  background-image: 
+    repeating-linear-gradient(
+      45deg,
+      rgba(220, 53, 69, 0.4) 0px,
+      rgba(220, 53, 69, 0.4) 1.5px,
+      rgba(255, 255, 255, 0.3) 1.5px,
+      rgba(255, 255, 255, 0.3) 4.5px
+    );
+}
+
+/* 
+   Alternative SVG-based pattern for pixel-perfect diagonal lines
+   Uncomment this section and comment out the gradient-based patterns above
+   for the crispest possible diagonal restrictions
+*/
+/*
+.restricted-date-pattern {
+  position: relative;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 12 12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 12L12 0' stroke='%23dc3545' stroke-width='2' stroke-opacity='0.25'/%3E%3Cpath d='M-3 9L9 -3' stroke='%23dc3545' stroke-width='2' stroke-opacity='0.25'/%3E%3Cpath d='M3 15L15 3' stroke='%23dc3545' stroke-width='2' stroke-opacity='0.25'/%3E%3C/svg%3E");
+  background-size: 8.485px 8.485px;
+  background-position: calc(36px * var(--col-index, 0)) calc(38px * var(--row-index, 0));
+  background-attachment: local;
+  z-index: 1;
+}
+
+.restricted-date-pattern.selected,
+.restricted-date-pattern.range-start,
+.restricted-date-pattern.range-end {
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 12 12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 12L12 0' stroke='%23dc3545' stroke-width='2' stroke-opacity='0.4'/%3E%3Cpath d='M-3 9L9 -3' stroke='%23dc3545' stroke-width='2' stroke-opacity='0.4'/%3E%3Cpath d='M3 15L15 3' stroke='%23dc3545' stroke-width='2' stroke-opacity='0.4'/%3E%3Cpath d='M0 12L12 0' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.6'/%3E%3Cpath d='M-3 9L9 -3' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.6'/%3E%3Cpath d='M3 15L15 3' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.6'/%3E%3C/svg%3E");
+}
+*/
+
+/* 
+   Ultra-modern CSS mask approach for the cleanest diagonal restrictions
+   This creates solid diagonal lines with perfect anti-aliasing
+   Uncomment this section for the most modern approach
+*/
+/*
+.restricted-date-pattern {
+  position: relative;
+  background: linear-gradient(45deg, 
+    rgba(220, 53, 69, 0.08) 0%, 
+    rgba(220, 53, 69, 0.08) 100%
   );
-  filter: grayscale(100%) opacity(0.5);
+  z-index: 1;
 }
 
 .restricted-date-pattern::before {
   content: '';
   position: absolute;
   inset: 0;
-  background-image: repeating-linear-gradient(
+  background: repeating-linear-gradient(
     45deg,
-    transparent,
-    transparent 3px,
-    rgba(128, 128, 128, 0.15) 3px,
-    rgba(128, 128, 128, 0.15) 6px
+    rgba(220, 53, 69, 0.6) 0px,
+    rgba(220, 53, 69, 0.6) 1px,
+    transparent 1px,
+    transparent 6px
   );
-  z-index: 1;
+  background-size: 8.485px 8.485px;
+  background-position: calc(36px * var(--col-index, 0)) calc(38px * var(--row-index, 0));
+  mask: repeating-linear-gradient(
+    45deg,
+    black 0px,
+    black 1px,
+    transparent 1px,
+    transparent 6px
+  );
+  mask-size: 8.485px 8.485px;
+  mask-position: calc(36px * var(--col-index, 0)) calc(38px * var(--row-index, 0));
 }
+
+.restricted-date-pattern.selected::before,
+.restricted-date-pattern.range-start::before,
+.restricted-date-pattern.range-end::before {
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(220, 53, 69, 0.8) 0px,
+    rgba(220, 53, 69, 0.8) 1px,
+    transparent 1px,
+    transparent 6px
+  );
+}
+*/

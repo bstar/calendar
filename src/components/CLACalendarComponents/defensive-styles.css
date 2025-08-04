@@ -89,21 +89,7 @@
 
 /* Grid protection */
 
-/* Restricted date pattern */
-.restricted-date-pattern {
-  background-image: repeating-linear-gradient(45deg,
-      rgba(150, 150, 150, 0.25) 0px,
-      rgba(150, 150, 150, 0.25) 2px,
-      rgba(255, 255, 255, 0.7) 2px,
-      rgba(255, 255, 255, 0.7) 6px) !important;
-  background-size: 8.5px 8.5px !important;
-  /* Precise value for clean 45° lines */
-  background-position: calc(36px * var(--col-index, 0)) calc(36px * var(--row-index, 0)) !important;
-  /* Offset based on grid position */
-  background-attachment: local !important;
-
-  /* Make the pattern relative to the cell itself *2
-}
+/* Diagonal restriction pattern styles consolidated in DayCell.css */
 
 /* Form controls - general styles except for .cla-form-control font size */
   .cla-calendar-wrapper input:not(.cla-form-control),

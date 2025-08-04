@@ -15,21 +15,7 @@
 
 /* Ensure the z-index for tooltips and popovers */
 
-/* Ensure the striped pattern for restricted dates is visible */
-.restricted-date-pattern {
-  background-image: repeating-linear-gradient(
-    45deg,
-    rgba(150, 150, 150, 0.25) 0px,
-    rgba(150, 150, 150, 0.25) 3px,
-    rgba(255, 255, 255, 0.7) 3px,
-    rgba(255, 255, 255, 0.7) 9px
-  ) !important;
-  background-size: 12px 12px !important; /* 12px divides evenly into 36px cells */
-  background-position: calc(36px * var(--col-index, 0)) calc(38px * var(--row-index, 0)) !important; /* 38px row height with padding */
-  background-attachment: local !important; /* Make the pattern relative to the cell itself */
-  position: relative !important;
-  z-index: 1 !important; /* Ensure this is below event elements */
-}
+/* Diagonal restriction pattern styles moved to DayCell.css for better organization */
 
 /* Reset form controls inside calendar to prevent external influence */
 .cla-calendar-wrapper input,

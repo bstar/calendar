@@ -71,6 +71,7 @@ const App: React.FC = () => {
                   <option value="popup-positions">Popup Positioning Tests</option>
                   <option value="dynamic-positioning">Dynamic Positioning Demo</option>
                   <option value="null-safe">Null-Safe Configuration</option>
+                  <option value="restrictions">Restriction Testing</option>
                 </select>
               </div>
 
@@ -480,6 +481,281 @@ const App: React.FC = () => {
                       <small className="cla-cal-small">
                         ✅ Calendar handles null/undefined values gracefully using defaults
                       </small>
+                    </div>
+                  </div>
+                )}
+
+                {currentDemo === 'restrictions' && (
+                  <div>
+                    <h4>Restriction Testing</h4>
+                    <p className="cla-cal-text-muted">
+                      Comprehensive testing of all 5 restriction types with diagonal pattern visualization
+                    </p>
+                    
+                    {/* Restriction Type 1: Date Range */}
+                    <div className="cla-cal-mb-4">
+                      <h5 style={{ fontSize: '18px', marginBottom: '10px' }}>1. Date Range Restrictions</h5>
+                      <p style={{ fontSize: '14px', color: '#666', marginBottom: '15px' }}>
+                        Blocks specific date ranges (e.g., holidays, maintenance periods)
+                      </p>
+                      <CLACalendar 
+                        settings={{
+                          displayMode: 'embedded',
+                          visibleMonths: 2,
+                          monthWidth: 300,
+                          selectionMode: 'range',
+                          showSubmitButton: true,
+                          restrictionConfigFactory: () => ({
+                            restrictions: [
+                              {
+                                type: 'daterange',
+                                enabled: true,
+                                ranges: [
+                                  { 
+                                    startDate: '2025-08-10', 
+                                    endDate: '2025-08-15',
+                                    message: 'Company retreat - dates unavailable'
+                                  },
+                                  { 
+                                    startDate: '2025-08-25', 
+                                    endDate: '2025-08-27',
+                                    message: 'System maintenance window'
+                                  }
+                                ]
+                              }
+                            ]
+                          })
+                        }}
+                        onSubmit={handleDateSubmit}
+                      />
+                      <div className="cla-cal-alert cla-cal-alert-warning cla-cal-mt-2">
+                        <small>🚫 Aug 10-15 and Aug 25-27 are restricted with diagonal pattern</small>
+                      </div>
+                    </div>
+
+                    {/* Restriction Type 2: Boundary */}
+                    <div className="cla-cal-mb-4">
+                      <h5 style={{ fontSize: '18px', marginBottom: '10px' }}>2. Boundary Restrictions</h5>
+                      <p style={{ fontSize: '14px', color: '#666', marginBottom: '15px' }}>
+                        Sets min/max selectable dates (e.g., only future dates, within 90 days)
+                      </p>
+                      <CLACalendar 
+                        settings={{
+                          displayMode: 'embedded',
+                          visibleMonths: 2,
+                          monthWidth: 300,
+                          selectionMode: 'range',
+                          showSubmitButton: true,
+                          restrictionConfigFactory: () => ({
+                            restrictions: [
+                              {
+                                type: 'boundary',
+                                enabled: true,
+                                minDate: '2025-08-05',
+                                maxDate: '2025-09-15',
+                                message: 'Please select dates between Aug 5 and Sep 15, 2025'
+                              }
+                            ]
+                          })
+                        }}
+                        onSubmit={handleDateSubmit}
+                      />
+                      <div className="cla-cal-alert cla-cal-alert-info cla-cal-mt-2">
+                        <small>📅 Only dates between Aug 5 - Sep 15 are selectable</small>
+                      </div>
+                    </div>
+
+                    {/* Restriction Type 3: Allowed Ranges */}
+                    <div className="cla-cal-mb-4">
+                      <h5 style={{ fontSize: '18px', marginBottom: '10px' }}>3. Allowed Ranges</h5>
+                      <p style={{ fontSize: '14px', color: '#666', marginBottom: '15px' }}>
+                        Only specific date ranges are selectable (inverse of date range restriction)
+                      </p>
+                      <CLACalendar 
+                        settings={{
+                          displayMode: 'embedded',
+                          visibleMonths: 2,
+                          monthWidth: 300,
+                          selectionMode: 'range',
+                          showSubmitButton: true,
+                          restrictionConfigFactory: () => ({
+                            restrictions: [
+                              {
+                                type: 'allowedranges',
+                                enabled: true,
+                                ranges: [
+                                  { 
+                                    startDate: '2025-08-01', 
+                                    endDate: '2025-08-07'
+                                  },
+                                  { 
+                                    startDate: '2025-08-20', 
+                                    endDate: '2025-08-24'
+                                  },
+                                  { 
+                                    startDate: '2025-09-01', 
+                                    endDate: '2025-09-10'
+                                  }
+                                ]
+                              }
+                            ]
+                          })
+                        }}
+                        onSubmit={handleDateSubmit}
+                      />
+                      <div className="cla-cal-alert cla-cal-alert-success cla-cal-mt-2">
+                        <small>✅ Only Aug 1-7, Aug 20-24, and Sep 1-10 are available</small>
+                      </div>
+                    </div>
+
+                    {/* Restriction Type 4: Weekday */}
+                    <div className="cla-cal-mb-4">
+                      <h5 style={{ fontSize: '18px', marginBottom: '10px' }}>4. Weekday Restrictions</h5>
+                      <p style={{ fontSize: '14px', color: '#666', marginBottom: '15px' }}>
+                        Block specific days of the week (e.g., weekends only, weekdays only)
+                      </p>
+                      <CLACalendar 
+                        settings={{
+                          displayMode: 'embedded',
+                          visibleMonths: 2,
+                          monthWidth: 300,
+                          selectionMode: 'range',
+                          showSubmitButton: true,
+                          restrictionConfigFactory: () => ({
+                            restrictions: [
+                              {
+                                type: 'weekday',
+                                enabled: true,
+                                days: [0, 6], // 0 = Sunday, 6 = Saturday
+                                message: 'Weekends are not available for booking'
+                              }
+                            ]
+                          })
+                        }}
+                        onSubmit={handleDateSubmit}
+                      />
+                      <div className="cla-cal-alert cla-cal-alert-warning cla-cal-mt-2">
+                        <small>🚫 All Saturdays and Sundays show diagonal restriction pattern</small>
+                      </div>
+                    </div>
+
+                    {/* Restriction Type 5: Restricted Boundary */}
+                    <div className="cla-cal-mb-4">
+                      <h5 style={{ fontSize: '18px', marginBottom: '10px' }}>5. Restricted Boundary (Complex)</h5>
+                      <p style={{ fontSize: '14px', color: '#666', marginBottom: '15px' }}>
+                        Multiple boundary zones with different rules (e.g., peak/off-peak periods)
+                      </p>
+                      <CLACalendar 
+                        settings={{
+                          displayMode: 'embedded',
+                          visibleMonths: 3,
+                          monthWidth: 300,
+                          selectionMode: 'range',
+                          showSubmitButton: true,
+                          restrictionConfigFactory: () => ({
+                            restrictions: [
+                              {
+                                type: 'restricted_boundary',
+                                enabled: true,
+                                ranges: [
+                                  {
+                                    startDate: '2025-08-01',
+                                    endDate: '2025-08-14',
+                                    message: 'Peak season - selections must stay within this period'
+                                  },
+                                  {
+                                    startDate: '2025-08-15',
+                                    endDate: '2025-08-31',
+                                    message: 'Off-peak - selections must stay within this period'
+                                  },
+                                  {
+                                    startDate: '2025-09-01',
+                                    endDate: '2025-09-30',
+                                    message: 'Regular season - selections must stay within this period'
+                                  }
+                                ]
+                              }
+                            ]
+                          })
+                        }}
+                        onSubmit={handleDateSubmit}
+                      />
+                      <div className="cla-cal-alert cla-cal-alert-info cla-cal-mt-2">
+                        <small>
+                          🔒 Three zones: Peak (Aug 1-14), Off-peak (Aug 15-31), Regular (Sep 1-30)<br/>
+                          Selections cannot cross zone boundaries
+                        </small>
+                      </div>
+                    </div>
+
+                    {/* Combined Restrictions Demo */}
+                    <div className="cla-cal-mb-4">
+                      <h5 style={{ fontSize: '18px', marginBottom: '10px' }}>Combined Restrictions</h5>
+                      <p style={{ fontSize: '14px', color: '#666', marginBottom: '15px' }}>
+                        Multiple restriction types working together
+                      </p>
+                      <CLACalendar 
+                        settings={{
+                          displayMode: 'embedded',
+                          visibleMonths: 2,
+                          monthWidth: 300,
+                          selectionMode: 'range',
+                          showSubmitButton: true,
+                          restrictionConfigFactory: () => ({
+                            restrictions: [
+                              {
+                                type: 'boundary',
+                                enabled: true,
+                                minDate: '2025-08-01',
+                                maxDate: '2025-09-30'
+                              },
+                              {
+                                type: 'weekday',
+                                enabled: true,
+                                days: [0, 6],
+                                message: 'Weekends unavailable'
+                              },
+                              {
+                                type: 'daterange',
+                                enabled: true,
+                                ranges: [
+                                  { 
+                                    startDate: '2025-08-15', 
+                                    endDate: '2025-08-18',
+                                    message: 'Company holiday'
+                                  }
+                                ]
+                              }
+                            ]
+                          })
+                        }}
+                        onSubmit={handleDateSubmit}
+                      />
+                      <div className="cla-cal-alert cla-cal-alert-secondary cla-cal-mt-2">
+                        <small>
+                          🔀 Combined: Aug-Sep only + No weekends + Aug 15-18 blocked<br/>
+                          Notice how diagonal patterns overlay for multiple restrictions
+                        </small>
+                      </div>
+                    </div>
+
+                    {/* Pattern Quality Test */}
+                    <div className="cla-cal-mt-4 cla-cal-p-3" style={{ backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
+                      <h6 style={{ fontSize: '16px', marginBottom: '10px' }}>🎨 Diagonal Pattern Quality Check</h6>
+                      <p style={{ fontSize: '14px', marginBottom: '10px' }}>
+                        The diagonal restriction pattern should appear as:
+                      </p>
+                      <ul style={{ fontSize: '14px', paddingLeft: '20px' }}>
+                        <li>Clean, crisp diagonal lines at 45° angle</li>
+                        <li>Red stripes (not gray) with proper spacing</li>
+                        <li>Seamless pattern continuation across calendar cells</li>
+                        <li>Enhanced visibility when overlaid with blue selection</li>
+                        <li>Consistent alignment across all months</li>
+                      </ul>
+                      <p style={{ fontSize: '13px', color: '#666', marginTop: '10px' }}>
+                        <strong>Implementation:</strong> Using CSS gradient with 1.5px stripes, 
+                        3px gaps, and global grid positioning for perfect alignment.
+                      </p>
                     </div>
                   </div>
                 )}
