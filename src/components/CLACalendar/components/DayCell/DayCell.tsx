@@ -174,14 +174,12 @@ export const DayCell: React.FC<DayCellProps> = ({
       onMouseLeave={handleMouseLeave}
       onMouseDown={onMouseDown}
       style={{
-        // Only apply backgroundColor for non-restricted dates
-        ...(!restrictionResult.allowed ? {
-          '--row-index': globalRowIndex ?? rowIndex,
-          '--col-index': globalColIndex ?? colIndex
-        } as React.CSSProperties : {
-          backgroundColor: (isSelected || isInRange) ? (settings?.backgroundColors?.selection || "#b1e4e5") : getBackgroundColor()
-        })
-      }}
+        backgroundColor: restrictionResult.allowed 
+          ? ((isSelected || isInRange) ? (settings?.backgroundColors?.selection || "#b1e4e5") : getBackgroundColor())
+          : 'transparent',
+        '--row-index': rowIndex,
+        '--col-index': colIndex
+      } as React.CSSProperties}
     >
       <div className="day-cell-date">
         <span className="day-cell-date-text" style={{

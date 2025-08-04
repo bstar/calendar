@@ -7,8 +7,8 @@ The calendar's diagonal restriction pattern has been significantly enhanced to p
 
 ### 1. Enhanced Contrast and Color
 - **Previous**: Light gray `rgba(128, 128, 128, 0.15)` - too subtle
-- **New**: Danger red `rgba(220, 53, 69, 0.25)` - much more visible
-- **Benefit**: Clear indication of restricted dates, consistent with UI danger color palette
+- **Current**: Medium gray `rgba(128, 128, 128, 0.3)` - good visibility without being aggressive
+- **Benefit**: Clear indication of restricted dates without overwhelming the UI
 
 ### 2. Optimized Stripe Proportions
 - **Previous**: 2px stripes with 4px gaps (6px total repeat)
@@ -86,10 +86,10 @@ The calendar's diagonal restriction pattern has been significantly enhanced to p
 - **Diagonal Repeat**: ~8.485px (optimized for 45° angle)
 
 ### Color Palette
-- **Base Pattern**: `rgba(220, 53, 69, 0.25)` - Bootstrap danger red at 25% opacity
-- **Selected Pattern**: `rgba(220, 53, 69, 0.4)` - Enhanced to 40% opacity
+- **Base Pattern**: `rgba(128, 128, 128, 0.3)` - Medium gray at 30% opacity
+- **Selected Pattern**: `rgba(128, 128, 128, 0.5)` - Enhanced to 50% opacity
 - **Selection Background**: `#b1e4e5` - Light blue (existing)
-- **White Accents**: `rgba(255, 255, 255, 0.3)` - For selected state contrast
+- **White Accents**: `rgba(255, 255, 255, 0.4)` - For selected state contrast
 
 ### Pattern Mathematics
 - **45° Diagonal**: Creates clean northwest-to-southeast lines

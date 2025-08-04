@@ -88,35 +88,42 @@
 /* Professional diagonal restriction pattern optimized for 36px square cells */
 .restricted-date-pattern {
   position: relative;
-  /* Primary diagonal pattern with enhanced contrast and crisp lines */
+  overflow: hidden;
+}
+
+.restricted-date-pattern::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  /* Clean diagonal pattern with better spacing */
   background-image: 
     repeating-linear-gradient(
       45deg,
-      rgba(220, 53, 69, 0.25) 0px,
-      rgba(220, 53, 69, 0.25) 1.5px,
-      transparent 1.5px,
-      transparent 4.5px
+      rgba(128, 128, 128, 0.2) 0px,
+      rgba(128, 128, 128, 0.2) 3px,
+      transparent 3px,
+      transparent 10px
     );
-  /* Perfect diagonal repeat: 6px * √2 ≈ 8.485px ensures clean alignment */
-  background-size: 8.485px 8.485px;
-  /* Position based on global grid coordinates for seamless pattern */
-  background-position: calc(36px * var(--col-index, 0)) calc(38px * var(--row-index, 0));
-  background-attachment: local;
+  /* Natural pattern size that doesn't need positioning adjustments */
+  background-size: 14.142px 14.142px; /* 10px * √2 for perfect 45° diagonals */
+  /* Offset to align diagonals across cells - diagonal requires both row and column offsets */
+  background-position: calc(var(--col-index, 0) * 36px) calc(var(--row-index, 0) * 38px + var(--col-index, 0) * var(--diagonal-col-offset, 2px));
   z-index: 1;
+  pointer-events: none;
 }
 
 /* Enhanced pattern for better visibility when overlaid with selection */
-.restricted-date-pattern.selected,
-.restricted-date-pattern.range-start,
-.restricted-date-pattern.range-end {
+.restricted-date-pattern.selected::before,
+.restricted-date-pattern.range-start::before,
+.restricted-date-pattern.range-end::before {
   /* Stronger pattern when overlaid with blue selection background */
   background-image: 
     repeating-linear-gradient(
       45deg,
-      rgba(220, 53, 69, 0.4) 0px,
-      rgba(220, 53, 69, 0.4) 1.5px,
-      rgba(255, 255, 255, 0.3) 1.5px,
-      rgba(255, 255, 255, 0.3) 4.5px
+      rgba(128, 128, 128, 0.35) 0px,
+      rgba(128, 128, 128, 0.35) 3px,
+      rgba(255, 255, 255, 0.4) 3px,
+      rgba(255, 255, 255, 0.4) 10px
     );
 }
 

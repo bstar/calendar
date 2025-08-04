@@ -51,7 +51,7 @@
 /* Tooltip styles */
 .month-grid-tooltip {
   position: fixed;
-  background-color: rgba(220, 53, 69, 0.9);
+  background-color: rgba(128, 128, 128, 0.9);
   color: white;
   padding: 8px 12px;
   border-radius: 4px;

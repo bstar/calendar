@@ -184,7 +184,7 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
               rowIndex={weekIndex}
               colIndex={dayIndex}
               globalRowIndex={weekIndex}
-              globalColIndex={monthIndex * 7 + dayIndex}
+              globalColIndex={dayIndex}
             />
           ))
         )}

@@ -16,7 +16,7 @@
  * @module CalendarStoryWrapper
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CLACalendar } from '../../components/CLACalendar';
 import { getDefaultSettings } from '../../components/CLACalendar.config';
 import { argsToSettings } from './storyControls';
@@ -56,6 +56,18 @@ export const CalendarStoryWrapper: React.FC<CalendarStoryWrapperProps> = ({
     start: string | null;
     end: string | null;
   }>({ start: null, end: null });
+
+  // Apply diagonal offset CSS variable when it changes
+  useEffect(() => {
+    // Always set the value, using default if not provided
+    const offset = args.diagonalColOffset ?? 2;
+    document.documentElement.style.setProperty('--diagonal-col-offset', offset + 'px');
+    
+    // Cleanup on unmount
+    return () => {
+      document.documentElement.style.removeProperty('--diagonal-col-offset');
+    };
+  }, [args.diagonalColOffset]);
 
   const handleSubmit = (start: string | null, end: string | null) => {
     setSelectedDates({

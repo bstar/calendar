@@ -492,6 +492,36 @@ const App: React.FC = () => {
                       Comprehensive testing of all 5 restriction types with diagonal pattern visualization
                     </p>
                     
+                    {/* Diagonal Pattern Offset Slider */}
+                    <div className="cla-cal-mb-4 cla-cal-p-3" style={{ backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
+                      <h5 style={{ fontSize: '16px', marginBottom: '10px' }}>Diagonal Pattern Alignment</h5>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                        <label style={{ fontSize: '14px', minWidth: '150px' }}>Column Y-Offset:</label>
+                        <input
+                          type="range"
+                          min="0"
+                          max="10"
+                          defaultValue="2"
+                          step="0.5"
+                          style={{ flex: 1 }}
+                          onChange={(e) => {
+                            const offset = e.target.value;
+                            // Update CSS variable for column offset
+                            document.documentElement.style.setProperty('--diagonal-col-offset', offset + 'px');
+                            // Update displayed value
+                            const valueDisplay = document.getElementById('col-offset-value');
+                            if (valueDisplay) valueDisplay.textContent = offset;
+                          }}
+                        />
+                        <span style={{ fontSize: '14px', minWidth: '60px' }}>
+                          <span id="col-offset-value">2</span>px
+                        </span>
+                      </div>
+                      <p style={{ fontSize: '12px', color: '#666', marginTop: '10px', marginBottom: 0 }}>
+                        Controls how much each column shifts the pattern down. Set to 2px for perfect alignment.
+                      </p>
+                    </div>
+                    
                     {/* Restriction Type 1: Date Range */}
                     <div className="cla-cal-mb-4">
                       <h5 style={{ fontSize: '18px', marginBottom: '10px' }}>1. Date Range Restrictions</h5>
