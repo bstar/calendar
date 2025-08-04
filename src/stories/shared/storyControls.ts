@@ -41,11 +41,11 @@ export const calendarArgTypes: ArgTypes = {
     }
   },
   monthWidth: {
-    control: { type: 'range', min: 200, max: 600, step: 50 },
-    description: 'Width of each month in pixels',
+    control: { type: 'range', min: 252, max: 1200, step: 10 },
+    description: 'Width of each month in pixels (minimum 252px for 36px cells)',
     table: {
       category: 'Display',
-      defaultValue: { summary: 500 }
+      defaultValue: { summary: 300 }
     }
   },
   
@@ -217,7 +217,7 @@ export const calendarArgTypes: ArgTypes = {
 export const defaultArgs = {
   displayMode: 'embedded',
   visibleMonths: 2,
-  monthWidth: 400,
+  monthWidth: 300,
   selectionMode: 'range',
   position: 'bottom-left',
   useDynamicPosition: true,

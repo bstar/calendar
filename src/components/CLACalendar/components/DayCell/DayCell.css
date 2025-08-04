@@ -2,14 +2,14 @@
 
 /* Base day cell styles */
 .day-cell {
-  width: 100%;
-  height: 100%;
+  width: 36px; /* Fixed width for square cells */
+  height: 36px; /* Fixed height for square cells */
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0;
-  padding: 0;
+  padding: 1px 0; /* 1px top and bottom padding */
   box-sizing: border-box;
   cursor: pointer;
   font-weight: normal;
@@ -19,8 +19,8 @@
 
 /* Day cell placeholder for non-current month days */
 .day-cell-placeholder {
-  width: 100%;
-  height: 100%;
+  width: 36px; /* Fixed width for square cells */
+  height: 36px; /* Fixed height for square cells */
   position: relative;
 }
 

@@ -5,6 +5,7 @@ import { Renderer } from '../../CLACalendar.types';
 
 export interface MonthGridProps {
   baseDate: Date;
+  monthIndex?: number; // Position of this month in the calendar (0-based)
   selectedRange: DateRange;
   onSelectionStart: (date: Date) => void;
   onSelectionMove: (date: Date) => void;

@@ -502,8 +502,7 @@ export const CalendarContainer: React.FC<CalendarContainerProps> = ({
       ref={containerRef}
       className={`cla-card ${displayMode === 'popup' ? 'cla-card-popup' : ''}`}
       style={{
-        '--calendar-width': visibleMonths === 1 ? `${monthWidth}px` : `${monthWidth * Math.min(6, Math.max(1, visibleMonths))}px`,
-        width: 'var(--calendar-width)',
+        width: 'auto',
         ...DEFAULT_CONTAINER_STYLES,
         ...containerStyle
       } as React.CSSProperties}

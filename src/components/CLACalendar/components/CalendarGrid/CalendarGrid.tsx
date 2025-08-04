@@ -50,16 +50,18 @@ const MonthPair: React.FC<MonthPairProps> = ({
     <div style={{
       display: 'flex',
       width: '100%',
-      gap: '0px'
+      gap: '0px',
+      justifyContent: 'center'
     }}>
-      {monthsToShow.map((month, _index) => (
+      {monthsToShow.map((month, index) => (
         <MonthGrid
           key={month.toISOString()}
           baseDate={month}
+          monthIndex={index}
           selectedRange={selectedRange}
           onSelectionStart={onSelectionStart}
           onSelectionMove={onSelectionMove}
-          style={{ width: `${100 / visibleMonths}%` }}
+          style={{ width: 'auto' }}
           showMonthHeading={showMonthHeadings}
           showTooltips={showTooltips}
           renderDay={renderDay}

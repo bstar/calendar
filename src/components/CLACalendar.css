@@ -20,12 +20,12 @@
   background-image: repeating-linear-gradient(
     45deg,
     rgba(150, 150, 150, 0.25) 0px,
-    rgba(150, 150, 150, 0.25) 2px,
-    rgba(255, 255, 255, 0.7) 2px,
-    rgba(255, 255, 255, 0.7) 6px
+    rgba(150, 150, 150, 0.25) 3px,
+    rgba(255, 255, 255, 0.7) 3px,
+    rgba(255, 255, 255, 0.7) 9px
   ) !important;
-  background-size: 8.5px 8.5px !important; /* Precise value for clean 45° lines */
-  background-position: calc(36px * var(--col-index, 0)) calc(36px * var(--row-index, 0)) !important; /* Offset based on grid position */
+  background-size: 12px 12px !important; /* 12px divides evenly into 36px cells */
+  background-position: calc(36px * var(--col-index, 0)) calc(38px * var(--row-index, 0)) !important; /* 38px row height with padding */
   background-attachment: local !important; /* Make the pattern relative to the cell itself */
   position: relative !important;
   z-index: 1 !important; /* Ensure this is below event elements */

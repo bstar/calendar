@@ -22,6 +22,7 @@ import './MonthGrid.css';
 
 export const MonthGrid: React.FC<MonthGridProps> = ({
   baseDate,
+  monthIndex = 0,
   selectedRange,
   onSelectionStart,
   onSelectionMove,
@@ -182,6 +183,8 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
               settings={settings}
               rowIndex={weekIndex}
               colIndex={dayIndex}
+              globalRowIndex={weekIndex}
+              globalColIndex={monthIndex * 7 + dayIndex}
             />
           ))
         )}

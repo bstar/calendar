@@ -25,7 +25,9 @@ export const DayCell: React.FC<DayCellProps> = ({
   restrictionConfig,
   settings,
   rowIndex,
-  colIndex
+  colIndex,
+  globalRowIndex,
+  globalColIndex
 }) => {
   const { isSelected, isInRange, isRangeStart, isRangeEnd } = useMemo(() => {
     if (!selectedRange.start) {
@@ -174,8 +176,8 @@ export const DayCell: React.FC<DayCellProps> = ({
       style={{
         // Only apply backgroundColor for non-restricted dates
         ...(!restrictionResult.allowed ? {
-          '--row-index': rowIndex,
-          '--col-index': colIndex
+          '--row-index': globalRowIndex ?? rowIndex,
+          '--col-index': globalColIndex ?? colIndex
         } as React.CSSProperties : {
           backgroundColor: (isSelected || isInRange) ? (settings?.backgroundColors?.selection || "#b1e4e5") : getBackgroundColor()
         })

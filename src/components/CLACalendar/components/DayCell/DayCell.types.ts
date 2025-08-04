@@ -16,4 +16,6 @@ export interface DayCellProps {
   settings?: CalendarSettings;
   rowIndex: number;
   colIndex: number;
+  globalRowIndex?: number; // Global row index across all months
+  globalColIndex?: number; // Global column index across all months
 }

@@ -1213,9 +1213,9 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
               portalClassName={`cla-calendar-portal cla-calendar-portal-${calendarIdRef.current}`}
               position={settings.position}
               dynamicPosition={settings.useDynamicPosition}
-              expectedWidth={settings.visibleMonths * settings.monthWidth + ((settings.visibleMonths - 1) * 10)}
+              expectedWidth={settings.visibleMonths * settings.monthWidth}
               portalStyle={{
-                width: `${settings.visibleMonths * settings.monthWidth + ((settings.visibleMonths - 1) * 10)}px`,
+                width: `${settings.visibleMonths * settings.monthWidth}px`,
                 visibility: isReady ? 'visible' : 'hidden',
                 pointerEvents: isReady ? 'auto' : 'none'
               }}
@@ -1224,7 +1224,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
                 ref={calendarRef}
                 className="cla-card"
                 style={{
-                  width: `${settings.visibleMonths * settings.monthWidth + ((settings.visibleMonths - 1) * 16)}px`,
+                  width: `${settings.visibleMonths * settings.monthWidth}px`,
                   ...DEFAULT_CONTAINER_STYLES,
                   ...settings.containerStyle,
                   visibility: isReady ? 'visible' : 'hidden'
