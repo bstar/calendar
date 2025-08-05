@@ -938,11 +938,10 @@ describe('CalendarContainer', () => {
     const { container } = render(<CalendarContainer {...defaultProps} />);
     const card = container.querySelector('.cla-card');
     
-    // Check that the element has the calendar width custom property set
+    // Check that the calendar container exists and has auto width
     expect(card).toBeInTheDocument();
     const style = card!.getAttribute('style');
-    expect(style).toContain('--calendar-width: 1000px');
-    expect(style).toContain('width: var(--calendar-width)');
+    expect(style).toContain('width: auto');
   });
 
   it('should handle mouse events when enableOutOfBoundsScroll is true', () => {

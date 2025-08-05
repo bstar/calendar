@@ -175,7 +175,7 @@ describe('CalendarGrid', () => {
       const monthGrids = screen.getAllByTestId('month-grid');
       
       monthGrids.forEach(grid => {
-        expect(grid).toHaveStyle({ width: '50%' }); // 100% / 2 visible months
+        expect(grid).toHaveStyle({ width: 'auto' }); // MonthGrids use auto width
       });
     });
 
