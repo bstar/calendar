@@ -37,19 +37,24 @@
   font-weight: 600;
 }
 
-/* Range start styles */
+/* Range start styles - perfect semi-circle on left */
 .day-cell.range-start {
-  border-radius: 15px 0 0 15px;
+  border-radius: 50% 0 0 50%;
 }
 
-/* Range end styles */
+/* Range end styles - perfect semi-circle on right */
 .day-cell.range-end {
-  border-radius: 0 15px 15px 0;
+  border-radius: 0 50% 50% 0;
 }
 
-/* Range start and end (single day) styles */
+/* Range start and end (single day) styles - full circle */
 .day-cell.range-start.range-end {
   border-radius: 50%;
+}
+
+/* Range middle cells - no rounded corners */
+.day-cell.range-middle {
+  border-radius: 0;
 }
 
 /* Restricted date styles */

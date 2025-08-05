@@ -76,6 +76,36 @@
   color: #004085 !important; /* Dark blue text, contrast 8.6:1 */
 }
 
+/* Ensure all range cells have consistent size */
+.day-cell.range-start,
+.day-cell.range-end,
+.day-cell.range-middle,
+.day-cell.selected {
+  width: 36px !important;
+  height: 36px !important;
+  margin: 0 !important;
+  padding: 1px 0 !important;
+}
+
+/* Range-specific rounded corners */
+.day-cell.range-start:not(.range-end) {
+  border-radius: 50% 0 0 50% !important;
+}
+
+.day-cell.range-end:not(.range-start) {
+  border-radius: 0 50% 50% 0 !important;
+}
+
+.day-cell.range-middle {
+  border-radius: 0 !important;
+}
+
+/* Single day selection - full circle */
+.day-cell.single-day,
+.day-cell.range-start.range-end {
+  border-radius: 50% !important;
+}
+
 /* Today's date - improve visibility */
 .cla-day-cell.today {
   border: 2px solid #0056b3 !important;

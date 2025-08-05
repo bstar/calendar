@@ -192,6 +192,7 @@ export const DayCell: React.FC<DayCellProps> = ({
     isSelected && 'selected',
     isRangeStart && 'range-start',
     isRangeEnd && 'range-end',
+    isInRange && !isSelected && 'range-middle',
     isSingleDay && (isSelected || isInRange) && 'single-day'
   ].filter(Boolean).join(' ');
 
