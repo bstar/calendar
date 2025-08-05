@@ -50,7 +50,7 @@ const App: React.FC = () => {
               <div className="cla-cal-card-header">
                 <h1 className="cla-cal-h3 cla-cal-mb-0">CLA Calendar - Simple Demo</h1>
                 <p className="cla-cal-text-muted cla-cal-mb-0">
-                A demonstration of the hardened configuration system with SimpleCalendar
+                A demonstration of the hardened configuration system with CLACalendar
               </p>
             </div>
             <div className="cla-cal-card-body">
@@ -960,8 +960,8 @@ const App: React.FC = () => {
                   <pre className="cla-cal-bg-light cla-cal-p-2 cla-cal-rounded">
                     <code>{`import CLACalendar from './components/CLACalendar';
 
-<SimpleCalendar 
-  config={{
+<CLACalendar 
+  settings={{
     displayMode: 'embedded',
     showSubmitButton: true,
   }}

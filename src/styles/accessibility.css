@@ -268,3 +268,16 @@
 .cla-tooltip {
   pointer-events: none;
 }
+
+/* Fix rounded corner bleed-through */
+.cla-card > *:first-child {
+  border-radius: 8px 8px 0 0;
+  overflow: hidden;
+}
+
+/* Ensure proper clipping for calendar container */
+.cla-card {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}

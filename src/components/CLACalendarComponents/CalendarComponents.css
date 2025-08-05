@@ -182,6 +182,7 @@
   position: relative;
   flex-wrap: nowrap;
   background-color: white;
+  z-index: 1; /* Ensure header is above other content */
 }
 
 .cla-button-nav {
@@ -325,8 +326,9 @@
   isolation: isolate;
   /* Default container styles from config */
   border: 1px solid #e0e0e0;
-  overflow: visible;
+  overflow: hidden;
   box-sizing: border-box;
+  position: relative;
 }
 
 /* Embedded mode - normal document flow */

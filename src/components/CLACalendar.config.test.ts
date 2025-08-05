@@ -60,7 +60,7 @@ describe('CLACalendar Configuration', () => {
     it('should have all required color properties', () => {
       const settings = getDefaultSettings();
       
-      expect(settings.colors).toHaveProperty('primary', '#0366d6');
+      expect(settings.colors).toHaveProperty('primary', '#0056b3');
       expect(settings.colors).toHaveProperty('success', '#28a745');
       expect(settings.colors).toHaveProperty('warning', '#f6c23e');
       expect(settings.colors).toHaveProperty('danger', '#dc3545');
@@ -74,7 +74,7 @@ describe('CLACalendar Configuration', () => {
   describe('DEFAULT_COLORS', () => {
     it('should contain all expected color values', () => {
       expect(DEFAULT_COLORS).toEqual({
-        primary: '#0366d6',
+        primary: '#0056b3',
         success: '#28a745',
         warning: '#f6c23e',
         danger: '#dc3545',
