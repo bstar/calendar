@@ -53,7 +53,7 @@ export const createCalendarStory = (config: {
   settingsOverrides?: Partial<CalendarSettings>;
   containerStyle?: React.CSSProperties;
   showSelectedDate?: boolean;
-}): StoryObj<Meta<typeof CLACalendar>> => ({
+}): StoryObj<typeof CLACalendar> => ({
   name: config.name,
   render: (args) => (
     <CalendarStoryWrapper
@@ -76,7 +76,7 @@ export const createCustomCalendarStory = (config: {
   name: string;
   render: (args: Partial<CalendarSettings>) => React.ReactElement;
   args?: Partial<CalendarSettings>;
-}): StoryObj<Meta<typeof CLACalendar>> => ({
+}): StoryObj<typeof CLACalendar> => ({
   name: config.name,
   render: (args) => config.render(args),
   args: config.args

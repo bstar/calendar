@@ -72,6 +72,7 @@ const App: React.FC = () => {
                   <option value="dynamic-positioning">Dynamic Positioning Demo</option>
                   <option value="null-safe">Null-Safe Configuration</option>
                   <option value="restrictions">Restriction Testing</option>
+                  <option value="accessibility">Accessibility Features</option>
                 </select>
               </div>
 
@@ -740,6 +741,205 @@ const App: React.FC = () => {
                       </div>
                     </div>
 
+                  </div>
+                )}
+
+                {currentDemo === 'accessibility' && (
+                  <div>
+                    <h4>Accessibility Features (WCAG 2.1 AA Compliant)</h4>
+                    <p className="cla-cal-text-muted">
+                      Test the calendar's accessibility features including keyboard navigation, 
+                      screen reader support, and ARIA attributes.
+                    </p>
+
+                    {/* Keyboard Navigation Demo */}
+                    <div className="cla-cal-mb-4">
+                      <h5 style={{ fontSize: '18px', marginBottom: '10px' }}>1. Keyboard Navigation</h5>
+                      <p style={{ fontSize: '14px', color: '#666', marginBottom: '15px' }}>
+                        Try navigating with your keyboard! Focus the calendar and use:
+                      </p>
+                      <div className="cla-cal-alert cla-cal-alert-info cla-cal-mb-3">
+                        <strong>Keyboard Shortcuts:</strong>
+                        <ul style={{ marginBottom: 0, paddingLeft: '20px' }}>
+                          <li><kbd>Tab</kbd> - Move to calendar, then to other controls</li>
+                          <li><kbd>Arrow Keys</kbd> - Navigate between days</li>
+                          <li><kbd>Home</kbd> - Go to first day of week</li>
+                          <li><kbd>End</kbd> - Go to last day of week</li>
+                          <li><kbd>Ctrl+Home</kbd> - Go to first day of month</li>
+                          <li><kbd>Ctrl+End</kbd> - Go to last day of month</li>
+                          <li><kbd>Enter</kbd> or <kbd>Space</kbd> - Select a date</li>
+                          <li><kbd>Esc</kbd> - Close popup (in popup mode)</li>
+                        </ul>
+                      </div>
+                      <CLACalendar 
+                        settings={{
+                          displayMode: 'embedded',
+                          visibleMonths: 1,
+                          monthWidth: 300,
+                          selectionMode: 'range',
+                          showSubmitButton: true,
+                          showSelectionAlert: true,
+                          onSubmit: handleDateSubmit
+                        }}
+                      />
+                    </div>
+
+                    {/* Screen Reader Support Demo */}
+                    <div className="cla-cal-mb-4">
+                      <h5 style={{ fontSize: '18px', marginBottom: '10px' }}>2. Screen Reader Support</h5>
+                      <p style={{ fontSize: '14px', color: '#666', marginBottom: '15px' }}>
+                        The calendar provides comprehensive ARIA labels and live regions for screen readers.
+                      </p>
+                      <div className="cla-cal-alert cla-cal-alert-success cla-cal-mb-3">
+                        <strong>ARIA Features:</strong>
+                        <ul style={{ marginBottom: 0, paddingLeft: '20px' }}>
+                          <li>Calendar grid with proper <code>role="grid"</code> structure</li>
+                          <li>Live regions for month changes and notifications</li>
+                          <li>Descriptive labels for all interactive elements</li>
+                          <li>Error announcements with <code>role="alert"</code></li>
+                          <li>Selected date announcements</li>
+                          <li>Restriction messages for unavailable dates</li>
+                        </ul>
+                      </div>
+                      <CLACalendar 
+                        settings={{
+                          displayMode: 'popup',
+                          visibleMonths: 1,
+                          monthWidth: 300,
+                          selectionMode: 'single',
+                          showSubmitButton: true,
+                          showTooltips: true,
+                          restrictionConfigFactory: () => ({
+                            restrictions: [
+                              {
+                                type: 'weekday',
+                                enabled: true,
+                                days: [0, 6],
+                                message: 'Weekends are not available for booking'
+                              }
+                            ]
+                          })
+                        }}
+                        onSubmit={handleDateSubmit}
+                      />
+                      <p style={{ fontSize: '12px', color: '#666', marginTop: '10px' }}>
+                        <em>Tip: Enable a screen reader to hear the announcements when navigating</em>
+                      </p>
+                    </div>
+
+                    {/* Focus Management Demo */}
+                    <div className="cla-cal-mb-4">
+                      <h5 style={{ fontSize: '18px', marginBottom: '10px' }}>3. Focus Management</h5>
+                      <p style={{ fontSize: '14px', color: '#666', marginBottom: '15px' }}>
+                        Clear focus indicators and proper focus trapping in popup mode.
+                      </p>
+                      <CLACalendar 
+                        settings={{
+                          displayMode: 'embedded',
+                          visibleMonths: 2,
+                          monthWidth: 250,
+                          selectionMode: 'range',
+                          showSubmitButton: true,
+                          showLayersNavigation: true,
+                          layers: [
+                            {
+                              name: 'holidays',
+                              title: 'Holidays',
+                              description: 'Public holidays',
+                              visible: true,
+                              data: {
+                                events: [
+                                  {
+                                    date: '2025-08-15',
+                                    title: 'Independence Day',
+                                    type: 'holiday',
+                                    time: 'All day',
+                                    description: 'National holiday',
+                                    color: '#dc3545'
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              name: 'personal',
+                              title: 'Personal',
+                              description: 'Personal events',
+                              visible: true,
+                              data: {
+                                events: [
+                                  {
+                                    date: '2025-08-20',
+                                    title: 'Team Meeting',
+                                    type: 'meeting',
+                                    time: '10:00 AM',
+                                    description: 'Monthly team sync',
+                                    color: '#0366d6'
+                                  }
+                                ]
+                              }
+                            }
+                          ],
+                          showDateInputs: true,
+                        }}
+                        onSubmit={handleDateSubmit}
+                      />
+                      <div className="cla-cal-alert cla-cal-alert-warning cla-cal-mt-2">
+                        <small>
+                          <strong>Focus Features:</strong>
+                          <ul style={{ marginBottom: 0, paddingLeft: '20px' }}>
+                            <li>Blue outline (2px) on focused elements</li>
+                            <li>High contrast mode support with thicker outlines</li>
+                            <li>Roving tabindex for efficient navigation</li>
+                            <li>Focus returns to trigger when popup closes</li>
+                          </ul>
+                        </small>
+                      </div>
+                    </div>
+
+                    {/* Form Integration Demo */}
+                    <div className="cla-cal-mb-4">
+                      <h5 style={{ fontSize: '18px', marginBottom: '10px' }}>4. Form Integration & Validation</h5>
+                      <p style={{ fontSize: '14px', color: '#666', marginBottom: '15px' }}>
+                        Proper form labels, error messages, and validation feedback.
+                      </p>
+                      <CLACalendar 
+                        settings={{
+                          displayMode: 'embedded',
+                          visibleMonths: 1,
+                          monthWidth: 300,
+                          selectionMode: 'range',
+                          showSubmitButton: true,
+                          showDateInputs: true,
+                          showFooter: true,
+                          restrictionConfigFactory: () => ({
+                            restrictions: [
+                              {
+                                type: 'boundary',
+                                enabled: true,
+                                minDate: new Date().toISOString().split('T')[0],
+                                message: 'Please select a future date'
+                              }
+                            ]
+                          })
+                        }}
+                        onSubmit={handleDateSubmit}
+                      />
+                      <p style={{ fontSize: '12px', color: '#666', marginTop: '10px' }}>
+                        Try typing an invalid date in the input fields to see error announcements
+                      </p>
+                    </div>
+
+                    {/* Testing Tips */}
+                    <div className="cla-cal-alert cla-cal-alert-secondary">
+                      <h6>Testing Accessibility:</h6>
+                      <ol style={{ marginBottom: 0, paddingLeft: '20px' }}>
+                        <li>Use <strong>keyboard only</strong> navigation (no mouse)</li>
+                        <li>Enable a <strong>screen reader</strong> (NVDA, JAWS, VoiceOver)</li>
+                        <li>Use browser <strong>DevTools accessibility panel</strong></li>
+                        <li>Check <strong>color contrast</strong> with browser extensions</li>
+                        <li>Test with <strong>Windows High Contrast mode</strong></li>
+                      </ol>
+                    </div>
                   </div>
                 )}
               </div>

@@ -40,6 +40,7 @@ import { CalendarErrorBoundary } from "./ErrorBoundary";
 
 import "./CLACalendar.css";
 import "./CLACalendarComponents/CalendarComponents.css";
+import "../styles/accessibility.css";
 
 import { DateRangeSelectionManager, DateRange } from "./CLACalendarComponents/selection/DateRangeSelectionManager";
 import { CLACalendarHandlers } from "./CLACalendarComponents/handlers/CLACalendarHandlers";
@@ -1079,7 +1080,13 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
           <div style={{ display: 'flex' }}>
             {activeLayers.map(layer =>
               layer.name === activeLayer && (
-                <div key={layer.name} style={{ width: '100%' }}>
+                <div 
+                  key={layer.name} 
+                  id={`layer-panel-${layer.name}`}
+                  role="tabpanel"
+                  aria-label={`${layer.title} view`}
+                  style={{ width: '100%' }}
+                >
                   {renderLayer(layer)}
                 </div>
               )
@@ -1185,6 +1192,10 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
             value={getDisplayText()}
             onClick={handleInputClick}
             onChange={settings.inputOnChange}
+            aria-label={settings.selectionMode === 'single' ? 'Select date' : 'Select date range'}
+            aria-haspopup="dialog"
+            aria-expanded={isOpen}
+            aria-controls={isOpen ? `${calendarIdRef.current}-calendar` : undefined}
           />
         )}
 
@@ -1222,7 +1233,10 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
             >
               <div
                 ref={calendarRef}
+                id={`${calendarIdRef.current}-calendar`}
                 className="cla-card"
+                role="dialog"
+                aria-label="Date picker calendar"
                 style={{
                   width: `${settings.visibleMonths * settings.monthWidth}px`,
                   ...DEFAULT_CONTAINER_STYLES,

@@ -18,4 +18,7 @@ export interface DayCellProps {
   colIndex: number;
   globalRowIndex?: number; // Global row index across all months
   globalColIndex?: number; // Global column index across all months
+  onKeyDown?: (e: React.KeyboardEvent) => void;
+  tabIndex?: number;
+  onFocus?: (e: React.FocusEvent) => void;
 }

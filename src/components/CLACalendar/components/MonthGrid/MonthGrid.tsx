@@ -10,7 +10,10 @@ import {
   parseISO,
   isValid,
   isWithinInterval,
-  isSameMonth
+  isSameMonth,
+  addDays,
+  addMonths,
+  isSameDay
 } from '../../../../utils/DateUtils';
 import { RestrictionManager } from '../../../CLACalendarComponents/restrictions/RestrictionManager';
 import { RestrictedBoundaryRestriction } from '../../../CLACalendarComponents/restrictions/types';
@@ -65,6 +68,8 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
   // Use a ref for current mouse position instead of state to avoid render loops
   const mousePositionRef = useRef({ x: 0, y: 0 });
   const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
+  const [focusedDate, setFocusedDate] = useState<Date | null>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
   const restrictionManager = useMemo(() => {
     if (!hoveredDate || !restrictionConfig || !restrictionConfig.restrictions || restrictionConfig.restrictions.length === 0) {
       return null;
@@ -91,6 +96,87 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
     setHoveredDate(null);
   };
 
+  // Keyboard navigation handler
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!focusedDate) return;
+
+    const currentIndex = calendarDays.findIndex(day => 
+      isSameDay(day, focusedDate, timezone)
+    );
+    if (currentIndex === -1) return;
+
+    let newIndex = currentIndex;
+    let preventDefault = true;
+
+    switch (e.key) {
+      case 'ArrowLeft':
+        newIndex = Math.max(0, currentIndex - 1);
+        break;
+      case 'ArrowRight':
+        newIndex = Math.min(calendarDays.length - 1, currentIndex + 1);
+        break;
+      case 'ArrowUp':
+        newIndex = Math.max(0, currentIndex - 7);
+        break;
+      case 'ArrowDown':
+        newIndex = Math.min(calendarDays.length - 1, currentIndex + 7);
+        break;
+      case 'Home':
+        if (e.ctrlKey) {
+          // Go to first day of month
+          newIndex = calendarDays.findIndex(day => 
+            isSameMonth(day, baseDate, timezone)
+          );
+        } else {
+          // Go to first day of week
+          const weekStart = Math.floor(currentIndex / 7) * 7;
+          newIndex = weekStart;
+        }
+        break;
+      case 'End':
+        if (e.ctrlKey) {
+          // Go to last day of month
+          for (let i = calendarDays.length - 1; i >= 0; i--) {
+            if (isSameMonth(calendarDays[i], baseDate, timezone)) {
+              newIndex = i;
+              break;
+            }
+          }
+        } else {
+          // Go to last day of week
+          const weekStart = Math.floor(currentIndex / 7) * 7;
+          newIndex = Math.min(weekStart + 6, calendarDays.length - 1);
+        }
+        break;
+      case 'PageUp':
+        // Move to same day in previous month
+        e.preventDefault();
+        // This would require parent component coordination
+        return;
+      case 'PageDown':
+        // Move to same day in next month
+        e.preventDefault();
+        // This would require parent component coordination
+        return;
+      default:
+        preventDefault = false;
+    }
+
+    if (preventDefault) {
+      e.preventDefault();
+      const newDate = calendarDays[newIndex];
+      setFocusedDate(newDate);
+      
+      // Focus the new cell
+      requestAnimationFrame(() => {
+        const cell = gridRef.current?.querySelector(
+          `[data-date="${format(newDate, 'yyyy-MM-dd', timezone)}"]`
+        ) as HTMLElement;
+        cell?.focus();
+      });
+    }
+  }, [focusedDate, calendarDays, baseDate, timezone]);
+
   // Add scroll handler to hide tooltip on scroll
   useEffect(() => {
     const handleScroll = () => {
@@ -106,6 +192,26 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
       window.removeEventListener('scroll', handleScroll, true);
     };
   }, [hoveredDate]);
+
+  // Set initial focus on the current date or first day of month
+  useEffect(() => {
+    if (!focusedDate && monthIndex === 0) {
+      const today = new Date();
+      const isCurrentMonthView = isSameMonth(today, baseDate, timezone);
+      
+      if (isCurrentMonthView && calendarDays.some(day => isSameDay(day, today, timezone))) {
+        setFocusedDate(today);
+      } else {
+        // Focus on the first day of the current month
+        const firstDayOfMonth = calendarDays.find(day => 
+          isSameMonth(day, baseDate, timezone)
+        );
+        if (firstDayOfMonth) {
+          setFocusedDate(firstDayOfMonth);
+        }
+      }
+    }
+  }, []);
 
   // Only render tooltip when necessary
   const renderTooltip = useCallback((message: string, settings?: CalendarSettings) => {
@@ -142,11 +248,13 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
       )}
 
       {/* Weekday header row */}
-      <div className="month-grid-weekdays">
+      <div className="month-grid-weekdays" role="row">
         {weekDays.map(day => (
           <div
             key={day}
             className="month-grid-weekday"
+            role="columnheader"
+            aria-label={day}
             style={{
               fontSize: getFontSize(settings, 'small')
             }}
@@ -158,9 +266,13 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
 
       {/* Days grid */}
       <div
+        ref={gridRef}
         className="month-grid-days"
         onMouseMove={handleGridMouseMove}
         onMouseLeave={handleGridMouseLeave}
+        onKeyDown={handleKeyDown}
+        role="grid"
+        aria-label={`Calendar grid for ${format(monthStart, 'MMMM yyyy')}`}
       >
         {Object.values(weeks).flatMap((week, weekIndex) =>
           week.map((date, dayIndex) => (
@@ -185,6 +297,8 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
               colIndex={dayIndex}
               globalRowIndex={weekIndex}
               globalColIndex={dayIndex}
+              tabIndex={focusedDate && isSameDay(date, focusedDate, timezone) ? 0 : -1}
+              onFocus={() => setFocusedDate(date)}
             />
           ))
         )}

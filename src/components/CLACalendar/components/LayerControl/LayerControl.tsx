@@ -8,7 +8,11 @@ export const LayerControl: React.FC<LayerControlProps> = ({
   onLayerChange 
 }) => {
   return (
-    <div className="cla-layer-control">
+    <div 
+      className="cla-layer-control"
+      role="tablist"
+      aria-label="Calendar view options"
+    >
       {layers
         .filter(layer => layer.visible !== false)
         .map(layer => (
@@ -16,6 +20,10 @@ export const LayerControl: React.FC<LayerControlProps> = ({
             key={layer.name}
             onClick={() => onLayerChange(layer.name)}
             className={`cla-layer-button ${activeLayer === layer.name ? 'active' : ''}`}
+            role="tab"
+            aria-selected={activeLayer === layer.name}
+            aria-controls={`layer-panel-${layer.name}`}
+            aria-label={`View ${layer.title}`}
           >
             {layer.title}
           </button>

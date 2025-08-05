@@ -27,7 +27,10 @@ export const DayCell: React.FC<DayCellProps> = ({
   rowIndex,
   colIndex,
   globalRowIndex,
-  globalColIndex
+  globalColIndex,
+  onKeyDown,
+  tabIndex,
+  onFocus
 }) => {
   const { isSelected, isInRange, isRangeStart, isRangeEnd } = useMemo(() => {
     if (!selectedRange.start) {
@@ -113,6 +116,32 @@ export const DayCell: React.FC<DayCellProps> = ({
     setIsHovered(false);
   }, []);
 
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (!restrictionResult.allowed) return;
+    
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      // Simulate a mouse down event for selection
+      const mouseEvent = new MouseEvent('mousedown', {
+        bubbles: true,
+        cancelable: true,
+        view: window
+      });
+      e.currentTarget.dispatchEvent(mouseEvent);
+    } else if (onKeyDown) {
+      onKeyDown(e);
+    }
+  }, [restrictionResult.allowed, onKeyDown]);
+
+  const handleFocus = useCallback((e: React.FocusEvent) => {
+    setIsHovered(true);
+    if (onFocus) onFocus(e);
+  }, [onFocus]);
+
+  const handleBlur = useCallback(() => {
+    setIsHovered(false);
+  }, []);
+
   const isSingleDay = useMemo(() => {
     if (!selectedRange.start) return false;
     if (!selectedRange.end) return true;
@@ -166,15 +195,34 @@ export const DayCell: React.FC<DayCellProps> = ({
     isSingleDay && (isSelected || isInRange) && 'single-day'
   ].filter(Boolean).join(' ');
 
+  // Format date for screen reader
+  const dateLabel = format(date, "EEEE, MMMM d, yyyy", settings?.timezone || 'UTC');
+  const ariaLabel = [
+    dateLabel,
+    isSelected && 'selected',
+    isRangeStart && 'start of range',
+    isRangeEnd && 'end of range',
+    !restrictionResult.allowed && `unavailable: ${restrictionResult.message || 'restricted'}`
+  ].filter(Boolean).join(', ');
+
   const cellContent = (
     <div
       className={dayCellClasses}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onMouseDown={onMouseDown}
+      onKeyDown={handleKeyDown}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+      tabIndex={isCurrentMonth ? (tabIndex ?? -1) : -1}
+      role="gridcell"
+      aria-label={ariaLabel}
+      aria-selected={isSelected}
+      aria-disabled={!restrictionResult.allowed}
+      data-date={format(date, 'yyyy-MM-dd', settings?.timezone || 'UTC')}
       style={{
         backgroundColor: restrictionResult.allowed 
-          ? ((isSelected || isInRange) ? (settings?.backgroundColors?.selection || "#b1e4e5") : getBackgroundColor())
+          ? ((isSelected || isInRange) ? (settings?.backgroundColors?.selection || "#cce5ff") : getBackgroundColor())
           : 'transparent',
         '--row-index': rowIndex,
         '--col-index': colIndex

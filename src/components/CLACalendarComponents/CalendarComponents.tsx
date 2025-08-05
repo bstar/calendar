@@ -271,6 +271,9 @@ export const DateInput: React.FC<DateInputProps> = ({
         placeholder={placeholder}
         autoComplete="off"
         className="date-input"
+        aria-label={placeholder}
+        aria-invalid={!!error}
+        aria-describedby={error ? `${field}-error` : undefined}
         style={{
           backgroundColor: settings?.backgroundColors?.input || '#fff'
         }}
@@ -281,7 +284,10 @@ export const DateInput: React.FC<DateInputProps> = ({
         </div>
       )}
       <div
+        id={`${field}-error`}
         className={`date-input-error ${error && showError ? 'show' : ''}`}
+        role="alert"
+        aria-live="polite"
       >
         {error?.message}
       </div>
@@ -323,6 +329,8 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 
   return (
     <div className="cla-header"
+         role="navigation"
+         aria-label="Calendar navigation"
          style={{
            backgroundColor: settings?.backgroundColors?.monthHeader || 'white'
          }}>
@@ -333,15 +341,17 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
       >
         <ChevronLeft size={16} />
       </button>
-      <span 
+      <h2 
         className="cla-header-title"
+        aria-live="polite"
+        aria-atomic="true"
         title={`Current timezone: ${formatTimezone(timezone)}`}
       >
         {visibleMonths === 1
           ? format(months[0], "MMMM yyyy", 'UTC')
           : `${format(months[0], "MMMM yyyy", 'UTC')} - ${format(months[months.length - 1], "MMMM yyyy", 'UTC')}`
         }
-      </span>
+      </h2>
       <button
         className="cla-button-nav"
         onClick={() => moveToMonth('next')}
@@ -385,6 +395,8 @@ export const DateInputSection: React.FC<DateInputSectionProps> = ({
   settings
 }) => (
   <div className={`cla-input-container ${selectionMode === 'single' ? 'single' : 'range'}`}
+       role="group"
+       aria-label={selectionMode === 'single' ? 'Date selection' : 'Date range selection'}
        style={{
          backgroundColor: settings?.backgroundColors?.headerContainer || 'transparent'
        }}>
@@ -436,10 +448,11 @@ export const CalendarFooter: React.FC<CalendarFooterProps> = ({
   handleClear,
   handleSubmit
 }) => (
-  <div className="calendar-footer">
+  <div className="calendar-footer" role="group" aria-label="Calendar actions">
     <Button
       variant="secondary"
       onClick={handleClear}
+      aria-label="Clear date selection"
     >
       Clear
     </Button>
@@ -447,6 +460,7 @@ export const CalendarFooter: React.FC<CalendarFooterProps> = ({
       <Button
         variant="primary"
         onClick={handleSubmit}
+        aria-label="Submit date selection"
       >
         Submit
       </Button>
@@ -501,6 +515,8 @@ export const CalendarContainer: React.FC<CalendarContainerProps> = ({
     <div
       ref={containerRef}
       className={`cla-card ${displayMode === 'popup' ? 'cla-card-popup' : ''}`}
+      role="application"
+      aria-label="Date picker calendar"
       style={{
         width: 'auto',
         ...DEFAULT_CONTAINER_STYLES,

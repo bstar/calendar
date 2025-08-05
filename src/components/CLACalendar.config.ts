@@ -375,7 +375,7 @@ export interface SettingsConfig {
 
 // Default colors that can be overridden
 export const DEFAULT_COLORS = {
-  primary: '#0366d6',    // Blue
+  primary: '#0056b3',    // Darker blue for better contrast (WCAG AA compliant)
   success: '#28a745',    // Green
   warning: '#f6c23e',    // Yellow
   danger: '#dc3545',     // Red

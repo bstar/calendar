@@ -35,7 +35,7 @@
 }
 
 .cla-cal-text-muted {
-  color: #6c757d !important;
+  color: #595959 !important;
 }
 
 .cla-cal-small {
@@ -123,7 +123,7 @@
 }
 
 .cla-cal-form-select:focus {
-  border-color: #86b7fe;
+  border-color: #0056b3;
   outline: 0;
   box-shadow: 0 0 0 0.25rem rgba(13,110,253,.25);
 }

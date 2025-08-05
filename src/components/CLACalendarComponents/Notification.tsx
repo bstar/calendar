@@ -29,7 +29,11 @@ export const Notification: React.FC<NotificationProps> = ({
   }, [duration, onDismiss]);
 
   return (
-    <div className={`cla-notification ${isFading ? 'fade-out' : ''}`}>
+    <div 
+      className={`cla-notification ${isFading ? 'fade-out' : ''}`}
+      role="alert"
+      aria-live="polite"
+    >
       <span className="cla-notification-message">{message}</span>
       <button
         className="cla-notification-dismiss"
@@ -38,6 +42,7 @@ export const Notification: React.FC<NotificationProps> = ({
           setIsFading(true);
           setTimeout(onDismiss, 300); // Wait for fade out animation
         }}
+        aria-label="Dismiss notification"
       >
         ×
       </button>
