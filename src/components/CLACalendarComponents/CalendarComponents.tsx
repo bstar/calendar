@@ -445,7 +445,7 @@ export const CalendarFooter: React.FC<CalendarFooterProps> = ({
     </Button>
     {showSubmitButton && (
       <Button
-        variant="secondary"
+        variant="primary"
         onClick={handleSubmit}
       >
         Submit

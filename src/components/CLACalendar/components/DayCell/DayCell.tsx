@@ -159,7 +159,6 @@ export const DayCell: React.FC<DayCellProps> = ({
 
   const dayCellClasses = [
     'day-cell',
-    !restrictionResult.allowed && 'restricted-date-pattern',
     !restrictionResult.allowed && 'restricted',
     isSelected && 'selected',
     isRangeStart && 'range-start',

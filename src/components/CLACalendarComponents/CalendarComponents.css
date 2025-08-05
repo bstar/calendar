@@ -66,19 +66,38 @@
 
 /* Button styles */
 .cla-button {
-  background-color: #2e334e;
-  color: #fff !important;
   border-radius: 4px;
   font-size: 12px;
   padding: 10px 20px;
-  border-radius: 4px;
   cursor: pointer;
   font-weight: 500;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  border: 1px solid transparent;
 }
 
-.cla-button:hover {
-  background-color: #434552;
+/* Primary button variant (default) */
+.cla-button-primary {
+  background-color: #212529;
+  color: #fff !important;
+  border-color: #212529;
+}
+
+.cla-button-primary:hover {
+  background-color: #343a40;
+  border-color: #343a40;
+}
+
+/* Secondary button variant */
+.cla-button-secondary {
+  background-color: #f7f7f7;
+  color: #4b4b4b !important;
+  border: 1px solid #cbcbcb;
+}
+
+.cla-button-secondary:hover {
+  background-color: #efefef;
+  color: #333333 !important;
+  border-color: #b8b8b8;
 }
 
 /* DateInput styles */

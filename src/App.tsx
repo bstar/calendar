@@ -489,38 +489,9 @@ const App: React.FC = () => {
                   <div>
                     <h4>Restriction Testing</h4>
                     <p className="cla-cal-text-muted">
-                      Comprehensive testing of all 5 restriction types with diagonal pattern visualization
+                      Comprehensive testing of all 5 restriction types with visual restrictions
                     </p>
                     
-                    {/* Diagonal Pattern Offset Slider */}
-                    <div className="cla-cal-mb-4 cla-cal-p-3" style={{ backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
-                      <h5 style={{ fontSize: '16px', marginBottom: '10px' }}>Diagonal Pattern Alignment</h5>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                        <label style={{ fontSize: '14px', minWidth: '150px' }}>Column Y-Offset:</label>
-                        <input
-                          type="range"
-                          min="0"
-                          max="10"
-                          defaultValue="2"
-                          step="0.5"
-                          style={{ flex: 1 }}
-                          onChange={(e) => {
-                            const offset = e.target.value;
-                            // Update CSS variable for column offset
-                            document.documentElement.style.setProperty('--diagonal-col-offset', offset + 'px');
-                            // Update displayed value
-                            const valueDisplay = document.getElementById('col-offset-value');
-                            if (valueDisplay) valueDisplay.textContent = offset;
-                          }}
-                        />
-                        <span style={{ fontSize: '14px', minWidth: '60px' }}>
-                          <span id="col-offset-value">2</span>px
-                        </span>
-                      </div>
-                      <p style={{ fontSize: '12px', color: '#666', marginTop: '10px', marginBottom: 0 }}>
-                        Controls how much each column shifts the pattern down. Set to 2px for perfect alignment.
-                      </p>
-                    </div>
                     
                     {/* Restriction Type 1: Date Range */}
                     <div className="cla-cal-mb-4">
@@ -559,7 +530,7 @@ const App: React.FC = () => {
                         onSubmit={handleDateSubmit}
                       />
                       <div className="cla-cal-alert cla-cal-alert-warning cla-cal-mt-2">
-                        <small>🚫 Aug 10-15 and Aug 25-27 are restricted with diagonal pattern</small>
+                        <small>🚫 Aug 10-15 and Aug 25-27 are restricted (dimmed)</small>
                       </div>
                     </div>
 
@@ -665,7 +636,7 @@ const App: React.FC = () => {
                         onSubmit={handleDateSubmit}
                       />
                       <div className="cla-cal-alert cla-cal-alert-warning cla-cal-mt-2">
-                        <small>🚫 All Saturdays and Sundays show diagonal restriction pattern</small>
+                        <small>🚫 All Saturdays and Sundays are dimmed</small>
                       </div>
                     </div>
 
@@ -764,29 +735,11 @@ const App: React.FC = () => {
                       <div className="cla-cal-alert cla-cal-alert-secondary cla-cal-mt-2">
                         <small>
                           🔀 Combined: Aug-Sep only + No weekends + Aug 15-18 blocked<br/>
-                          Notice how diagonal patterns overlay for multiple restrictions
+                          Notice how restrictions combine
                         </small>
                       </div>
                     </div>
 
-                    {/* Pattern Quality Test */}
-                    <div className="cla-cal-mt-4 cla-cal-p-3" style={{ backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
-                      <h6 style={{ fontSize: '16px', marginBottom: '10px' }}>🎨 Diagonal Pattern Quality Check</h6>
-                      <p style={{ fontSize: '14px', marginBottom: '10px' }}>
-                        The diagonal restriction pattern should appear as:
-                      </p>
-                      <ul style={{ fontSize: '14px', paddingLeft: '20px' }}>
-                        <li>Clean, crisp diagonal lines at 45° angle</li>
-                        <li>Red stripes (not gray) with proper spacing</li>
-                        <li>Seamless pattern continuation across calendar cells</li>
-                        <li>Enhanced visibility when overlaid with blue selection</li>
-                        <li>Consistent alignment across all months</li>
-                      </ul>
-                      <p style={{ fontSize: '13px', color: '#666', marginTop: '10px' }}>
-                        <strong>Implementation:</strong> Using CSS gradient with 1.5px stripes, 
-                        3px gaps, and global grid positioning for perfect alignment.
-                      </p>
-                    </div>
                   </div>
                 )}
               </div>

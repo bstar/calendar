@@ -57,17 +57,6 @@ export const CalendarStoryWrapper: React.FC<CalendarStoryWrapperProps> = ({
     end: string | null;
   }>({ start: null, end: null });
 
-  // Apply diagonal offset CSS variable when it changes
-  useEffect(() => {
-    // Always set the value, using default if not provided
-    const offset = args.diagonalColOffset ?? 2;
-    document.documentElement.style.setProperty('--diagonal-col-offset', offset + 'px');
-    
-    // Cleanup on unmount
-    return () => {
-      document.documentElement.style.removeProperty('--diagonal-col-offset');
-    };
-  }, [args.diagonalColOffset]);
 
   const handleSubmit = (start: string | null, end: string | null) => {
     setSelectedDates({

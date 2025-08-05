@@ -208,16 +208,6 @@ export const calendarArgTypes: ArgTypes = {
       category: 'Advanced',
       defaultValue: { summary: '1rem' }
     }
-  },
-  
-  // Diagonal Pattern Control
-  diagonalColOffset: {
-    control: { type: 'range', min: 0, max: 10, step: 0.5 },
-    description: 'Column Y-offset for diagonal restriction pattern alignment',
-    table: {
-      category: 'Advanced',
-      defaultValue: { summary: 2 }
-    }
   }
 };
 
@@ -245,8 +235,7 @@ export const defaultArgs = {
   dangerColor: '#dc3545',
   timezone: 'UTC',
   dateRangeSeparator: ' - ',
-  baseFontSize: '1rem',
-  diagonalColOffset: 2
+  baseFontSize: '1rem'
 };
 
 /**

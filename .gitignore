@@ -32,3 +32,4 @@ coverage/
 
 # npm pack output
 *.tgz
+.serena/cache/*

@@ -6,21 +6,6 @@ import { CalendarStoryWrapper } from './shared/CalendarStoryWrapper';
 import { createCalendarSettings } from '../components/CLACalendar.config';
 import type { RestrictionConfig } from '../components/CLACalendar.config';
 
-// Helper component to apply diagonal offset for all restriction stories
-const DiagonalOffsetWrapper: React.FC<{ args: any; children: React.ReactNode }> = ({ args, children }) => {
-  useEffect(() => {
-    // Always set the value, using default if not provided
-    const offset = args.diagonalColOffset ?? 2;
-    document.documentElement.style.setProperty('--diagonal-col-offset', offset + 'px');
-    
-    // Cleanup on unmount
-    return () => {
-      document.documentElement.style.removeProperty('--diagonal-col-offset');
-    };
-  }, [args.diagonalColOffset]);
-
-  return <>{children}</>;
-};
 
 const meta: Meta<typeof CLACalendar> = {
   title: 'Restrictions/Stories',
@@ -103,9 +88,7 @@ export const BoundaryRestriction: Story = {
     };
     
     return (
-      <DiagonalOffsetWrapper args={args}>
-        <BoundaryExample />
-      </DiagonalOffsetWrapper>
+      <BoundaryExample />
     );
   }
 };
@@ -176,9 +159,7 @@ export const WeekdayRestrictions: Story = {
     };
     
     return (
-      <DiagonalOffsetWrapper args={args}>
-        <WeekdayExample />
-      </DiagonalOffsetWrapper>
+      <WeekdayExample />
     );
   }
 };
@@ -280,9 +261,7 @@ export const DateRangeRestrictions: Story = {
     };
     
     return (
-      <DiagonalOffsetWrapper args={args}>
-        <DateRangeExample />
-      </DiagonalOffsetWrapper>
+      <DateRangeExample />
     );
   }
 };
@@ -372,9 +351,7 @@ export const AllowedRangesRestriction: Story = {
     };
     
     return (
-      <DiagonalOffsetWrapper args={args}>
-        <AllowedRangesExample />
-      </DiagonalOffsetWrapper>
+      <AllowedRangesExample />
     );
   }
 };
@@ -490,9 +467,7 @@ export const MultipleRestrictionsCombined: Story = {
     };
     
     return (
-      <DiagonalOffsetWrapper args={args}>
-        <MultipleRestrictionsExample />
-      </DiagonalOffsetWrapper>
+      <MultipleRestrictionsExample />
     );
   }
 };
@@ -627,9 +602,7 @@ export const DynamicRestrictions: Story = {
     };
     
     return (
-      <DiagonalOffsetWrapper args={args}>
-        <DynamicRestrictionsExample />
-      </DiagonalOffsetWrapper>
+      <DynamicRestrictionsExample />
     );
   }
 };
@@ -766,9 +739,7 @@ export const BusinessDaysOnly: Story = {
     };
     
     return (
-      <DiagonalOffsetWrapper args={args}>
-        <BusinessDaysExample />
-      </DiagonalOffsetWrapper>
+      <BusinessDaysExample />
     );
   }
 };
@@ -887,9 +858,7 @@ export const RestrictedBoundaryExample: Story = {
     };
     
     return (
-      <DiagonalOffsetWrapper args={args}>
-        <RestrictedBoundaryDemo />
-      </DiagonalOffsetWrapper>
+      <RestrictedBoundaryDemo />
     );
   }
 };
@@ -1005,9 +974,7 @@ export const MonthBoundaryRestriction: Story = {
     };
     
     return (
-      <DiagonalOffsetWrapper args={args}>
-        <MonthBoundaryExample />
-      </DiagonalOffsetWrapper>
+      <MonthBoundaryExample />
     );
   }
 };
@@ -1091,9 +1058,7 @@ export const SingleDateWithRestrictions: Story = {
     };
     
     return (
-      <DiagonalOffsetWrapper args={args}>
-        <SingleDateExample />
-      </DiagonalOffsetWrapper>
+      <SingleDateExample />
     );
   }
 };
