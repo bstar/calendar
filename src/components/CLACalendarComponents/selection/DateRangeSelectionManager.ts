@@ -264,9 +264,11 @@ export class DateRangeSelectionManager {
     }
 
     // First, check if direct selection is valid
+    // Pass the anchor date for restricted_boundary checks
     const directSelectionValid = this.restrictionManager.checkSelection(
       chronologicalStart,
-      chronologicalEnd
+      chronologicalEnd,
+      anchorDate
     );
 
     // If direct selection is valid, return it
@@ -297,7 +299,8 @@ export class DateRangeSelectionManager {
         currentDate = addDays(currentDate, -1)) {
 
         // Check if this current selection range is valid
-        const check = this.restrictionManager.checkSelection(currentDate, anchorDate);
+        // Pass anchor date for restricted_boundary checks
+        const check = this.restrictionManager.checkSelection(currentDate, anchorDate, anchorDate);
 
         if (check.allowed) {
           // This date is still valid - remember it and continue
@@ -345,7 +348,8 @@ export class DateRangeSelectionManager {
         currentDate = addDays(currentDate, 1)) {
 
         // Check if this current selection range is valid
-        const check = this.restrictionManager.checkSelection(anchorDate, currentDate);
+        // Pass anchor date for restricted_boundary checks
+        const check = this.restrictionManager.checkSelection(anchorDate, currentDate, anchorDate);
 
         if (check.allowed) {
           // This date is still valid - remember it and continue

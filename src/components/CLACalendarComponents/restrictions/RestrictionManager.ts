@@ -253,9 +253,10 @@ export class RestrictionManager {
    * Checks if a date range selection is allowed based on configured restrictions
    * @param {Date} start - Start date of the selection
    * @param {Date} end - End date of the selection
+   * @param {Date} [anchorDate] - Optional anchor date (where the selection actually started)
    * @returns {{ allowed: boolean; message?: string }} Object indicating if selection is allowed and any error message
    */
-  checkSelection(start: Date, end: Date): { allowed: boolean; message?: string } {
+  checkSelection(start: Date, end: Date, anchorDate?: Date): { allowed: boolean; message?: string } {
     if (!this.config?.restrictions) return { allowed: true };
 
     const messages: string[] = [];
@@ -265,8 +266,14 @@ export class RestrictionManager {
 
       const checker = this.restrictionCheckers[restriction.type];
       if (checker) {
-        const message = checker(start, end, restriction);
-        if (message) messages.push(message);
+        // For restricted_boundary, we need special handling with anchor date
+        if (restriction.type === 'restricted_boundary' && anchorDate) {
+          const message = this.checkRestrictedBoundaryRestriction(anchorDate, end, restriction);
+          if (message) messages.push(message);
+        } else {
+          const message = checker(start, end, restriction);
+          if (message) messages.push(message);
+        }
       }
     }
 
