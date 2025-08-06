@@ -761,12 +761,21 @@ const App: React.FC = () => {
                       <div className="cla-cal-alert cla-cal-alert-info cla-cal-mb-3">
                         <strong>Keyboard Shortcuts:</strong>
                         <ul style={{ marginBottom: 0, paddingLeft: '20px' }}>
-                          <li><kbd>Tab</kbd> - Move to calendar, then to other controls</li>
-                          <li><kbd>Arrow Keys</kbd> - Navigate between days</li>
+                          <li><kbd>Tab</kbd> - Move through inputs, navigation buttons, layers, and calendar months</li>
+                          <li><kbd>Arrow Keys</kbd> - Navigate between days:
+                            <ul style={{ paddingLeft: '20px', fontSize: '13px', marginTop: '5px' }}>
+                              <li><kbd>Left/Right</kbd> - Move between days, automatically moving to adjacent months at edges</li>
+                              <li><kbd>Up/Down</kbd> - Move between weeks, intelligently navigating to months above/below in grid layouts</li>
+                              <li>Navigation maintains column position when moving between months</li>
+                              <li>Works with any number of visible months (1-N)</li>
+                            </ul>
+                          </li>
                           <li><kbd>Home</kbd> - Go to first day of week</li>
                           <li><kbd>End</kbd> - Go to last day of week</li>
                           <li><kbd>Ctrl+Home</kbd> - Go to first day of month</li>
                           <li><kbd>Ctrl+End</kbd> - Go to last day of month</li>
+                          <li><kbd>Page Up</kbd> - Navigate to previous month</li>
+                          <li><kbd>Page Down</kbd> - Navigate to next month</li>
                           <li><kbd>Enter</kbd> or <kbd>Space</kbd> - Select a date</li>
                           <li><kbd>Esc</kbd> - Close popup (in popup mode)</li>
                         </ul>
@@ -782,6 +791,72 @@ const App: React.FC = () => {
                           onSubmit: handleDateSubmit
                         }}
                       />
+                    </div>
+
+                    {/* Multi-Month Keyboard Navigation Demo */}
+                    <div className="cla-cal-mb-4">
+                      <h5 style={{ fontSize: '18px', marginBottom: '10px' }}>1.1 Multi-Month Keyboard Navigation</h5>
+                      <p style={{ fontSize: '14px', color: '#666', marginBottom: '15px' }}>
+                        Test keyboard navigation with multiple visible months. Use arrow keys to navigate seamlessly between months:
+                      </p>
+                      <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginBottom: '20px' }}>
+                        <div>
+                          <p style={{ fontSize: '13px', fontWeight: 'bold', marginBottom: '10px' }}>2 Months (Horizontal)</p>
+                          <CLACalendar 
+                            settings={{
+                              displayMode: 'embedded',
+                              visibleMonths: 2,
+                              monthWidth: 250,
+                              selectionMode: 'range',
+                              showSubmitButton: true,
+                              showSelectionAlert: true,
+                              onSubmit: handleDateSubmit
+                            }}
+                          />
+                        </div>
+                        <div>
+                          <p style={{ fontSize: '13px', fontWeight: 'bold', marginBottom: '10px' }}>4 Months</p>
+                          <CLACalendar 
+                            settings={{
+                              displayMode: 'embedded',
+                              visibleMonths: 4,
+                              monthWidth: 200,
+                              selectionMode: 'range',
+                              showSubmitButton: true,
+                              showSelectionAlert: true,
+                              onSubmit: handleDateSubmit
+                            }}
+                          />
+                        </div>
+                      </div>
+                      <div style={{ marginBottom: '20px' }}>
+                        <p style={{ fontSize: '13px', fontWeight: 'bold', marginBottom: '10px' }}>6 Months</p>
+                        <CLACalendar 
+                          settings={{
+                            displayMode: 'embedded',
+                            visibleMonths: 6,
+                            monthWidth: 150,
+                            selectionMode: 'range',
+                            showSubmitButton: true,
+                            showSelectionAlert: true,
+                            onSubmit: handleDateSubmit
+                          }}
+                        />
+                      </div>
+                      <div style={{ marginBottom: '20px' }}>
+                        <p style={{ fontSize: '13px', fontWeight: 'bold', marginBottom: '10px' }}>9 Months</p>
+                        <CLACalendar 
+                          settings={{
+                            displayMode: 'embedded',
+                            visibleMonths: 9,
+                            monthWidth: 120,
+                            selectionMode: 'range',
+                            showSubmitButton: true,
+                            showSelectionAlert: true,
+                            onSubmit: handleDateSubmit
+                          }}
+                        />
+                      </div>
                     </div>
 
                     {/* Screen Reader Support Demo */}

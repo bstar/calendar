@@ -855,6 +855,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
         startWeekOnSunday={settings.startWeekOnSunday}
         settings={settings}
         activeLayer={activeLayer}
+        onNavigateMonth={moveToMonth}
       />
     );
   }, [everInitialized, months, selectedRange, handleSelectionStart, handleSelectionMove, isSelecting, settings, effectiveRestrictionConfig, activeLayer]);

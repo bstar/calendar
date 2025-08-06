@@ -37,7 +37,11 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
   startWeekOnSunday = false,
   restrictionConfig,
   activeLayer,
-  settings
+  settings,
+  totalMonths,
+  onNavigateToMonth,
+  onNavigateMonth,
+  monthsPerRow = totalMonths // Default to all months in one row
 }) => {
   const timezone = settings?.timezone || 'UTC';
   const monthStart = startOfMonth(baseDate, timezone);
@@ -96,6 +100,18 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
     setHoveredDate(null);
   };
 
+  // Helper function to find next valid day in current month
+  const findNextValidDay = useCallback((startIndex: number, direction: 1 | -1, days: Date[]): number => {
+    let index = startIndex;
+    while (index >= 0 && index < days.length) {
+      if (isSameMonth(days[index], baseDate, timezone)) {
+        return index;
+      }
+      index += direction;
+    }
+    return -1;
+  }, [baseDate, timezone]);
+
   // Keyboard navigation handler
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
     if (!focusedDate) return;
@@ -107,19 +123,146 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
 
     let newIndex = currentIndex;
     let preventDefault = true;
+    let targetDate: Date | null = null;
 
     switch (e.key) {
       case 'ArrowLeft':
-        newIndex = Math.max(0, currentIndex - 1);
+        // Try to find previous valid day in current month
+        const prevIndex = findNextValidDay(currentIndex - 1, -1, calendarDays);
+        if (prevIndex !== -1) {
+          newIndex = prevIndex;
+        } else {
+          // No more days in current month, try to navigate to previous month
+          if (monthIndex !== undefined && monthIndex > 0 && onNavigateToMonth) {
+            // Navigate to previous month's last day
+            const targetMonthIndex = monthIndex - 1;
+            const prevMonth = addMonths(baseDate, -1);
+            const prevMonthDays = eachDayOfInterval({
+              start: startOfWeek(startOfMonth(prevMonth, timezone), { weekStartsOn: startWeekOnSunday ? 0 : 1, timezone }),
+              end: endOfWeek(endOfMonth(prevMonth, timezone), { weekStartsOn: startWeekOnSunday ? 0 : 1, timezone })
+            });
+            // Find last day in previous month that's actually in that month
+            for (let i = prevMonthDays.length - 1; i >= 0; i--) {
+              if (isSameMonth(prevMonthDays[i], prevMonth, timezone)) {
+                targetDate = prevMonthDays[i];
+                break;
+              }
+            }
+            if (targetDate) {
+              onNavigateToMonth(targetMonthIndex, targetDate);
+            }
+          }
+        }
         break;
       case 'ArrowRight':
-        newIndex = Math.min(calendarDays.length - 1, currentIndex + 1);
+        // Try to find next valid day in current month
+        const nextIndex = findNextValidDay(currentIndex + 1, 1, calendarDays);
+        if (nextIndex !== -1) {
+          newIndex = nextIndex;
+        } else {
+          // No more days in current month, try to navigate to next month
+          if (monthIndex !== undefined && totalMonths !== undefined && 
+              monthIndex < totalMonths - 1 && onNavigateToMonth) {
+            // Navigate to next month's first day
+            const targetMonthIndex = monthIndex + 1;
+            const nextMonth = addMonths(baseDate, 1);
+            const nextMonthDays = eachDayOfInterval({
+              start: startOfWeek(startOfMonth(nextMonth, timezone), { weekStartsOn: startWeekOnSunday ? 0 : 1, timezone }),
+              end: endOfWeek(endOfMonth(nextMonth, timezone), { weekStartsOn: startWeekOnSunday ? 0 : 1, timezone })
+            });
+            // Find first day in next month that's actually in that month
+            for (let i = 0; i < nextMonthDays.length; i++) {
+              if (isSameMonth(nextMonthDays[i], nextMonth, timezone)) {
+                targetDate = nextMonthDays[i];
+                break;
+              }
+            }
+            if (targetDate) {
+              onNavigateToMonth(targetMonthIndex, targetDate);
+            }
+          }
+        }
         break;
       case 'ArrowUp':
-        newIndex = Math.max(0, currentIndex - 7);
+        let upIndex = currentIndex - 7;
+        // Check if the up index would be valid and in current month
+        if (upIndex >= 0 && isSameMonth(calendarDays[upIndex], baseDate, timezone)) {
+          newIndex = upIndex;
+        } else {
+          // Try to find a valid day above in current month
+          while (upIndex >= 0) {
+            if (isSameMonth(calendarDays[upIndex], baseDate, timezone)) {
+              newIndex = upIndex;
+              break;
+            }
+            upIndex -= 7;
+          }
+          
+          // If no valid day found above, try to navigate to previous month
+          if (newIndex === currentIndex && monthIndex !== undefined && monthIndex > 0 && onNavigateToMonth) {
+            const columnIndex = currentIndex % 7;
+            const targetMonthIndex = monthIndex - 1;
+            const prevMonth = addMonths(baseDate, -1);
+            const prevMonthDays = eachDayOfInterval({
+              start: startOfWeek(startOfMonth(prevMonth, timezone), { weekStartsOn: startWeekOnSunday ? 0 : 1, timezone }),
+              end: endOfWeek(endOfMonth(prevMonth, timezone), { weekStartsOn: startWeekOnSunday ? 0 : 1, timezone })
+            });
+            
+            // Find a valid day in the same column from bottom to top
+            for (let week = Math.floor((prevMonthDays.length - 1) / 7); week >= 0; week--) {
+              const idx = week * 7 + columnIndex;
+              if (idx < prevMonthDays.length && isSameMonth(prevMonthDays[idx], prevMonth, timezone)) {
+                targetDate = prevMonthDays[idx];
+                break;
+              }
+            }
+            
+            if (targetDate) {
+              onNavigateToMonth(targetMonthIndex, targetDate);
+            }
+          }
+        }
         break;
       case 'ArrowDown':
-        newIndex = Math.min(calendarDays.length - 1, currentIndex + 7);
+        let downIndex = currentIndex + 7;
+        // Check if the down index would be valid and in current month
+        if (downIndex < calendarDays.length && isSameMonth(calendarDays[downIndex], baseDate, timezone)) {
+          newIndex = downIndex;
+        } else {
+          // Try to find a valid day below in current month
+          while (downIndex < calendarDays.length) {
+            if (isSameMonth(calendarDays[downIndex], baseDate, timezone)) {
+              newIndex = downIndex;
+              break;
+            }
+            downIndex += 7;
+          }
+          
+          // If no valid day found below, try to navigate to next month
+          if (newIndex === currentIndex && monthIndex !== undefined && totalMonths !== undefined && 
+              monthIndex < totalMonths - 1 && onNavigateToMonth) {
+            const columnIndex = currentIndex % 7;
+            const targetMonthIndex = monthIndex + 1;
+            const nextMonth = addMonths(baseDate, 1);
+            const nextMonthDays = eachDayOfInterval({
+              start: startOfWeek(startOfMonth(nextMonth, timezone), { weekStartsOn: startWeekOnSunday ? 0 : 1, timezone }),
+              end: endOfWeek(endOfMonth(nextMonth, timezone), { weekStartsOn: startWeekOnSunday ? 0 : 1, timezone })
+            });
+            
+            // Find a valid day in the same column from top to bottom
+            for (let week = 0; week <= Math.floor((nextMonthDays.length - 1) / 7); week++) {
+              const idx = week * 7 + columnIndex;
+              if (idx < nextMonthDays.length && isSameMonth(nextMonthDays[idx], nextMonth, timezone)) {
+                targetDate = nextMonthDays[idx];
+                break;
+              }
+            }
+            
+            if (targetDate) {
+              onNavigateToMonth(targetMonthIndex, targetDate);
+            }
+          }
+        }
         break;
       case 'Home':
         if (e.ctrlKey) {
@@ -128,9 +271,15 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
             isSameMonth(day, baseDate, timezone)
           );
         } else {
-          // Go to first day of week
+          // Go to first day of week within current month
           const weekStart = Math.floor(currentIndex / 7) * 7;
-          newIndex = weekStart;
+          // Find first valid day in this week
+          for (let i = weekStart; i < weekStart + 7 && i < calendarDays.length; i++) {
+            if (isSameMonth(calendarDays[i], baseDate, timezone)) {
+              newIndex = i;
+              break;
+            }
+          }
         }
         break;
       case 'End':
@@ -143,20 +292,31 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
             }
           }
         } else {
-          // Go to last day of week
+          // Go to last day of week within current month
           const weekStart = Math.floor(currentIndex / 7) * 7;
-          newIndex = Math.min(weekStart + 6, calendarDays.length - 1);
+          const weekEnd = Math.min(weekStart + 6, calendarDays.length - 1);
+          // Find last valid day in this week
+          for (let i = weekEnd; i >= weekStart; i--) {
+            if (isSameMonth(calendarDays[i], baseDate, timezone)) {
+              newIndex = i;
+              break;
+            }
+          }
         }
         break;
       case 'PageUp':
-        // Move to same day in previous month
+        // Move to previous month
         e.preventDefault();
-        // This would require parent component coordination
+        if (onNavigateMonth) {
+          onNavigateMonth('prev');
+        }
         return;
       case 'PageDown':
-        // Move to same day in next month
+        // Move to next month
         e.preventDefault();
-        // This would require parent component coordination
+        if (onNavigateMonth) {
+          onNavigateMonth('next');
+        }
         return;
       default:
         preventDefault = false;
@@ -164,18 +324,21 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
 
     if (preventDefault) {
       e.preventDefault();
-      const newDate = calendarDays[newIndex];
-      setFocusedDate(newDate);
       
-      // Focus the new cell
-      requestAnimationFrame(() => {
-        const cell = gridRef.current?.querySelector(
-          `[data-date="${format(newDate, 'yyyy-MM-dd', timezone)}"]`
-        ) as HTMLElement;
-        cell?.focus();
-      });
+      if (newIndex !== currentIndex && newIndex >= 0 && newIndex < calendarDays.length) {
+        const newDate = calendarDays[newIndex];
+        setFocusedDate(newDate);
+        
+        // Focus the new cell
+        requestAnimationFrame(() => {
+          const cell = gridRef.current?.querySelector(
+            `[data-date="${format(newDate, 'yyyy-MM-dd', timezone)}"]`
+          ) as HTMLElement;
+          cell?.focus();
+        });
+      }
     }
-  }, [focusedDate, calendarDays, baseDate, timezone]);
+  }, [focusedDate, calendarDays, baseDate, timezone, monthIndex, totalMonths, onNavigateToMonth, onNavigateMonth, monthsPerRow, startWeekOnSunday, findNextValidDay]);
 
   // Add scroll handler to hide tooltip on scroll
   useEffect(() => {
@@ -199,16 +362,21 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
       const today = new Date();
       const isCurrentMonthView = isSameMonth(today, baseDate, timezone);
       
-      if (isCurrentMonthView && calendarDays.some(day => isSameDay(day, today, timezone))) {
-        setFocusedDate(today);
-      } else {
-        // Focus on the first day of the current month
-        const firstDayOfMonth = calendarDays.find(day => 
-          isSameMonth(day, baseDate, timezone)
-        );
-        if (firstDayOfMonth) {
-          setFocusedDate(firstDayOfMonth);
+      // Check if today is in the current month view and is visible
+      if (isCurrentMonthView) {
+        const todayInCalendar = calendarDays.find(day => isSameDay(day, today, timezone));
+        if (todayInCalendar && isSameMonth(todayInCalendar, baseDate, timezone)) {
+          setFocusedDate(todayInCalendar);
+          return;
         }
+      }
+      
+      // Otherwise, focus on the first day of the current month
+      const firstDayOfMonth = calendarDays.find(day => 
+        isSameMonth(day, baseDate, timezone)
+      );
+      if (firstDayOfMonth) {
+        setFocusedDate(firstDayOfMonth);
       }
     }
   }, []);

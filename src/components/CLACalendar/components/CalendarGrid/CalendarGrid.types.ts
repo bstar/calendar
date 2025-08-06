@@ -15,10 +15,12 @@ export interface CalendarGridProps {
   restrictionConfig?: RestrictionConfig;
   startWeekOnSunday?: boolean;
   settings?: CalendarSettings;
+  onNavigateMonth?: (direction: 'prev' | 'next') => void;
 }
 
 export interface MonthPairProps extends CalendarGridProps {
   firstMonth: Date;
   secondMonth: Date | null;
   renderDay: (date: Date) => any;
+  months?: Date[];
 }

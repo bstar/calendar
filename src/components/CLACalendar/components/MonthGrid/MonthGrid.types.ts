@@ -18,4 +18,8 @@ export interface MonthGridProps {
   restrictionConfig?: RestrictionConfig;
   activeLayer?: string;
   settings?: CalendarSettings;
+  totalMonths?: number; // Total number of visible months
+  onNavigateToMonth?: (monthIndex: number, date: Date) => void; // Callback to navigate to another month
+  onNavigateMonth?: (direction: 'prev' | 'next') => void; // Callback for Page Up/Down navigation
+  monthsPerRow?: number; // Number of months displayed per row (for grid layout)
 }

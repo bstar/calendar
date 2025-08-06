@@ -1,5 +1,5 @@
-import React, { useMemo, useCallback } from 'react';
-import { addMonths } from '../../../../utils/DateUtils';
+import React, { useMemo, useCallback, useRef } from 'react';
+import { addMonths, format } from '../../../../utils/DateUtils';
 import { LayerRenderer } from '../../../CLACalendarComponents/layers/LayerRenderer';
 import { MonthGrid } from '../MonthGrid';
 import { CalendarGridProps, MonthPairProps } from './CalendarGrid.types';
@@ -21,7 +21,8 @@ const MonthPair: React.FC<MonthPairProps> = ({
   restrictionConfig,
   startWeekOnSunday,
   settings,
-  months
+  months,
+  onNavigateMonth
 }) => {
   // Calculate whether to show tooltips based on settings
   const showTooltips = useMemo(() => {
@@ -29,6 +30,24 @@ const MonthPair: React.FC<MonthPairProps> = ({
     if (settings.suppressTooltipsOnSelection && isSelecting) return false;
     return true;
   }, [settings?.showTooltips, settings?.suppressTooltipsOnSelection, isSelecting]);
+
+  // Create a ref to store the focused date for each month
+  const focusedDatesRef = useRef<Map<number, Date>>(new Map());
+
+  // Handle navigation between months
+  const handleNavigateToMonth = useCallback((targetMonthIndex: number, targetDate: Date) => {
+    // Store the target date for the month
+    focusedDatesRef.current.set(targetMonthIndex, targetDate);
+    
+    // Find the element in the target month and focus it
+    requestAnimationFrame(() => {
+      const targetDateStr = format(targetDate, 'yyyy-MM-dd', settings?.timezone || 'UTC');
+      const targetCell = document.querySelector(`[data-date="${targetDateStr}"]`) as HTMLElement;
+      if (targetCell) {
+        targetCell.focus();
+      }
+    });
+  }, [settings?.timezone]);
   // Use the months array directly if provided, otherwise calculate months
   const monthsToShow: Date[] = months || (() => {
     const result: Date[] = [];
@@ -38,7 +57,7 @@ const MonthPair: React.FC<MonthPairProps> = ({
       result.push(firstMonth);
       result.push(secondMonth);
     } else {
-      for (let i = 0; i < visibleMonths && i < 6; i++) {
+      for (let i = 0; i < visibleMonths; i++) {
         result.push(addMonths(firstMonth, i));
       }
     }
@@ -70,6 +89,10 @@ const MonthPair: React.FC<MonthPairProps> = ({
           startWeekOnSunday={startWeekOnSunday}
           settings={settings}
           activeLayer={activeLayer}
+          totalMonths={monthsToShow.length}
+          onNavigateToMonth={handleNavigateToMonth}
+          onNavigateMonth={onNavigateMonth}
+          monthsPerRow={monthsToShow.length} // For now, all months in one row
         />
       ))}
     </div>
@@ -88,7 +111,8 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
   activeLayer,
   restrictionConfig,
   startWeekOnSunday,
-  settings
+  settings,
+  onNavigateMonth
 }) => {
   // Only create renderers when needed and they contain actual data
   const renderers: Renderer[] = useMemo(() => {
@@ -154,6 +178,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
       settings={settings}
       activeLayer={activeLayer}
       months={months}
+      onNavigateMonth={onNavigateMonth}
     />
   );
 };
