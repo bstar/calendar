@@ -33,16 +33,20 @@ const MonthPair: React.FC<MonthPairProps> = ({
 
   // Create a ref to store the focused date for each month
   const focusedDatesRef = useRef<Map<number, Date>>(new Map());
+  // Add a ref to track the container for this specific calendar instance
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Handle navigation between months
   const handleNavigateToMonth = useCallback((targetMonthIndex: number, targetDate: Date) => {
     // Store the target date for the month
     focusedDatesRef.current.set(targetMonthIndex, targetDate);
     
-    // Find the element in the target month and focus it
+    // Find the element in the target month and focus it within this calendar instance
     requestAnimationFrame(() => {
+      if (!containerRef.current) return;
       const targetDateStr = format(targetDate, 'yyyy-MM-dd', settings?.timezone || 'UTC');
-      const targetCell = document.querySelector(`[data-date="${targetDateStr}"]`) as HTMLElement;
+      // Scope the query to this specific calendar instance
+      const targetCell = containerRef.current.querySelector(`[data-date="${targetDateStr}"]`) as HTMLElement;
       if (targetCell) {
         targetCell.focus();
       }
@@ -66,12 +70,15 @@ const MonthPair: React.FC<MonthPairProps> = ({
   })();
 
   return (
-    <div style={{
-      display: 'flex',
-      width: '100%',
-      gap: '0px',
-      justifyContent: 'center'
-    }}>
+    <div 
+      ref={containerRef}
+      style={{
+        display: 'flex',
+        width: '100%',
+        gap: '0px',
+        justifyContent: 'center'
+      }}
+    >
       {monthsToShow.map((month, index) => (
         <MonthGrid
           key={month.toISOString()}

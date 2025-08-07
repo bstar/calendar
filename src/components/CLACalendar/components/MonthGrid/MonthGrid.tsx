@@ -56,6 +56,18 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
     end: weekEnd,
   });
 
+  // Ensure we always have exactly 42 cells (6 weeks × 7 days)
+  const TOTAL_CELLS = 42;
+  const cellsToAdd = TOTAL_CELLS - calendarDays.length;
+  
+  // Pad with additional days if needed (this handles edge cases where eachDayOfInterval doesn't return 42 days)
+  if (cellsToAdd > 0) {
+    const lastDay = calendarDays[calendarDays.length - 1];
+    for (let i = 1; i <= cellsToAdd; i++) {
+      calendarDays.push(addDays(lastDay, i));
+    }
+  }
+
   const weeks: Record<number, Date[]> = calendarDays.reduce((acc, day, index) => {
     const weekIndex = Math.floor(index / 7);
     return {
@@ -73,6 +85,12 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
   const mousePositionRef = useRef({ x: 0, y: 0 });
   const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
   const [focusedDate, setFocusedDate] = useState<Date | null>(null);
+  
+  // Find the first day of the current month for initial tab index
+  const firstDayOfMonth = useMemo(() => 
+    calendarDays.find(d => isSameMonth(d, baseDate, timezone)) || null,
+    [calendarDays, baseDate, timezone]
+  );
   const gridRef = useRef<HTMLDivElement>(null);
   const restrictionManager = useMemo(() => {
     if (!hoveredDate || !restrictionConfig || !restrictionConfig.restrictions || restrictionConfig.restrictions.length === 0) {
@@ -94,6 +112,16 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
       x: e.clientX,
       y: e.clientY
     };
+    
+    // If user moves mouse significantly, exit keyboard navigation mode
+    // This allows hover effects to work again
+    if (focusedDate) {
+      // Only exit if mouse actually moved (not just from focus changes)
+      const movement = Math.abs(e.movementX) + Math.abs(e.movementY);
+      if (movement > 5) {
+        setFocusedDate(null);
+      }
+    }
   };
 
   const handleGridMouseLeave = () => {
@@ -115,6 +143,12 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
   // Keyboard navigation handler
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
     if (!focusedDate) return;
+    
+    // Prevent handling keyboard events if the grid doesn't contain the active element
+    // This prevents the navigation loop when focus leaves
+    if (!gridRef.current?.contains(document.activeElement)) {
+      return;
+    }
 
     const currentIndex = calendarDays.findIndex(day => 
       isSameDay(day, focusedDate, timezone)
@@ -133,7 +167,8 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
           newIndex = prevIndex;
         } else {
           // No more days in current month, try to navigate to previous month
-          if (monthIndex !== undefined && monthIndex > 0 && onNavigateToMonth) {
+          // Only if there are multiple months visible AND we have a valid previous month
+          if (totalMonths && totalMonths > 1 && monthIndex !== undefined && onNavigateToMonth) {
             // Navigate to previous month's last day
             const targetMonthIndex = monthIndex - 1;
             const prevMonth = addMonths(baseDate, -1);
@@ -152,6 +187,8 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
               onNavigateToMonth(targetMonthIndex, targetDate);
             }
           }
+          // If single month or can't navigate, stay on current cell
+          // Keep preventDefault = true to prevent default browser behavior
         }
         break;
       case 'ArrowRight':
@@ -161,8 +198,8 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
           newIndex = nextIndex;
         } else {
           // No more days in current month, try to navigate to next month
-          if (monthIndex !== undefined && totalMonths !== undefined && 
-              monthIndex < totalMonths - 1 && onNavigateToMonth) {
+          // Only if there are multiple months visible
+          if (totalMonths && totalMonths > 1 && monthIndex !== undefined && onNavigateToMonth) {
             // Navigate to next month's first day
             const targetMonthIndex = monthIndex + 1;
             const nextMonth = addMonths(baseDate, 1);
@@ -179,8 +216,12 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
             }
             if (targetDate) {
               onNavigateToMonth(targetMonthIndex, targetDate);
+              e.preventDefault();
+              return;
             }
           }
+          // If single month or can't navigate, stay on current cell
+          // Keep preventDefault = true to prevent default browser behavior
         }
         break;
       case 'ArrowUp':
@@ -199,7 +240,8 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
           }
           
           // If no valid day found above, try to navigate to previous month
-          if (newIndex === currentIndex && monthIndex !== undefined && monthIndex > 0 && onNavigateToMonth) {
+          // Only if there are multiple months
+          if (newIndex === currentIndex && totalMonths && totalMonths > 1 && monthIndex !== undefined && onNavigateToMonth) {
             const columnIndex = currentIndex % 7;
             const targetMonthIndex = monthIndex - 1;
             const prevMonth = addMonths(baseDate, -1);
@@ -219,6 +261,8 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
             
             if (targetDate) {
               onNavigateToMonth(targetMonthIndex, targetDate);
+              e.preventDefault();
+              return;
             }
           }
         }
@@ -239,8 +283,8 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
           }
           
           // If no valid day found below, try to navigate to next month
-          if (newIndex === currentIndex && monthIndex !== undefined && totalMonths !== undefined && 
-              monthIndex < totalMonths - 1 && onNavigateToMonth) {
+          // Only if there are multiple months
+          if (newIndex === currentIndex && totalMonths && totalMonths > 1 && monthIndex !== undefined && onNavigateToMonth) {
             const columnIndex = currentIndex % 7;
             const targetMonthIndex = monthIndex + 1;
             const nextMonth = addMonths(baseDate, 1);
@@ -260,6 +304,8 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
             
             if (targetDate) {
               onNavigateToMonth(targetMonthIndex, targetDate);
+              e.preventDefault();
+              return;
             }
           }
         }
@@ -318,6 +364,14 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
           onNavigateMonth('next');
         }
         return;
+      case 'Escape':
+        // Exit keyboard navigation mode by blurring the focused element
+        e.preventDefault();
+        if (document.activeElement instanceof HTMLElement) {
+          document.activeElement.blur();
+        }
+        setFocusedDate(null);
+        return;
       default:
         preventDefault = false;
     }
@@ -329,16 +383,19 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
         const newDate = calendarDays[newIndex];
         setFocusedDate(newDate);
         
-        // Focus the new cell
+        // Focus the new cell within this grid instance only
         requestAnimationFrame(() => {
-          const cell = gridRef.current?.querySelector(
+          if (!gridRef.current) return;
+          const cell = gridRef.current.querySelector(
             `[data-date="${format(newDate, 'yyyy-MM-dd', timezone)}"]`
           ) as HTMLElement;
-          cell?.focus();
+          if (cell) {
+            cell.focus();
+          }
         });
       }
     }
-  }, [focusedDate, calendarDays, baseDate, timezone, monthIndex, totalMonths, onNavigateToMonth, onNavigateMonth, monthsPerRow, startWeekOnSunday, findNextValidDay]);
+  }, [focusedDate, calendarDays, baseDate, timezone, monthIndex, totalMonths, onNavigateToMonth, onNavigateMonth, startWeekOnSunday, findNextValidDay]);
 
   // Add scroll handler to hide tooltip on scroll
   useEffect(() => {
@@ -358,28 +415,37 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
 
   // Set initial focus on the current date or first day of month
   useEffect(() => {
+    // Only set initial focus if we don't already have a focused date and this is the first month
     if (!focusedDate && monthIndex === 0) {
-      const today = new Date();
-      const isCurrentMonthView = isSameMonth(today, baseDate, timezone);
-      
-      // Check if today is in the current month view and is visible
-      if (isCurrentMonthView) {
-        const todayInCalendar = calendarDays.find(day => isSameDay(day, today, timezone));
-        if (todayInCalendar && isSameMonth(todayInCalendar, baseDate, timezone)) {
-          setFocusedDate(todayInCalendar);
-          return;
+      // Use a small delay to allow manual focus to take precedence (important for tests)
+      const timer = setTimeout(() => {
+        // Check again after the delay to see if focus was set manually
+        if (focusedDate) return;
+        
+        const today = new Date();
+        const isCurrentMonthView = isSameMonth(today, baseDate, timezone);
+        
+        // Check if today is in the current month view and is visible
+        if (isCurrentMonthView) {
+          const todayInCalendar = calendarDays.find(day => isSameDay(day, today, timezone));
+          if (todayInCalendar && isSameMonth(todayInCalendar, baseDate, timezone)) {
+            setFocusedDate(todayInCalendar);
+            return;
+          }
         }
-      }
+        
+        // Otherwise, focus on the first day of the current month
+        const firstDayOfMonth = calendarDays.find(day => 
+          isSameMonth(day, baseDate, timezone)
+        );
+        if (firstDayOfMonth) {
+          setFocusedDate(firstDayOfMonth);
+        }
+      }, 10); // Small delay to allow manual focus to take precedence
       
-      // Otherwise, focus on the first day of the current month
-      const firstDayOfMonth = calendarDays.find(day => 
-        isSameMonth(day, baseDate, timezone)
-      );
-      if (firstDayOfMonth) {
-        setFocusedDate(firstDayOfMonth);
-      }
+      return () => clearTimeout(timer);
     }
-  }, []);
+  }, [focusedDate, monthIndex, baseDate, timezone, calendarDays]);
 
   // Only render tooltip when necessary
   const renderTooltip = useCallback((message: string, settings?: CalendarSettings) => {
@@ -432,30 +498,65 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
         ))}
       </div>
 
-      {/* Days grid */}
+      {/* Days grid - Always renders exactly 42 cells */}
       <div
         ref={gridRef}
         className="month-grid-days"
         onMouseMove={handleGridMouseMove}
         onMouseLeave={handleGridMouseLeave}
         onKeyDown={handleKeyDown}
+        onBlur={(e) => {
+          // Clear focused date when focus leaves the grid entirely
+          // Check if the new focus target is outside this grid
+          if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+            setFocusedDate(null);
+          }
+        }}
         role="grid"
         aria-label={`Calendar grid for ${format(monthStart, 'MMMM yyyy')}`}
       >
-        {Object.values(weeks).flatMap((week, weekIndex) =>
-          week.map((date, dayIndex) => (
+        {calendarDays.map((date, index) => {
+          const isCurrentMonth = isSameMonth(date, baseDate, timezone);
+          const weekIndex = Math.floor(index / 7);
+          const dayIndex = index % 7;
+          
+          return (
             <DayCell
               key={date.toISOString()}
               date={date}
               selectedRange={selectedRange}
-              isCurrentMonth={isSameMonth(date, baseDate, timezone)}
-              onMouseDown={() => onSelectionStart(date)}
+              isCurrentMonth={isCurrentMonth}
+              onMouseDown={(e: React.MouseEvent) => {
+                // Only exit keyboard navigation mode for real mouse clicks
+                // (clientX and clientY are 0 for keyboard-generated synthetic events)
+                const isRealMouseEvent = e.clientX !== 0 || e.clientY !== 0;
+                if (isRealMouseEvent) {
+                  setFocusedDate(null);
+                }
+                
+                if (e.shiftKey && selectedRange.start) {
+                  // Shift+Click: extend selection
+                  // For keyboard (synthetic event), pass forceUpdate=true
+                  onSelectionMove(date, !isRealMouseEvent);
+                } else {
+                  // Regular click: start new selection
+                  // Pass isMouseDrag=true only for real mouse events
+                  onSelectionStart(date, isRealMouseEvent);
+                }
+              }}
               onMouseEnter={() => {
-                onSelectionMove(date);
+                // Only trigger selection move from mouse if not in keyboard navigation mode
+                // This prevents the selection from following the mouse cursor during keyboard nav
+                if (!focusedDate) {
+                  onSelectionMove(date);
+                }
+                // Always update hovered date for tooltip display
                 requestAnimationFrame(() => {
                   setHoveredDate(date);
                 });
               }}
+              onSelectionStart={onSelectionStart}
+              onSelectionMove={onSelectionMove}
               showTooltips={showTooltips}
               renderContent={renderDay}
               layer={layer}
@@ -465,19 +566,16 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
               colIndex={dayIndex}
               globalRowIndex={weekIndex}
               globalColIndex={dayIndex}
-              tabIndex={focusedDate && isSameDay(date, focusedDate, timezone) ? 0 : -1}
+              tabIndex={
+                focusedDate ? 
+                  (isSameDay(date, focusedDate, timezone) ? 0 : -1) :
+                  (firstDayOfMonth && isSameDay(date, firstDayOfMonth, timezone) ? 0 : -1)
+              }
               onFocus={() => setFocusedDate(date)}
+              onKeyDown={handleKeyDown}
             />
-          ))
-        )}
-
-        {[...Array(emptyWeeks * 7)].map((_, i) => (
-          <div 
-            key={`empty-${i}`} 
-            className="month-grid-empty-cell" 
-            style={{ backgroundColor: settings?.backgroundColors?.emptyRows || "white" }} 
-          />
-        ))}
+          );
+        })}
       </div>
 
       {/* Portaled tooltip to body */}

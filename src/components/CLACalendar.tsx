@@ -792,7 +792,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     if (!everInitialized || !selectionManager) {
       return {
         handleSelectionStart: () => { },
-        handleSelectionMove: () => { }
+        handleSelectionMove: () => ({ start: null, end: null })
       };
     }
 

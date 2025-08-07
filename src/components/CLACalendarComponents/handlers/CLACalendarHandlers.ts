@@ -283,7 +283,7 @@ export class CLACalendarHandlers {
     selectedRange: DateRange,
     outOfBoundsDirection: 'prev' | 'next' | null
   ) {
-    const handleSelectionStart = (date: Date) => {
+    const handleSelectionStart = (date: Date, isMouseDrag: boolean = false) => {
       const result = selectionManager.startSelection(date);
 
       if (!result.success) {
@@ -293,20 +293,24 @@ export class CLACalendarHandlers {
         return;
       }
 
-      // For single selection mode, don't enter selecting state
+      // Only enter selecting state for mouse drag in range mode
       if (selectionManager.getSelectionMode() === 'single') {
         setSelectedRange(result.range);
         setNotification(null);
       } else {
-        setIsSelecting(true);
+        // Only set isSelecting for actual mouse drag, not keyboard selection
+        if (isMouseDrag) {
+          setIsSelecting(true);
+        }
         setSelectedRange(result.range);
         setNotification(null);
       }
     };
 
-    const handleSelectionMove = (date: Date): DateRange => {
-      // If we're not in selecting mode, don't process move events
-      if (!isSelecting) {
+    const handleSelectionMove = (date: Date, forceUpdate: boolean = false): DateRange => {
+      // Only process move events if we're in selecting mode (mouse drag)
+      // OR if it's a forced update (keyboard selection)
+      if (!isSelecting && !forceUpdate) {
         return selectedRange;
       }
 

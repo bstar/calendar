@@ -21,4 +21,6 @@ export interface DayCellProps {
   onKeyDown?: (e: React.KeyboardEvent) => void;
   tabIndex?: number;
   onFocus?: (e: React.FocusEvent) => void;
+  onSelectionStart?: (date: Date, isMouseDrag?: boolean) => void;
+  onSelectionMove?: (date: Date, forceUpdate?: boolean) => void;
 }

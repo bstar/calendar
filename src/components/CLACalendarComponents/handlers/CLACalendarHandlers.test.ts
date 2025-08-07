@@ -517,7 +517,7 @@ describe('CLACalendarHandlers', () => {
       );
     });
 
-    it('should handle successful selection start', () => {
+    it('should handle successful selection start with mouse drag', () => {
       const date = createDate(2025, 5, 15);
       mockSelectionManager.startSelection.mockReturnValue({
         success: true,
@@ -525,9 +525,27 @@ describe('CLACalendarHandlers', () => {
         message: null
       });
 
-      handlers.handleSelectionStart(date);
+      handlers.handleSelectionStart(date, true); // Pass isMouseDrag=true
 
       expect(mockSetIsSelecting).toHaveBeenCalledWith(true);
+      expect(mockSetSelectedRange).toHaveBeenCalledWith({
+        start: date.toISOString(),
+        end: null
+      });
+      expect(mockSetNotification).toHaveBeenCalledWith(null);
+    });
+
+    it('should not set isSelecting for keyboard selection', () => {
+      const date = createDate(2025, 5, 15);
+      mockSelectionManager.startSelection.mockReturnValue({
+        success: true,
+        range: { start: date.toISOString(), end: null },
+        message: null
+      });
+
+      handlers.handleSelectionStart(date, false); // Pass isMouseDrag=false for keyboard
+
+      expect(mockSetIsSelecting).not.toHaveBeenCalled();
       expect(mockSetSelectedRange).toHaveBeenCalledWith({
         start: date.toISOString(),
         end: null
@@ -642,6 +660,39 @@ describe('CLACalendarHandlers', () => {
       expect(mockSelectionManager.updateSelection).not.toHaveBeenCalled();
       expect(mockSetSelectedRange).not.toHaveBeenCalled();
       expect(result).toEqual(currentRange);
+    });
+
+    it('should handle selection move with forceUpdate even when not selecting', () => {
+      const date = createDate(2025, 5, 20);
+      const currentRange = { start: '2025-06-15T00:00:00.000Z', end: null };
+      
+      handlers = CLACalendarHandlers.createSelectionHandlers(
+        mockSelectionManager,
+        false, // Not selecting
+        mockSetIsSelecting,
+        mockSetSelectedRange,
+        mockSetNotification,
+        true,
+        currentRange,
+        null
+      );
+
+      mockSelectionManager.updateSelection.mockReturnValue({
+        range: { start: '2025-06-15T00:00:00.000Z', end: date.toISOString() },
+        message: null
+      });
+
+      const result = handlers.handleSelectionMove(date, true); // Pass forceUpdate=true
+
+      expect(mockSelectionManager.updateSelection).toHaveBeenCalled();
+      expect(mockSetSelectedRange).toHaveBeenCalledWith({
+        start: '2025-06-15T00:00:00.000Z',
+        end: date.toISOString()
+      });
+      expect(result).toEqual({
+        start: '2025-06-15T00:00:00.000Z',
+        end: date.toISOString()
+      });
     });
 
     it('should show notification during selection move with message', () => {

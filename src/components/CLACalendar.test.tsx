@@ -317,7 +317,8 @@ describe('CLACalendar', () => {
           {...defaultProps}
           settings={createCalendarSettings({
             displayMode: 'embedded',
-            selectionMode: 'range'
+            selectionMode: 'range',
+            enableOutOfBoundsScroll: true
           })}
         />
       );
@@ -329,8 +330,8 @@ describe('CLACalendar', () => {
       expect(startDate).toBeTruthy();
       expect(endDate).toBeTruthy();
 
-      // Start selection
-      fireEvent.mouseDown(startDate!);
+      // Start selection with proper mouse event properties
+      fireEvent.mouseDown(startDate!, { clientX: 100, clientY: 100, button: 0 });
       
       // Move to end date
       fireEvent.mouseEnter(endDate!);
@@ -977,7 +978,8 @@ describe('CLACalendar', () => {
           _onSettingsChange={onSettingsChange}
           settings={createCalendarSettings({
             displayMode: 'embedded',
-            selectionMode: 'range'
+            selectionMode: 'range',
+            enableOutOfBoundsScroll: true
           })}
         />
       );
@@ -986,8 +988,8 @@ describe('CLACalendar', () => {
       const date1 = Array.from(dates).find(cell => cell.textContent === '10');
       const date2 = Array.from(dates).find(cell => cell.textContent === '15');
 
-      // Start selection
-      fireEvent.mouseDown(date1!);
+      // Start selection with proper mouse event properties
+      fireEvent.mouseDown(date1!, { clientX: 100, clientY: 100, button: 0 });
       
       // Move selection
       fireEvent.mouseEnter(date2!);
@@ -1926,6 +1928,7 @@ describe('CLACalendar', () => {
             showFooter: true,
             showSubmitButton: true,
             selectionMode: 'range',
+            enableOutOfBoundsScroll: true,
             onSubmit
           })}
         />
@@ -1939,8 +1942,8 @@ describe('CLACalendar', () => {
       expect(startDate).toBeTruthy();
       expect(endDate).toBeTruthy();
       
-      // Start selection
-      fireEvent.mouseDown(startDate!);
+      // Start selection with proper mouse event properties
+      fireEvent.mouseDown(startDate!, { clientX: 100, clientY: 100, button: 0 });
       
       // Move to end date
       fireEvent.mouseEnter(endDate!);

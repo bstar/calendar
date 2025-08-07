@@ -30,7 +30,9 @@ export const DayCell: React.FC<DayCellProps> = ({
   globalColIndex,
   onKeyDown,
   tabIndex,
-  onFocus
+  onFocus,
+  onSelectionStart,
+  onSelectionMove
 }) => {
   const { isSelected, isInRange, isRangeStart, isRangeEnd } = useMemo(() => {
     if (!selectedRange.start) {
@@ -116,22 +118,85 @@ export const DayCell: React.FC<DayCellProps> = ({
     setIsHovered(false);
   }, []);
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (!restrictionResult.allowed) return;
-    
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      // Simulate a mouse down event for selection
-      const mouseEvent = new MouseEvent('mousedown', {
-        bubbles: true,
-        cancelable: true,
-        view: window
-      });
-      e.currentTarget.dispatchEvent(mouseEvent);
-    } else if (onKeyDown) {
+  const handleCellKeyDown = useCallback((e: React.KeyboardEvent) => {
+    // Always forward the event to parent first for navigation handling
+    if (onKeyDown) {
       onKeyDown(e);
     }
-  }, [restrictionResult.allowed, onKeyDown]);
+    
+    if (!restrictionResult.allowed) return;
+    
+    // Only handle Enter and Space for selection if not already handled
+    if (!e.defaultPrevented && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
+      
+      // Check if Shift is held for range selection
+      if (e.shiftKey) {
+        // Shift+Enter/Space: extend selection to this date
+        if (onSelectionMove) {
+          // Pass forceUpdate=true for keyboard selection
+          onSelectionMove(date, true);
+        }
+        // Also call the mouse handler if it exists for compatibility
+        if (onMouseDown) {
+          const syntheticEvent = {
+            button: 0,
+            preventDefault: () => {},
+            stopPropagation: () => {},
+            currentTarget: e.currentTarget as HTMLDivElement,
+            target: e.target,
+            clientX: 0,
+            clientY: 0,
+            buttons: 1,
+            movementX: 0,
+            movementY: 0,
+            offsetX: 0,
+            offsetY: 0,
+            pageX: 0,
+            pageY: 0,
+            screenX: 0,
+            screenY: 0,
+            altKey: e.altKey,
+            ctrlKey: e.ctrlKey,
+            metaKey: e.metaKey,
+            shiftKey: true
+          } as React.MouseEvent<HTMLDivElement>;
+          onMouseDown(syntheticEvent);
+        }
+      } else {
+        // Regular Enter/Space: start new selection
+        if (onSelectionStart) {
+          onSelectionStart(date);
+        }
+        // Also call the mouse handler if it exists for compatibility
+        if (onMouseDown) {
+          const syntheticEvent = {
+            button: 0,
+            preventDefault: () => {},
+            stopPropagation: () => {},
+            currentTarget: e.currentTarget as HTMLDivElement,
+            target: e.target,
+            clientX: 0,
+            clientY: 0,
+            buttons: 1,
+            movementX: 0,
+            movementY: 0,
+            offsetX: 0,
+            offsetY: 0,
+            pageX: 0,
+            pageY: 0,
+            screenX: 0,
+            screenY: 0,
+            altKey: e.altKey,
+            ctrlKey: e.ctrlKey,
+            metaKey: e.metaKey,
+            shiftKey: false
+          } as React.MouseEvent<HTMLDivElement>;
+          onMouseDown(syntheticEvent);
+        }
+      }
+    }
+  }, [restrictionResult.allowed, onKeyDown, onMouseDown, onSelectionStart, onSelectionMove, date]);
 
   const handleFocus = useCallback((e: React.FocusEvent) => {
     setIsHovered(true);
@@ -152,11 +217,6 @@ export const DayCell: React.FC<DayCellProps> = ({
     );
   }, [selectedRange.start, selectedRange.end, settings?.timezone]);
 
-  // Always render the DayCell component, but return a placeholder for non-current month days
-  const cellPlaceholder = !isCurrentMonth ? (
-    <div className="day-cell-placeholder" style={{ backgroundColor: settings?.backgroundColors?.emptyRows || "white" }} />
-  ) : null;
-
   // Moved useMemo outside the conditional statement
   const eventContent = useMemo(() => {
     if (!renderContent) return null;
@@ -170,11 +230,6 @@ export const DayCell: React.FC<DayCellProps> = ({
     }
     return null;
   }, [renderContent, date, showTooltips, isSelected, isInRange, isHovered, isCurrentMonth]);
-
-  // If this is not the current month, render the placeholder
-  if (!isCurrentMonth) {
-    return cellPlaceholder;
-  }
 
   const getBackgroundColor = () => {
     // Only get background color for non-restricted dates
@@ -193,7 +248,8 @@ export const DayCell: React.FC<DayCellProps> = ({
     isRangeStart && 'range-start',
     isRangeEnd && 'range-end',
     isInRange && !isSelected && 'range-middle',
-    isSingleDay && (isSelected || isInRange) && 'single-day'
+    isSingleDay && (isSelected || isInRange) && 'single-day',
+    !isCurrentMonth && 'non-current-month'
   ].filter(Boolean).join(' ');
 
   // Format date for screen reader
@@ -203,30 +259,35 @@ export const DayCell: React.FC<DayCellProps> = ({
     isSelected && 'selected',
     isRangeStart && 'start of range',
     isRangeEnd && 'end of range',
-    !restrictionResult.allowed && `unavailable: ${restrictionResult.message || 'restricted'}`
+    !restrictionResult.allowed && `unavailable: ${restrictionResult.message || 'restricted'}`,
+    !isCurrentMonth && 'outside current month'
   ].filter(Boolean).join(', ');
 
+  // Always render a cell with role="gridcell", but make non-current month cells non-interactive
   const cellContent = (
     <div
       className={dayCellClasses}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      onMouseDown={onMouseDown}
-      onKeyDown={handleKeyDown}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
+      onMouseEnter={isCurrentMonth ? handleMouseEnter : undefined}
+      onMouseLeave={isCurrentMonth ? handleMouseLeave : undefined}
+      onMouseDown={isCurrentMonth ? onMouseDown : undefined}
+      onKeyDown={isCurrentMonth ? handleCellKeyDown : undefined}
+      onFocus={isCurrentMonth ? handleFocus : undefined}
+      onBlur={isCurrentMonth ? handleBlur : undefined}
       tabIndex={isCurrentMonth ? (tabIndex ?? -1) : -1}
       role="gridcell"
       aria-label={ariaLabel}
-      aria-selected={isSelected}
-      aria-disabled={!restrictionResult.allowed}
+      aria-selected={isCurrentMonth ? isSelected : false}
+      aria-disabled={!isCurrentMonth || !restrictionResult.allowed}
       data-date={format(date, 'yyyy-MM-dd', settings?.timezone || 'UTC')}
       style={{
-        backgroundColor: restrictionResult.allowed 
-          ? ((isSelected || isInRange) ? (settings?.backgroundColors?.selection || "#cce5ff") : getBackgroundColor())
-          : 'transparent',
+        backgroundColor: isCurrentMonth 
+          ? (restrictionResult.allowed 
+              ? ((isSelected || isInRange) ? (settings?.backgroundColors?.selection || "#cce5ff") : getBackgroundColor())
+              : 'transparent')
+          : (settings?.backgroundColors?.emptyRows || "white"),
         '--row-index': rowIndex,
-        '--col-index': colIndex
+        '--col-index': colIndex,
+        opacity: isCurrentMonth ? 1 : 0.3 // Make non-current month cells visually subdued
       } as React.CSSProperties}
     >
       <div className="day-cell-date">
@@ -236,7 +297,7 @@ export const DayCell: React.FC<DayCellProps> = ({
           {format(date, "d", settings?.timezone || 'UTC')}
         </span>
       </div>
-      {eventContent?.element && (
+      {isCurrentMonth && eventContent?.element && (
         <div className="day-cell-event">
           {eventContent.element}
         </div>
@@ -246,7 +307,7 @@ export const DayCell: React.FC<DayCellProps> = ({
 
   // Only show tooltips if showTooltips is true and we have tooltip content
   const tooltipContent = eventContent?.tooltipContent;
-  return (showTooltips && tooltipContent) ? (
+  return (showTooltips && tooltipContent && isCurrentMonth) ? (
     <Tooltip
       content={tooltipContent}
       show={isHovered}

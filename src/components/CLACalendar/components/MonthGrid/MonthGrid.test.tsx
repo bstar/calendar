@@ -20,7 +20,17 @@ vi.mock('../DayCell', () => ({
   DayCell: ({ date, onMouseDown, onMouseEnter }: any) => (
     <div 
       data-testid={`day-${format(date, 'yyyy-MM-dd')}`}
-      onMouseDown={onMouseDown}
+      onMouseDown={(e) => {
+        // Create a proper mouse event with clientX and clientY
+        const event = {
+          ...e,
+          clientX: 100,
+          clientY: 100,
+          shiftKey: e?.shiftKey || false,
+          preventDefault: () => {}
+        };
+        if (onMouseDown) onMouseDown(event);
+      }}
       onMouseEnter={onMouseEnter}
     >
       {format(date, 'd')}
@@ -143,9 +153,8 @@ describe('MonthGrid', () => {
       fireEvent.mouseDown(dayCell);
       
       expect(defaultProps.onSelectionStart).toHaveBeenCalledWith(
-        expect.objectContaining({
-          // Date object for June 15, 2025
-        })
+        expect.any(Date),
+        true // isMouseDrag=true for real mouse events
       );
     });
 
