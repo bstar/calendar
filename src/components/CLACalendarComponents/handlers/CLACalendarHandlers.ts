@@ -1,4 +1,4 @@
-import { RefObject } from 'react';
+import { RefObject, MutableRefObject } from 'react';
 import { format, parseISO, startOfMonth, addMonthsUTC } from '../../../utils/DateUtils';
 import { DateRange, DateRangeSelectionManager } from '../selection/DateRangeSelectionManager';
 
@@ -155,7 +155,8 @@ export class CLACalendarHandlers {
     setOutOfBoundsDirection: (direction: 'prev' | 'next' | null) => void,
     setMousePosition: (position: MousePosition) => void,
     moveToMonthRef: RefObject<((direction: 'prev' | 'next') => void) | null>,
-    setIsSelecting: (isSelecting: boolean) => void
+    setIsSelecting: (isSelecting: boolean) => void,
+    enableOutOfBoundsScroll: boolean = false
   ) {
     const handleDocumentMouseMove = (e: MouseEvent) => {
       e.preventDefault();
@@ -163,33 +164,37 @@ export class CLACalendarHandlers {
 
       const containerRect = containerRef.current.getBoundingClientRect();
       const { clientX: mouseX, clientY: mouseY } = e;
-      const BOUNDARY_THRESHOLD = 20;
-
+      
       setMousePosition({ x: mouseX, y: mouseY });
 
-      // Check both boundaries with equal thresholds
-      const newDirection = mouseX < containerRect.left + BOUNDARY_THRESHOLD ? 'prev'
-        : mouseX > containerRect.right - BOUNDARY_THRESHOLD ? 'next'
-          : null;
+      // Only handle out-of-bounds scrolling if enabled
+      if (enableOutOfBoundsScroll) {
+        const BOUNDARY_THRESHOLD = 20;
+        
+        // Check both boundaries with equal thresholds
+        const newDirection = mouseX < containerRect.left + BOUNDARY_THRESHOLD ? 'prev'
+          : mouseX > containerRect.right - BOUNDARY_THRESHOLD ? 'next'
+            : null;
 
-      if (newDirection !== outOfBoundsDirection) {
-        setOutOfBoundsDirection(newDirection);
+        if (newDirection !== outOfBoundsDirection) {
+          setOutOfBoundsDirection(newDirection);
 
-        // If we're entering a boundary area, trigger the month change
-        if (newDirection && moveToMonthRef.current) {
-          // Immediately move to the next/prev month
-          moveToMonthRef.current(newDirection);
+          // If we're entering a boundary area, trigger the month change
+          if (newDirection && moveToMonthRef.current) {
+            // Immediately move to the next/prev month
+            moveToMonthRef.current(newDirection);
 
-          // Set up an interval to continue moving if mouse stays in boundary
-          const intervalId = setInterval(() => {
-            if (moveToMonthRef.current) {
-              moveToMonthRef.current(newDirection);
-            }
-          }, 1000);
+            // Set up an interval to continue moving if mouse stays in boundary
+            const intervalId = setInterval(() => {
+              if (moveToMonthRef.current) {
+                moveToMonthRef.current(newDirection);
+              }
+            }, 1000);
 
-          // Store the interval ID in a safer way
-          const mouseEvent = e as MouseEvent & { intervalId?: IntervalID };
-          mouseEvent.intervalId = intervalId;
+            // Store the interval ID in a safer way
+            const mouseEvent = e as MouseEvent & { intervalId?: IntervalID };
+            mouseEvent.intervalId = intervalId;
+          }
         }
       }
     };
@@ -204,6 +209,8 @@ export class CLACalendarHandlers {
       };
 
       setUserSelectNone();
+      
+      // Always attach document handlers during selection for proper drag tracking
       document.addEventListener("mousemove", handleDocumentMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
     };
@@ -275,7 +282,7 @@ export class CLACalendarHandlers {
    */
   static createSelectionHandlers(
     selectionManager: DateRangeSelectionManager,
-    isSelecting: boolean,
+    isSelectingRef: MutableRefObject<boolean>,
     setIsSelecting: (isSelecting: boolean) => void,
     setSelectedRange: (range: DateRange) => void,
     setNotification: (message: string | null) => void,
@@ -301,6 +308,39 @@ export class CLACalendarHandlers {
         // Only set isSelecting for actual mouse drag, not keyboard selection
         if (isMouseDrag) {
           setIsSelecting(true);
+          isSelectingRef.current = true;
+          
+          // Attach document handlers for drag tracking
+          const setUserSelectNone = () => {
+            const styles = ['userSelect', 'webkitUserSelect', 'mozUserSelect', 'msUserSelect'] as const;
+            styles.forEach(style => document.body.style[style as any] = 'none');
+          };
+          setUserSelectNone();
+          
+          // Create handlers inline to ensure they have access to the current state
+          const handleDocumentMouseMove = (e: MouseEvent) => {
+            e.preventDefault();
+            // The mouse move will be handled by MonthGrid's onMouseEnter
+            // We just need to track that we're still dragging
+          };
+          
+          const handleMouseUp = () => {
+            setIsSelecting(false);
+            isSelectingRef.current = false;
+            
+            // Restore user select
+            const styles = ['userSelect', 'webkitUserSelect', 'mozUserSelect', 'msUserSelect'] as const;
+            styles.forEach(style => {
+              document.body.style[style as any] = '';
+            });
+            
+            // Clean up event listeners
+            document.removeEventListener('mousemove', handleDocumentMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+          };
+          
+          document.addEventListener('mousemove', handleDocumentMouseMove);
+          document.addEventListener('mouseup', handleMouseUp);
         }
         setSelectedRange(result.range);
         setNotification(null);
@@ -310,7 +350,7 @@ export class CLACalendarHandlers {
     const handleSelectionMove = (date: Date, forceUpdate: boolean = false): DateRange => {
       // Only process move events if we're in selecting mode (mouse drag)
       // OR if it's a forced update (keyboard selection)
-      if (!isSelecting && !forceUpdate) {
+      if (!isSelectingRef.current && !forceUpdate) {
         return selectedRange;
       }
 

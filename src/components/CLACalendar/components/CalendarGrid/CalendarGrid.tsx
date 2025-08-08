@@ -87,6 +87,7 @@ const MonthPair: React.FC<MonthPairProps> = ({
           selectedRange={selectedRange}
           onSelectionStart={onSelectionStart}
           onSelectionMove={onSelectionMove}
+          isSelecting={isSelecting}
           style={{ width: 'auto' }}
           showMonthHeading={showMonthHeadings}
           showTooltips={showTooltips}

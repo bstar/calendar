@@ -959,7 +959,7 @@ describe('CalendarContainer', () => {
     expect(defaultProps.handleMouseLeave).toHaveBeenCalled();
   });
 
-  it('should not attach mouse handlers when enableOutOfBoundsScroll is false', () => {
+  it('should always attach mouse handlers for drag selection', () => {
     const handleMouseDown = vi.fn();
     const handleMouseMove = vi.fn();
     const handleMouseLeave = vi.fn();
@@ -979,9 +979,10 @@ describe('CalendarContainer', () => {
     fireEvent.mouseMove(card!);
     fireEvent.mouseLeave(card!);
     
-    expect(handleMouseDown).not.toHaveBeenCalled();
-    expect(handleMouseMove).not.toHaveBeenCalled();
-    expect(handleMouseLeave).not.toHaveBeenCalled();
+    // Mouse handlers should always be attached for drag selection
+    expect(handleMouseDown).toHaveBeenCalled();
+    expect(handleMouseMove).toHaveBeenCalled();
+    expect(handleMouseLeave).toHaveBeenCalled();
   });
 });
 

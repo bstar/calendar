@@ -7,8 +7,9 @@ export interface MonthGridProps {
   baseDate: Date;
   monthIndex?: number; // Position of this month in the calendar (0-based)
   selectedRange: DateRange;
-  onSelectionStart: (date: Date) => void;
-  onSelectionMove: (date: Date) => void;
+  onSelectionStart: (date: Date, isMouseDrag?: boolean) => void;
+  onSelectionMove: (date: Date, forceUpdate?: boolean) => DateRange | void;
+  isSelecting?: boolean; // Whether a drag selection is in progress
   style?: React.CSSProperties;
   showMonthHeading?: boolean;
   showTooltips: boolean;

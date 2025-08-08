@@ -173,9 +173,10 @@ describe('DateRangeSelectionManager - Edge Cases', () => {
       const updateResult = manager.updateSelection(startResult.range, beforeBlocked);
       
       expect(updateResult.success).toBe(true);
-      expect(updateResult.range.start).toBe('2025-06-13'); // Stopped after blocked range
-      expect(updateResult.range.end).toBe('2025-06-15');
-      expect(updateResult.message).toBe('Blocked period 1');
+      // With the new logic, if June 8 is valid, we select it even if there are blocked dates in between
+      expect(updateResult.range.start).toBe('2025-06-08'); // Can select the target date
+      expect(updateResult.range.end).toBe('2025-06-08'); // But can't extend past the blocked range
+      expect(updateResult.message).toBe('Cannot select across restricted dates');
     });
 
     it('should stop forward selection at blocked range', () => {
@@ -188,9 +189,10 @@ describe('DateRangeSelectionManager - Edge Cases', () => {
       const updateResult = manager.updateSelection(startResult.range, afterBlocked);
       
       expect(updateResult.success).toBe(true);
-      expect(updateResult.range.start).toBe('2025-06-15');
-      expect(updateResult.range.end).toBe('2025-06-17'); // Stopped before blocked range
-      expect(updateResult.message).toBe('Blocked period 2');
+      // With the new logic, if June 22 is valid, we select it even if there are blocked dates in between
+      expect(updateResult.range.start).toBe('2025-06-22'); // But can't extend past the blocked range
+      expect(updateResult.range.end).toBe('2025-06-22'); // Can select the target date
+      expect(updateResult.message).toBe('Cannot select across restricted dates');
     });
 
     it('should handle selection when no valid dates found backward', () => {
@@ -262,7 +264,8 @@ describe('DateRangeSelectionManager - Edge Cases', () => {
       const updateResult = manager.updateSelection(startResult.range, pastBlocked);
       
       expect(updateResult.success).toBe(true);
-      expect(updateResult.range.end).toBe('2025-06-19'); // Stopped before blocked range
+      // With the new logic, if June 27 is valid, we select it even if there are blocked dates in between
+      expect(updateResult.range.end).toBe('2025-06-27'); // Can select the target date
     });
 
     it('should handle boundary within restricted boundary backward', () => {
@@ -302,7 +305,8 @@ describe('DateRangeSelectionManager - Edge Cases', () => {
       const updateResult = manager.updateSelection(startResult.range, beforeBlocked);
       
       expect(updateResult.success).toBe(true);
-      expect(updateResult.range.start).toBe('2025-06-11'); // Stopped after blocked range
+      // With the new logic, if June 3 is valid, we select it even if there are blocked dates in between
+      expect(updateResult.range.start).toBe('2025-06-03'); // Can select the target date
     });
   });
 

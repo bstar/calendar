@@ -160,7 +160,7 @@ export const DayCell: React.FC<DayCellProps> = ({
             ctrlKey: e.ctrlKey,
             metaKey: e.metaKey,
             shiftKey: true
-          } as React.MouseEvent<HTMLDivElement>;
+          } as unknown as React.MouseEvent<HTMLDivElement>;
           onMouseDown(syntheticEvent);
         }
       } else {
@@ -191,7 +191,7 @@ export const DayCell: React.FC<DayCellProps> = ({
             ctrlKey: e.ctrlKey,
             metaKey: e.metaKey,
             shiftKey: false
-          } as React.MouseEvent<HTMLDivElement>;
+          } as unknown as React.MouseEvent<HTMLDivElement>;
           onMouseDown(syntheticEvent);
         }
       }
@@ -267,9 +267,9 @@ export const DayCell: React.FC<DayCellProps> = ({
   const cellContent = (
     <div
       className={dayCellClasses}
-      onMouseEnter={isCurrentMonth ? handleMouseEnter : undefined}
-      onMouseLeave={isCurrentMonth ? handleMouseLeave : undefined}
-      onMouseDown={isCurrentMonth ? onMouseDown : undefined}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onMouseDown={onMouseDown}
       onKeyDown={isCurrentMonth ? handleCellKeyDown : undefined}
       onFocus={isCurrentMonth ? handleFocus : undefined}
       onBlur={isCurrentMonth ? handleBlur : undefined}

@@ -29,6 +29,7 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
   selectedRange,
   onSelectionStart,
   onSelectionMove,
+  isSelecting = false,
   style,
   showMonthHeading = false,
   showTooltips,
@@ -545,9 +546,12 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
                 }
               }}
               onMouseEnter={() => {
-                // Only trigger selection move from mouse if not in keyboard navigation mode
+                // Trigger selection move if:
+                // 1. We're in drag selection mode (isSelecting), OR
+                // 2. We're not in keyboard navigation mode (!focusedDate)
                 // This prevents the selection from following the mouse cursor during keyboard nav
-                if (!focusedDate) {
+                // but allows drag selection to work even when focusedDate is set
+                if (isSelecting || !focusedDate) {
                   onSelectionMove(date);
                 }
                 // Always update hovered date for tooltip display

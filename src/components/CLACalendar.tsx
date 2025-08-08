@@ -324,6 +324,12 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   });
   const [outOfBoundsDirection, setOutOfBoundsDirection] = useState<'prev' | 'next' | null>(null);
   const [isSelecting, setIsSelecting] = useState(false);
+  const isSelectingRef = useRef(false);
+  
+  // Keep ref in sync with state
+  useEffect(() => {
+    isSelectingRef.current = isSelecting;
+  }, [isSelecting]);
   const [_validationErrors, setValidationErrors] = useState<Record<string, CalendarValidationError>>({});
   const [notification, setNotification] = useState<string | null>(null);
   const [dateInputContext, setDateInputContext] = useState(() => {
@@ -751,7 +757,8 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
         mousePositionRef.current = position;
       },
       moveToMonthRef,
-      setIsSelecting
+      setIsSelecting,
+      settings.enableOutOfBoundsScroll
     );
   }, [everInitialized, containerRef, isSelecting, outOfBoundsDirection, setOutOfBoundsDirection, moveToMonthRef, setIsSelecting]);
 
@@ -798,7 +805,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
 
     return CLACalendarHandlers.createSelectionHandlers(
       selectionManager,
-      isSelecting,
+      isSelectingRef,
       setIsSelecting,
       setSelectedRange,
       setNotification,
@@ -1246,9 +1253,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
                 }}
                 onMouseDown={(e) => {
                   e.stopPropagation();
-                  if (settings.enableOutOfBoundsScroll) {
-                    handleMouseDown(e);
-                  }
+                  handleMouseDown(e);
                 }}
                 onClick={(e) => e.stopPropagation()}
               >
@@ -1257,12 +1262,10 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
                   style={{ width: '100%', height: '100%' }}
                   onMouseDown={(e) => {
                     e.stopPropagation();
-                    if (settings.enableOutOfBoundsScroll) {
-                      handleMouseDown(e);
-                    }
+                    handleMouseDown(e);
                   }}
-                  onMouseMove={settings.enableOutOfBoundsScroll ? handleMouseMove : undefined}
-                  onMouseLeave={settings.enableOutOfBoundsScroll ? handleMouseLeave : undefined}
+                  onMouseMove={handleMouseMove}
+                  onMouseLeave={handleMouseLeave}
                 >
                   {renderCalendarContent()}
                 </div>

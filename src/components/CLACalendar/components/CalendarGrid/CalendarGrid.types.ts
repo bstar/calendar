@@ -5,8 +5,8 @@ import { RestrictionConfig } from '../../../CLACalendarComponents/restrictions/t
 export interface CalendarGridProps {
   months: Date[];
   selectedRange: DateRange;
-  onSelectionStart: (date: Date) => void;
-  onSelectionMove: (date: Date) => void;
+  onSelectionStart: (date: Date, isMouseDrag?: boolean) => void;
+  onSelectionMove: (date: Date, forceUpdate?: boolean) => DateRange | void;
   isSelecting: boolean;
   visibleMonths: number;
   showMonthHeadings: boolean;
@@ -18,7 +18,7 @@ export interface CalendarGridProps {
   onNavigateMonth?: (direction: 'prev' | 'next') => void;
 }
 
-export interface MonthPairProps extends CalendarGridProps {
+export interface MonthPairProps extends Omit<CalendarGridProps, 'months'> {
   firstMonth: Date;
   secondMonth: Date | null;
   renderDay: (date: Date) => any;

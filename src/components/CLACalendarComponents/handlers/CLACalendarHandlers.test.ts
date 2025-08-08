@@ -324,7 +324,8 @@ describe('CLACalendarHandlers', () => {
         mockSetOutOfBoundsDirection,
         mockSetMousePosition,
         moveToMonthRef,
-        mockSetIsSelecting
+        mockSetIsSelecting,
+        true // enableOutOfBoundsScroll
       );
     });
 
@@ -375,7 +376,8 @@ describe('CLACalendarHandlers', () => {
         mockSetOutOfBoundsDirection,
         mockSetMousePosition,
         moveToMonthRef,
-        mockSetIsSelecting
+        mockSetIsSelecting,
+        true // enableOutOfBoundsScroll
       );
 
       const event = {
@@ -493,6 +495,7 @@ describe('CLACalendarHandlers', () => {
     let mockSetIsSelecting: ReturnType<typeof vi.fn>;
     let mockSetSelectedRange: ReturnType<typeof vi.fn>;
     let mockSetNotification: ReturnType<typeof vi.fn>;
+    let isSelectingRef: { current: boolean };
     let handlers: ReturnType<typeof CLACalendarHandlers.createSelectionHandlers>;
 
     beforeEach(() => {
@@ -504,10 +507,11 @@ describe('CLACalendarHandlers', () => {
       mockSetIsSelecting = vi.fn();
       mockSetSelectedRange = vi.fn();
       mockSetNotification = vi.fn();
+      isSelectingRef = { current: false };
 
       handlers = CLACalendarHandlers.createSelectionHandlers(
         mockSelectionManager,
-        false,
+        isSelectingRef,
         mockSetIsSelecting,
         mockSetSelectedRange,
         mockSetNotification,
@@ -587,9 +591,10 @@ describe('CLACalendarHandlers', () => {
     });
 
     it('should show notification on failed selection with out of bounds', () => {
+      isSelectingRef.current = false;
       handlers = CLACalendarHandlers.createSelectionHandlers(
         mockSelectionManager,
-        false,
+        isSelectingRef,
         mockSetIsSelecting,
         mockSetSelectedRange,
         mockSetNotification,
@@ -611,9 +616,10 @@ describe('CLACalendarHandlers', () => {
     });
 
     it('should handle selection move when selecting', () => {
+      isSelectingRef.current = true;
       handlers = CLACalendarHandlers.createSelectionHandlers(
         mockSelectionManager,
-        true, // Currently selecting
+        isSelectingRef,
         mockSetIsSelecting,
         mockSetSelectedRange,
         mockSetNotification,
@@ -696,9 +702,10 @@ describe('CLACalendarHandlers', () => {
     });
 
     it('should show notification during selection move with message', () => {
+      isSelectingRef.current = true;
       handlers = CLACalendarHandlers.createSelectionHandlers(
         mockSelectionManager,
-        true,
+        isSelectingRef,
         mockSetIsSelecting,
         mockSetSelectedRange,
         mockSetNotification,

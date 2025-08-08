@@ -522,9 +522,9 @@ export const CalendarContainer: React.FC<CalendarContainerProps> = ({
         ...DEFAULT_CONTAINER_STYLES,
         ...containerStyle
       } as React.CSSProperties}
-      onMouseDown={enableOutOfBoundsScroll ? handleMouseDown : undefined}
-      onMouseMove={enableOutOfBoundsScroll ? handleMouseMove : undefined}
-      onMouseLeave={enableOutOfBoundsScroll ? handleMouseLeave : undefined}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
     >
       {children}
     </div>

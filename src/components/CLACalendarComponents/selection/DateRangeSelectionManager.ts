@@ -213,13 +213,13 @@ export class DateRangeSelectionManager {
     // Check if the anchor date is in a restricted boundary
     const anchorBoundary = this.isInRestrictedBoundary(anchorDate);
 
-    // If the anchor is in a boundary, the selection must stay within that boundary
+    // If the anchor is in a boundary, clamp selection to stay within that boundary
     if (anchorBoundary.inBoundary) {
       const boundaryStart = anchorBoundary.boundaryStart;
       const boundaryEnd = anchorBoundary.boundaryEnd;
 
       if (isBackwardSelection && boundaryStart) {
-        // For backward selection, the new date must not go before the boundary start
+        // For backward selection, clamp to boundary start if trying to go before it
         if (isBefore(newDate, boundaryStart)) {
           return {
             success: true,
@@ -234,7 +234,7 @@ export class DateRangeSelectionManager {
         }
       }
       else if (!isBackwardSelection && boundaryEnd) {
-        // For forward selection, the new date must not go beyond the boundary end
+        // For forward selection, clamp to boundary end if trying to go after it
         if (isAfter(newDate, boundaryEnd)) {
           return {
             success: true,
@@ -250,34 +250,20 @@ export class DateRangeSelectionManager {
       }
     }
 
-    // For both forward and backward selections, we need to check if the direct selection is valid
-    // This ensures we can't "jump over" restricted ranges
+    // For normal selection (not clamped by boundary), order the dates correctly
+    const startDate = isBackwardSelection ? newDate : anchorDate;
+    const endDate = isBackwardSelection ? anchorDate : newDate;
 
-    // Define the chronological start and end
-    let chronologicalStart, chronologicalEnd;
-    if (isBackwardSelection) {
-      chronologicalStart = newDate;
-      chronologicalEnd = anchorDate;
-    } else {
-      chronologicalStart = anchorDate;
-      chronologicalEnd = newDate;
-    }
+    // Check if this selection is valid
+    const selectionCheck = this.restrictionManager.checkSelection(startDate, endDate, anchorDate);
 
-    // First, check if direct selection is valid
-    // Pass the anchor date for restricted_boundary checks
-    const directSelectionValid = this.restrictionManager.checkSelection(
-      chronologicalStart,
-      chronologicalEnd,
-      anchorDate
-    );
-
-    // If direct selection is valid, return it
-    if (directSelectionValid.allowed) {
+    if (selectionCheck.allowed) {
+      // Selection is valid, return it
       return {
         success: true,
         range: {
-          start: isBackwardSelection ? format(newDate, 'yyyy-MM-dd') : format(anchorDate, 'yyyy-MM-dd'),
-          end: isBackwardSelection ? format(anchorDate, 'yyyy-MM-dd') : format(newDate, 'yyyy-MM-dd'),
+          start: format(startDate, 'yyyy-MM-dd'),
+          end: format(endDate, 'yyyy-MM-dd'),
           anchorDate: format(anchorDate, 'yyyy-MM-dd'),
           isBackwardSelection
         },
@@ -285,108 +271,35 @@ export class DateRangeSelectionManager {
       };
     }
 
-    // If direct selection is not valid, find the closest valid date to the anchor
-    const message = directSelectionValid.message || 'Cannot select across restricted dates';
-
-    if (isBackwardSelection) {
-      // Find the last valid date when moving backward from anchor
-      let validDate = anchorDate;
-      let foundValidDate = false;
-
-      // We try day by day from anchor toward newDate until we hit a restriction
-      for (let currentDate = addDays(anchorDate, -1);
-        !isBefore(currentDate, newDate);
-        currentDate = addDays(currentDate, -1)) {
-
-        // Check if this current selection range is valid
-        // Pass anchor date for restricted_boundary checks
-        const check = this.restrictionManager.checkSelection(currentDate, anchorDate, anchorDate);
-
-        if (check.allowed) {
-          // This date is still valid - remember it and continue
-          validDate = currentDate;
-          foundValidDate = true;
-        } else {
-          // We hit a restriction - stop here
-          break;
-        }
-      }
-
-      // If we found a valid date, use it
-      if (foundValidDate) {
-        return {
-          success: true,
-          range: {
-            start: format(validDate, 'yyyy-MM-dd'),
-            end: format(anchorDate, 'yyyy-MM-dd'),
-            anchorDate: format(anchorDate, 'yyyy-MM-dd'),
-            isBackwardSelection: true
-          },
-          message
-        };
-      }
-
-      // If no valid date found (only the anchor is valid), return just the anchor
+    // Selection is not valid due to restrictions
+    // Try to at least select the hover date if it's valid
+    const hoverCheck = this.restrictionManager.checkSelection(newDate, newDate, anchorDate);
+    
+    if (hoverCheck.allowed) {
+      // Can select the hover date at least
       return {
-        success: false,
+        success: true,
         range: {
-          start: format(anchorDate, 'yyyy-MM-dd'),
-          end: format(anchorDate, 'yyyy-MM-dd'),
+          start: format(newDate, 'yyyy-MM-dd'),
+          end: format(newDate, 'yyyy-MM-dd'),
           anchorDate: format(anchorDate, 'yyyy-MM-dd'),
-          isBackwardSelection: true
+          isBackwardSelection
         },
-        message
-      };
-    } else {
-      // Find the last valid date when moving forward from anchor
-      let validDate = anchorDate;
-      let foundValidDate = false;
-
-      // We try day by day from anchor toward newDate until we hit a restriction
-      for (let currentDate = addDays(anchorDate, 1);
-        !isAfter(currentDate, newDate);
-        currentDate = addDays(currentDate, 1)) {
-
-        // Check if this current selection range is valid
-        // Pass anchor date for restricted_boundary checks
-        const check = this.restrictionManager.checkSelection(anchorDate, currentDate, anchorDate);
-
-        if (check.allowed) {
-          // This date is still valid - remember it and continue
-          validDate = currentDate;
-          foundValidDate = true;
-        } else {
-          // We hit a restriction - stop here
-          break;
-        }
-      }
-
-      // If we found a valid date, use it
-      if (foundValidDate) {
-        return {
-          success: true,
-          range: {
-            start: format(anchorDate, 'yyyy-MM-dd'),
-            end: format(validDate, 'yyyy-MM-dd'),
-            anchorDate: format(anchorDate, 'yyyy-MM-dd'),
-            isBackwardSelection: false
-          },
-          message
-        };
-      }
-
-      // If no valid date found (only the anchor is valid), return just the anchor
-      return {
-        success: false,
-        range: {
-          start: format(anchorDate, 'yyyy-MM-dd'),
-          end: format(anchorDate, 'yyyy-MM-dd'),
-          anchorDate: format(anchorDate, 'yyyy-MM-dd'),
-          isBackwardSelection: false
-        },
-        message
+        message: 'Cannot select across restricted dates'
       };
     }
+
+    // Can't even select the hover date - return failure but keep anchor in range
+    return {
+      success: false,
+      range: {
+        start: format(anchorDate, 'yyyy-MM-dd'),
+        end: format(anchorDate, 'yyyy-MM-dd'),
+        anchorDate: format(anchorDate, 'yyyy-MM-dd'),
+        isBackwardSelection
+      },
+      message: selectionCheck.message || 'Cannot select this date'
+    };
   }
 
   /**
