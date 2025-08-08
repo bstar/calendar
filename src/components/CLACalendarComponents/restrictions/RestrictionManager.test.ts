@@ -681,14 +681,17 @@ describe('RestrictionManager', () => {
       };
       manager = new RestrictionManager(config);
 
-      // Test different times on the same day
-      const startOfDay = parseISO('2025-06-15T00:00:00Z');
-      const endOfDay = parseISO('2025-06-15T23:59:59Z');
+      // Create dates in local timezone to avoid timezone issues
+      const june14 = new Date(2025, 5, 14); // June 14 in local
+      const june15 = new Date(2025, 5, 15); // June 15 in local
+      const june16 = new Date(2025, 5, 16); // June 16 in local
       
-      // Both restrictions target same date: before June 15th AND after June 15th
-      // Implementation correctly blocks due to before restriction
-      expect(manager.checkSelection(startOfDay, startOfDay).allowed).toBe(false);
-      expect(manager.checkSelection(endOfDay, endOfDay).allowed).toBe(true);
+      // June 14 should be blocked (before June 15)
+      expect(manager.checkSelection(june14, june14).allowed).toBe(false);
+      // June 15 is the boundary - should not be blocked
+      expect(manager.checkSelection(june15, june15).allowed).toBe(true);
+      // June 16 should be blocked (after June 15)
+      expect(manager.checkSelection(june16, june16).allowed).toBe(false);
     });
   });
 

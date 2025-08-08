@@ -89,8 +89,10 @@ export class RestrictionBackgroundGenerator {
     if (restriction.direction === 'before' && date < boundaryDate) {
       return 'rgba(0, 0, 0, 0.1)';
     } else if (restriction.direction === 'after') {
+      // Since parseISO returns UTC dates, we should use UTC hours for consistency
+      // Create end of day in UTC timezone
       const boundaryEndOfDay = new Date(boundaryDate);
-      boundaryEndOfDay.setHours(23, 59, 59, 999);
+      boundaryEndOfDay.setUTCHours(23, 59, 59, 999);
       if (date > boundaryEndOfDay) {
         return 'rgba(0, 0, 0, 0.1)';
       }
