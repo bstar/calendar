@@ -36,6 +36,15 @@ const App: React.FC = () => {
   }>({ start: null, end: null });
 
   const [currentDemo, setCurrentDemo] = useState<string>('basic');
+  
+  // For range-single-day demo - track submit count too
+  const [submitResult, setSubmitResult] = useState<{
+    start: string | null;
+    end: string | null;
+    timestamp: string;
+  } | null>(null);
+  
+  const [submitCount, setSubmitCount] = useState(0);
 
   const handleDateSubmit = (start: string | null, end: string | null) => {
     setSelectedRange({ start, end });
@@ -61,10 +70,17 @@ const App: React.FC = () => {
                 <select 
                   className="cla-cal-form-select"
                   value={currentDemo}
-                  onChange={(e) => setCurrentDemo(e.target.value)}
+                  onChange={(e) => {
+                    setCurrentDemo(e.target.value);
+                    // Only reset if switching AWAY from range-single-day
+                    if (currentDemo === 'range-single-day' && e.target.value !== 'range-single-day') {
+                      setSubmitResult(null);
+                    }
+                  }}
                 >
                   <option value="basic">Basic Usage</option>
                   <option value="single">Single Date Selection</option>
+                  <option value="range-single-day">Range Mode - Single Day Selection</option>
                   <option value="multiple">Multiple Months</option>
                   <option value="custom">Custom Theme</option>
                   <option value="popup">Popup Mode</option>
@@ -77,7 +93,7 @@ const App: React.FC = () => {
               </div>
 
               {/* Selected range display */}
-              {selectedRange.start && (
+              {selectedRange.start && currentDemo !== 'range-single-day' && (
                 <div className="cla-cal-alert cla-cal-alert-info cla-cal-mb-3">
                   <strong>Selected:</strong>{' '}
                   {currentDemo === 'single' 
@@ -115,6 +131,77 @@ const App: React.FC = () => {
                         showSubmitButton: true,
                       }}
                       onSubmit={handleDateSubmit}
+                    />
+                  </div>
+                )}
+
+                {currentDemo === 'range-single-day' && (
+                  <div>
+                    <h4>Testing Single Day Selection in Range Mode</h4>
+                    
+                    {/* BIG VISIBLE OUTPUT */}
+                    <div style={{
+                      backgroundColor: '#000',
+                      color: '#0f0',
+                      padding: '30px',
+                      marginBottom: '20px',
+                      fontSize: '20px',
+                      fontFamily: 'monospace',
+                      border: '3px solid #0f0'
+                    }}>
+                      <div>Submit Count: {submitCount}</div>
+                      <div>Last Result:</div>
+                      <pre>{submitResult ? JSON.stringify({
+                        startDate: submitResult.start,
+                        endDate: submitResult.end
+                      }, null, 2) : 'NOTHING YET'}</pre>
+                    </div>
+
+                    {/* Simple test button */}
+                    <button 
+                      onClick={() => {
+                        const testResult = {
+                          start: '2025-01-01',
+                          end: '2025-01-01',
+                          timestamp: new Date().toISOString()
+                        };
+                        setSubmitResult(testResult);
+                        setSubmitCount(c => c + 1);
+                      }}
+                      style={{
+                        padding: '10px 20px',
+                        fontSize: '16px',
+                        marginBottom: '20px',
+                        backgroundColor: '#007bff',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      TEST: Manually trigger state update
+                    </button>
+
+                    {/* Calendar */}
+                    <CLACalendar 
+                      settings={{
+                        displayMode: 'embedded',
+                        selectionMode: 'range',
+                        visibleMonths: 2,
+                        showSubmitButton: true,
+                        onSubmit: (start, end) => {
+                          console.log('onSubmit called with:', { start, end });
+                          
+                          const result = {
+                            start,
+                            end,
+                            timestamp: new Date().toISOString()
+                          };
+                          
+                          setSubmitResult(result);
+                          setSubmitCount(prev => prev + 1);
+                        }
+                      }}
                     />
                   </div>
                 )}

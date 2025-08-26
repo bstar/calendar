@@ -411,8 +411,12 @@ export class CLACalendarHandlers {
     };
 
     const handleSubmit = () => {
+      // In range mode, if only start is selected (no drag), use it for both dates
+      if (selectedRange.start && !selectedRange.end && onSubmit) {
+        onSubmit(selectedRange.start, selectedRange.start);
+      } 
       // If we have a valid range and onSubmit handler, call it directly
-      if (selectedRange.start && selectedRange.end && onSubmit) {
+      else if (selectedRange.start && selectedRange.end && onSubmit) {
         onSubmit(selectedRange.start, selectedRange.end);
       }
 

@@ -72,7 +72,6 @@ export const CalendarPortal: React.FC<PortalProps> = ({
 
   // Create portal element when component mounts
   useEffect(() => {
-    console.log('[Portal] Creating portal element');
     const element = document.createElement('div');
     element.className = portalClassName;
     
@@ -88,7 +87,6 @@ export const CalendarPortal: React.FC<PortalProps> = ({
     document.body.appendChild(element);
     setPortalElement(element);
     portalRef.current = element;
-    console.log('[Portal] Portal element created and added to DOM');
 
     return () => {
       if (element.parentNode) {
@@ -108,12 +106,7 @@ export const CalendarPortal: React.FC<PortalProps> = ({
 
   // Update portal position when it's open or the trigger ref changes
   const updatePosition = useCallback(() => {
-    console.log('[Portal] updatePosition called');
-    console.log('[Portal] portalElement exists:', !!portalElement);
-    console.log('[Portal] triggerRef.current exists:', !!triggerRef.current);
-    
     if (!portalElement || !triggerRef.current) {
-      console.log('[Portal] Early return - missing element or ref');
       return;
     }
 
@@ -131,12 +124,6 @@ export const CalendarPortal: React.FC<PortalProps> = ({
     // Use expected width if provided (for right-aligned positions)
     const portalWidth = expectedWidth || contentElement?.offsetWidth || portalElement.offsetWidth || 500;
     const PADDING = 8;
-    
-    console.log('[Portal] Dimensions:', { 
-      portalHeight, 
-      portalWidth, 
-      triggerRect: { top: triggerRect.top, left: triggerRect.left, bottom: triggerRect.bottom, right: triggerRect.right }
-    });
 
 
     let topPosition: number;
@@ -204,7 +191,6 @@ export const CalendarPortal: React.FC<PortalProps> = ({
 
     // Apply styles directly using properties that are safe to set
     if (portalElement) {
-      console.log('[Portal] Applying position:', { top: topPosition, left: leftPosition });
       portalElement.style.top = `${topPosition}px`;
       portalElement.style.left = `${leftPosition}px`;
       // Don't set width here - let it be controlled by portalStyle
@@ -222,10 +208,6 @@ export const CalendarPortal: React.FC<PortalProps> = ({
 
   // Initial and delayed position updates
   useEffect(() => {
-    console.log('[Portal] Position update effect triggered');
-    console.log('[Portal] portalStyle:', portalStyle);
-    console.log('[Portal] Should update position?', !portalStyle || (portalStyle.top === undefined && portalStyle.left === undefined));
-    
     // For right-aligned positions, we need to wait for width to be applied
     const needsDelayedPositioning = position?.includes('right');
     
@@ -244,7 +226,6 @@ export const CalendarPortal: React.FC<PortalProps> = ({
     if (!isOpen || !dynamicPosition) return;
     
     const handleResize = () => {
-      console.log('[Portal] Window resized, updating position');
       updatePosition();
     };
     
@@ -275,7 +256,6 @@ export const CalendarPortal: React.FC<PortalProps> = ({
         entries.forEach((entry) => {
           // If less than 95% of the calendar is visible, reposition
           if (entry.intersectionRatio < 0.95 && entry.intersectionRatio > 0) {
-            console.log('[Portal] Calendar partially cut off, repositioning');
             updatePosition();
           }
         });

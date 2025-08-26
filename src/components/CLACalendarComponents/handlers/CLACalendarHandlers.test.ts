@@ -786,7 +786,7 @@ describe('CLACalendarHandlers', () => {
       expect(mockSetIsSelecting).toHaveBeenCalledWith(false);
     });
 
-    it('should not call onSubmit if range is incomplete', () => {
+    it('should call onSubmit with same date for both params when only start is selected', () => {
       handlers = CLACalendarHandlers.createCalendarActionHandlers(
         mockSetSelectedRange,
         mockSetDateInputContext,
@@ -802,7 +802,7 @@ describe('CLACalendarHandlers', () => {
 
       handlers.handleSubmit();
 
-      expect(mockOnSubmit).not.toHaveBeenCalled();
+      expect(mockOnSubmit).toHaveBeenCalledWith('2025-06-15T00:00:00.000Z', '2025-06-15T00:00:00.000Z');
       expect(mockSetIsOpen).toHaveBeenCalledWith(false);
     });
 
