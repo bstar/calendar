@@ -34,6 +34,7 @@ describe('CLACalendar Configuration', () => {
       expect(settings.showSubmitButton).toBe(true);
       expect(settings.showClearButton).toBe(true);
       expect(settings.showFooter).toBe(true);
+      expect(settings.footerButtonAlignment).toBe('space-between');
       expect(settings.enableOutOfBoundsScroll).toBe(true);
       expect(settings.suppressTooltipsOnSelection).toBe(false);
       expect(settings.showSelectionAlert).toBe(false);

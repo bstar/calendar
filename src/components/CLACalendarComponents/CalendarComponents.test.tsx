@@ -865,6 +865,7 @@ describe('CalendarFooter', () => {
   const defaultProps = {
     showSubmitButton: false,
     showClearButton: true,
+    footerButtonAlignment: 'space-between' as const,
     handleClear: vi.fn(),
     handleSubmit: vi.fn()
   };
@@ -911,6 +912,44 @@ describe('CalendarFooter', () => {
     render(<CalendarFooter {...defaultProps} showClearButton={true} />);
     
     expect(screen.getByText('Clear')).toBeInTheDocument();
+  });
+
+  it('should apply footer button alignment style', () => {
+    const { container } = render(
+      <CalendarFooter {...defaultProps} footerButtonAlignment="center" />
+    );
+    
+    const footer = container.querySelector('.calendar-footer') as HTMLElement;
+    expect(footer?.style.justifyContent).toBe('center');
+  });
+
+  it('should auto-align submit button to right when its the only button', () => {
+    const { container } = render(
+      <CalendarFooter 
+        {...defaultProps} 
+        showSubmitButton={true} 
+        showClearButton={false}
+        footerButtonAlignment="space-between"
+      />
+    );
+    
+    const footer = container.querySelector('.calendar-footer') as HTMLElement;
+    expect(footer?.style.justifyContent).toBe('flex-end');
+  });
+
+  it('should not apply inline style for default space-between alignment', () => {
+    const { container } = render(
+      <CalendarFooter 
+        {...defaultProps} 
+        showSubmitButton={true} 
+        showClearButton={true}
+        footerButtonAlignment="space-between"
+      />
+    );
+    
+    const footer = container.querySelector('.calendar-footer') as HTMLElement;
+    // Should not have inline style, relying on CSS default
+    expect(footer?.style.justifyContent).toBe('');
   });
 });
 

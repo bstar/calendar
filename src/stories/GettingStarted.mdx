@@ -121,6 +121,8 @@ const settings = {
   // UI features
   showHeader: true,
   showFooter: true,
+  showSubmitButton: true,
+  showClearButton: true,
   showTooltips: true,
   showLayersNavigation: false,
   
@@ -320,6 +322,37 @@ function DateRangeFilter({ onRangeChange }) {
   );
 }
 ```
+
+### Footer Customization
+Control which buttons appear in the calendar footer and their alignment:
+
+```typescript
+function CustomFooterCalendar() {
+  const [settings] = useState({
+    ...getDefaultSettings(),
+    showFooter: true,
+    showSubmitButton: true,  // Show/hide Submit button
+    showClearButton: false,  // Show/hide Clear button
+    footerButtonAlignment: 'flex-end', // Button alignment
+  });
+  
+  return <CLACalendar settings={settings} />;
+}
+```
+
+#### Footer Button Alignment Options:
+- `'space-between'` - Buttons on opposite sides (default)
+- `'flex-start'` - Buttons aligned to the left
+- `'flex-end'` - Buttons aligned to the right
+- `'center'` - Buttons centered
+- `'space-around'` - Even spacing around buttons
+
+Use cases for footer customization:
+- **No Clear button**: When you want users to always have a selection
+- **No Submit button**: For instant date selection without confirmation
+- **No footer**: For minimal, read-only calendar displays
+- **Right-aligned single button**: Professional form layouts
+- **Centered buttons**: Symmetric, balanced designs
 
 ## Next Steps
 

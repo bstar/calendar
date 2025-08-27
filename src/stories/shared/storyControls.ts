@@ -106,6 +106,23 @@ export const calendarArgTypes: ArgTypes = {
       defaultValue: { summary: true }
     }
   },
+  showClearButton: {
+    control: 'boolean',
+    description: 'Show clear button in footer',
+    table: {
+      category: 'Features',
+      defaultValue: { summary: true }
+    }
+  },
+  footerButtonAlignment: {
+    control: 'select',
+    options: ['space-between', 'flex-start', 'flex-end', 'center', 'space-around'],
+    description: 'Alignment of footer buttons',
+    table: {
+      category: 'Features',
+      defaultValue: { summary: 'space-between' }
+    }
+  },
   showTooltips: {
     control: 'boolean',
     description: 'Show hover tooltips',
@@ -224,6 +241,8 @@ export const defaultArgs = {
   showHeader: true,
   showFooter: true,
   showSubmitButton: true,
+  showClearButton: true,
+  footerButtonAlignment: 'space-between',
   showTooltips: true,
   showLayersNavigation: false,
   showDateInputs: true,
@@ -252,6 +271,8 @@ export function argsToSettings(args: any) {
     showHeader: args.showHeader,
     showFooter: args.showFooter,
     showSubmitButton: args.showSubmitButton,
+    showClearButton: args.showClearButton,
+    footerButtonAlignment: args.footerButtonAlignment,
     showTooltips: args.showTooltips,
     showLayersNavigation: args.showLayersNavigation,
     showDateInputs: args.showDateInputs,

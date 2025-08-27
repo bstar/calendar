@@ -82,6 +82,7 @@ const App: React.FC = () => {
                   <option value="single">Single Date Selection</option>
                   <option value="range-single-day">Range Mode - Single Day Selection</option>
                   <option value="no-clear">No Clear Button Demo</option>
+                  <option value="footer-alignment">Footer Button Alignment</option>
                   <option value="multiple">Multiple Months</option>
                   <option value="custom">Custom Theme</option>
                   <option value="popup">Popup Mode</option>
@@ -226,6 +227,161 @@ const App: React.FC = () => {
                         }
                       }}
                     />
+                  </div>
+                )}
+
+                {currentDemo === 'footer-alignment' && (
+                  <div>
+                    <h4>Footer Button Alignment Examples</h4>
+                    <p className="cla-cal-text-muted">
+                      Demonstrating different footer button alignment options
+                    </p>
+                    
+                    <div className="cla-cal-row">
+                      <div className="cla-cal-col-6">
+                        <h5>Default: Clear (Left) & Submit (Right)</h5>
+                        <div className="cla-cal-code-block cla-cal-mb-2">
+                          <code>{`{
+  showClearButton: true,
+  showSubmitButton: true,
+  footerButtonAlignment: 'space-between'
+}`}</code>
+                        </div>
+                        <CLACalendar 
+                          settings={{
+                            displayMode: 'embedded',
+                            visibleMonths: 1,
+                            showClearButton: true,
+                            showSubmitButton: true,
+                            footerButtonAlignment: 'space-between',
+                            onSubmit: (start, end) => {
+                              alert(`Selected: ${start} to ${end}`);
+                            }
+                          }}
+                        />
+                      </div>
+                      
+                      <div className="cla-cal-col-6">
+                        <h5>Submit Only (Auto Right-Aligned)</h5>
+                        <div className="cla-cal-code-block cla-cal-mb-2">
+                          <code>{`{
+  showClearButton: false,
+  showSubmitButton: true,
+  footerButtonAlignment: 'space-between'
+  // Auto-aligns to 'flex-end'
+}`}</code>
+                        </div>
+                        <CLACalendar 
+                          settings={{
+                            displayMode: 'embedded',
+                            visibleMonths: 1,
+                            showClearButton: false,
+                            showSubmitButton: true,
+                            footerButtonAlignment: 'space-between',
+                            onSubmit: (start, end) => {
+                              alert(`Selected: ${start} to ${end}`);
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="cla-cal-row cla-cal-mt-4">
+                      <div className="cla-cal-col-6">
+                        <h5>Both Buttons (Center Aligned)</h5>
+                        <div className="cla-cal-code-block cla-cal-mb-2">
+                          <code>{`{
+  showClearButton: true,
+  showSubmitButton: true,
+  footerButtonAlignment: 'center'
+}`}</code>
+                        </div>
+                        <CLACalendar 
+                          settings={{
+                            displayMode: 'embedded',
+                            visibleMonths: 1,
+                            showClearButton: true,
+                            showSubmitButton: true,
+                            footerButtonAlignment: 'center',
+                            onSubmit: (start, end) => {
+                              alert(`Selected: ${start} to ${end}`);
+                            }
+                          }}
+                        />
+                      </div>
+                      
+                      <div className="cla-cal-col-6">
+                        <h5>Both Buttons (Left Aligned)</h5>
+                        <div className="cla-cal-code-block cla-cal-mb-2">
+                          <code>{`{
+  showClearButton: true,
+  showSubmitButton: true,
+  footerButtonAlignment: 'flex-start'
+}`}</code>
+                        </div>
+                        <CLACalendar 
+                          settings={{
+                            displayMode: 'embedded',
+                            visibleMonths: 1,
+                            showClearButton: true,
+                            showSubmitButton: true,
+                            footerButtonAlignment: 'flex-start',
+                            onSubmit: (start, end) => {
+                              alert(`Selected: ${start} to ${end}`);
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="cla-cal-row cla-cal-mt-4">
+                      <div className="cla-cal-col-6">
+                        <h5>Both Buttons (Right Aligned)</h5>
+                        <div className="cla-cal-code-block cla-cal-mb-2">
+                          <code>{`{
+  showClearButton: true,
+  showSubmitButton: true,
+  footerButtonAlignment: 'flex-end'
+}`}</code>
+                        </div>
+                        <CLACalendar 
+                          settings={{
+                            displayMode: 'embedded',
+                            visibleMonths: 1,
+                            showClearButton: true,
+                            showSubmitButton: true,
+                            footerButtonAlignment: 'flex-end',
+                            onSubmit: (start, end) => {
+                              alert(`Selected: ${start} to ${end}`);
+                            }
+                          }}
+                        />
+                      </div>
+                      
+                      <div className="cla-cal-col-6">
+                        <h5>Clear Only (Left Aligned)</h5>
+                        <div className="cla-cal-code-block cla-cal-mb-2">
+                          <code>{`{
+  showClearButton: true,
+  showSubmitButton: false,
+  footerButtonAlignment: 'space-between'
+  // Stays at 'flex-start' naturally
+}`}</code>
+                        </div>
+                        <CLACalendar 
+                          settings={{
+                            displayMode: 'embedded',
+                            visibleMonths: 1,
+                            showClearButton: true,
+                            showSubmitButton: false,
+                            footerButtonAlignment: 'space-between',
+                            onSubmit: (start, end) => {
+                              alert(`Selected: ${start} to ${end}`);
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
                   </div>
                 )}
 

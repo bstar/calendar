@@ -433,6 +433,7 @@ export const DateInputSection: React.FC<DateInputSectionProps> = ({
 export interface CalendarFooterProps {
   showSubmitButton: boolean;
   showClearButton: boolean;
+  footerButtonAlignment?: 'space-between' | 'flex-start' | 'flex-end' | 'center' | 'space-around';
   handleClear: () => void;
   handleSubmit: () => void;
 }
@@ -441,6 +442,7 @@ export interface CalendarFooterProps {
  * Footer with action buttons for the calendar
  * @param showSubmitButton - Whether to show the submit button
  * @param showClearButton - Whether to show the clear button
+ * @param footerButtonAlignment - Alignment of footer buttons (space-between, flex-start, flex-end, center, space-around)
  * @param handleClear - Function to clear the selection
  * @param handleSubmit - Function to submit the selection
  * @returns Footer with clear and submit buttons
@@ -448,30 +450,49 @@ export interface CalendarFooterProps {
 export const CalendarFooter: React.FC<CalendarFooterProps> = ({
   showSubmitButton,
   showClearButton,
+  footerButtonAlignment = 'space-between',
   handleClear,
   handleSubmit
-}) => (
-  <div className="calendar-footer" role="group" aria-label="Calendar actions">
-    {showClearButton && (
-      <Button
-        variant="secondary"
-        onClick={handleClear}
-        aria-label="Clear date selection"
-      >
-        Clear
-      </Button>
-    )}
-    {showSubmitButton && (
-      <Button
-        variant="primary"
-        onClick={handleSubmit}
-        aria-label="Submit date selection"
-      >
-        Submit
-      </Button>
-    )}
-  </div>
-);
+}) => {
+  // Smart default: if only Submit button is shown and using default alignment, right-align it
+  let alignment = footerButtonAlignment;
+  if (!showClearButton && showSubmitButton && footerButtonAlignment === 'space-between') {
+    alignment = 'flex-end';
+  }
+
+  // Only apply inline style if it's different from the CSS default (space-between)
+  const styleProps = alignment !== 'space-between' 
+    ? { style: { justifyContent: alignment } }
+    : {};
+
+  return (
+    <div 
+      className="calendar-footer" 
+      role="group" 
+      aria-label="Calendar actions"
+      {...styleProps}
+    >
+      {showClearButton && (
+        <Button
+          variant="secondary"
+          onClick={handleClear}
+          aria-label="Clear date selection"
+        >
+          Clear
+        </Button>
+      )}
+      {showSubmitButton && (
+        <Button
+          variant="primary"
+          onClick={handleSubmit}
+          aria-label="Submit date selection"
+        >
+          Submit
+        </Button>
+      )}
+    </div>
+  );
+};
 
 // Calendar Container component
 export interface CalendarContainerProps {

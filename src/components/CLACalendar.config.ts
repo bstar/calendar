@@ -247,6 +247,7 @@ export interface CalendarSettings {
   showSubmitButton?: boolean;
   showClearButton?: boolean;
   showFooter?: boolean;
+  footerButtonAlignment?: 'space-between' | 'flex-start' | 'flex-end' | 'center' | 'space-around';
   enableOutOfBoundsScroll?: boolean;
   suppressTooltipsOnSelection?: boolean;
   showSelectionAlert?: boolean;
@@ -411,6 +412,7 @@ const CORE_DEFAULTS = {
   showSubmitButton: true,
   showClearButton: true,
   showFooter: true,
+  footerButtonAlignment: 'space-between' as const,
   enableOutOfBoundsScroll: true,
   suppressTooltipsOnSelection: false,
   showSelectionAlert: false,

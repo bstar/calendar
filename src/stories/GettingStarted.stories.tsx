@@ -215,3 +215,59 @@ export const DynamicPositioning: Story = {
     </div>
   ),
 };
+
+// Footer button customization
+export const FooterButtonControl: Story = {
+  name: 'Footer Button Control',
+  args: {
+    ...defaultArgs,
+    displayMode: 'embedded',
+    visibleMonths: 2,
+    showFooter: true,
+    showSubmitButton: true,
+    showClearButton: false,
+    footerButtonAlignment: 'flex-end'
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Demonstrates control over footer buttons. You can independently show/hide the Submit and Clear buttons and control their alignment. Try different combinations of showClearButton, showSubmitButton, and footerButtonAlignment in the controls.'
+      }
+    }
+  },
+  render: (args) => (
+    <CalendarStoryWrapper 
+      args={args}
+      title="Footer Button Control"
+      description="This example shows the calendar with only the Submit button visible, aligned to the right. Try toggling buttons and changing the alignment."
+    />
+  ),
+};
+
+// Footer button alignment showcase
+export const FooterButtonAlignment: Story = {
+  name: 'Footer Button Alignment',
+  args: {
+    ...defaultArgs,
+    displayMode: 'embedded',
+    visibleMonths: 1,
+    showFooter: true,
+    showSubmitButton: true,
+    showClearButton: true,
+    footerButtonAlignment: 'center'
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Showcases different footer button alignment options. Use the controls to try: space-between (default), flex-start (left), flex-end (right), center, and space-around.'
+      }
+    }
+  },
+  render: (args) => (
+    <CalendarStoryWrapper 
+      args={args}
+      title="Footer Button Alignment"
+      description="Buttons are currently center-aligned. Try different footerButtonAlignment values and button visibility combinations."
+    />
+  ),
+};

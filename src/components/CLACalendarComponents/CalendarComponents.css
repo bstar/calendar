@@ -300,6 +300,11 @@
   justify-content: space-between;
 }
 
+/* Add spacing between buttons when they're grouped together */
+.calendar-footer > button + button {
+  margin-left: 8px;
+}
+
 /* Calendar wrapper to handle positioning */
 .cla-calendar-wrapper {
   position: relative;
