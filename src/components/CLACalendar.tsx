@@ -1105,6 +1105,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
         {settings.showFooter && (
           <CalendarFooter
             showSubmitButton={settings.showSubmitButton}
+            showClearButton={settings.showClearButton}
             handleClear={handleClearAll}
             handleSubmit={handleSubmit}
           />

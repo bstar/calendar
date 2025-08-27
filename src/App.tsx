@@ -81,6 +81,7 @@ const App: React.FC = () => {
                   <option value="basic">Basic Usage</option>
                   <option value="single">Single Date Selection</option>
                   <option value="range-single-day">Range Mode - Single Day Selection</option>
+                  <option value="no-clear">No Clear Button Demo</option>
                   <option value="multiple">Multiple Months</option>
                   <option value="custom">Custom Theme</option>
                   <option value="popup">Popup Mode</option>
@@ -200,6 +201,28 @@ const App: React.FC = () => {
                           
                           setSubmitResult(result);
                           setSubmitCount(prev => prev + 1);
+                        }
+                      }}
+                    />
+                  </div>
+                )}
+
+                {currentDemo === 'no-clear' && (
+                  <div>
+                    <h4>No Clear Button Demo</h4>
+                    <p className="cla-cal-text-muted">
+                      Demonstrating the calendar with <code>showClearButton: false</code>. 
+                      Only the Submit button will be shown in the footer.
+                    </p>
+                    <CLACalendar 
+                      settings={{
+                        displayMode: 'embedded',
+                        selectionMode: 'range',
+                        visibleMonths: 2,
+                        showSubmitButton: true,
+                        showClearButton: false,
+                        onSubmit: (start, end) => {
+                          alert(`Selected: ${start} to ${end}`);
                         }
                       }}
                     />

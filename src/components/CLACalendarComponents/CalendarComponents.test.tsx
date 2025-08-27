@@ -864,6 +864,7 @@ describe('DateInputSection', () => {
 describe('CalendarFooter', () => {
   const defaultProps = {
     showSubmitButton: false,
+    showClearButton: true,
     handleClear: vi.fn(),
     handleSubmit: vi.fn()
   };
@@ -898,6 +899,18 @@ describe('CalendarFooter', () => {
     render(<CalendarFooter {...defaultProps} showSubmitButton={false} />);
     
     expect(screen.queryByText('Submit')).not.toBeInTheDocument();
+  });
+
+  it('should hide clear button when showClearButton is false', () => {
+    render(<CalendarFooter {...defaultProps} showClearButton={false} />);
+    
+    expect(screen.queryByText('Clear')).not.toBeInTheDocument();
+  });
+
+  it('should show clear button when showClearButton is true', () => {
+    render(<CalendarFooter {...defaultProps} showClearButton={true} />);
+    
+    expect(screen.getByText('Clear')).toBeInTheDocument();
   });
 });
 

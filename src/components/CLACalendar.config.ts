@@ -245,6 +245,7 @@ export interface CalendarSettings {
   showHeader?: boolean;
   closeOnClickAway?: boolean;
   showSubmitButton?: boolean;
+  showClearButton?: boolean;
   showFooter?: boolean;
   enableOutOfBoundsScroll?: boolean;
   suppressTooltipsOnSelection?: boolean;
@@ -408,6 +409,7 @@ const CORE_DEFAULTS = {
   showHeader: true,
   closeOnClickAway: true,
   showSubmitButton: true,
+  showClearButton: true,
   showFooter: true,
   enableOutOfBoundsScroll: true,
   suppressTooltipsOnSelection: false,

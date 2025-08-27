@@ -432,6 +432,7 @@ export const DateInputSection: React.FC<DateInputSectionProps> = ({
 // Calendar Footer component
 export interface CalendarFooterProps {
   showSubmitButton: boolean;
+  showClearButton: boolean;
   handleClear: () => void;
   handleSubmit: () => void;
 }
@@ -439,23 +440,27 @@ export interface CalendarFooterProps {
 /**
  * Footer with action buttons for the calendar
  * @param showSubmitButton - Whether to show the submit button
+ * @param showClearButton - Whether to show the clear button
  * @param handleClear - Function to clear the selection
  * @param handleSubmit - Function to submit the selection
  * @returns Footer with clear and submit buttons
  */
 export const CalendarFooter: React.FC<CalendarFooterProps> = ({
   showSubmitButton,
+  showClearButton,
   handleClear,
   handleSubmit
 }) => (
   <div className="calendar-footer" role="group" aria-label="Calendar actions">
-    <Button
-      variant="secondary"
-      onClick={handleClear}
-      aria-label="Clear date selection"
-    >
-      Clear
-    </Button>
+    {showClearButton && (
+      <Button
+        variant="secondary"
+        onClick={handleClear}
+        aria-label="Clear date selection"
+      >
+        Clear
+      </Button>
+    )}
     {showSubmitButton && (
       <Button
         variant="primary"
