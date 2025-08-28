@@ -42,8 +42,21 @@ export interface SimpleCalendarSettings {
   /** Callback when user submits a date selection */
   onSubmit?: (startDate: string | null, endDate: string | null) => void;
   
-  /** Custom date formatter function */
+  /** 
+   * Custom date formatter for visual display in the input field
+   * @default (date: Date) => format(date, "MMM dd, yyyy")
+   * @example (date) => format(date, "dd/MM/yyyy") // "15/07/2025"
+   */
   dateFormatter?: (date: Date) => string;
+  
+  /**
+   * Custom formatter for dates passed to onSubmit callback
+   * @default undefined (uses raw ISO format "YYYY-MM-DD")
+   * @example (date) => format(date, "MM/dd/yyyy") // "07/15/2025"
+   * @example (date) => date.getTime().toString() // "1736899200000"
+   * @example (date) => date.toISOString() // "2025-07-15T00:00:00.000Z"
+   */
+  submissionFormatter?: (date: Date) => string;
   
   /** Whether to show the submit button */
   showSubmitButton?: boolean;
@@ -252,7 +265,8 @@ export interface CalendarSettings {
   suppressTooltipsOnSelection?: boolean;
   showSelectionAlert?: boolean;
   startWeekOnSunday?: boolean;
-  dateFormatter?: (date: Date) => string; // Custom date formatter function
+  dateFormatter?: (date: Date) => string; // Custom date formatter for visual display
+  submissionFormatter?: (date: Date) => string; // Custom formatter for onSubmit callback data
   dateRangeSeparator?: string; // Custom separator for date ranges (default is " - ")
   defaultRange?: { start: string; end: string }; // Default date range to initialize with
   
@@ -538,6 +552,7 @@ export function createSimpleCalendarSettings(simpleSettings: SimpleCalendarSetti
     selectionMode: safeSettings.selectionMode,
     defaultRange: safeSettings.defaultRange,
     dateFormatter: safeSettings.dateFormatter,
+    submissionFormatter: safeSettings.submissionFormatter,
     showSubmitButton: safeSettings.showSubmitButton,
     startWeekOnSunday: safeSettings.startWeekOnSunday,
     inputClassName: safeSettings.inputClassName,

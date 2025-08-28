@@ -60,7 +60,7 @@
  * Returns: 'rgba(0, 0, 0, 0.1)' or undefined  // Grey overlay for restricted dates
  */
 
-import { parseISO, isWithinInterval } from '../../../utils/DateUtils';
+import { parseISO, isWithinInterval, format } from '../../../utils/DateUtils';
 import { isValid } from 'date-fns';
 import { RestrictionConfig, BoundaryRestriction, DateRangeRestriction, RestrictedBoundaryRestriction, AllowedRangesRestriction, WeekdayRestriction } from './types';
 import { BackgroundData } from '../../CLACalendar.config';
@@ -86,16 +86,15 @@ export class RestrictionBackgroundGenerator {
     const boundaryDate = parseISO(restriction.date);
     if (!isValid(boundaryDate)) return undefined;
 
-    if (restriction.direction === 'before' && date < boundaryDate) {
+    // Compare dates at the day level, ignoring time
+    // Convert both dates to YYYY-MM-DD strings for comparison
+    const dateStr = format(date, 'yyyy-MM-dd');
+    const boundaryStr = format(boundaryDate, 'yyyy-MM-dd');
+
+    if (restriction.direction === 'before' && dateStr < boundaryStr) {
       return 'rgba(0, 0, 0, 0.1)';
-    } else if (restriction.direction === 'after') {
-      // Since parseISO returns UTC dates, we should use UTC hours for consistency
-      // Create end of day in UTC timezone
-      const boundaryEndOfDay = new Date(boundaryDate);
-      boundaryEndOfDay.setUTCHours(23, 59, 59, 999);
-      if (date > boundaryEndOfDay) {
-        return 'rgba(0, 0, 0, 0.1)';
-      }
+    } else if (restriction.direction === 'after' && dateStr > boundaryStr) {
+      return 'rgba(0, 0, 0, 0.1)';
     }
     return undefined;
   }

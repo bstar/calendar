@@ -827,9 +827,10 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       setActiveLayer,
       selectedRange,
       settings.onSubmit,
-      settings.closeOnClickAway
+      settings.closeOnClickAway,
+      settings.submissionFormatter
     ),
-    [setSelectedRange, setDateInputContext, setIsSelecting, setValidationErrors, setCurrentMonth, setIsOpen, setActiveLayer, selectedRange, settings.onSubmit, settings.closeOnClickAway]
+    [setSelectedRange, setDateInputContext, setIsSelecting, setValidationErrors, setCurrentMonth, setIsOpen, setActiveLayer, selectedRange, settings.onSubmit, settings.closeOnClickAway, settings.submissionFormatter]
   );
 
   // Wrap the original handleSubmit to update displayRange

@@ -392,7 +392,8 @@ export class CLACalendarHandlers {
     setActiveLayer: (layerId: string) => void,
     selectedRange: DateRange,
     onSubmit?: (startDate: string, endDate: string) => void,
-    closeOnClickAway?: boolean
+    closeOnClickAway?: boolean,
+    submissionFormatter?: (date: Date) => string
   ) {
     const handleClear = () => {
       // Reset range and context
@@ -411,13 +412,32 @@ export class CLACalendarHandlers {
     };
 
     const handleSubmit = () => {
+      // Helper function to format dates for submission
+      const formatForSubmission = (dateString: string) => {
+        // If no formatter provided, return ISO format (backward compatibility)
+        if (!submissionFormatter) return dateString;
+        
+        try {
+          // Parse and format the date
+          const date = parseISO(dateString);
+          return submissionFormatter(date);
+        } catch (error) {
+          // If formatter throws, fall back to ISO format
+          console.error('Error in submissionFormatter:', error);
+          return dateString;
+        }
+      };
+
       // In range mode, if only start is selected (no drag), use it for both dates
       if (selectedRange.start && !selectedRange.end && onSubmit) {
-        onSubmit(selectedRange.start, selectedRange.start);
+        const formattedStart = formatForSubmission(selectedRange.start);
+        onSubmit(formattedStart, formattedStart);
       } 
       // If we have a valid range and onSubmit handler, call it directly
       else if (selectedRange.start && selectedRange.end && onSubmit) {
-        onSubmit(selectedRange.start, selectedRange.end);
+        const formattedStart = formatForSubmission(selectedRange.start);
+        const formattedEnd = formatForSubmission(selectedRange.end);
+        onSubmit(formattedStart, formattedEnd);
       }
 
       // Close the calendar
