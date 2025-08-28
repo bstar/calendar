@@ -45,6 +45,28 @@ const App: React.FC = () => {
   } | null>(null);
   
   const [submitCount, setSubmitCount] = useState(0);
+  
+  // For submission formatter demo - Example 1
+  const [submissionFormatResult, setSubmissionFormatResult] = useState<{
+    display: string;
+    submitted: { start: string | null; end: string | null };
+    timestamp: string;
+  } | null>(null);
+  
+  // For dynamic formatter demo - Example 2
+  const [selectedFormatType, setSelectedFormatType] = useState<string>('us');
+  const [dynamicFormatResult, setDynamicFormatResult] = useState<{
+    visual: string;
+    start: string | null;
+    end: string | null;
+  } | null>(null);
+  
+  // For API format demo - Example 4
+  const [apiFormatResult, setApiFormatResult] = useState<{
+    visual: string;
+    checkIn: string | null;
+    checkOut: string | null;
+  } | null>(null);
 
   const handleDateSubmit = (start: string | null, end: string | null) => {
     setSelectedRange({ start, end });
@@ -91,6 +113,7 @@ const App: React.FC = () => {
                   <option value="null-safe">Null-Safe Configuration</option>
                   <option value="restrictions">Restriction Testing</option>
                   <option value="accessibility">Accessibility Features</option>
+                  <option value="submissionFormatter">Submission Formatter</option>
                 </select>
               </div>
 
@@ -1280,6 +1303,447 @@ const App: React.FC = () => {
                         <li>Check <strong>color contrast</strong> with browser extensions</li>
                         <li>Test with <strong>Windows High Contrast mode</strong></li>
                       </ol>
+                    </div>
+                  </div>
+                )}
+
+                {currentDemo === 'submissionFormatter' && (
+                  <div>
+                    <h4>Submission Formatter - Separate Visual & Submission Formats</h4>
+                    <p className="cla-cal-text-muted">
+                      The new <code>submissionFormatter</code> prop allows you to format dates differently for submission vs visual display.
+                      This is useful when your API requires a specific format that differs from what users see.
+                    </p>
+
+                    {/* Example 1: Different Formats */}
+                    <div className="cla-cal-mb-4">
+                      <h5 style={{ fontSize: '18px', marginBottom: '10px' }}>1. Different Visual vs Submission Formats</h5>
+                      <p style={{ fontSize: '14px', color: '#666', marginBottom: '15px' }}>
+                        Visual: <code>MMM dd, yyyy</code> | Submission: <code>MM/dd/yyyy</code>
+                      </p>
+                      
+                      <CLACalendar 
+                        settings={{
+                          displayMode: 'embedded',
+                          visibleMonths: 1,
+                          monthWidth: 300,
+                          selectionMode: 'range',
+                          showSubmitButton: true,
+                          showFooter: true,
+                          dateFormatter: (date: Date) => {
+                            // Visual display format
+                            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                                          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                            return `${months[date.getMonth()]} ${date.getDate().toString().padStart(2, '0')}, ${date.getFullYear()}`;
+                          },
+                          submissionFormatter: (date: Date) => {
+                            // Submission format (US format)
+                            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                            const day = date.getDate().toString().padStart(2, '0');
+                            return `${month}/${day}/${date.getFullYear()}`;
+                          },
+                          onSubmit: (start: string | null, end: string | null) => {
+                            const input = document.querySelector('.cla-input-custom') as HTMLInputElement;
+                            setSubmissionFormatResult({
+                              display: input?.value || '',
+                              submitted: { start, end },
+                              timestamp: new Date().toISOString()
+                            });
+                          },
+                          defaultRange: { start: '2025-03-15', end: '2025-03-20' }
+                        }}
+                      />
+                      
+                      {submissionFormatResult && (
+                        <div style={{
+                          marginTop: '15px',
+                          padding: '15px',
+                          backgroundColor: '#f8f9fa',
+                          borderRadius: '8px',
+                          border: '1px solid #dee2e6'
+                        }}>
+                          <h6 style={{ marginBottom: '10px', color: '#495057' }}>Result:</h6>
+                          <div style={{ fontFamily: 'monospace', fontSize: '14px' }}>
+                            <div style={{ marginBottom: '8px' }}>
+                              <strong>Visual Display:</strong> <span style={{ color: '#0066cc' }}>{submissionFormatResult.display}</span>
+                            </div>
+                            <div style={{ marginBottom: '8px' }}>
+                              <strong>Submitted Start:</strong> <span style={{ color: '#28a745' }}>{submissionFormatResult.submitted.start}</span>
+                            </div>
+                            <div>
+                              <strong>Submitted End:</strong> <span style={{ color: '#28a745' }}>{submissionFormatResult.submitted.end}</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Example 2: Dynamic Visual Format Switcher */}
+                    <div className="cla-cal-mb-4">
+                      <h5 style={{ fontSize: '18px', marginBottom: '10px' }}>2. Dynamic Visual Format Switcher</h5>
+                      <p style={{ fontSize: '14px', color: '#666', marginBottom: '15px' }}>
+                        Change the visual format using the dropdown - the input field updates immediately!
+                        <br />
+                        <strong>Note:</strong> This only affects the visual display, not the submission format (always ISO).
+                      </p>
+                      
+                      <div style={{ marginBottom: '15px' }}>
+                        <label style={{ marginRight: '10px', fontSize: '14px', fontWeight: 'bold' }}>
+                          Select Date Format:
+                        </label>
+                        <select 
+                          value={selectedFormatType}
+                          onChange={(e) => setSelectedFormatType(e.target.value)}
+                          style={{
+                            padding: '6px 12px',
+                            borderRadius: '4px',
+                            border: '1px solid #ced4da',
+                            fontSize: '14px',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <option value="us">US Format (MM/DD/YYYY)</option>
+                          <option value="eu">European Format (DD.MM.YYYY)</option>
+                          <option value="iso">ISO Format (YYYY-MM-DD)</option>
+                          <option value="long">Long Format (Month DD, YYYY)</option>
+                          <option value="full">Full Format (Weekday, Month DD, YYYY)</option>
+                          <option value="compact">Compact (MMM DD, YY)</option>
+                          <option value="japanese">Japanese Style (YYYY年MM月DD日)</option>
+                          <option value="custom">Custom with Time (DD MMM @ 12:00 PM)</option>
+                        </select>
+                      </div>
+                      
+                      <div id="dynamic-format-example">
+                        <CLACalendar 
+                          key={selectedFormatType} // Force re-render when format changes
+                          settings={{
+                            displayMode: 'popup',
+                            visibleMonths: 2,
+                            monthWidth: 300,
+                            selectionMode: 'range',
+                            inputStyle: { width: '600px' }, // Make input field 2x wider
+                            showSubmitButton: true,
+                            showFooter: true,
+                            dateFormatter: (date: Date) => {
+                              switch(selectedFormatType) {
+                                case 'us':
+                                  return `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}/${date.getFullYear()}`;
+                                case 'eu':
+                                  return `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear()}`;
+                                case 'iso':
+                                  return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+                                case 'long':
+                                  const longMonths = ['January', 'February', 'March', 'April', 'May', 'June', 
+                                                     'July', 'August', 'September', 'October', 'November', 'December'];
+                                  return `${longMonths[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+                                case 'full':
+                                  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                                  const fullMonths = ['January', 'February', 'March', 'April', 'May', 'June', 
+                                                     'July', 'August', 'September', 'October', 'November', 'December'];
+                                  return `${days[date.getDay()]}, ${fullMonths[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+                                case 'compact':
+                                  const compactMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                                                         'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                                  return `${compactMonths[date.getMonth()]} ${date.getDate()}, '${date.getFullYear().toString().slice(-2)}`;
+                                case 'japanese':
+                                  return `${date.getFullYear()}年${(date.getMonth() + 1)}月${date.getDate()}日`;
+                                case 'custom':
+                                  const customMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                                                       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                                  return `${date.getDate()} ${customMonths[date.getMonth()]} @ 12:00 PM`;
+                                default:
+                                  return date.toLocaleDateString();
+                              }
+                            },
+                            // Note: submissionFormatter is intentionally NOT provided
+                            // This means submission will always be ISO format (YYYY-MM-DD)
+                            onSubmit: (start: string | null, end: string | null) => {
+                              const dynamicExample = document.getElementById('dynamic-format-example');
+                              const input = dynamicExample?.querySelector('.cla-input-custom') as HTMLInputElement;
+                              const visualDisplay = input?.value || '';
+                              
+                              // Update the state for this specific example
+                              setDynamicFormatResult({
+                                visual: visualDisplay,
+                                start,
+                                end
+                              });
+                            },
+                            defaultRange: { start: '2025-03-15', end: '2025-03-20' }
+                          }}
+                        />
+                      </div>
+                      
+                      {/* Result Display */}
+                      <div style={{
+                        marginTop: '15px',
+                        padding: '15px',
+                        backgroundColor: '#f8f9fa',
+                        borderRadius: '8px',
+                        border: '1px solid #dee2e6',
+                        minHeight: '50px'
+                      }}>
+                        {dynamicFormatResult ? (
+                          <>
+                            <h6 style={{ marginBottom: '10px', color: '#495057' }}>Submission Results:</h6>
+                            <div style={{ fontFamily: 'monospace', fontSize: '14px' }}>
+                              <div style={{ marginBottom: '8px' }}>
+                                <strong>Visual Display ({selectedFormatType}):</strong>{' '}
+                                <span style={{ color: '#0066cc', background: '#f0f8ff', padding: '2px 6px', borderRadius: '3px' }}>
+                                  {dynamicFormatResult.visual}
+                                </span>
+                              </div>
+                              <div style={{ marginBottom: '8px' }}>
+                                <strong>Submitted Start (ISO):</strong>{' '}
+                                <span style={{ color: '#28a745', background: '#d4edda', padding: '2px 6px', borderRadius: '3px' }}>
+                                  {dynamicFormatResult.start}
+                                </span>
+                              </div>
+                              <div>
+                                <strong>Submitted End (ISO):</strong>{' '}
+                                <span style={{ color: '#28a745', background: '#d4edda', padding: '2px 6px', borderRadius: '3px' }}>
+                                  {dynamicFormatResult.end}
+                                </span>
+                              </div>
+                            </div>
+                            <div style={{ marginTop: '12px', padding: '10px', background: '#fff3cd', borderRadius: '4px', fontSize: '13px' }}>
+                              ⚠️ Notice: The visual format changes with the dropdown, but submission always uses ISO format!
+                            </div>
+                          </>
+                        ) : (
+                          <p style={{ color: '#6c757d', margin: 0, fontSize: '14px' }}>
+                            Click the input field above, select dates, and submit to see the format difference...
+                          </p>
+                        )}
+                      </div>
+                      
+                      <div style={{
+                        marginTop: '15px',
+                        padding: '12px',
+                        backgroundColor: '#e8f4f8',
+                        borderRadius: '6px',
+                        border: '1px solid #b8daff',
+                        fontSize: '13px'
+                      }}>
+                        <strong>Current Format Type:</strong> {(() => {
+                          switch(selectedFormatType) {
+                            case 'us': return 'US Format (MM/DD/YYYY)';
+                            case 'eu': return 'European Format (DD.MM.YYYY)';
+                            case 'iso': return 'ISO Format (YYYY-MM-DD)';
+                            case 'long': return 'Long Format (Month DD, YYYY)';
+                            case 'full': return 'Full Format (Weekday, Month DD, YYYY)';
+                            case 'compact': return 'Compact (MMM DD, \'YY)';
+                            case 'japanese': return 'Japanese Style (YYYY年MM月DD日)';
+                            case 'custom': return 'Custom with Time';
+                            default: return 'Unknown';
+                          }
+                        })()}
+                        <br />
+                        <span style={{ color: '#6c757d' }}>
+                          Try selecting different formats to see how the input field display changes!
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Example 3: Timestamp Format */}
+                    <div className="cla-cal-mb-4">
+                      <h5 style={{ fontSize: '18px', marginBottom: '10px' }}>3. Unix Timestamp Submission</h5>
+                      <p style={{ fontSize: '14px', color: '#666', marginBottom: '15px' }}>
+                        Visual: <code>dd MMM yyyy</code> | Submission: Unix timestamp (milliseconds)
+                      </p>
+                      
+                      <CLACalendar 
+                        settings={{
+                          displayMode: 'embedded',
+                          visibleMonths: 1,
+                          monthWidth: 300,
+                          selectionMode: 'single',
+                          showSubmitButton: true,
+                          showFooter: true,
+                          dateFormatter: (date: Date) => {
+                            // Visual: "15 Mar 2025"
+                            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                                          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                            return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+                          },
+                          submissionFormatter: (date: Date) => {
+                            // Submit as timestamp
+                            return date.getTime().toString();
+                          },
+                          onSubmit: (start: string | null, end: string | null) => {
+                            if (start) {
+                              const timestamp = parseInt(start);
+                              const date = new Date(timestamp);
+                              alert(`Submitted timestamp: ${start}\nParsed date: ${date.toLocaleString()}`);
+                            }
+                          }
+                        }}
+                      />
+                    </div>
+
+                    {/* Example 4: API Format */}
+                    <div className="cla-cal-mb-4">
+                      <h5 style={{ fontSize: '18px', marginBottom: '10px' }}>4. API-Specific ISO Format</h5>
+                      <p style={{ fontSize: '14px', color: '#666', marginBottom: '15px' }}>
+                        Visual: Localized format | Submission: ISO 8601 with time
+                      </p>
+                      
+                      <div id="api-format-example">
+                        <CLACalendar 
+                          settings={{
+                            displayMode: 'embedded',
+                            visibleMonths: 2,
+                            monthWidth: 350,
+                            selectionMode: 'range',
+                          showSubmitButton: true,
+                          showFooter: true,
+                          dateFormatter: (date: Date) => {
+                            // Localized display
+                            return date.toLocaleDateString('en-US', { 
+                              weekday: 'short', 
+                              year: 'numeric', 
+                              month: 'short', 
+                              day: 'numeric' 
+                            });
+                          },
+                          submissionFormatter: (date: Date) => {
+                            // API expects ISO format with noon time
+                            const apiDate = new Date(date);
+                            apiDate.setHours(12, 0, 0, 0);
+                            return apiDate.toISOString();
+                          },
+                            onSubmit: (start: string | null, end: string | null) => {
+                              console.log('API Payload:', { checkIn: start, checkOut: end });
+                              // Update the state to show the API payload
+                              const apiExample = document.getElementById('api-format-example');
+                              const input = apiExample?.querySelector('.cla-input-custom') as HTMLInputElement;
+                              const displayText = input?.value || '';
+                              
+                              // Update state for this specific example
+                              setApiFormatResult({
+                                visual: displayText,
+                                checkIn: start,
+                                checkOut: end
+                              });
+                            }
+                          }}
+                        />
+                      </div>
+                      
+                      {/* API Result Display */}
+                      <div style={{
+                        marginTop: '15px',
+                        padding: '15px',
+                        backgroundColor: '#f8f9fa',
+                        borderRadius: '8px',
+                        border: '1px solid #dee2e6',
+                        minHeight: '50px'
+                      }}>
+                        {apiFormatResult ? (
+                          <>
+                            <h6 style={{ marginBottom: '10px', color: '#495057' }}>API Payload:</h6>
+                            <div style={{ fontFamily: 'monospace', fontSize: '14px' }}>
+                              <div style={{ marginBottom: '8px' }}>
+                                <strong>Visual Display:</strong>{' '}
+                                <span style={{ color: '#0066cc' }}>{apiFormatResult.visual}</span>
+                              </div>
+                              <div style={{ marginBottom: '8px' }}>
+                                <strong>Check-in (ISO):</strong>{' '}
+                                <span style={{ color: '#28a745' }}>{apiFormatResult.checkIn}</span>
+                              </div>
+                              <div>
+                                <strong>Check-out (ISO):</strong>{' '}
+                                <span style={{ color: '#28a745' }}>{apiFormatResult.checkOut}</span>
+                              </div>
+                            </div>
+                            <div style={{
+                              marginTop: '12px',
+                              padding: '10px',
+                              backgroundColor: '#e8f4f8',
+                              borderRadius: '4px',
+                              fontSize: '12px'
+                            }}>
+                              <strong>Raw API Request:</strong>
+                              <pre style={{ margin: '5px 0 0 0', fontSize: '11px' }}>
+{JSON.stringify({ 
+  booking: { 
+    checkIn: apiFormatResult.checkIn?.split('T')[0], 
+    checkOut: apiFormatResult.checkOut?.split('T')[0],
+    time: '12:00 PM' 
+  } 
+}, null, 2)}
+                              </pre>
+                            </div>
+                          </>
+                        ) : (
+                          <p style={{ color: '#6c757d', margin: 0, fontSize: '14px' }}>
+                            Submit dates to see the API payload format...
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Example 5: Backward Compatibility */}
+                    <div className="cla-cal-mb-4">
+                      <h5 style={{ fontSize: '18px', marginBottom: '10px' }}>5. Backward Compatibility (No submissionFormatter)</h5>
+                      <p style={{ fontSize: '14px', color: '#666', marginBottom: '15px' }}>
+                        When <code>submissionFormatter</code> is not provided, dates are submitted in ISO format (YYYY-MM-DD) as before.
+                      </p>
+                      
+                      <CLACalendar 
+                        settings={{
+                          displayMode: 'embedded',
+                          visibleMonths: 1,
+                          monthWidth: 300,
+                          selectionMode: 'range',
+                          showSubmitButton: true,
+                          showFooter: true,
+                          dateFormatter: (date: Date) => {
+                            // Custom visual format
+                            const day = date.getDate().toString().padStart(2, '0');
+                            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                            return `${day}/${month}/${date.getFullYear()}`;
+                          },
+                          // Note: NO submissionFormatter - maintains backward compatibility
+                          onSubmit: (start: string | null, end: string | null) => {
+                            alert(`Default ISO Format:\nStart: ${start}\nEnd: ${end}`);
+                          }
+                        }}
+                      />
+                    </div>
+
+                    {/* Code Example */}
+                    <div className="cla-cal-alert cla-cal-alert-info">
+                      <h6>Implementation Example:</h6>
+                      <pre className="cla-cal-bg-light cla-cal-p-2 cla-cal-rounded" style={{ fontSize: '13px' }}>
+                        <code>{`<CLACalendar 
+  settings={{
+    // Visual display format
+    dateFormatter: (date) => format(date, "MMM dd, yyyy"),
+    
+    // Submission format (new feature!)
+    submissionFormatter: (date) => format(date, "MM/dd/yyyy"),
+    
+    onSubmit: (start, end) => {
+      // start = "03/15/2025" (submission format)
+      // NOT "Mar 15, 2025" (display format)
+      // NOT "2025-03-15" (default ISO format)
+      
+      api.submitDates({ start, end });
+    }
+  }}
+/>`}</code>
+                      </pre>
+                    </div>
+
+                    <div className="cla-cal-alert cla-cal-alert-warning cla-cal-mt-3">
+                      <strong>Key Points:</strong>
+                      <ul style={{ marginBottom: 0, paddingLeft: '20px' }}>
+                        <li><code>dateFormatter</code> - Controls visual display in the input field</li>
+                        <li><code>submissionFormatter</code> - Controls the format passed to <code>onSubmit</code></li>
+                        <li>When <code>submissionFormatter</code> is not provided, ISO format (YYYY-MM-DD) is used (backward compatible)</li>
+                        <li>Both formatters work independently - you can use either, both, or neither</li>
+                      </ul>
                     </div>
                   </div>
                 )}
