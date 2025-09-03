@@ -86,11 +86,11 @@ export class CLACalendarHandlers {
 
         if (field === 'start') {
           // For start date, we want it in the leftmost month
-          const newBaseMonth = startOfMonth(date);
+          const newBaseMonth = startOfMonth(date, 'UTC');
           setCurrentMonth(newBaseMonth);
         } else {
           // For end date, we want it in the rightmost month
-          const newBaseMonth = addMonthsUTC(startOfMonth(date), -(validVisibleMonths - 1));
+          const newBaseMonth = addMonthsUTC(startOfMonth(date, 'UTC'), -(validVisibleMonths - 1));
           setCurrentMonth(newBaseMonth);
         }
       }

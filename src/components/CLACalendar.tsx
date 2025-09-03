@@ -35,6 +35,7 @@ import {
   isSameDay,
   isWithinInterval,
   parseISO,
+  createUTCDate,
 } from "../utils/DateUtils";
 import { CalendarErrorBoundary } from "./ErrorBoundary";
 
@@ -148,10 +149,10 @@ const dateValidator = (() => {
 
     const fullYear = year.length === 2 ? `20${year}` : year;
 
-    // Create and validate date
-    const date = new Date(fullYear, parseInt(month) - 1, parseInt(day));
+    // Create and validate date in UTC to match calendar's timezone handling
+    const date = createUTCDate(parseInt(fullYear), parseInt(month) - 1, parseInt(day));
 
-    const isValid = date.getMonth() === parseInt(month) - 1;
+    const isValid = date.getUTCMonth() === parseInt(month) - 1;
 
     return isValid ? date : null;
   };
@@ -191,7 +192,12 @@ const dateValidator = (() => {
     formatValue: (date) => !date ? '' : format(date, DATE_FORMAT, 'UTC'),
     parseValue: (value) => {
       if (!value) return null;
-      return /\d\./.test(value) ? parseDotNotation(value) : parse(value, DATE_FORMAT, new Date());
+      if (/\d\./.test(value)) {
+        return parseDotNotation(value);
+      }
+      // Parse in UTC context to match calendar's timezone handling
+      const parsedDate = parse(value, DATE_FORMAT, new Date());
+      return createUTCDate(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate());
     },
     DATE_FORMAT
   };
