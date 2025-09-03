@@ -1334,13 +1334,13 @@ const App: React.FC = () => {
                             // Visual display format
                             const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
                                           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                            return `${months[date.getMonth()]} ${date.getDate().toString().padStart(2, '0')}, ${date.getFullYear()}`;
+                            return `${months[date.getUTCMonth()]} ${date.getUTCDate().toString().padStart(2, '0')}, ${date.getUTCFullYear()}`;
                           },
                           submissionFormatter: (date: Date) => {
                             // Submission format (US format)
-                            const month = (date.getMonth() + 1).toString().padStart(2, '0');
-                            const day = date.getDate().toString().padStart(2, '0');
-                            return `${month}/${day}/${date.getFullYear()}`;
+                            const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+                            const day = date.getUTCDate().toString().padStart(2, '0');
+                            return `${month}/${day}/${date.getUTCFullYear()}`;
                           },
                           onSubmit: (start: string | null, end: string | null) => {
                             const input = document.querySelector('.cla-input-custom') as HTMLInputElement;
@@ -1564,7 +1564,7 @@ const App: React.FC = () => {
                             // Visual: "15 Mar 2025"
                             const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
                                           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                            return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+                            return `${date.getUTCDate()} ${months[date.getUTCMonth()]} ${date.getUTCFullYear()}`;
                           },
                           submissionFormatter: (date: Date) => {
                             // Submit as timestamp
@@ -1609,7 +1609,7 @@ const App: React.FC = () => {
                           submissionFormatter: (date: Date) => {
                             // API expects ISO format with noon time
                             const apiDate = new Date(date);
-                            apiDate.setHours(12, 0, 0, 0);
+                            apiDate.setUTCHours(12, 0, 0, 0);
                             return apiDate.toISOString();
                           },
                             onSubmit: (start: string | null, end: string | null) => {
