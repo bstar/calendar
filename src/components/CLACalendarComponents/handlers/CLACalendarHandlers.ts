@@ -1,5 +1,5 @@
 import { RefObject, MutableRefObject } from 'react';
-import { format, parseISO, startOfMonth, addMonthsUTC } from '../../../utils/DateUtils';
+import { format, parseISO, parseISOUTC, startOfMonth, addMonthsUTC } from '../../../utils/DateUtils';
 import { DateRange, DateRangeSelectionManager } from '../selection/DateRangeSelectionManager';
 
 export interface ValidationError {
@@ -418,8 +418,8 @@ export class CLACalendarHandlers {
         if (!submissionFormatter) return dateString;
         
         try {
-          // Parse and format the date
-          const date = parseISO(dateString);
+          // Parse and format the date using UTC-consistent parsing
+          const date = parseISOUTC(dateString);
           return submissionFormatter(date);
         } catch (error) {
           // If formatter throws, fall back to ISO format
