@@ -6,8 +6,8 @@ import { CLACalendar } from '../CLACalendar';
 import { getDefaultSettings } from '../CLACalendar.config';
 
 // Mock jest-axe if it's not available
-let axe: any = () => Promise.resolve({ violations: [] });
-let toHaveNoViolations: any = {};
+const axe: any = () => Promise.resolve({ violations: [] });
+const toHaveNoViolations: any = {};
 
 // Comment out jest-axe import to avoid build errors when package is missing
 // Uncomment and install jest-axe when running accessibility tests

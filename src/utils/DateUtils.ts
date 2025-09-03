@@ -115,6 +115,12 @@ export const parseISO = (dateString: string, timezone: string = 'UTC'): Date => 
  * @deprecated Use parseISO(dateString, 'UTC') instead
  */
 export const parseISOUTC = (dateString: string): Date => {
+  // If it's already a full ISO string with timezone (ends with 'Z'), 
+  // parse it directly to avoid double timezone conversion
+  if (dateString.endsWith('Z')) {
+    return dateFnsParseISO(dateString);
+  }
+  // For all other cases (date-only or datetime without 'Z'), use UTC parsing
   return parseISO(dateString, 'UTC');
 };
 

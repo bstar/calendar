@@ -922,7 +922,7 @@ describe('CLACalendar', () => {
       );
 
       // Verify calendar is open
-      let portal = document.querySelector('.cla-calendar-portal');
+      const portal = document.querySelector('.cla-calendar-portal');
       expect(portal).toBeInTheDocument();
 
       // Click outside

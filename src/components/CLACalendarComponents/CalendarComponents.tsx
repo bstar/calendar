@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import {
   format,
   parseISO,
+  parseISOUTC,
   isSameDay,
 } from '../../utils/DateUtils';
 import { DateRange } from './selection/DateRangeSelectionManager';
@@ -121,6 +122,31 @@ export const DateInput: React.FC<DateInputProps> = ({
   const [showIndicator, setShowIndicator] = useState<'success' | 'error' | null>(null);
   const previousInputRef = useRef(defaultValue || '');
 
+  // UTC-aware date parsing function to fix timezone issues
+  const parseUserInput = (input: string): Date | null => {
+    if (!input?.trim()) return null;
+    
+    try {
+      // If it looks like an ISO date string, parse it as UTC
+      if (/^\d{4}-\d{2}-\d{2}(T|$)/.test(input)) {
+        return parseISOUTC(input);
+      }
+      
+      // For other formats, create a date and convert to UTC equivalent
+      const localDate = new Date(input);
+      if (isNaN(localDate.getTime())) return null;
+      
+      // Create a UTC date with the same date components (ignoring time)
+      return new Date(Date.UTC(
+        localDate.getFullYear(),
+        localDate.getMonth(),
+        localDate.getDate()
+      ));
+    } catch {
+      return null;
+    }
+  };
+
   // Initialize with defaultValue when component first mounts
   useEffect(() => {
     if (defaultValue && !value && !inputValue) {
@@ -128,13 +154,9 @@ export const DateInput: React.FC<DateInputProps> = ({
       previousInputRef.current = defaultValue;
       
       // Try to parse defaultValue as a date and trigger onChange
-      try {
-        const date = new Date(defaultValue);
-        if (!isNaN(date.getTime())) {
-          onChange(date);
-        }
-      } catch (e) {
-        // Ignore parsing errors for defaultValue
+      const date = parseUserInput(defaultValue);
+      if (date) {
+        onChange(date);
       }
     }
   }, [defaultValue, value, onChange, inputValue]);
@@ -182,13 +204,12 @@ export const DateInput: React.FC<DateInputProps> = ({
       return;
     }
 
-    // Try to parse the input value
-    try {
-      const date = new Date(inputValue);
-      if (!isNaN(date.getTime())) {
+    // Try to parse the input value using UTC-aware parsing
+    const date = parseUserInput(inputValue);
+    if (date) {
         // Range validation
         if (field === 'start' && selectedRange?.end) {
-          const endDate = parseISO(selectedRange.end);
+          const endDate = parseISOUTC(selectedRange.end);
           if (date > endDate) {
             showValidationError({
               message: 'Start date must be before end date',
@@ -198,7 +219,7 @@ export const DateInput: React.FC<DateInputProps> = ({
             return;
           }
         } else if (field === 'end' && selectedRange?.start) {
-          const startDate = parseISO(selectedRange.start);
+          const startDate = parseISOUTC(selectedRange.start);
           if (date < startDate) {
             showValidationError({
               message: 'End date must be after start date',
@@ -219,14 +240,7 @@ export const DateInput: React.FC<DateInputProps> = ({
         onChange(date);
         setError(null);
         setShowError(false);
-      } else {
-        showValidationError({
-          message: 'Please use format: MM/DD/YY or MMM DD, YYYY',
-          type: 'error',
-          field: 'format'
-        });
-      }
-    } catch {
+    } else {
       showValidationError({
         message: 'Please use format: MM/DD/YY or MMM DD, YYYY',
         type: 'error',
@@ -402,7 +416,7 @@ export const DateInputSection: React.FC<DateInputSectionProps> = ({
        }}>
     <div className="cla-input-wrapper">
       <DateInput
-        value={selectedRange.start ? parseISO(selectedRange.start) : null}
+        value={selectedRange.start ? parseISOUTC(selectedRange.start) : null}
         onChange={handleDateChange('start')}
         field="start"
         placeholder={selectionMode === 'single' ? "Select date" : "Start date"}
@@ -415,7 +429,7 @@ export const DateInputSection: React.FC<DateInputSectionProps> = ({
     {selectionMode === 'range' && (
       <div className="cla-input-wrapper">
         <DateInput
-          value={selectedRange.end ? parseISO(selectedRange.end) : null}
+          value={selectedRange.end ? parseISOUTC(selectedRange.end) : null}
           onChange={handleDateChange('end')}
           field="end"
           placeholder="End date"
