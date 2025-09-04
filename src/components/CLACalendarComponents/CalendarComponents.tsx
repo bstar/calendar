@@ -397,6 +397,15 @@ export const DateInputSection: React.FC<DateInputSectionProps> = ({
   <div className={`cla-input-container ${selectionMode === 'single' ? 'single' : 'range'}`}
        role="group"
        aria-label={selectionMode === 'single' ? 'Date selection' : 'Date range selection'}
+       onClick={(e) => {
+         // If clicking outside an input but within the input section, blur focused inputs
+         if (!(e.target as HTMLElement).classList.contains('date-input')) {
+           const activeElement = document.activeElement as HTMLElement;
+           if (activeElement?.classList.contains('date-input')) {
+             activeElement.blur();
+           }
+         }
+       }}
        style={{
          backgroundColor: settings?.backgroundColors?.headerContainer || 'transparent'
        }}>
@@ -551,6 +560,18 @@ export const CalendarContainer: React.FC<CalendarContainerProps> = ({
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      onClick={(e) => {
+        // If clicking in calendar but not on inputs or day cells, blur focused inputs
+        const target = e.target as HTMLElement;
+        if (!target.classList.contains('date-input') && 
+            !target.classList.contains('day-cell') &&
+            !target.closest('.day-cell')) {
+          const activeElement = document.activeElement as HTMLElement;
+          if (activeElement?.classList.contains('date-input')) {
+            activeElement.blur();
+          }
+        }
+      }}
     >
       {children}
     </div>

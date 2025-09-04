@@ -841,9 +841,54 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
 
   // Wrap the original handleSubmit to update displayRange
   const handleSubmit = useCallback(() => {
-    setDisplayRange(selectedRange);
-    originalHandleSubmit();
-  }, [selectedRange, originalHandleSubmit]);
+    // Check for any focused date inputs and get their values
+    const dateInputs = containerRef.current?.querySelectorAll('.date-input') as NodeListOf<HTMLInputElement>;
+    let updatedRange = { ...selectedRange };
+    
+    if (dateInputs) {
+      dateInputs.forEach(input => {
+        if (document.activeElement === input && input.value) {
+          // Parse the focused input's current value using the same logic as validateAndUpdate
+          try {
+            const date = new Date(input.value);
+            if (!isNaN(date.getTime())) {
+              const field = input.getAttribute('aria-label')?.toLowerCase().includes('start') ? 'start' : 'end';
+              updatedRange[field] = date.toISOString();
+            }
+          } catch (e) {
+            // Invalid date - don't update, let existing validation show error
+          }
+        }
+      });
+    }
+    
+    setDisplayRange(updatedRange);
+    
+    // Use the updated range for submission
+    if (settings.onSubmit && (updatedRange.start || updatedRange.end)) {
+      const formatForSubmission = (dateString: string) => {
+        if (!settings.submissionFormatter) return dateString;
+        try {
+          const date = parseISO(dateString);
+          return settings.submissionFormatter(date);
+        } catch (error) {
+          return dateString;
+        }
+      };
+
+      if (updatedRange.start && !updatedRange.end) {
+        const formatted = formatForSubmission(updatedRange.start);
+        settings.onSubmit(formatted, formatted);
+      } else if (updatedRange.start && updatedRange.end) {
+        const formattedStart = formatForSubmission(updatedRange.start);
+        const formattedEnd = formatForSubmission(updatedRange.end);
+        settings.onSubmit(formattedStart, formattedEnd);
+      }
+    }
+    
+    setIsOpen(false);
+    setIsSelecting(false);
+  }, [selectedRange, containerRef, dateValidator, settings, parseISO, setIsOpen, setIsSelecting]);
 
   // Update handleClear to also clear displayRange
   const handleClearAll = useCallback(() => {
