@@ -484,7 +484,7 @@ describe('DateInput', () => {
     
     const input = container.querySelector('input');
     expect(input).toBeInTheDocument();
-    expect(input).toHaveValue('Jul 15, 2025');
+    expect(input).toHaveValue('07/15/2025');
   });
 
   it('should handle date change', () => {
@@ -734,7 +734,7 @@ describe('DateInput', () => {
     
     await waitFor(() => {
       const errorEl = container.querySelector('.date-input-error');
-      expect(errorEl).toHaveTextContent('Please use format: MM/DD/YY or MMM DD, YYYY');
+      expect(errorEl).toHaveTextContent('Please use format: MM/DD/YYYY');
     });
   });
 

@@ -142,7 +142,7 @@ export const DateInput: React.FC<DateInputProps> = ({
   // Update input value when value changes
   useEffect(() => {
     if (!isEditing && value) {
-      const formattedValue = format(value, "MMM dd, yyyy", 'UTC');
+      const formattedValue = format(value, "MM/dd/yyyy", 'UTC');
       setInputValue(formattedValue);
       previousInputRef.current = formattedValue;
     } else if (!isEditing && !value && !defaultValue) {
@@ -221,14 +221,14 @@ export const DateInput: React.FC<DateInputProps> = ({
         setShowError(false);
       } else {
         showValidationError({
-          message: 'Please use format: MM/DD/YY or MMM DD, YYYY',
+          message: 'Please use format: MM/DD/YYYY',
           type: 'error',
           field: 'format'
         });
       }
     } catch {
       showValidationError({
-        message: 'Please use format: MM/DD/YY or MMM DD, YYYY',
+        message: 'Please use format: MM/DD/YYYY',
         type: 'error',
         field: 'format'
       });

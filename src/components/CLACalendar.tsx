@@ -130,7 +130,7 @@ const _handleClickOutsideListener = (
 };
 
 const dateValidator = (() => {
-  const DATE_FORMAT = "MMMM d, yyyy";
+  const DATE_FORMAT = "MM/dd/yyyy";
 
   const parseDotNotation = (input) => {
     // Quick test for dot notation attempt
@@ -864,6 +864,12 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       });
     }
     
+    // Check for any validation errors before submitting
+    if (Object.keys(_validationErrors).length > 0) {
+      // Don't submit if there are validation errors
+      return;
+    }
+    
     // Only update displayRange if we found and processed pending changes
     if (hadPendingChanges) {
       setDisplayRange(updatedRange);
@@ -889,10 +895,11 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
         const formattedEnd = formatForSubmission(updatedRange.end);
         settings.onSubmit(formattedStart, formattedEnd);
       }
+      
+      // Only close calendar after successful submission
+      setIsOpen(false);
+      setIsSelecting(false);
     }
-    
-    setIsOpen(false);
-    setIsSelecting(false);
   }, [selectedRange, containerRef, dateValidator, settings, parseISO, setIsOpen, setIsSelecting]);
 
   // Update handleClear to also clear displayRange
