@@ -844,6 +844,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     // Check for any focused date inputs and get their values
     const dateInputs = containerRef.current?.querySelectorAll('.date-input') as NodeListOf<HTMLInputElement>;
     let updatedRange = { ...selectedRange };
+    let hadPendingChanges = false;
     
     if (dateInputs) {
       dateInputs.forEach(input => {
@@ -854,6 +855,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
             if (!isNaN(date.getTime())) {
               const field = input.getAttribute('aria-label')?.toLowerCase().includes('start') ? 'start' : 'end';
               updatedRange[field] = date.toISOString();
+              hadPendingChanges = true;
             }
           } catch (e) {
             // Invalid date - don't update, let existing validation show error
@@ -862,7 +864,10 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       });
     }
     
-    setDisplayRange(updatedRange);
+    // Only update displayRange if we found and processed pending changes
+    if (hadPendingChanges) {
+      setDisplayRange(updatedRange);
+    }
     
     // Use the updated range for submission
     if (settings.onSubmit && (updatedRange.start || updatedRange.end)) {
