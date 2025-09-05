@@ -178,8 +178,8 @@ describe('CLACalendar', () => {
 
       const inputs = container.querySelectorAll('input.date-input') as NodeListOf<HTMLInputElement>;
       expect(inputs).toHaveLength(2);
-      expect(inputs[0].value).toContain('Jun 15, 2025');
-      expect(inputs[1].value).toContain('Jun 20, 2025');
+      expect(inputs[0].value).toContain('06/15/2025');
+      expect(inputs[1].value).toContain('06/20/2025');
     });
 
     it('should call onMonthChange when months change', () => {
@@ -363,8 +363,8 @@ describe('CLACalendar', () => {
       // Verify initial values are set
       const inputsBefore = container.querySelectorAll('input.date-input') as NodeListOf<HTMLInputElement>;
       expect(inputsBefore).toHaveLength(2);
-      expect(inputsBefore[0].value).toContain('Jul 10, 2025');
-      expect(inputsBefore[1].value).toContain('Jul 15, 2025');
+      expect(inputsBefore[0].value).toContain('07/10/2025');
+      expect(inputsBefore[1].value).toContain('07/15/2025');
 
       const clearButton = container.querySelector('button.cla-button-secondary');
       expect(clearButton).toBeInTheDocument();
@@ -1025,7 +1025,7 @@ describe('CLACalendar', () => {
       fireEvent.blur(startInput);
 
       // The change should be reflected (timezone might affect the display)
-      expect(startInput.value).toMatch(/Jul (19|20), 2025/);
+      expect(startInput.value).toMatch(/07\/(19|20)\/2025/);
     });
 
     it('should handle layer change events', () => {
@@ -1252,8 +1252,8 @@ describe('CLACalendar', () => {
       );
       
       const input = container.querySelector('input.cla-input-custom') as HTMLInputElement;
-      expect(input.value).toContain('Jul 15, 2025');
-      expect(input.value).toContain('Jul 20, 2025');
+      expect(input.value).toContain('07/15/2025');
+      expect(input.value).toContain('07/20/2025');
     });
 
     it('should handle restriction check for date selection', () => {
@@ -2220,7 +2220,7 @@ describe('CLACalendar', () => {
       fireEvent.blur(dateInput);
       
       // Should be formatted properly
-      expect(dateInput.value).toContain('Jul');
+      expect(dateInput.value).toContain('07/');
     });
 
     it('should handle date input context initialization with default range', () => {
@@ -2241,8 +2241,8 @@ describe('CLACalendar', () => {
       );
       
       const inputs = container.querySelectorAll('input.date-input') as NodeListOf<HTMLInputElement>;
-      expect(inputs[0].value).toContain('Jul 10');
-      expect(inputs[1].value).toContain('Jul 15');
+      expect(inputs[0].value).toContain('07/10');
+      expect(inputs[1].value).toContain('07/15');
     });
 
     it('should handle popup input click to open calendar', () => {
@@ -2350,7 +2350,7 @@ describe('CLACalendar', () => {
       fireEvent.blur(dateInput);
       
       // Should parse the date
-      expect(dateInput.value).toContain('Dec');
+      expect(dateInput.value).toContain('12/');
     });
 
     it('should handle layer validation filter', () => {
@@ -2433,8 +2433,8 @@ describe('CLACalendar', () => {
       expect(inputs).toHaveLength(2);
       
       // Values should be formatted
-      expect((inputs[0] as HTMLInputElement).value).toContain('Jul');
-      expect((inputs[1] as HTMLInputElement).value).toContain('Jul');
+      expect((inputs[0] as HTMLInputElement).value).toContain('07/');
+      expect((inputs[1] as HTMLInputElement).value).toContain('07/');
     });
 
     it('should handle advanceMonth timer function', async () => {

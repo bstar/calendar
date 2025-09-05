@@ -417,7 +417,7 @@ export const DateInputSection: React.FC<DateInputSectionProps> = ({
         placeholder={selectionMode === 'single' ? "Select date" : "Start date"}
         context={dateInputContext}
         selectedRange={selectedRange}
-        defaultValue={defaultRange?.start ? format(new Date(defaultRange.start), "MMM dd, yyyy", 'UTC') : undefined}
+        defaultValue={defaultRange?.start ? format(new Date(defaultRange.start), "MM/dd/yyyy", 'UTC') : undefined}
         settings={settings}
       />
     </div>
@@ -430,7 +430,7 @@ export const DateInputSection: React.FC<DateInputSectionProps> = ({
           placeholder="End date"
           context={dateInputContext}
           selectedRange={selectedRange}
-          defaultValue={defaultRange?.end ? format(new Date(defaultRange.end), "MMM dd, yyyy", 'UTC') : undefined}
+          defaultValue={defaultRange?.end ? format(new Date(defaultRange.end), "MM/dd/yyyy", 'UTC') : undefined}
           settings={settings}
         />
       </div>

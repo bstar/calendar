@@ -515,8 +515,8 @@ describe('CLACalendar External Input', () => {
       const externalInput = screen.getByTestId('external-input') as HTMLInputElement;
       
       // Should have the default range value
-      expect(externalInput.value).toContain('Jul 15');
-      expect(externalInput.value).toContain('Jul 20');
+      expect(externalInput.value).toContain('07/15');
+      expect(externalInput.value).toContain('07/20');
     });
   });
 

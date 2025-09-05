@@ -264,7 +264,7 @@ export class CLACalendarHandlers {
         const date = parseISO(dateString);
         return dateFormatter
           ? dateFormatter(date)
-          : format(date, "MMM dd, yyyy");
+          : format(date, "MM/dd/yyyy");
       };
 
       if (selectionMode === 'single') {

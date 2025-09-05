@@ -346,7 +346,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
           const date = parseISO(dateString);
           return settings.dateFormatter
             ? settings.dateFormatter(date)
-            : format(date, "MMM dd, yyyy", 'UTC');
+            : format(date, "MM/dd/yyyy", 'UTC');
         } catch (e) {
           return null;
         }
@@ -679,7 +679,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
             const date = parseISO(dateString);
             return settings.dateFormatter
               ? settings.dateFormatter(date)
-              : format(date, "MMM dd, yyyy", 'UTC');
+              : format(date, "MM/dd/yyyy", 'UTC');
           } catch (e) {
             return null;
           }

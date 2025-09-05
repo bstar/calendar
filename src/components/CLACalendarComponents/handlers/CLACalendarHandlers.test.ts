@@ -9,10 +9,10 @@ vi.mock('../../../utils/DateUtils', async () => {
   return {
     ...actual,
     format: vi.fn((date: Date, formatStr: string) => {
-      if (formatStr === 'MMM dd, yyyy') {
+      if (formatStr === 'MM/dd/yyyy') {
         // Ensure UTC date formatting
         const options: Intl.DateTimeFormatOptions = { 
-          month: 'short', 
+          month: '2-digit', 
           day: '2-digit', 
           year: 'numeric',
           timeZone: 'UTC'
@@ -436,7 +436,7 @@ describe('CLACalendarHandlers', () => {
         'single'
       );
 
-      expect(formatter()).toBe('Jun 15, 2025');
+      expect(formatter()).toBe('06/15/2025');
     });
 
     it('should format date range selection', () => {
@@ -445,7 +445,7 @@ describe('CLACalendarHandlers', () => {
         'range'
       );
 
-      expect(formatter()).toBe('Jun 15, 2025 - Jun 20, 2025');
+      expect(formatter()).toBe('06/15/2025 - 06/20/2025');
     });
 
     it('should use custom date formatter', () => {
@@ -468,7 +468,7 @@ describe('CLACalendarHandlers', () => {
         ' to '
       );
 
-      expect(formatter()).toBe('Jun 15, 2025 to Jun 20, 2025');
+      expect(formatter()).toBe('06/15/2025 to 06/20/2025');
     });
 
     it('should return placeholder when no start date', () => {
@@ -486,7 +486,7 @@ describe('CLACalendarHandlers', () => {
         'range'
       );
 
-      expect(formatter()).toBe('Jun 15, 2025');
+      expect(formatter()).toBe('06/15/2025');
     });
   });
 
