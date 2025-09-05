@@ -131,6 +131,76 @@ describe('LayerRenderer', () => {
       const tooltip = result?.tooltipContent as React.ReactElement;
       expect(tooltip.props.children).toHaveLength(2);
     });
+
+    it('should render solid treatment by default', () => {
+      const eventsData = [
+        { date: '2025-01-01', title: 'Meeting', type: 'meeting', time: '10:00', description: 'Test meeting', color: '#0366d6' }
+      ];
+      const renderer = LayerRenderer.createEventRenderer(eventsData);
+      const date = parseISO('2025-01-01');
+      const result = renderer(date);
+      
+      const element = result?.element as React.ReactElement;
+      expect(element.props.className).toBe('layer-event-container');
+      expect(element.props.style.backgroundColor).toBe('#0366d633');
+      expect(element.props.style.border).toBeUndefined();
+    });
+
+    it('should render solid treatment when explicitly specified', () => {
+      const eventsData = [
+        { date: '2025-01-01', title: 'Meeting', type: 'meeting', time: '10:00', description: 'Test meeting', color: '#0366d6', displayTreatment: 'solid' as const }
+      ];
+      const renderer = LayerRenderer.createEventRenderer(eventsData);
+      const date = parseISO('2025-01-01');
+      const result = renderer(date);
+      
+      const element = result?.element as React.ReactElement;
+      expect(element.props.className).toBe('layer-event-container');
+      expect(element.props.style.backgroundColor).toBe('#0366d633');
+      expect(element.props.style.border).toBeUndefined();
+    });
+
+    it('should render stroke treatment when specified', () => {
+      const eventsData = [
+        { date: '2025-01-01', title: 'Meeting', type: 'meeting', time: '10:00', description: 'Test meeting', color: '#0366d6', displayTreatment: 'stroke' as const }
+      ];
+      const renderer = LayerRenderer.createEventRenderer(eventsData);
+      const date = parseISO('2025-01-01');
+      const result = renderer(date);
+      
+      const element = result?.element as React.ReactElement;
+      expect(element.props.className).toBe('layer-event-container stroke');
+      expect(element.props.style.backgroundColor).toBe('transparent');
+      expect(element.props.style.border).toBe('2px solid #4a5568');
+    });
+
+    it('should use dark gray color for event count in stroke treatment', () => {
+      const eventsData = [
+        { date: '2025-01-01', title: 'Meeting 1', type: 'meeting', time: '10:00', description: 'Test 1', color: '#0366d6', displayTreatment: 'stroke' as const },
+        { date: '2025-01-01', title: 'Meeting 2', type: 'meeting', time: '11:00', description: 'Test 2', color: '#dc3545', displayTreatment: 'stroke' as const }
+      ];
+      const renderer = LayerRenderer.createEventRenderer(eventsData);
+      const date = parseISO('2025-01-01');
+      const result = renderer(date);
+      
+      const element = result?.element as React.ReactElement;
+      const countSpan = element.props.children;
+      expect(countSpan.props.style.color).toBe('#4a5568');
+    });
+
+    it('should use event color for event count in solid treatment', () => {
+      const eventsData = [
+        { date: '2025-01-01', title: 'Meeting 1', type: 'meeting', time: '10:00', description: 'Test 1', color: '#0366d6', displayTreatment: 'solid' as const },
+        { date: '2025-01-01', title: 'Meeting 2', type: 'meeting', time: '11:00', description: 'Test 2', color: '#dc3545', displayTreatment: 'solid' as const }
+      ];
+      const renderer = LayerRenderer.createEventRenderer(eventsData);
+      const date = parseISO('2025-01-01');
+      const result = renderer(date);
+      
+      const element = result?.element as React.ReactElement;
+      const countSpan = element.props.children;
+      expect(countSpan.props.style.color).toBe('#0366d6'); // Uses main event color
+    });
   });
 
   describe('createCustomRenderer', () => {

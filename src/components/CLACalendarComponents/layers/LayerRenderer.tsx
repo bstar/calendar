@@ -118,19 +118,32 @@ export class LayerRenderer {
 
       const mainEvent = dayEvents[0];
       const eventColor = mainEvent.color || '#0366d6'; // Default to blue if no color specified
+      const displayTreatment = mainEvent.displayTreatment || 'solid'; // Default to solid
+
+      // Determine styling based on display treatment
+      const containerStyle = displayTreatment === 'stroke' 
+        ? {
+            border: '2px solid #4a5568', // Dark gray stroke
+            backgroundColor: 'transparent'
+          }
+        : {
+            backgroundColor: `${eventColor}33` // 20% opacity version of the color (solid)
+          };
+
+      const containerClassName = displayTreatment === 'stroke' 
+        ? 'layer-event-container stroke'
+        : 'layer-event-container';
 
       return {
         element: (
           <div
-            className="layer-event-container"
-            style={{
-              backgroundColor: `${eventColor}33` // 20% opacity version of the color
-            }}
+            className={containerClassName}
+            style={containerStyle}
           >
             {dayEvents.length > 1 && (
               <span 
                 className="layer-event-count"
-                style={{ color: eventColor }}
+                style={{ color: displayTreatment === 'stroke' ? '#4a5568' : eventColor }}
               >
                 {dayEvents.length}
               </span>

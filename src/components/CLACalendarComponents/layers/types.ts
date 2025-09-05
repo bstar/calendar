@@ -61,6 +61,7 @@ export interface Event {
   time: string;
   description: string;
   color?: string;
+  displayTreatment?: 'solid' | 'stroke';
 }
 
 /**

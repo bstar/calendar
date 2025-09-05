@@ -112,6 +112,7 @@ const App: React.FC = () => {
                   <option value="dynamic-positioning">Dynamic Positioning Demo</option>
                   <option value="null-safe">Null-Safe Configuration</option>
                   <option value="restrictions">Restriction Testing</option>
+                  <option value="events">Event Display Treatments</option>
                   <option value="accessibility">Accessibility Features</option>
                   <option value="submissionFormatter">Submission Formatter</option>
                 </select>
@@ -1030,6 +1031,89 @@ const App: React.FC = () => {
                       </div>
                     </div>
 
+                  </div>
+                )}
+
+                {currentDemo === 'events' && (
+                  <div>
+                    <h4>Event Display Treatments</h4>
+                    <p className="cla-cal-text-muted">
+                      Compare solid vs stroke display treatments for events. Both preserve event colors for categorization.
+                    </p>
+
+                    <div className="cla-cal-row">
+                      <div className="cla-cal-col-6">
+                        <h5>Solid Treatment (Default)</h5>
+                        <p>displayTreatment: 'solid'</p>
+                        <CLACalendar 
+                          settings={{
+                            displayMode: 'embedded',
+                            visibleMonths: 1,
+                            showSubmitButton: false,
+                            showTooltips: true,
+                            layersFactory: () => [{
+                              name: 'events',
+                              title: 'Events',
+                              description: 'Calendar events',
+                              visible: true,
+                              data: {
+                                events: [
+                                  {
+                                    date: '2025-09-15',
+                                    title: 'Meeting',
+                                    type: 'meeting', 
+                                    time: '10:00 AM',
+                                    description: 'Team meeting',
+                                    color: '#0366d6',
+                                    displayTreatment: 'solid'
+                                  }
+                                ]
+                              }
+                            }]
+                          }}
+                          onSubmit={handleDateSubmit}
+                        />
+                        <p className="cla-cal-text-muted cla-cal-small">
+                          Filled background with event color
+                        </p>
+                      </div>
+                      
+                      <div className="cla-cal-col-6">
+                        <h5>Stroke Treatment (New)</h5>
+                        <p>displayTreatment: 'stroke'</p>
+                        <CLACalendar 
+                          settings={{
+                            displayMode: 'embedded',
+                            visibleMonths: 1,
+                            showSubmitButton: false,
+                            showTooltips: true,
+                            layersFactory: () => [{
+                              name: 'events',
+                              title: 'Events', 
+                              description: 'Calendar events',
+                              visible: true,
+                              data: {
+                                events: [
+                                  {
+                                    date: '2025-09-15',
+                                    title: 'Meeting',
+                                    type: 'meeting',
+                                    time: '10:00 AM', 
+                                    description: 'Team meeting',
+                                    color: '#0366d6',
+                                    displayTreatment: 'stroke'
+                                  }
+                                ]
+                              }
+                            }]
+                          }}
+                          onSubmit={handleDateSubmit}
+                        />
+                        <p className="cla-cal-text-muted cla-cal-small">
+                          Dark gray circle outline
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 )}
 
