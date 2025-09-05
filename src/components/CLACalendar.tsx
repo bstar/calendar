@@ -557,11 +557,9 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     };
 
     externalInputRef.addEventListener('click', handleClick);
-    externalInputRef.addEventListener('focus', handleClick);
 
     return () => {
       externalInputRef.removeEventListener('click', handleClick);
-      externalInputRef.removeEventListener('focus', handleClick);
     };
   }, [externalInputRef, settings.bindExternalInputEvents, settings.displayMode, isOpen, everInitialized, settings.defaultRange, lazyDataLoaded, settings.restrictionConfigFactory, settings.layersFactory, activeLayer]);
 

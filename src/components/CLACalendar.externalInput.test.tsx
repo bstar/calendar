@@ -99,7 +99,7 @@ describe('CLACalendar External Input', () => {
       expect(wrapper?.getAttribute('data-open')).toBe('true');
     });
 
-    it('should open calendar when external input is focused', () => {
+    it('should not open calendar when external input is focused (focus-to-open disabled)', () => {
       const ExternalInputTest = () => {
         const externalInputRef = useRef<HTMLInputElement>(null);
         
@@ -122,9 +122,9 @@ describe('CLACalendar External Input', () => {
       const externalInput = screen.getByTestId('external-input');
       fireEvent.focus(externalInput);
       
-      // Calendar should be marked as open
+      // Calendar should NOT be open (focus no longer opens calendar)
       const wrapper = container.querySelector('.cla-calendar-wrapper');
-      expect(wrapper?.getAttribute('data-open')).toBe('true');
+      expect(wrapper?.getAttribute('data-open')).toBe('false');
     });
 
     it('should not bind events when bindExternalInputEvents is false', () => {
