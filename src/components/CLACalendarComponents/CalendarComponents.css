@@ -157,17 +157,37 @@
 }
 
 .date-input-error {
-  font-size: 0.875rem;
+  font-size: 12px !important;
+  line-height: 1.2 !important;
   color: #dc3545;
   overflow: hidden;
-  transition: height 0.2s ease-in-out, margin-top 0.2s ease-in-out;
-  height: 0;
-  margin-top: 0;
+  display: block;
+  margin-top: 0; /* no gap by default */
+  opacity: 0;
+  transform: translateY(-4px);
+  will-change: max-height, margin-top, transform, opacity;
+  transition:
+    max-height 0.25s ease-in-out,
+    margin-top 0.2s ease-in-out,
+    transform 0.2s ease-in-out,
+    opacity 0.15s ease-in-out;
+  max-height: 0;
 }
 
 .date-input-error.show {
-  height: 24px;
-  margin-top: 4px;
+  margin-top: 6px; /* add gap only when visible */
+  max-height: 24px; /* allow one-line message to roll out */
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Increase specificity to defeat host overrides */
+.cla-calendar-wrapper .date-input-error,
+.cla-calendar-portal .date-input-error,
+.cla-calendar-wrapper .date-input-error[role='alert'],
+.cla-calendar-portal .date-input-error[role='alert'] {
+  font-size: 12px !important;
+  line-height: 1.2 !important;
 }
 
 /* Calendar header styles */
@@ -256,10 +276,10 @@
   flex-direction: row;
   flex-wrap: nowrap;
   width: 100%;
-  padding: 10px 8px;
+  padding: 10px 8px; /* equal top/bottom padding */
   font-size: 14px;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start; /* keep inputs aligned at the top */
   box-sizing: border-box;
   white-space: nowrap;
   overflow: visible;
@@ -297,6 +317,8 @@
 .cla-input-container.range .cla-input-wrapper:last-child {
   width: 50%;
 }
+
+/* No extra reserved space; error message participates in flow and pushes content down */
 
 /* CalendarFooter styles */
 .calendar-footer {

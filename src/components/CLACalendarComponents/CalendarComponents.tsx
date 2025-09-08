@@ -190,7 +190,7 @@ export const DateInput: React.FC<DateInputProps> = ({
       setShowError(false);
       if (value) {
         setShowIndicator('error');
-        setTimeout(() => setShowIndicator(null), 1500);
+        setTimeout(() => setShowIndicator(null), 3000);
       }
       return;
     }
@@ -200,18 +200,35 @@ export const DateInput: React.FC<DateInputProps> = ({
       const parseUserDateString = (s: string): Date | null => {
         const trimmed = s.trim();
         // Accept MM/DD/YYYY
-        const mdy = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+        const mdy = /^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/;
+        // Accept dot notation: M.D.YY or M.D.YYYY
+        const dot = /^(\d{1,2})\.(\d{1,2})\.(\d{2}|\d{4})$/;
         const iso = /^(\d{4})-(\d{2})-(\d{2})$/;
         let yyyy: string, mm: string, dd: string;
         if (mdy.test(trimmed)) {
           const [, m, d, y] = trimmed.match(mdy)!;
-          yyyy = y;
+          yyyy = y.length === 2 ? `20${y}` : y;
           mm = String(parseInt(m, 10)).padStart(2, '0');
           dd = String(parseInt(d, 10)).padStart(2, '0');
           return parseISO(`${yyyy}-${mm}-${dd}`); // UTC-aware
         }
+        if (dot.test(trimmed)) {
+          const [, m, d, y] = trimmed.match(dot)!;
+          yyyy = y.length === 2 ? `20${y}` : y;
+          mm = String(parseInt(m, 10)).padStart(2, '0');
+          dd = String(parseInt(d, 10)).padStart(2, '0');
+          return parseISO(`${yyyy}-${mm}-${dd}`);
+        }
         if (iso.test(trimmed)) {
           return parseISO(trimmed); // UTC-aware
+        }
+        // Fallback: month name formats (e.g., Jul 20, 2025)
+        const native = new Date(trimmed);
+        if (!isNaN(native.getTime())) {
+          const y = native.getFullYear();
+          const m = String(native.getMonth() + 1).padStart(2, '0');
+          const d = String(native.getDate()).padStart(2, '0');
+          return parseISO(`${y}-${m}-${d}`);
         }
         return null;
       };
@@ -245,7 +262,7 @@ export const DateInput: React.FC<DateInputProps> = ({
         const isNewValue = !value || !isSameDay(date, value);
         if (isNewValue) {
           setShowIndicator('success');
-          setTimeout(() => setShowIndicator(null), 1500);
+          setTimeout(() => setShowIndicator(null), 3000);
         }
 
         onChange(date);
@@ -253,14 +270,14 @@ export const DateInput: React.FC<DateInputProps> = ({
         setShowError(false);
       } else {
         showValidationError({
-          message: 'Please use format: MM/DD/YYYY or YYYY-MM-DD',
+          message: 'Please use format: MM/DD/YYYY',
           type: 'error',
           field: 'format'
         });
       }
     } catch {
       showValidationError({
-        message: 'Please use format: MM/DD/YYYY or YYYY-MM-DD',
+        message: 'Please use format: MM/DD/YYYY',
         type: 'error',
         field: 'format'
       });
@@ -274,10 +291,14 @@ export const DateInput: React.FC<DateInputProps> = ({
     onChange(null, false, error);
 
     setTimeout(() => {
+      // Start roll-up animation by removing .show
       setShowError(false);
-      setError(null);
       setShowIndicator(null);
-    }, 1500);
+      // After animation completes, clear the error message
+      setTimeout(() => {
+        setError(null);
+      }, 300);
+    }, 3000);
   };
 
   return (
