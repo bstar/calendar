@@ -127,14 +127,27 @@ export const DateInput: React.FC<DateInputProps> = ({
       setInputValue(defaultValue);
       previousInputRef.current = defaultValue;
       
-      // Try to parse defaultValue as a date and trigger onChange
-      try {
-        const date = new Date(defaultValue);
-        if (!isNaN(date.getTime())) {
-          onChange(date);
+      // Parse defaultValue (assume UTC)
+      const parseUserDateString = (s: string): Date | null => {
+        const trimmed = s.trim();
+        const mdy = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+        const iso = /^(\d{4})-(\d{2})-(\d{2})$/;
+        if (mdy.test(trimmed)) {
+          const [, m, d, y] = trimmed.match(mdy)!;
+          const yyyy = y;
+          const mm = String(parseInt(m, 10)).padStart(2, '0');
+          const dd = String(parseInt(d, 10)).padStart(2, '0');
+          return parseISO(`${yyyy}-${mm}-${dd}`);
         }
-      } catch (e) {
-        // Ignore parsing errors for defaultValue
+        if (iso.test(trimmed)) {
+          return parseISO(trimmed);
+        }
+        return null;
+      };
+
+      const date = parseUserDateString(defaultValue);
+      if (date && !isNaN(date.getTime())) {
+        onChange(date);
       }
     }
   }, [defaultValue, value, onChange, inputValue]);
@@ -182,10 +195,29 @@ export const DateInput: React.FC<DateInputProps> = ({
       return;
     }
 
-    // Try to parse the input value
+    // Try to parse the input value (UTC-safe)
     try {
-      const date = new Date(inputValue);
-      if (!isNaN(date.getTime())) {
+      const parseUserDateString = (s: string): Date | null => {
+        const trimmed = s.trim();
+        // Accept MM/DD/YYYY
+        const mdy = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+        const iso = /^(\d{4})-(\d{2})-(\d{2})$/;
+        let yyyy: string, mm: string, dd: string;
+        if (mdy.test(trimmed)) {
+          const [, m, d, y] = trimmed.match(mdy)!;
+          yyyy = y;
+          mm = String(parseInt(m, 10)).padStart(2, '0');
+          dd = String(parseInt(d, 10)).padStart(2, '0');
+          return parseISO(`${yyyy}-${mm}-${dd}`); // UTC-aware
+        }
+        if (iso.test(trimmed)) {
+          return parseISO(trimmed); // UTC-aware
+        }
+        return null;
+      };
+
+      const date = parseUserDateString(inputValue);
+      if (date && !isNaN(date.getTime())) {
         // Range validation
         if (field === 'start' && selectedRange?.end) {
           const endDate = parseISO(selectedRange.end);
@@ -221,14 +253,14 @@ export const DateInput: React.FC<DateInputProps> = ({
         setShowError(false);
       } else {
         showValidationError({
-          message: 'Please use format: MM/DD/YYYY',
+          message: 'Please use format: MM/DD/YYYY or YYYY-MM-DD',
           type: 'error',
           field: 'format'
         });
       }
     } catch {
       showValidationError({
-        message: 'Please use format: MM/DD/YYYY',
+        message: 'Please use format: MM/DD/YYYY or YYYY-MM-DD',
         type: 'error',
         field: 'format'
       });

@@ -69,7 +69,8 @@ export class CLACalendarHandlers {
       }
 
       const newState = {
-        range: { ...selectedRange, [field]: date?.toISOString() || null },
+        // Store normalized UTC date-only string to avoid timezone rollbacks
+        range: { ...selectedRange, [field]: date ? format(date, 'yyyy-MM-dd', 'UTC') : null },
         context: {
           ...dateInputContext,
           [`${field}Date`]: date ? dateValidator.formatValue(date) : null

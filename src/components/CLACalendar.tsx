@@ -845,18 +845,35 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     let hadPendingChanges = false;
     
     if (dateInputs) {
+      const parseUserDateString = (s: string): Date | null => {
+        const trimmed = s.trim();
+        const mdy = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/; // MM/DD/YYYY
+        const iso = /^(\d{4})-(\d{2})-(\d{2})$/;         // YYYY-MM-DD
+        if (mdy.test(trimmed)) {
+          const [, m, d, y] = trimmed.match(mdy)!;
+          const yyyy = y;
+          const mm = String(parseInt(m, 10)).padStart(2, '0');
+          const dd = String(parseInt(d, 10)).padStart(2, '0');
+          return parseISO(`${yyyy}-${mm}-${dd}`); // Assume UTC
+        }
+        if (iso.test(trimmed)) {
+          return parseISO(trimmed); // Assume UTC
+        }
+        return null;
+      };
+
       dateInputs.forEach(input => {
         if (document.activeElement === input && input.value) {
-          // Parse the focused input's current value using the same logic as validateAndUpdate
           try {
-            const date = new Date(input.value);
-            if (!isNaN(date.getTime())) {
+            const date = parseUserDateString(input.value);
+            if (date && !isNaN(date.getTime())) {
               const field = input.getAttribute('aria-label')?.toLowerCase().includes('start') ? 'start' : 'end';
-              updatedRange[field] = date.toISOString();
+              // Store normalized UTC date string (YYYY-MM-DD)
+              updatedRange[field] = format(date, 'yyyy-MM-dd', 'UTC');
               hadPendingChanges = true;
             }
           } catch (e) {
-            // Invalid date - don't update, let existing validation show error
+            // Invalid date - ignore, validation already handles errors
           }
         }
       });
