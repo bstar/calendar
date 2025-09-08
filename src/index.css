@@ -51,7 +51,7 @@
   padding: 0.5rem 1rem;
   margin-bottom: 0;
   background-color: #fff;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: none; /* prevent unintended bottom line in header area */
 }
 
 /* Button styles */
@@ -115,7 +115,7 @@
   display: flex;
   gap: 20px;
   background-color: rgba(226, 228, 238, 0.5);
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: none; /* avoid bottom line below inputs */
 }
 
 .cla-input-wrapper {

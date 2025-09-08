@@ -244,8 +244,16 @@ const restrictionConfig = {
     {
       type: 'boundary',
       enabled: true,
-      minDate: '2025-01-01',
-      maxDate: '2025-12-31'
+      date: '2025-01-01',
+      direction: 'before',
+      message: 'Please select dates in 2025 or later'
+    },
+    {
+      type: 'boundary',
+      enabled: true,
+      date: '2025-12-31',
+      direction: 'after',
+      message: 'Please select dates in 2025 or earlier'
     },
     {
       type: 'weekday',

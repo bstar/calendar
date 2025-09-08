@@ -239,9 +239,15 @@
   overflow: hidden;
   text-overflow: ellipsis;
   font-weight: 500;
-  font-size: 16px;
-  line-height: 1.5;
+  font-size: 16px !important;
+  line-height: 1.5 !important;
   color: #333;
+}
+
+/* Harden against aggressive global h2 styles */
+.cla-calendar-wrapper .cla-header-title {
+  font-size: 16px !important;
+  line-height: 1.5 !important;
 }
 
 /* DateInputSection styles */

@@ -758,8 +758,6 @@ export const RestrictedBoundaryExample: Story = {
         restrictions: [{
           type: 'restricted_boundary',
           enabled: true,
-          minDate: '2025-01-01',
-          maxDate: '2025-12-31',
           ranges: [
             {
               startDate: '2025-06-01',

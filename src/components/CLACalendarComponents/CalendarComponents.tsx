@@ -341,7 +341,9 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
       >
         <ChevronLeft size={16} />
       </button>
-      <h2 
+      <div
+        role="heading"
+        aria-level={2}
         className="cla-header-title"
         aria-live="polite"
         aria-atomic="true"
@@ -351,7 +353,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
           ? format(months[0], "MMMM yyyy", 'UTC')
           : `${format(months[0], "MMMM yyyy", 'UTC')} - ${format(months[months.length - 1], "MMMM yyyy", 'UTC')}`
         }
-      </h2>
+      </div>
       <button
         className="cla-button-nav"
         onClick={() => moveToMonth('next')}

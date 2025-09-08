@@ -28,6 +28,7 @@ All stories use a common implementation pattern with shared argTypes for consist
 - Tooltips
 - Week start day
 - Primary color theme
+- Submit/Clear buttons and footer alignment
 
 ## Running Storybook
 

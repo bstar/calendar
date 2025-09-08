@@ -23,11 +23,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/your-org/cla-calendar.git"
+    "url": "git+https://github.com/<your-org>/<your-repo>.git"
   },
-  "homepage": "https://github.com/your-org/cla-calendar#readme",
+  "homepage": "https://github.com/<your-org>/<your-repo>#readme",
   "bugs": {
-    "url": "https://github.com/your-org/cla-calendar/issues"
+    "url": "https://github.com/<your-org>/<your-repo>/issues"
   },
   "scripts": {
     "dev": "vite",
@@ -42,7 +42,8 @@
     "lint:all": "eslint --config eslint.config.js \"src/**/*.{js,ts,tsx}\"",
     "lint:fix": "eslint --config eslint.config.js --fix \"src/**/*.{js,ts,tsx}\"",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "docs:validate": "node scripts/validate-docs.js"
   },
   "peerDependencies": {
     "date-fns": "^4.1.0",

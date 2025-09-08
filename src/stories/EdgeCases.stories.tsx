@@ -203,8 +203,8 @@ export const ConflictingRestrictions: Story = {
         {
           type: 'boundary' as const,
           enabled: true,
-          minDate: '2025-06-01',
-          maxDate: '2025-06-30'
+          date: '2025-06-01',
+          direction: 'before'
         },
         {
           type: 'daterange' as const,

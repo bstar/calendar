@@ -10,12 +10,15 @@
     <a href="https://bundlephobia.com/package/cla-calendar">
       <img src="https://img.shields.io/bundlephobia/minzip/cla-calendar.svg" alt="Bundle Size" />
     </a>
-    <a href="https://github.com/your-org/cla-calendar/actions">
-      <img src="https://github.com/your-org/cla-calendar/workflows/CI/badge.svg" alt="CI Status" />
+    <!-- Optional CI/Coverage badges; add your real org/repo if available -->
+    <!--
+    <a href="https://github.com/<your-org>/<your-repo>/actions">
+      <img src="https://github.com/<your-org>/<your-repo>/workflows/CI/badge.svg" alt="CI Status" />
     </a>
-    <a href="https://codecov.io/gh/your-org/cla-calendar">
-      <img src="https://codecov.io/gh/your-org/cla-calendar/branch/main/graph/badge.svg" alt="Coverage" />
+    <a href="https://codecov.io/gh/<your-org>/<your-repo>">
+      <img src="https://codecov.io/gh/<your-org>/<your-repo>/branch/main/graph/badge.svg" alt="Coverage" />
     </a>
+    -->
   </p>
   <p>
     <a href="#key-features">Features</a> •
@@ -172,11 +175,20 @@ Control which dates users can select:
     ...getDefaultSettings(),
     restrictionConfigFactory: () => ({
       restrictions: [
+        // Limit selection to year 2024 using two boundary rules
         {
           type: 'boundary',
           enabled: true,
-          minDate: '2024-01-01',
-          maxDate: '2024-12-31'
+          date: '2024-01-01',
+          direction: 'before',
+          message: 'Please select dates in 2024 or later'
+        },
+        {
+          type: 'boundary',
+          enabled: true,
+          date: '2024-12-31',
+          direction: 'after',
+          message: 'Please select dates in 2024 or earlier'
         },
         {
           type: 'weekday',
@@ -188,7 +200,7 @@ Control which dates users can select:
           type: 'daterange',
           enabled: true,
           ranges: [
-            { start: '2024-12-24', end: '2024-12-26' }
+            { startDate: '2024-12-24', endDate: '2024-12-26' }
           ],
           message: 'Holiday period'
         }
@@ -272,7 +284,7 @@ Complete configuration options for the calendar:
 | `inputStyle` | `CSSProperties` | `undefined` | Custom styles for input field |
 | `isOpen` | `boolean` | `false` | Control popup open state |
 | `visibleMonths` | `number` | `2` | Number of months to display (1-12) |
-| `monthWidth` | `number` | `500` | Width of each month in pixels |
+| `monthWidth` | `number` | `300` | Width of each month in pixels |
 | `showMonthHeadings` | `boolean` | `true` | Show month/year headers |
 | `baseFontSize` | `string` | `'1rem'` | Base font size (e.g. '1rem', '16px') |
 | `position` | `'bottom-right' \| 'bottom-left' \| 'top-right' \| 'top-left'` | `'bottom-left'` | Popup position relative to input |
@@ -286,9 +298,9 @@ Complete configuration options for the calendar:
 | `showTooltips` | `boolean` | `true` | Show hover tooltips |
 | `showHeader` | `boolean` | `true` | Show calendar header |
 | `closeOnClickAway` | `boolean` | `true` | Close popup when clicking outside |
-| `showSubmitButton` | `boolean` | `false` | Show submit button |
+| `showSubmitButton` | `boolean` | `true` | Show submit button |
 | `showFooter` | `boolean` | `true` | Show calendar footer |
-| `enableOutOfBoundsScroll` | `boolean` | `false` | Allow scrolling beyond bounds |
+| `enableOutOfBoundsScroll` | `boolean` | `true` | Allow scrolling beyond bounds |
 | `suppressTooltipsOnSelection` | `boolean` | `false` | Hide tooltips during selection |
 | `showSelectionAlert` | `boolean` | `false` | Show selection feedback |
 | `startWeekOnSunday` | `boolean` | `false` | Week starts on Sunday vs Monday |
@@ -564,10 +576,10 @@ const customTheme = {
 
 | Type | Description | Use Case |
 |------|-------------|----------|
-| `boundary` | Min/max date limits | Booking windows |
+| `boundary` | Min/max date limits (use two rules for min/max) | Booking windows |
 | `daterange` | Block specific ranges | Holidays, maintenance |
-| `allowedRanges` | Only allow certain ranges | Available slots |
-| `restrictedBoundary` | Complex boundary rules | Business logic |
+| `allowedranges` | Only allow certain ranges | Available slots |
+| `restricted_boundary` | Complex boundary rules | Business logic |
 | `weekday` | Block days of week | Business days only |
 
 </details>
@@ -601,7 +613,7 @@ const settings = {
 
 ## Demo
 
-[Live Storybook Demo](https://your-org.github.io/cla-calendar/) - Interactive examples and documentation
+[Live Storybook Demo](#) - Interactive examples and documentation
 
 ### Example Implementations
 
@@ -632,7 +644,7 @@ const settings = {
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/cla-calendar.git
+git clone https://github.com/<your-org>/<your-repo>.git
 cd cla-calendar
 
 # Install dependencies

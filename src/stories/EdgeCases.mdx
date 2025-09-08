@@ -103,7 +103,7 @@ Testing how the component handles conflicting restriction rules.
 
 ### Conflicting Restrictions
 Tests a scenario where:
-- A boundary restriction allows only June 2025 (minDate: '2025-06-01', maxDate: '2025-06-30')
+- Boundary rules allow only June 2025 (two boundaries: before 2025-06-01 and after 2025-06-30)
 - A daterange restriction blocks the entire month of June 2025
 
 **Configuration:**
@@ -114,14 +114,21 @@ Tests a scenario where:
       {
         type: 'boundary',
         enabled: true,
-        minDate: '2025-06-01',
-        maxDate: '2025-06-30'
+        date: '2025-06-01',
+        direction: 'before'
+      },
+      {
+        type: 'boundary',
+        enabled: true,
+        date: '2025-06-30',
+        direction: 'after'
       },
       {
         type: 'daterange',
         enabled: true,
-        startDate: '2025-06-01',
-        endDate: '2025-06-30'
+        ranges: [
+          { startDate: '2025-06-01', endDate: '2025-06-30' }
+        ]
       }
     ]
   })
