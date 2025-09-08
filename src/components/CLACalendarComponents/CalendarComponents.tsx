@@ -346,7 +346,7 @@ export const DateInput: React.FC<DateInputProps> = ({
         role="alert"
         aria-live="polite"
       >
-        {(error && showError) ? error.message : externalError?.message}
+        {(error && showError) ? error.message : externalError?.message || ''}
       </div>
     </div>
   );

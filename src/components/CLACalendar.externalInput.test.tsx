@@ -617,6 +617,61 @@ describe('CLACalendar External Input', () => {
         expect(end).toBeTruthy();
       }
     });
+
+    it('should keep calendar open and show error when external input has end before start on submit', async () => {
+      const handleSubmit = vi.fn();
+
+      const ExternalInputTest = () => {
+        const externalInputRef = useRef<HTMLInputElement>(null);
+
+        return (
+          <div>
+            <input ref={externalInputRef} data-testid="external-input" />
+            <CLACalendar
+              {...defaultProps}
+              settings={createCalendarSettings({
+                displayMode: 'popup',
+                externalInput: externalInputRef,
+                selectionMode: 'range',
+                showSubmitButton: true,
+                showFooter: true,
+                onSubmit: handleSubmit
+              })}
+            />
+          </div>
+        );
+      };
+
+      const { container } = render(<ExternalInputTest />);
+
+      const externalInput = screen.getByTestId('external-input') as HTMLInputElement;
+
+      // Pre-fill external input with invalid range (end before start)
+      externalInput.value = '02/01/2026 - 12/31/2025';
+
+      // Open calendar
+      fireEvent.click(externalInput);
+
+      // Click submit
+      const submitButton = screen.getByText('Submit');
+      fireEvent.click(submitButton);
+
+      // Calendar should remain open (state updates are async)
+      await waitFor(() => {
+        const wrapper = container.querySelector('.cla-calendar-wrapper');
+        expect(wrapper?.getAttribute('data-open')).toBe('true');
+      });
+
+      // onSubmit should not be called
+      expect(handleSubmit).not.toHaveBeenCalled();
+
+      // Inline error should be visible under End input
+      await waitFor(() => {
+        const error = document.querySelector('.date-input-error.show');
+        expect(error).toBeInTheDocument();
+        expect(error?.textContent).toMatch(/End date must be after start date/i);
+      });
+    });
   });
 
   describe('External Input with Custom Settings', () => {

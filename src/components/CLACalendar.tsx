@@ -842,7 +842,9 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     // Clear any prior submit notice (removed overlay usage)
     // Check for any focused date inputs and get their values
     const dateInputs = containerRef.current?.querySelectorAll('.date-input') as NodeListOf<HTMLInputElement>;
-    let updatedRange = { ...selectedRange };
+    // IMPORTANT: Do not default to previously selectedRange on submit.
+    // Always derive submission candidates from current inputs/external value.
+    let updatedRange: DateRange = { start: null, end: null, anchorDate: null };
     let hadPendingChanges = false;
     
     if (dateInputs) {
@@ -907,6 +909,89 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       }
       if (parseError) return;
     }
+
+    // Fallback: if header inputs are hidden/empty but there's an external input value, parse it
+    try {
+      const headerInputsMissing = !dateInputs || dateInputs.length === 0;
+      const headerInputsEmpty = !headerInputsMissing && Array.from(dateInputs!).every(inp => !inp.value?.trim());
+      const externalEl = externalInputRef;
+      if ((headerInputsMissing || headerInputsEmpty) && externalEl && externalEl.value) {
+        const raw = externalEl.value.trim();
+        const sep = settings.dateRangeSeparator || ' - ';
+        const parts = raw.split(sep).map(s => s.trim()).filter(Boolean);
+
+        const parseUserDateString = (s: string): Date | null => {
+          const trimmed = s.trim();
+          const mdy = /^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/;
+          const dot = /^(\d{1,2})\.(\d{1,2})\.(\d{2}|\d{4})$/;
+          const iso = /^(\d{4})-(\d{2})-(\d{2})$/;
+          let yyyy: string, mm: string, dd: string;
+          if (mdy.test(trimmed)) {
+            const [, m, d, y] = trimmed.match(mdy)!;
+            yyyy = y.length === 2 ? `20${y}` : y;
+            mm = String(parseInt(m, 10)).padStart(2, '0');
+            dd = String(parseInt(d, 10)).padStart(2, '0');
+            return parseISO(`${yyyy}-${mm}-${dd}`);
+          }
+          if (dot.test(trimmed)) {
+            const [, m, d, y] = trimmed.match(dot)!;
+            yyyy = y.length === 2 ? `20${y}` : y;
+            mm = String(parseInt(m, 10)).padStart(2, '0');
+            dd = String(parseInt(d, 10)).padStart(2, '0');
+            return parseISO(`${yyyy}-${mm}-${dd}`);
+          }
+          if (iso.test(trimmed)) {
+            return parseISO(trimmed);
+          }
+          const native = new Date(trimmed);
+          if (!isNaN(native.getTime())) {
+            const y = native.getFullYear();
+            const m = String(native.getMonth() + 1).padStart(2, '0');
+            const d = String(native.getDate()).padStart(2, '0');
+            return parseISO(`${y}-${m}-${d}`);
+          }
+          return null;
+        };
+
+        if (settings.selectionMode === 'single') {
+          const only = parts[0];
+          const d = only ? parseUserDateString(only) : null;
+          if (!d) {
+            setValidationErrors(prev => ({ ...prev, start: { message: 'Please use format: MM/DD/YYYY', type: 'error', field: 'format' } }));
+            setIsOpen(true);
+            return;
+          }
+          updatedRange.start = format(d, 'yyyy-MM-dd', 'UTC');
+          updatedRange.end = null;
+          hadPendingChanges = true;
+        } else {
+          // range mode
+          const [startStr, endStr] = [parts[0], parts[1]];
+          const startDate = startStr ? parseUserDateString(startStr) : null;
+          const endDate = endStr ? parseUserDateString(endStr) : null;
+          if (!startDate && !endDate) {
+            // nothing to submit
+          } else if (startDate && !endDate) {
+            setValidationErrors(prev => ({ ...prev, end: { message: 'Please select an end date', type: 'error', field: 'end' } }));
+            setIsOpen(true);
+            return;
+          } else if (!startDate && endDate) {
+            setValidationErrors(prev => ({ ...prev, start: { message: 'Please select a start date', type: 'error', field: 'start' } }));
+            setIsOpen(true);
+            return;
+          } else if (startDate && endDate) {
+            if (endDate < startDate) {
+              setValidationErrors(prev => ({ ...prev, end: { message: 'End date must be after start date', type: 'error', field: 'range' } }));
+              setIsOpen(true);
+              return;
+            }
+            updatedRange.start = format(startDate, 'yyyy-MM-dd', 'UTC');
+            updatedRange.end = format(endDate, 'yyyy-MM-dd', 'UTC');
+            hadPendingChanges = true;
+          }
+        }
+      }
+    } catch {}
     
     // Check for any validation errors before submitting
     if (Object.keys(_validationErrors).length > 0) {
@@ -953,6 +1038,64 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
         // ignore; format validation handled elsewhere
       }
     }
+
+    // Validate against restrictions before submitting
+    try {
+      // Ensure we have a restriction-aware manager even before lazy load
+      const runtimeRestrictionConfig = settings.restrictionConfigFactory
+        ? (lazyRestrictionConfig || settings.restrictionConfigFactory())
+        : (settings.restrictionConfig || null);
+      const runtimeSelectionManager = selectionManager || new DateRangeSelectionManager(
+        runtimeRestrictionConfig,
+        settings.selectionMode,
+        settings.showSelectionAlert
+      );
+
+      if (runtimeSelectionManager) {
+        if (settings.selectionMode === 'single') {
+          if (updatedRange.start) {
+            const startDate = parseISO(updatedRange.start);
+            const check = runtimeSelectionManager.canSelectDate(startDate);
+            if (!check.allowed) {
+              setValidationErrors(prev => ({
+                ...prev,
+                start: { message: check.message || 'Date is restricted', type: 'error', field: 'restriction' }
+              }));
+              setIsOpen(true);
+              // Focus start
+              try {
+                const container = containerRef.current;
+                const startInput = container?.querySelector('input.date-input[aria-label="Start date"]') as HTMLInputElement | null;
+                if (startInput) { startInput.focus(); startInput.select(); }
+              } catch {}
+              return;
+            }
+          }
+        } else {
+          if (updatedRange.start && updatedRange.end) {
+            const startDate = parseISO(updatedRange.start);
+            const endDate = parseISO(updatedRange.end);
+            // Use anchor from current selection when available
+            const anchor = selectedRange.anchorDate ? parseISO(selectedRange.anchorDate) : startDate;
+            const rangeCheck = runtimeSelectionManager.canSelectRange(startDate, endDate, anchor);
+            if (!rangeCheck.allowed) {
+              // Attribute the message to end by default (user likely needs to adjust end)
+              setValidationErrors(prev => ({
+                ...prev,
+                end: { message: rangeCheck.message || 'Selection violates restrictions', type: 'error', field: 'restriction' }
+              }));
+              setIsOpen(true);
+              try {
+                const container = containerRef.current;
+                const endInput = container?.querySelector('input.date-input[aria-label="End date"]') as HTMLInputElement | null;
+                if (endInput) { endInput.focus(); endInput.select(); }
+              } catch {}
+              return;
+            }
+          }
+        }
+      }
+    } catch {}
 
     // If no dates are selected, show guidance and do not submit
     if (!updatedRange.start && !updatedRange.end) {
@@ -1016,7 +1159,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       // Clear inline errors on success
       setValidationErrors({});
     }
-  }, [selectedRange, containerRef, dateValidator, settings, parseISO, setIsOpen, setIsSelecting]);
+  }, [selectedRange, containerRef, externalInputRef, settings.dateRangeSeparator, settings.selectionMode, settings.submissionFormatter, settings.onSubmit, parseISO, setIsOpen, setIsSelecting]);
 
   // Update handleClear to also clear displayRange
   const handleClearAll = useCallback(() => {
