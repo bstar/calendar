@@ -16,6 +16,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant: string;
   children: React.ReactNode;
   className?: string;
+  type?: 'button' | 'submit' | 'reset';
 }
 
 /**
@@ -26,8 +27,9 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
  * @param props - Additional button HTML attributes
  * @returns Styled button element
  */
-export const Button: React.FC<ButtonProps> = ({ variant, children, className, ...props }) => (
+export const Button: React.FC<ButtonProps> = ({ variant, children, className, type = 'button', ...props }) => (
   <button
+    type={type}
     className={`cla-button cla-button-${variant} ${className || ''}`}
     {...props}
   >
@@ -93,6 +95,7 @@ export interface DateInputProps {
   selectedRange: DateRange;
   defaultValue?: string;
   settings?: CalendarSettings;
+  externalError?: ValidationError | null;
 }
 
 /**
@@ -112,7 +115,8 @@ export const DateInput: React.FC<DateInputProps> = ({
   placeholder,
   selectedRange,
   defaultValue,
-  settings
+  settings,
+  externalError
 }) => {
   const [inputValue, setInputValue] = useState<string>(defaultValue || '');
   const [error, setError] = useState<ValidationError | null>(null);
@@ -169,7 +173,7 @@ export const DateInput: React.FC<DateInputProps> = ({
     setInputValue(newValue);
     setIsEditing(true);
 
-    if (error) {
+    if (error || externalError) {
       setError(null);
       setShowError(false);
       onChange(null, true);
@@ -325,8 +329,8 @@ export const DateInput: React.FC<DateInputProps> = ({
         autoComplete="off"
         className="date-input"
         aria-label={placeholder}
-        aria-invalid={!!error}
-        aria-describedby={error ? `${field}-error` : undefined}
+        aria-invalid={Boolean(error || externalError)}
+        aria-describedby={error || externalError ? `${field}-error` : undefined}
         style={{
           backgroundColor: settings?.backgroundColors?.input || '#fff'
         }}
@@ -338,11 +342,11 @@ export const DateInput: React.FC<DateInputProps> = ({
       )}
       <div
         id={`${field}-error`}
-        className={`date-input-error ${error && showError ? 'show' : ''}`}
+        className={`date-input-error ${((error && showError) || externalError) ? 'show' : ''}`}
         role="alert"
         aria-live="polite"
       >
-        {error?.message}
+        {(error && showError) ? error.message : externalError?.message}
       </div>
     </div>
   );
@@ -430,6 +434,7 @@ export interface DateInputSectionProps {
   selectionMode: 'single' | 'range';
   defaultRange?: { start: string; end: string };
   settings?: CalendarSettings;
+  externalErrors?: Record<string, ValidationError>;
 }
 
 /**
@@ -447,7 +452,8 @@ export const DateInputSection: React.FC<DateInputSectionProps> = ({
   dateInputContext,
   selectionMode,
   defaultRange,
-  settings
+  settings,
+  externalErrors
 }) => (
   <div className={`cla-input-container ${selectionMode === 'single' ? 'single' : 'range'}`}
        role="group"
@@ -474,6 +480,7 @@ export const DateInputSection: React.FC<DateInputSectionProps> = ({
         selectedRange={selectedRange}
         defaultValue={defaultRange?.start ? format(new Date(defaultRange.start), "MM/dd/yyyy", 'UTC') : undefined}
         settings={settings}
+        externalError={externalErrors?.start || null}
       />
     </div>
     {selectionMode === 'range' && (
@@ -487,6 +494,7 @@ export const DateInputSection: React.FC<DateInputSectionProps> = ({
           selectedRange={selectedRange}
           defaultValue={defaultRange?.end ? format(new Date(defaultRange.end), "MM/dd/yyyy", 'UTC') : undefined}
           settings={settings}
+          externalError={externalErrors?.end || null}
         />
       </div>
     )}
@@ -548,6 +556,7 @@ export const CalendarFooter: React.FC<CalendarFooterProps> = ({
       {showSubmitButton && (
         <Button
           variant="primary"
+          type="button"
           onClick={handleSubmit}
           aria-label="Submit date selection"
         >

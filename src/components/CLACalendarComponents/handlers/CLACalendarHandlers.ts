@@ -160,8 +160,9 @@ export class CLACalendarHandlers {
     enableOutOfBoundsScroll: boolean = false
   ) {
     const handleDocumentMouseMove = (e: MouseEvent) => {
-      e.preventDefault();
       if (!isSelecting || !containerRef.current) return;
+      // Prevent default only during drag selection to preserve text selection in inputs
+      e.preventDefault();
 
       const containerRect = containerRef.current.getBoundingClientRect();
       const { clientX: mouseX, clientY: mouseY } = e;
@@ -202,6 +203,17 @@ export class CLACalendarHandlers {
 
     const handleMouseDown = (e: React.MouseEvent) => {
       if (isSelecting) return;
+      const target = (e.target as HTMLElement) || null;
+      const selectors = 'input, textarea, select, button, [contenteditable], .date-input, .date-input-container';
+      const isInteractive = target && typeof (target as any).closest === 'function' 
+        ? target.closest(selectors)
+        : null;
+      // If the user is interacting with inputs or controls, let the default behavior happen
+      if (isInteractive) {
+        return;
+      }
+
+      // Start drag selection context
       e.preventDefault();
 
       const setUserSelectNone = () => {
@@ -210,7 +222,7 @@ export class CLACalendarHandlers {
       };
 
       setUserSelectNone();
-      
+
       // Always attach document handlers during selection for proper drag tracking
       document.addEventListener("mousemove", handleDocumentMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
@@ -413,6 +425,38 @@ export class CLACalendarHandlers {
     };
 
     const handleSubmit = () => {
+      // Validate range before submitting
+      const hasStart = Boolean(selectedRange.start);
+      const hasEnd = Boolean(selectedRange.end);
+
+      // If both dates present, ensure order is valid
+      if (hasStart && hasEnd) {
+        try {
+          const start = parseISO(selectedRange.start as string);
+          const end = parseISO(selectedRange.end as string);
+          if (end < start) {
+            setValidationErrors({ end: { message: 'End date must be after start date', type: 'error', field: 'range' } });
+            setIsOpen(true);
+            return; // Block submit
+          }
+        } catch {
+          // If parse fails, surface generic errors
+          setValidationErrors({ end: { message: 'Invalid date', type: 'error', field: 'format' } });
+          setIsOpen(true);
+          return;
+        }
+      }
+
+      // If only start is present, submit start for both params (backward-compatible behavior)
+      // (Handled below in the submission section)
+
+      // If end is present but start is missing, block submit
+      if (!hasStart && hasEnd) {
+        setValidationErrors({ start: { message: 'Please select a start date', type: 'error', field: 'start' } });
+        setIsOpen(true);
+        return;
+      }
+
       // Helper function to format dates for submission
       const formatForSubmission = (dateString: string) => {
         // If no formatter provided, return ISO format (backward compatibility)
@@ -429,16 +473,14 @@ export class CLACalendarHandlers {
         }
       };
 
-      // In range mode, if only start is selected (no drag), use it for both dates
-      if (selectedRange.start && !selectedRange.end && onSubmit) {
-        const formattedStart = formatForSubmission(selectedRange.start);
-        onSubmit(formattedStart, formattedStart);
-      } 
-      // If we have a valid range and onSubmit handler, call it directly
-      else if (selectedRange.start && selectedRange.end && onSubmit) {
+      // Submit when both dates are present and valid, or when only start is present (single-day)
+      if (selectedRange.start && selectedRange.end && onSubmit) {
         const formattedStart = formatForSubmission(selectedRange.start);
         const formattedEnd = formatForSubmission(selectedRange.end);
         onSubmit(formattedStart, formattedEnd);
+      } else if (selectedRange.start && !selectedRange.end && onSubmit) {
+        const formattedStart = formatForSubmission(selectedRange.start);
+        onSubmit(formattedStart, formattedStart);
       }
 
       // Close the calendar

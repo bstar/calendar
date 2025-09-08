@@ -839,6 +839,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
 
   // Wrap the original handleSubmit to update displayRange
   const handleSubmit = useCallback(() => {
+    // Clear any prior submit notice (removed overlay usage)
     // Check for any focused date inputs and get their values
     const dateInputs = containerRef.current?.querySelectorAll('.date-input') as NodeListOf<HTMLInputElement>;
     let updatedRange = { ...selectedRange };
@@ -847,41 +848,74 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     if (dateInputs) {
       const parseUserDateString = (s: string): Date | null => {
         const trimmed = s.trim();
-        const mdy = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/; // MM/DD/YYYY
-        const iso = /^(\d{4})-(\d{2})-(\d{2})$/;         // YYYY-MM-DD
+        // Accept MM/DD/YY or MM/DD/YYYY
+        const mdy = /^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/;
+        // Accept dot notation: M.D.YY or M.D.YYYY
+        const dot = /^(\d{1,2})\.(\d{1,2})\.(\d{2}|\d{4})$/;
+        const iso = /^(\d{4})-(\d{2})-(\d{2})$/;
+        let yyyy: string, mm: string, dd: string;
         if (mdy.test(trimmed)) {
           const [, m, d, y] = trimmed.match(mdy)!;
-          const yyyy = y;
-          const mm = String(parseInt(m, 10)).padStart(2, '0');
-          const dd = String(parseInt(d, 10)).padStart(2, '0');
-          return parseISO(`${yyyy}-${mm}-${dd}`); // Assume UTC
+          yyyy = y.length === 2 ? `20${y}` : y;
+          mm = String(parseInt(m, 10)).padStart(2, '0');
+          dd = String(parseInt(d, 10)).padStart(2, '0');
+          return parseISO(`${yyyy}-${mm}-${dd}`);
+        }
+        if (dot.test(trimmed)) {
+          const [, m, d, y] = trimmed.match(dot)!;
+          yyyy = y.length === 2 ? `20${y}` : y;
+          mm = String(parseInt(m, 10)).padStart(2, '0');
+          dd = String(parseInt(d, 10)).padStart(2, '0');
+          return parseISO(`${yyyy}-${mm}-${dd}`);
         }
         if (iso.test(trimmed)) {
-          return parseISO(trimmed); // Assume UTC
+          return parseISO(trimmed);
+        }
+        // Fallback for month name formats like "Feb 1, 2026"
+        const native = new Date(trimmed);
+        if (!isNaN(native.getTime())) {
+          const y = native.getFullYear();
+          const m = String(native.getMonth() + 1).padStart(2, '0');
+          const d = String(native.getDate()).padStart(2, '0');
+          return parseISO(`${y}-${m}-${d}`);
         }
         return null;
       };
 
-      dateInputs.forEach(input => {
-        if (document.activeElement === input && input.value) {
-          try {
-            const date = parseUserDateString(input.value);
-            if (date && !isNaN(date.getTime())) {
-              const field = input.getAttribute('aria-label')?.toLowerCase().includes('start') ? 'start' : 'end';
-              // Store normalized UTC date string (YYYY-MM-DD)
-              updatedRange[field] = format(date, 'yyyy-MM-dd', 'UTC');
-              hadPendingChanges = true;
-            }
-          } catch (e) {
-            // Invalid date - ignore, validation already handles errors
-          }
+      const inputsArray = Array.from(dateInputs);
+      let parseError = false;
+      for (const input of inputsArray) {
+        const raw = input.value?.trim();
+        if (!raw) continue;
+        const aria = input.getAttribute('aria-label')?.toLowerCase() || '';
+        const field: 'start' | 'end' = aria.includes('end') ? 'end' : 'start';
+        const date = parseUserDateString(raw);
+        if (date && !isNaN(date.getTime())) {
+          updatedRange[field] = format(date, 'yyyy-MM-dd', 'UTC');
+          hadPendingChanges = true;
+        } else {
+          setValidationErrors(prev => ({
+            ...prev,
+            [field]: { message: 'Please use format: MM/DD/YYYY', type: 'error', field: 'format' }
+          }));
+          setIsOpen(true);
+          input.focus();
+          input.select();
+          parseError = true;
+          break;
         }
-      });
+      }
+      if (parseError) return;
     }
     
     // Check for any validation errors before submitting
     if (Object.keys(_validationErrors).length > 0) {
-      // Don't submit if there are validation errors
+      // Build a concise message for the user
+      const humanField = (field: string) => field === 'start' ? 'Start date' : field === 'end' ? 'End date' : 'Date';
+      const msg = Object.entries(_validationErrors)
+        .map(([field, err]) => `${humanField(field)}: ${err.message}`)
+        .join('  ');
+      // Surface error under inputs via existing per-field validation messaging
       return;
     }
     
@@ -890,8 +924,51 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       setDisplayRange(updatedRange);
     }
     
+    // If both dates are present, ensure the end is not before the start
+    if (updatedRange.start && updatedRange.end) {
+      try {
+        const start = parseISO(updatedRange.start);
+        const end = parseISO(updatedRange.end);
+        if (end < start) {
+          // Show error inline under End input and keep calendar open
+          setValidationErrors(prev => ({
+            ...prev,
+            end: { message: 'End date must be after start date', type: 'error', field: 'range' }
+          }));
+          // Keep calendar open and direct user to the end input for correction
+          try {
+            setIsOpen(true);
+            const container = containerRef.current;
+            const byAria = container?.querySelector('input.date-input[aria-label="End date"]') as HTMLInputElement | null;
+            const allInputs = container?.querySelectorAll('input.date-input') as NodeListOf<HTMLInputElement> | undefined;
+            const endInput = byAria || (allInputs && allInputs.length > 1 ? allInputs[1] : null);
+            if (endInput) {
+              endInput.focus();
+              endInput.select();
+            }
+          } catch {}
+          return;
+        }
+      } catch {
+        // ignore; format validation handled elsewhere
+      }
+    }
+
+    // If no dates are selected, show guidance and do not submit
+    if (!updatedRange.start && !updatedRange.end) {
+      const msg = settings.selectionMode === 'single'
+        ? 'Please select a date before submitting.'
+        : 'Please select a start date (and optionally an end date) before submitting.';
+      // Show guidance inline under Start input
+      setValidationErrors(prev => ({
+        ...prev,
+        start: { message: msg, type: 'error', field: 'submit' }
+      }));
+      return;
+    }
+
     // Use the updated range for submission
-    if (settings.onSubmit && (updatedRange.start || updatedRange.end)) {
+    if (settings.onSubmit) {
       const formatForSubmission = (dateString: string) => {
         if (!settings.submissionFormatter) return dateString;
         try {
@@ -903,17 +980,41 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       };
 
       if (updatedRange.start && !updatedRange.end) {
-        const formatted = formatForSubmission(updatedRange.start);
-        settings.onSubmit(formatted, formatted);
+        // In range mode, require an end date; in single mode, allow same-day submit
+        if (settings.selectionMode === 'range') {
+          setValidationErrors(prev => ({
+            ...prev,
+            end: { message: 'Please select an end date', type: 'error', field: 'end' }
+          }));
+          // Keep open and focus End
+          try {
+            setIsOpen(true);
+            const container = containerRef.current;
+            const endInput = container?.querySelector('input.date-input[aria-label="End date"]') as HTMLInputElement | null;
+            if (endInput) {
+              endInput.focus();
+              endInput.select();
+            }
+          } catch {}
+          return;
+        } else {
+          const formatted = formatForSubmission(updatedRange.start);
+          settings.onSubmit(formatted, formatted);
+        }
       } else if (updatedRange.start && updatedRange.end) {
         const formattedStart = formatForSubmission(updatedRange.start);
         const formattedEnd = formatForSubmission(updatedRange.end);
         settings.onSubmit(formattedStart, formattedEnd);
+      } else {
+        // Neither start nor end present: already handled earlier, but guard anyway
+        return;
       }
       
       // Only close calendar after successful submission
       setIsOpen(false);
       setIsSelecting(false);
+      // Clear inline errors on success
+      setValidationErrors({});
     }
   }, [selectedRange, containerRef, dateValidator, settings, parseISO, setIsOpen, setIsSelecting]);
 
@@ -1141,6 +1242,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
                   selectionMode={settings.selectionMode}
                   defaultRange={settings.defaultRange}
                   settings={settings}
+                  externalErrors={_validationErrors}
                 />
               )}
             </div>
@@ -1198,7 +1300,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
           />
         )}
 
-        {settings.showSelectionAlert && notification && (
+        {notification && settings.showSelectionAlert && (
           <Notification
             message={notification}
             onDismiss={() => setNotification(null)}
