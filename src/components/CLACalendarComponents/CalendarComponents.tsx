@@ -162,9 +162,14 @@ export const DateInput: React.FC<DateInputProps> = ({
       const formattedValue = format(value, "MM/dd/yyyy", 'UTC');
       setInputValue(formattedValue);
       previousInputRef.current = formattedValue;
+      // Clear any prior error when value is programmatically updated (e.g., mouse selection)
+      setError(null);
+      setShowError(false);
     } else if (!isEditing && !value && !defaultValue) {
       setInputValue('');
       previousInputRef.current = '';
+      setError(null);
+      setShowError(false);
     }
   }, [value, isEditing, defaultValue]);
 
@@ -557,6 +562,10 @@ export const CalendarFooter: React.FC<CalendarFooterProps> = ({
         <Button
           variant="primary"
           type="button"
+          onMouseDown={(e) => {
+            // Prevent focus loss from inputs before our validation runs
+            e.preventDefault();
+          }}
           onClick={handleSubmit}
           aria-label="Submit date selection"
         >

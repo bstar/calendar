@@ -301,9 +301,15 @@ export class CLACalendarHandlers {
     setNotification: (message: string | null) => void,
     showSelectionAlert: boolean,
     selectedRange: DateRange,
-    outOfBoundsDirection: 'prev' | 'next' | null
+    outOfBoundsDirection: 'prev' | 'next' | null,
+    setValidationErrors?: (errors: Record<string, ValidationError>) => void
   ) {
     const handleSelectionStart = (date: Date, isMouseDrag: boolean = false) => {
+      // Clear any existing input validation errors when the user starts a mouse selection
+      if (setValidationErrors) {
+        setValidationErrors({});
+      }
+
       const result = selectionManager.startSelection(date);
 
       if (!result.success) {
@@ -317,6 +323,9 @@ export class CLACalendarHandlers {
       if (selectionManager.getSelectionMode() === 'single') {
         setSelectedRange(result.range);
         setNotification(null);
+        if (setValidationErrors) {
+          setValidationErrors({});
+        }
       } else {
         // Only set isSelecting for actual mouse drag, not keyboard selection
         if (isMouseDrag) {
@@ -357,6 +366,9 @@ export class CLACalendarHandlers {
         }
         setSelectedRange(result.range);
         setNotification(null);
+        if (setValidationErrors) {
+          setValidationErrors({});
+        }
       }
     };
 
@@ -375,6 +387,9 @@ export class CLACalendarHandlers {
 
       // Update the selection range with the result
       setSelectedRange(selectionUpdate.range);
+      if (setValidationErrors) {
+        setValidationErrors({});
+      }
 
       // Show notification only if there's a message and we have showSelectionAlert enabled
       if (selectionUpdate.message && showSelectionAlert) {
@@ -425,6 +440,7 @@ export class CLACalendarHandlers {
     };
 
     const handleSubmit = () => {
+      let didSubmit = false;
       // Validate range before submitting
       const hasStart = Boolean(selectedRange.start);
       const hasEnd = Boolean(selectedRange.end);
@@ -478,14 +494,18 @@ export class CLACalendarHandlers {
         const formattedStart = formatForSubmission(selectedRange.start);
         const formattedEnd = formatForSubmission(selectedRange.end);
         onSubmit(formattedStart, formattedEnd);
+        didSubmit = true;
       } else if (selectedRange.start && !selectedRange.end && onSubmit) {
         const formattedStart = formatForSubmission(selectedRange.start);
         onSubmit(formattedStart, formattedStart);
+        didSubmit = true;
       }
 
-      // Close the calendar
-      setIsOpen(false);
-      setIsSelecting(false);
+      // Close the calendar only after a successful submit
+      if (didSubmit) {
+        setIsOpen(false);
+        setIsSelecting(false);
+      }
     };
 
     const handleClickOutside = () => {

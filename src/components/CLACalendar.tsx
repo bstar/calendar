@@ -815,9 +815,10 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       setNotification,
       settings.showSelectionAlert,
       selectedRange,
-      outOfBoundsDirection
+      outOfBoundsDirection,
+      setValidationErrors
     );
-  }, [everInitialized, selectionManager, isSelecting, setIsSelecting, setSelectedRange, setNotification, settings.showSelectionAlert, selectedRange, outOfBoundsDirection]);
+  }, [everInitialized, selectionManager, isSelecting, setIsSelecting, setSelectedRange, setNotification, settings.showSelectionAlert, selectedRange, outOfBoundsDirection, setValidationErrors]);
 
   // Use the abstracted calendar action handlers
   const { handleClear, handleSubmit: originalHandleSubmit, handleClickOutside, handleLayerChange } = useMemo(() =>
