@@ -156,22 +156,22 @@ export const DateInput: React.FC<DateInputProps> = ({
     }
   }, [defaultValue, value, onChange, inputValue]);
 
-  // Update input value when value changes
+  // Update input value when value prop actually changes (programmatic updates)
   useEffect(() => {
-    if (!isEditing && value) {
+    if (value) {
       const formattedValue = format(value, "MM/dd/yyyy", 'UTC');
       setInputValue(formattedValue);
       previousInputRef.current = formattedValue;
       // Clear any prior error when value is programmatically updated (e.g., mouse selection)
       setError(null);
       setShowError(false);
-    } else if (!isEditing && !value && !defaultValue) {
+    } else if (value === null && !defaultValue) {
       setInputValue('');
       previousInputRef.current = '';
       setError(null);
       setShowError(false);
     }
-  }, [value, isEditing, defaultValue]);
+  }, [value]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;

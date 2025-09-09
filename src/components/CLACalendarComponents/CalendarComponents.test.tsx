@@ -515,7 +515,7 @@ describe('DateInput', () => {
     expect(input).toBeInTheDocument();
   });
 
-  it('should show validation error for invalid date', () => {
+  it('should show validation error for invalid date', async () => {
     const { container } = render(<DateInput {...defaultProps} />);
     
     const input = container.querySelector('input');
@@ -523,8 +523,10 @@ describe('DateInput', () => {
     fireEvent.blur(input!);
     
     // Error should be shown
-    const errorEl = container.querySelector('.date-input-error');
-    expect(errorEl).toBeInTheDocument();
+    await waitFor(() => {
+      const errorEl = container.querySelector('.date-input-error.show');
+      expect(errorEl).toBeInTheDocument();
+    });
   });
 
   it('should show success indicator when valid date is entered', async () => {
@@ -588,7 +590,7 @@ describe('DateInput', () => {
     fireEvent.blur(input!);
     
     await waitFor(() => {
-      const errorEl = container.querySelector('.date-input-error');
+      const errorEl = container.querySelector('.date-input-error.show');
       expect(errorEl).toHaveTextContent('Start date must be before end date');
     });
   });
@@ -609,7 +611,7 @@ describe('DateInput', () => {
     fireEvent.blur(input!);
     
     await waitFor(() => {
-      const errorEl = container.querySelector('.date-input-error');
+      const errorEl = container.querySelector('.date-input-error.show');
       expect(errorEl).toHaveTextContent('End date must be after start date');
     });
   });
@@ -733,7 +735,7 @@ describe('DateInput', () => {
     fireEvent.blur(input!);
     
     await waitFor(() => {
-      const errorEl = container.querySelector('.date-input-error');
+      const errorEl = container.querySelector('.date-input-error.show');
       expect(errorEl).toHaveTextContent('Please use format: MM/DD/YYYY');
     });
   });
