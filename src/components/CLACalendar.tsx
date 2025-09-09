@@ -1479,8 +1479,30 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     return () => clearTimeout(timer);
   }, [isOpen]);
 
-
-
+  // Attempt to auto-focus the start date input when the popup opens so it's immediately selectable
+  useEffect(() => {
+    if (!isOpen) return;
+    if (settings.displayMode !== 'popup') return;
+    if (settings.showDateInputs === false) return;
+    // defer until inputs rendered
+    const tid = setTimeout(() => {
+      try {
+        const portalRoot = document.querySelector('.cla-calendar-portal');
+        if (!portalRoot) return;
+        const startInput = portalRoot.querySelector('.date-input-container input.date-input') as HTMLInputElement | null;
+        if (startInput) {
+          startInput.focus({ preventScroll: true });
+          // If value empty, place caret at start
+          if (startInput.selectionStart === null) {
+            startInput.setSelectionRange?.(0, 0);
+          }
+        }
+      } catch (e) {
+        // swallow
+      }
+    }, 80); // after initial 50ms readiness delay
+    return () => clearTimeout(tid);
+  }, [isOpen, settings.displayMode, settings.showDateInputs]);
 
   return (
     <CalendarErrorBoundary
