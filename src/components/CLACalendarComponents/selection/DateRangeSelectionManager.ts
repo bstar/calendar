@@ -126,7 +126,8 @@ export class DateRangeSelectionManager {
       success: true,
       range: {
         start: formattedDate,
-        end: this.selectionMode === 'single' ? formattedDate : null,
+        // In range mode, a single click selects a single-day range
+        end: formattedDate,
         // Store the original anchor point to maintain it during selection
         anchorDate: formattedDate
       },

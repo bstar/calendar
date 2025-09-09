@@ -95,13 +95,13 @@ describe('DateRangeSelectionManager', () => {
       expect(result.message).toBeNull();
     });
 
-    it('should start range selection correctly', () => {
+    it('should start range selection correctly (single-day selection)', () => {
       const date = new Date('2025-06-15T12:00:00.000Z');
       const result = manager.startSelection(date);
       
       expect(result.success).toBe(true);
       expect(result.range.start).toBe('2025-06-15');
-      expect(result.range.end).toBeNull();
+      expect(result.range.end).toBe('2025-06-15');
       expect(result.range.anchorDate).toBe('2025-06-15');
     });
 
