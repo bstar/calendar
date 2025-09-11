@@ -441,7 +441,7 @@
 }
 
 /* Tooltip container styles */
-.tooltip-container {
+.cla-calendar-tooltip-container {
   position: relative !important;
   display: inline-block !important;
   width: 100% !important;
@@ -450,7 +450,8 @@
 }
 
 /* Tooltip styles - use !important to ensure they can't be overridden */
-.tooltip {
+/* Namespaced tooltip styles to prevent conflicts with global Bootstrap .tooltip */
+.cla-calendar-tooltip {
   position: fixed !important;
   background: #333 !important;
   color: #fff !important;
@@ -465,14 +466,14 @@
   transition: opacity 0.2s ease !important;
 }
 
-.tooltip[style*="hidden"] {
+.cla-calendar-tooltip[style*="hidden"] {
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
 }
 
 /* Add arrow/triangle to tooltip - ensure it's visible */
-.tooltip::before {
+.cla-calendar-tooltip::before {
   content: '' !important;
   position: absolute !important;
   bottom: -6px !important;
@@ -487,7 +488,7 @@
 }
 
 /* Add a subtle shadow effect for the arrow */
-.tooltip::after {
+.cla-calendar-tooltip::after {
   content: '' !important;
   position: absolute !important;
   bottom: -7px !important;
@@ -503,12 +504,12 @@
 
 /* Event styling within tooltip */
 
-/* Ensure text inside tooltip is readable */
-.tooltip * {
+/* Ensure text inside namespaced tooltip is readable */
+.cla-calendar-tooltip * {
   color: inherit !important;
 }
 
-.tooltip a {
+.cla-calendar-tooltip a {
   color: #4dabf7 !important;
 }
 

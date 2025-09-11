@@ -847,13 +847,13 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, show, children }) => 
 
   return (
     <>
-      <div ref={targetRef} className="tooltip-container">
+      <div ref={targetRef} className="cla-calendar-tooltip-container">
         {children}
       </div>
       {show && portalContainer && ReactDOM.createPortal(
         <div
           ref={tooltipRef}
-          className="tooltip"
+          className="cla-calendar-tooltip"
           style={{
             top: `${position.top}px`,
             left: `${position.left}px`,

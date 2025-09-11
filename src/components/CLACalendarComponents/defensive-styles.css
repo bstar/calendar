@@ -69,7 +69,7 @@
 }
 
 /* Tooltip container and styles */
-.tooltip {
+.cla-calendar-tooltip {
   position: fixed !important;
   background-color: #1a1a1a !important;
   color: #ffffff !important;
