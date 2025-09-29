@@ -541,6 +541,22 @@ describe('DateUtils', () => {
         expect(result[0].getUTCFullYear()).toBe(2024);
         expect(result[3].getUTCFullYear()).toBe(2025);
       });
+
+      it('should not duplicate days across US DST (Mar 8, 2026)', () => {
+        // Span late Feb through end of March 2026
+        const start = createUTCDate(2026, 1, 24); // 2026-02-24
+        const end = createUTCDate(2026, 2, 31);   // 2026-03-31
+        const result = eachDayOfIntervalUTC({ start, end });
+
+        // Ensure March 8, 2026 appears exactly once
+        const marchDays = result.filter(d => d.getUTCFullYear() === 2026 && d.getUTCMonth() === 2);
+        const march8 = marchDays.filter(d => d.getUTCDate() === 8);
+        expect(march8).toHaveLength(1);
+
+        // Ensure all March days are unique
+        const uniqueMarch = new Set(marchDays.map(d => d.toISOString().slice(0, 10)));
+        expect(uniqueMarch.size).toBe(31);
+      });
     });
 
     describe('isWithinIntervalUTC', () => {

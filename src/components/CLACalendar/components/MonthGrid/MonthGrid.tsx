@@ -6,12 +6,14 @@ import {
   startOfWeek,
   endOfWeek,
   eachDayOfInterval,
+  eachDayOfIntervalUTC,
   format,
   parseISO,
   isValid,
   isWithinInterval,
   isSameMonth,
   addDays,
+  addDaysUTC,
   addMonthsUTC,
   isSameDay
 } from '../../../../utils/DateUtils';
@@ -50,9 +52,9 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
   const weekStart = startOfWeek(monthStart, { weekStartsOn: startWeekOnSunday ? 0 : 1, timezone });
   const weekEnd = endOfWeek(monthEnd, { weekStartsOn: startWeekOnSunday ? 0 : 1, timezone });
 
-  // Use our UTC-aware version for the critical date interval calculation
-  // This ensures all days are correctly included regardless of timezone
-  const calendarDays = eachDayOfInterval({
+  // Generate the calendar interval days using UTC-safe iteration when in UTC mode
+  // This avoids DST-induced duplicates (e.g. March 8, 2026 in US timezones)
+  const calendarDays = (timezone === 'UTC' ? eachDayOfIntervalUTC : eachDayOfInterval)({
     start: weekStart,
     end: weekEnd,
   });
@@ -65,7 +67,8 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
   if (cellsToAdd > 0) {
     const lastDay = calendarDays[calendarDays.length - 1];
     for (let i = 1; i <= cellsToAdd; i++) {
-      calendarDays.push(addDays(lastDay, i));
+      const addFn = timezone === 'UTC' ? addDaysUTC : addDays;
+      calendarDays.push(addFn(lastDay, i));
     }
   }
 
@@ -173,7 +176,7 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
             // Navigate to previous month's last day
             const targetMonthIndex = monthIndex - 1;
             const prevMonth = addMonthsUTC(baseDate, -1);
-            const prevMonthDays = eachDayOfInterval({
+            const prevMonthDays = (timezone === 'UTC' ? eachDayOfIntervalUTC : eachDayOfInterval)({
               start: startOfWeek(startOfMonth(prevMonth, timezone), { weekStartsOn: startWeekOnSunday ? 0 : 1, timezone }),
               end: endOfWeek(endOfMonth(prevMonth, timezone), { weekStartsOn: startWeekOnSunday ? 0 : 1, timezone })
             });
@@ -204,7 +207,7 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
             // Navigate to next month's first day
             const targetMonthIndex = monthIndex + 1;
             const nextMonth = addMonthsUTC(baseDate, 1);
-            const nextMonthDays = eachDayOfInterval({
+            const nextMonthDays = (timezone === 'UTC' ? eachDayOfIntervalUTC : eachDayOfInterval)({
               start: startOfWeek(startOfMonth(nextMonth, timezone), { weekStartsOn: startWeekOnSunday ? 0 : 1, timezone }),
               end: endOfWeek(endOfMonth(nextMonth, timezone), { weekStartsOn: startWeekOnSunday ? 0 : 1, timezone })
             });
@@ -246,7 +249,7 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
             const columnIndex = currentIndex % 7;
             const targetMonthIndex = monthIndex - 1;
             const prevMonth = addMonthsUTC(baseDate, -1);
-            const prevMonthDays = eachDayOfInterval({
+            const prevMonthDays = (timezone === 'UTC' ? eachDayOfIntervalUTC : eachDayOfInterval)({
               start: startOfWeek(startOfMonth(prevMonth, timezone), { weekStartsOn: startWeekOnSunday ? 0 : 1, timezone }),
               end: endOfWeek(endOfMonth(prevMonth, timezone), { weekStartsOn: startWeekOnSunday ? 0 : 1, timezone })
             });
@@ -289,7 +292,7 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
             const columnIndex = currentIndex % 7;
             const targetMonthIndex = monthIndex + 1;
             const nextMonth = addMonthsUTC(baseDate, 1);
-            const nextMonthDays = eachDayOfInterval({
+            const nextMonthDays = (timezone === 'UTC' ? eachDayOfIntervalUTC : eachDayOfInterval)({
               start: startOfWeek(startOfMonth(nextMonth, timezone), { weekStartsOn: startWeekOnSunday ? 0 : 1, timezone }),
               end: endOfWeek(endOfMonth(nextMonth, timezone), { weekStartsOn: startWeekOnSunday ? 0 : 1, timezone })
             });

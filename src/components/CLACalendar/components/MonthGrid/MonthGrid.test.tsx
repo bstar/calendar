@@ -641,4 +641,46 @@ describe('MonthGrid', () => {
       expect(screen.getByTestId('day-2025-06-01')).toBeInTheDocument();
     });
   });
+
+  describe('DST Duplication Regression - March 2026', () => {
+    it('should not duplicate March 8, 2026 (UTC, Monday start)', () => {
+      const props = {
+        ...defaultProps,
+        baseDate: createDate(2026, 2, 1), // March 2026
+        startWeekOnSunday: false,
+        settings: { ...defaultProps.settings, timezone: 'UTC' }
+      };
+
+      const { container } = render(<MonthGrid {...props} />);
+      expect(container.querySelector('.month-grid-days')).toBeInTheDocument();
+
+      const dayCells = Array.from(container.querySelectorAll('[data-testid^="day-"]')) as HTMLElement[];
+      const marchCells = dayCells.filter(el => el.dataset.testid?.startsWith('day-2026-03-'));
+
+      // Ensure 31 unique March days
+      const unique = new Set(marchCells.map(el => el.dataset.testid));
+      expect(unique.size).toBe(31);
+
+      // Ensure March 8 appears exactly once
+      const march8 = marchCells.filter(el => el.dataset.testid === 'day-2026-03-08');
+      expect(march8.length).toBe(1);
+    });
+
+    it('should not duplicate March 8, 2026 (UTC, Sunday start)', () => {
+      const props = {
+        ...defaultProps,
+        baseDate: createDate(2026, 2, 1), // March 2026
+        startWeekOnSunday: true,
+        settings: { ...defaultProps.settings, timezone: 'UTC' }
+      };
+
+      const { container } = render(<MonthGrid {...props} />);
+      const dayCells = Array.from(container.querySelectorAll('[data-testid^="day-"]')) as HTMLElement[];
+      const marchCells = dayCells.filter(el => el.dataset.testid?.startsWith('day-2026-03-'));
+      const unique = new Set(marchCells.map(el => el.dataset.testid));
+      expect(unique.size).toBe(31);
+      const march8 = marchCells.filter(el => el.dataset.testid === 'day-2026-03-08');
+      expect(march8.length).toBe(1);
+    });
+  });
 });
