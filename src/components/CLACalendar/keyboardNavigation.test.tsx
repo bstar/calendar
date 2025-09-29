@@ -713,6 +713,43 @@ describe('CLACalendar Keyboard Navigation', () => {
     });
   });
 
+  it('tabs from rightmost month to footer actions (Clear then Submit)', async () => {
+    const { container } = render(
+      <CLACalendar
+        settings={{
+          ...getDefaultSettings(),
+          displayMode: 'embedded',
+          visibleMonths: 2,
+          showFooter: true,
+          showSubmitButton: true,
+          showClearButton: true,
+        }}
+      />
+    );
+
+    // Focus a day in the rightmost month (second month)
+    const grids = container.querySelectorAll('[role="grid"]');
+    expect(grids.length).toBeGreaterThanOrEqual(2);
+    const rightGrid = grids[1];
+    const rightMonthCells = rightGrid.querySelectorAll('[role="gridcell"]');
+    const focusableCell = Array.from(rightMonthCells).find(el => el.getAttribute('tabindex') === '0') as HTMLElement | undefined;
+    (focusableCell || rightMonthCells[0] as HTMLElement).focus();
+
+    // Press Tab and expect Clear to get focus first (if present)
+    fireEvent.keyDown(rightGrid, { key: 'Tab' });
+    const clearButton = screen.queryByRole('button', { name: /clear/i });
+    const submitButton = screen.getByRole('button', { name: /submit/i });
+    if (clearButton) {
+      expect(document.activeElement).toBe(clearButton);
+      // Next Tab should go to Submit
+      fireEvent.keyDown(clearButton, { key: 'Tab' });
+      expect(document.activeElement).toBe(submitButton);
+    } else {
+      // If no Clear, it should focus Submit directly
+      expect(document.activeElement).toBe(submitButton);
+    }
+  });
+
   describe('Selection with Keyboard', () => {
     it.skip('should select date with Space or Enter', () => {
       render(

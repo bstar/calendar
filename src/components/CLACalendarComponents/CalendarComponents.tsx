@@ -575,6 +575,17 @@ export const CalendarFooter: React.FC<CalendarFooterProps> = ({
           variant="secondary"
           onClick={handleClear}
           aria-label="Clear date selection"
+          onKeyDown={(e) => {
+            if (e.key === 'Tab' && !e.shiftKey) {
+              const container = (e.currentTarget as HTMLElement).closest('.calendar-footer') as HTMLElement | null;
+              const submit = (container?.querySelector('[aria-label="Submit date selection"]') as HTMLElement | null)
+                || (document.querySelector('[aria-label="Submit date selection"]') as HTMLElement | null);
+              if (submit) {
+                e.preventDefault();
+                submit.focus();
+              }
+            }
+          }}
         >
           Clear
         </Button>

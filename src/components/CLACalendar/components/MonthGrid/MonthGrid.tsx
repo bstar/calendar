@@ -146,9 +146,31 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
 
   // Keyboard navigation handler
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
+    // Always handle Tab for footer focus handoff when on rightmost month
+    if (e.key === 'Tab') {
+      // Only if focus is within this grid
+      if (gridRef.current?.contains(document.activeElement)) {
+        if (!e.shiftKey && totalMonths && monthIndex !== undefined && monthIndex === totalMonths - 1) {
+          const clearButton = document.querySelector('[aria-label="Clear date selection"]') as HTMLElement | null;
+          const submitButton = document.querySelector('[aria-label="Submit date selection"]') as HTMLElement | null;
+          if (clearButton) {
+            e.preventDefault();
+            clearButton.focus();
+            return;
+          }
+          if (submitButton) {
+            e.preventDefault();
+            submitButton.focus();
+            return;
+          }
+        }
+      }
+      // Fall through to default browser behavior
+    }
+
     if (!focusedDate) return;
-    
-    // Prevent handling keyboard events if the grid doesn't contain the active element
+
+    // Prevent handling other keyboard events if the grid doesn't contain the active element
     // This prevents the navigation loop when focus leaves
     if (!gridRef.current?.contains(document.activeElement)) {
       return;
@@ -164,6 +186,10 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
     let targetDate: Date | null = null;
 
     switch (e.key) {
+      case 'Tab':
+        // Already handled above; allow default behavior here
+        preventDefault = false;
+        break;
       case 'ArrowLeft':
         // Try to find previous valid day in current month
         const prevIndex = findNextValidDay(currentIndex - 1, -1, calendarDays);
