@@ -1281,31 +1281,39 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       if (!everInitialized || !currentMonth) return;
 
     const { before, after } = getNavigationRestrictionDate(settings);
-    const nextMonth = direction === 'next'
-      ? addMonths(currentMonth, 1)
-      : addMonths(currentMonth, -1);
-              // Reset button state
-    // Enable both navigation buttons by default
-    setIsMoveToMonthBackwardBtnDisabled(false);
-    setIsMoveToMonthForwardBtnDisabled(false);
 
-    // Determine restriction conditions
-    const isPrevRestricted = direction === 'prev' && before?.date && nextMonth < startOfMonth(before?.date);
-    const isNextRestricted = direction === 'next' && after?.date && nextMonth > startOfMonth(after?.date);
+    const visibleMonths = Math.min(6, Math.max(1, settings.visibleMonths));
+
+    // Candidate first and last visible months with UTC-safe math
+    const candidateFirst = direction === 'next'
+      ? addMonthsUTC(currentMonth, 1)
+      : addMonthsUTC(currentMonth, -1);
+    const candidateLast = addMonthsUTC(candidateFirst, visibleMonths - 1);
+
+    // Determine restriction conditions using month granularity
+    // 'before' means: minimum FIRST visible month
+    // 'after' means: maximum LAST visible month
+    const isPrevRestricted = direction === 'prev'
+      && !!before?.date
+      && startOfMonth(candidateFirst) < startOfMonth(before.date);
+    const isNextRestricted = direction === 'next'
+      && !!after?.date
+      && startOfMonth(candidateLast) > startOfMonth(after.date);
 
     // Apply restrictions if needed
     if (isPrevRestricted || isNextRestricted) {
       if (isPrevRestricted) {
         setIsMoveToMonthBackwardBtnDisabled(true);
+        setNotification(before?.message || 'Navigation blocked');
       } else {
         setIsMoveToMonthForwardBtnDisabled(true);
+        setNotification(after?.message || 'Navigation blocked');
       }
-      console.warn('Navigation blocked due to restriction boundary');
       return;
     }
 
       // First move the month
-      setCurrentMonth(() => nextMonth);
+      setCurrentMonth(() => candidateFirst);
 
       // Then handle selection logic only if we're in an out-of-bounds selection
       if (isSelecting && outOfBoundsDirection && selectionManager) {
@@ -1313,8 +1321,8 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
         if (!start) return;
       // Calculate the month we just moved to
         const nextMonthForSelection = direction === 'next'
-          ? addMonths(months[months.length - 1], 1)
-          : addMonths(months[0], -1);
+          ? addMonthsUTC(months[months.length - 1], 1)
+          : addMonthsUTC(months[0], -1);
 
         const firstDayOfMonth = startOfMonth(nextMonthForSelection);
         const lastDayOfMonth = endOfMonth(nextMonthForSelection);
@@ -1350,9 +1358,55 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
       selectedRange,
       handleDocumentMouseMove,
       handleMouseUp,
-      currentMonth
+      currentMonth,
+      settings.visibleMonths,
+      settings
     ]
   );
+
+  // Proactively disable nav buttons based on current window and nav restrictions
+  useEffect(() => {
+    if (!everInitialized || !currentMonth) return;
+    const { before, after } = getNavigationRestrictionDate(settings);
+    const visible = Math.min(6, Math.max(1, settings.visibleMonths));
+
+    const prevFirst = addMonthsUTC(currentMonth, -1);
+    const prevLast = addMonthsUTC(prevFirst, visible - 1);
+    const nextFirst = addMonthsUTC(currentMonth, 1);
+    const nextLast = addMonthsUTC(nextFirst, visible - 1);
+
+    // With 'before' meaning minimum FIRST visible month
+    const prevDisabled = !!before?.date && startOfMonth(prevFirst) < startOfMonth(before.date);
+    const nextDisabled = !!after?.date && startOfMonth(nextLast) > startOfMonth(after.date);
+
+    setIsMoveToMonthBackwardBtnDisabled(prevDisabled);
+    setIsMoveToMonthForwardBtnDisabled(nextDisabled);
+  }, [everInitialized, currentMonth, settings.visibleMonths, settings]);
+
+  // Clamp currentMonth so first/last visible months stay within nav window
+  useEffect(() => {
+    if (!everInitialized || !currentMonth) return;
+    const { before, after } = getNavigationRestrictionDate(settings);
+    const visible = Math.min(6, Math.max(1, settings.visibleMonths));
+    const firstVisible = startOfMonth(currentMonth);
+    const lastVisible = addMonthsUTC(firstVisible, visible - 1);
+
+    // If first visible is earlier than minimum allowed first month
+    if (before?.date && startOfMonth(firstVisible) < startOfMonth(before.date)) {
+      const clampedFirst = startOfMonth(before.date);
+      if (+startOfMonth(clampedFirst) !== +startOfMonth(currentMonth)) {
+        setCurrentMonth(clampedFirst);
+      }
+      return;
+    }
+    // If above maximum last visible month
+    if (after?.date && startOfMonth(lastVisible) > startOfMonth(after.date)) {
+      const clampedFirst = addMonthsUTC(startOfMonth(after.date), -(visible - 1));
+      if (+startOfMonth(clampedFirst) !== +startOfMonth(currentMonth)) {
+        setCurrentMonth(clampedFirst);
+      }
+    }
+  }, [everInitialized, currentMonth, settings.visibleMonths, settings]);
 
 
   // Update moveToMonthRef when moveToMonth changes

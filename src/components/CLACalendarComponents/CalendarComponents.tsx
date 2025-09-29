@@ -238,15 +238,19 @@ const validateAndUpdate = () => {
       return;
     }
 
-  const { before, after } = getNavigationRestrictionDate(settings);
+  const { before, after } = getNavigationRestrictionDate(settings as any);
 
     if (before?.date || after?.date) {
-      const isBeforeRestricted = before?.date && date < startOfDay(before?.date);
-      const isAfterRestricted = after?.date && date > endOfDay(after?.date);
+      // Enforce month-level, UTC, with date representing LAST visible month inclusive
+      const lastVisibleMonth = (d: Date) => startOfMonth(d);
+      const candidateMonth = lastVisibleMonth(date);
+
+      const isBeforeRestricted = !!before?.date && candidateMonth < startOfMonth(before.date);
+      const isAfterRestricted = !!after?.date && candidateMonth > startOfMonth(after.date);
 
       if (isBeforeRestricted || isAfterRestricted) {
         showValidationError({
-          message: isBeforeRestricted ? before?.message : after?.message,
+          message: isBeforeRestricted ? before?.message || 'Date is before minimum allowed month' : after?.message || 'Date is after maximum allowed month',
           type: 'error',
           field: 'range'
         });
@@ -321,6 +325,7 @@ const validateAndUpdate = () => {
       className="date-input-container"
       onClick={(e) => e.stopPropagation()}
       onMouseDown={(e) => e.stopPropagation()}
+      style={{ position: 'relative' }}
     >
       <input
         type="text"
@@ -354,6 +359,12 @@ const validateAndUpdate = () => {
       >
         {(error && showError) ? error.message : externalError?.message || ''}
       </div>
+      {showIndicator === 'success' && (
+        <span className="date-input-indicator date-input-indicator-success" aria-hidden="true">✓</span>
+      )}
+      {showIndicator === 'error' && (
+        <span className="date-input-indicator date-input-indicator-error" aria-hidden="true">×</span>
+      )}
     </div>
   );
 };

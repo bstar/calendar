@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback, useRef } from 'react';
-import { addMonths, format } from '../../../../utils/DateUtils';
+import { addMonthsUTC, format } from '../../../../utils/DateUtils';
 import { LayerRenderer } from '../../../CLACalendarComponents/layers/LayerRenderer';
 import { MonthGrid } from '../MonthGrid';
 import { CalendarGridProps, MonthPairProps } from './CalendarGrid.types';
@@ -62,7 +62,7 @@ const MonthPair: React.FC<MonthPairProps> = ({
       result.push(secondMonth);
     } else {
       for (let i = 0; i < visibleMonths; i++) {
-        result.push(addMonths(firstMonth, i));
+        result.push(addMonthsUTC(firstMonth, i));
       }
     }
 

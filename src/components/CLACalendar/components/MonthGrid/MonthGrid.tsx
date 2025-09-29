@@ -12,7 +12,7 @@ import {
   isWithinInterval,
   isSameMonth,
   addDays,
-  addMonths,
+  addMonthsUTC,
   isSameDay
 } from '../../../../utils/DateUtils';
 import { RestrictionManager } from '../../../CLACalendarComponents/restrictions/RestrictionManager';
@@ -172,7 +172,7 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
           if (totalMonths && totalMonths > 1 && monthIndex !== undefined && onNavigateToMonth) {
             // Navigate to previous month's last day
             const targetMonthIndex = monthIndex - 1;
-            const prevMonth = addMonths(baseDate, -1);
+            const prevMonth = addMonthsUTC(baseDate, -1);
             const prevMonthDays = eachDayOfInterval({
               start: startOfWeek(startOfMonth(prevMonth, timezone), { weekStartsOn: startWeekOnSunday ? 0 : 1, timezone }),
               end: endOfWeek(endOfMonth(prevMonth, timezone), { weekStartsOn: startWeekOnSunday ? 0 : 1, timezone })
@@ -203,7 +203,7 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
           if (totalMonths && totalMonths > 1 && monthIndex !== undefined && onNavigateToMonth) {
             // Navigate to next month's first day
             const targetMonthIndex = monthIndex + 1;
-            const nextMonth = addMonths(baseDate, 1);
+            const nextMonth = addMonthsUTC(baseDate, 1);
             const nextMonthDays = eachDayOfInterval({
               start: startOfWeek(startOfMonth(nextMonth, timezone), { weekStartsOn: startWeekOnSunday ? 0 : 1, timezone }),
               end: endOfWeek(endOfMonth(nextMonth, timezone), { weekStartsOn: startWeekOnSunday ? 0 : 1, timezone })
@@ -245,7 +245,7 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
           if (newIndex === currentIndex && totalMonths && totalMonths > 1 && monthIndex !== undefined && onNavigateToMonth) {
             const columnIndex = currentIndex % 7;
             const targetMonthIndex = monthIndex - 1;
-            const prevMonth = addMonths(baseDate, -1);
+            const prevMonth = addMonthsUTC(baseDate, -1);
             const prevMonthDays = eachDayOfInterval({
               start: startOfWeek(startOfMonth(prevMonth, timezone), { weekStartsOn: startWeekOnSunday ? 0 : 1, timezone }),
               end: endOfWeek(endOfMonth(prevMonth, timezone), { weekStartsOn: startWeekOnSunday ? 0 : 1, timezone })
@@ -288,7 +288,7 @@ export const MonthGrid: React.FC<MonthGridProps> = ({
           if (newIndex === currentIndex && totalMonths && totalMonths > 1 && monthIndex !== undefined && onNavigateToMonth) {
             const columnIndex = currentIndex % 7;
             const targetMonthIndex = monthIndex + 1;
-            const nextMonth = addMonths(baseDate, 1);
+            const nextMonth = addMonthsUTC(baseDate, 1);
             const nextMonthDays = eachDayOfInterval({
               start: startOfWeek(startOfMonth(nextMonth, timezone), { weekStartsOn: startWeekOnSunday ? 0 : 1, timezone }),
               end: endOfWeek(endOfMonth(nextMonth, timezone), { weekStartsOn: startWeekOnSunday ? 0 : 1, timezone })

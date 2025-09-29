@@ -276,6 +276,19 @@ export interface CalendarSettings {
   showLayersNavigation?: boolean;
   defaultLayer?: string;
   restrictionConfig?: RestrictionConfig;
+  /**
+   * Navigation-only restrictions (month granularity, UTC)
+   * - These restrict which months can be navigated to or displayed.
+   * - Dates represent the LAST visible month and are inclusive of that month.
+   * - They do NOT affect date selection rules; those live in `restrictionConfig`.
+   */
+  navigationRestrictions?: {
+    restrictions: Array<{
+      date: string; // ISO date string; month granularity (treated in UTC)
+      direction: 'before' | 'after'; // 'before' => minimum last visible month, 'after' => maximum last visible month
+      message?: string;
+    }>;
+  };
   
   // Color Settings
   colors?: {
@@ -508,6 +521,11 @@ export function createCalendarSettings(userSettings: Partial<CalendarSettings> =
     ...DEFAULT_COLORS,
     ...(settings.colors || {})
   };
+
+  // Normalize navigationRestrictions to a predictable shape
+  if (settings.navigationRestrictions && !Array.isArray(settings.navigationRestrictions.restrictions)) {
+    settings.navigationRestrictions = { restrictions: [] };
+  }
   
   // Validate and sanitize numeric values
   if (typeof settings.visibleMonths !== 'number' || settings.visibleMonths < 1 || settings.visibleMonths > 6) {

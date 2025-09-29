@@ -28,6 +28,7 @@ import './App.css';
 import './components/CLACalendarComponents/defensive-styles.css';
 
 import CLACalendar from './components/CLACalendar';
+import { useEffect as _useEffect, useState as _useState } from 'react';
 
 const App: React.FC = () => {
   const [selectedRange, setSelectedRange] = useState<{
@@ -112,6 +113,7 @@ const App: React.FC = () => {
                   <option value="dynamic-positioning">Dynamic Positioning Demo</option>
                   <option value="null-safe">Null-Safe Configuration</option>
                   <option value="restrictions">Restriction Testing</option>
+                  <option value="nav-restrictions">Navigation Restrictions</option>
                   <option value="events">Event Display Treatments</option>
                   <option value="accessibility">Accessibility Features</option>
                   <option value="submissionFormatter">Submission Formatter</option>
@@ -1034,6 +1036,59 @@ const App: React.FC = () => {
                   </div>
                 )}
 
+                {currentDemo === 'nav-restrictions' && (
+                  <div>
+                    <h4>Navigation Restrictions (Month-Level, UTC)</h4>
+                    <p className="cla-cal-text-muted">
+                      Blocks navigation beyond a configured month window. Dates typed into inputs also respect these month limits.
+                      The configured dates represent the <strong>last visible month</strong> and are inclusive of that month.
+                    </p>
+
+                    {/* Live editor for navigation restrictions */}
+                    <div className="cla-cal-alert cla-cal-alert-secondary cla-cal-mb-3" style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+                      <div>
+                        <label className="cla-cal-form-label">Visible Months</label>
+                        <input id="nav-demo-visible" type="number" min={1} max={6} defaultValue={2} className="cla-cal-form-control" style={{ width: 120 }} />
+                      </div>
+                      <div>
+                        <label className="cla-cal-form-label">Before (min first month)</label>
+                        <input id="nav-demo-before" type="date" defaultValue="2025-09-01" className="cla-cal-form-control" />
+                      </div>
+                      <div>
+                        <label className="cla-cal-form-label">After (max last month)</label>
+                        <input id="nav-demo-after" type="date" defaultValue="2025-12-31" className="cla-cal-form-control" />
+                      </div>
+                      <button
+                        className="cla-button cla-button-primary"
+                        onClick={() => {
+                          const visible = Number((document.getElementById('nav-demo-visible') as HTMLInputElement)?.value || 2);
+                          const before = (document.getElementById('nav-demo-before') as HTMLInputElement)?.value || '';
+                          const after = (document.getElementById('nav-demo-after') as HTMLInputElement)?.value || '';
+                          const ev = new CustomEvent('nav-restrictions-update', { detail: { visibleMonths: visible, before, after } });
+                          window.dispatchEvent(ev);
+                        }}
+                      >Apply</button>
+                    </div>
+
+                    <div className="cla-cal-alert cla-cal-alert-info cla-cal-mb-3">
+                      <small>
+                        <strong>Config:</strong> Min first visible month = Sep 2025; Max last visible month = Dec 2025; visibleMonths = 2<br/>
+                        Expected: first visible month cannot be earlier than Sep 2025 and the last cannot be later than Dec 2025. Buttons and PageUp/Down disabled at edges. Inputs blocked outside window.
+                      </small>
+                    </div>
+
+                    {/* Controlled calendar via window event to avoid heavy demo state */}
+                    <NavRestrictionsDemoCalendar onSubmit={handleDateSubmit} />
+
+                    <div className="cla-cal-alert cla-cal-alert-secondary cla-cal-mt-3">
+                      <small>
+                        Try typing a date like <code>2025-08-15</code> (blocked) or <code>2026-01-05</code> (blocked).
+                        Try navigating with the buttons and with <kbd>PageUp</kbd>/<kbd>PageDown</kbd>.
+                      </small>
+                    </div>
+                  </div>
+                )}
+
                 {currentDemo === 'events' && (
                   <div>
                     <h4>Event Display Treatments</h4>
@@ -1876,3 +1931,42 @@ const App: React.FC = () => {
 };
 
 export default App;
+
+// Helper component to allow live-updating nav restrictions via window event
+const NavRestrictionsDemoCalendar: React.FC<{ onSubmit: (a: string|null, b: string|null) => void }> = ({ onSubmit }) => {
+  const [cfg, setCfg] = _useState({ visibleMonths: 2, before: '2025-09-01', after: '2025-12-31' });
+
+  _useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail || {};
+      setCfg(prev => ({
+        visibleMonths: Math.min(6, Math.max(1, Number(detail.visibleMonths ?? prev.visibleMonths))),
+        before: detail.before || prev.before,
+        after: detail.after || prev.after
+      }));
+    };
+    window.addEventListener('nav-restrictions-update' as any, handler as any);
+    return () => window.removeEventListener('nav-restrictions-update' as any, handler as any);
+  }, []);
+
+  return (
+    <CLACalendar
+      settings={{
+        displayMode: 'embedded',
+        visibleMonths: cfg.visibleMonths,
+        monthWidth: 260,
+        selectionMode: 'range',
+        showSubmitButton: true,
+        showDateInputs: true,
+        showSelectionAlert: true,
+        navigationRestrictions: {
+          restrictions: [
+            { direction: 'before', date: cfg.before, message: 'Minimum month reached' },
+            { direction: 'after', date: cfg.after, message: 'Maximum month reached' }
+          ]
+        }
+      }}
+      onSubmit={onSubmit}
+    />
+  );
+};
