@@ -1591,8 +1591,29 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   useEffect(() => {
     if (!isOpen) {
       setIsReady(false);
+      // Optionally clear uncommitted local state on click-away close
+      if (settings.clearStateOnClickAway) {
+        // Restore selectedRange and displayRange from the external input or defaultRange
+        // If defaultRange exists, keep it; otherwise clear selection
+        const dr = settings.defaultRange;
+        if (dr?.start && dr?.end) {
+          setSelectedRange({ start: dr.start, end: dr.end, anchorDate: dr.start });
+          setDisplayRange({ start: dr.start, end: dr.end, anchorDate: dr.start });
+          // Re-sync currentMonth to reflect the defaultRange start
+          setCurrentMonth(new Date(dr.start));
+        } else {
+          setSelectedRange({ start: null, end: null, anchorDate: null });
+          setDisplayRange({ start: null, end: null, anchorDate: null });
+          // Re-sync currentMonth to "today" for a neutral reset
+          setCurrentMonth(new Date());
+        }
+        // Clear any validation errors and notifications
+        setValidationErrors({});
+        setNotification(null);
+        setIsSelecting(false);
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, settings.clearStateOnClickAway, settings.defaultRange]);
 
   // Show calendar after a brief delay
   useEffect(() => {

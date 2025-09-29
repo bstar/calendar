@@ -265,6 +265,12 @@ export interface CalendarSettings {
   enableOutOfBoundsScroll?: boolean;
   suppressTooltipsOnSelection?: boolean;
   showSelectionAlert?: boolean;
+  /**
+   * When true, clicking away will also clear the calendar's uncommitted local state
+   * (e.g., temporary selection and internal month focus), restoring it to the last
+   * committed values reflected in the input/display.
+   */
+  clearStateOnClickAway?: boolean;
   startWeekOnSunday?: boolean;
   dateFormatter?: (date: Date) => string; // Custom date formatter for visual display
   submissionFormatter?: (date: Date) => string; // Custom formatter for onSubmit callback data
@@ -437,6 +443,7 @@ const CORE_DEFAULTS = {
   showTooltips: true,
   showHeader: true,
   closeOnClickAway: true,
+  clearStateOnClickAway: false,
   showSubmitButton: true,
   showClearButton: true,
   showFooter: true,

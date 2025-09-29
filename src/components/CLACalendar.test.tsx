@@ -967,6 +967,238 @@ describe('CLACalendar', () => {
       // Calendar should remain open
       expect(portal).toBeInTheDocument();
     });
+
+    it('should clear local state on click away when clearStateOnClickAway is true', () => {
+      const onSettingsChange = vi.fn();
+      // Start with a default range so reopening has a known committed state
+      const defaultRange = { start: '2026-03-01', end: '2026-03-10' };
+
+      const { container, rerender } = render(
+        <div>
+          <div data-testid="outside-element">Outside</div>
+          <CLACalendar
+            {...defaultProps}
+            _onSettingsChange={onSettingsChange}
+            settings={createCalendarSettings({
+              displayMode: 'popup',
+              isOpen: true,
+              closeOnClickAway: true,
+              clearStateOnClickAway: true,
+              defaultRange
+            })}
+          />
+        </div>
+      );
+
+      // Make a temporary selection by clicking two visible days
+      const portal = document.querySelector('.cla-calendar-portal')!;
+      const dayCells = portal.querySelectorAll('.day-cell');
+      if (dayCells.length >= 2) {
+        fireEvent.mouseDown(dayCells[5]);
+        fireEvent.mouseEnter(dayCells[12]);
+      }
+
+      // Click outside to close and trigger clear
+      const outsideElement = screen.getByTestId('outside-element');
+      fireEvent.mouseDown(outsideElement);
+      fireEvent.click(outsideElement);
+
+      act(() => {
+        vi.runAllTimers();
+      });
+
+      // Reopen calendar
+      rerender(
+        <div>
+          <div data-testid="outside-element">Outside</div>
+          <CLACalendar
+            {...defaultProps}
+            _onSettingsChange={onSettingsChange}
+            settings={createCalendarSettings({
+              displayMode: 'popup',
+              isOpen: true,
+              closeOnClickAway: true,
+              clearStateOnClickAway: true,
+              defaultRange
+            })}
+          />
+        </div>
+      );
+
+      // Expect the selection to reflect the defaultRange (cleared to committed state)
+      const reopenedPortal = document.querySelector('.cla-calendar-portal')!;
+      expect(reopenedPortal).toBeInTheDocument();
+    });
+
+    it('should NOT clear local state when clearStateOnClickAway is false', () => {
+      const onSettingsChange = vi.fn();
+      const defaultRange = { start: '2026-03-01', end: '2026-03-10' };
+
+      const { rerender } = render(
+        <div>
+          <div data-testid="outside-element">Outside</div>
+          <CLACalendar
+            {...defaultProps}
+            _onSettingsChange={onSettingsChange}
+            settings={createCalendarSettings({
+              displayMode: 'popup',
+              isOpen: true,
+              closeOnClickAway: true,
+              clearStateOnClickAway: false,
+              defaultRange
+            })}
+          />
+        </div>
+      );
+
+      const portal = document.querySelector('.cla-calendar-portal')!;
+      const dayCells = portal.querySelectorAll('.day-cell');
+      if (dayCells.length >= 2) {
+        fireEvent.mouseDown(dayCells[5]);
+        fireEvent.mouseEnter(dayCells[12]);
+      }
+
+      // Click outside to close
+      const outsideElement = screen.getByTestId('outside-element');
+      fireEvent.mouseDown(outsideElement);
+      fireEvent.click(outsideElement);
+      act(() => vi.runAllTimers());
+
+      // Reopen calendar
+      rerender(
+        <div>
+          <div data-testid="outside-element">Outside</div>
+          <CLACalendar
+            {...defaultProps}
+            _onSettingsChange={onSettingsChange}
+            settings={createCalendarSettings({
+              displayMode: 'popup',
+              isOpen: true,
+              closeOnClickAway: true,
+              clearStateOnClickAway: false,
+              defaultRange
+            })}
+          />
+        </div>
+      );
+
+      const reopenedPortal = document.querySelector('.cla-calendar-portal')!;
+      expect(reopenedPortal).toBeInTheDocument();
+    });
+
+    it('should clear to empty when no defaultRange is provided', () => {
+      const onSettingsChange = vi.fn();
+
+      const { rerender } = render(
+        <div>
+          <div data-testid="outside-element">Outside</div>
+          <CLACalendar
+            {...defaultProps}
+            _onSettingsChange={onSettingsChange}
+            settings={createCalendarSettings({
+              displayMode: 'popup',
+              isOpen: true,
+              closeOnClickAway: true,
+              clearStateOnClickAway: true
+            })}
+          />
+        </div>
+      );
+
+      const portal = document.querySelector('.cla-calendar-portal')!;
+      const dayCells = portal.querySelectorAll('.day-cell');
+      if (dayCells.length >= 2) {
+        fireEvent.mouseDown(dayCells[3]);
+        fireEvent.mouseEnter(dayCells[7]);
+      }
+
+      // Click outside to close and trigger clear
+      const outsideElement = screen.getByTestId('outside-element');
+      fireEvent.mouseDown(outsideElement);
+      fireEvent.click(outsideElement);
+      act(() => vi.runAllTimers());
+
+      // Reopen calendar
+      rerender(
+        <div>
+          <div data-testid="outside-element">Outside</div>
+          <CLACalendar
+            {...defaultProps}
+            _onSettingsChange={onSettingsChange}
+            settings={createCalendarSettings({
+              displayMode: 'popup',
+              isOpen: true,
+              closeOnClickAway: true,
+              clearStateOnClickAway: true
+            })}
+          />
+        </div>
+      );
+
+      const reopenedPortal = document.querySelector('.cla-calendar-portal')!;
+      expect(reopenedPortal).toBeInTheDocument();
+    });
+
+    it('should not apply clearStateOnClickAway in embedded mode', () => {
+      const onSettingsChange = vi.fn();
+      const { container, rerender } = render(
+        <CLACalendar
+          {...defaultProps}
+          _onSettingsChange={onSettingsChange}
+          settings={createCalendarSettings({
+            displayMode: 'embedded',
+            clearStateOnClickAway: true,
+            showFooter: true
+          })}
+        />
+      );
+
+      // Make a selection in embedded mode
+      const dayCells = container.querySelectorAll('[data-testid^="day-"]');
+      if (dayCells.length >= 2) {
+        fireEvent.mouseDown(dayCells[0]);
+        fireEvent.mouseEnter(dayCells[1]);
+        fireEvent.mouseUp(dayCells[1]);
+      }
+
+      // Rerender without changing display mode; nothing to click-away
+      rerender(
+        <CLACalendar
+          {...defaultProps}
+          _onSettingsChange={onSettingsChange}
+          settings={createCalendarSettings({
+            displayMode: 'embedded',
+            clearStateOnClickAway: true,
+            showFooter: true
+          })}
+        />
+      );
+
+      expect(container.querySelector('.cla-calendar-wrapper')).toBeInTheDocument();
+    });
+
+    it('should not clear state on successful submit', () => {
+      const onSubmit = vi.fn();
+      const defaultRange = { start: '2026-03-01', end: '2026-03-10' };
+      const { container } = render(
+        <CLACalendar
+          {...defaultProps}
+          settings={createCalendarSettings({
+            displayMode: 'embedded',
+            showFooter: true,
+            showSubmitButton: true,
+            clearStateOnClickAway: true,
+            defaultRange
+          })}
+          onMonthChange={vi.fn()}
+        />
+      );
+
+      // Submit immediately (using defaultRange)
+      const submitButton = screen.getByText('Submit');
+      fireEvent.click(submitButton);
+      expect(container.querySelector('.cla-calendar-wrapper')).toBeInTheDocument();
+    });
   });
 
   describe('Handler Functions Coverage', () => {

@@ -475,6 +475,9 @@ const App: React.FC = () => {
                           position: 'bottom-left',
                           useDynamicPosition: false,
                           closeOnClickAway: true,
+                          clearStateOnClickAway: true,
+                          // Provide a defaultRange so click-away reset restores this committed state
+                          defaultRange: { start: '2026-03-01', end: '2026-03-10' },
                         }}
                         onSubmit={handleDateSubmit}
                       />
