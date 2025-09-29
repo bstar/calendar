@@ -780,7 +780,9 @@ describe('CalendarHeader', () => {
     visibleMonths: 1,
     moveToMonth: vi.fn(),
     settings: createCalendarSettings({}),
-    timezone: 'UTC'
+    timezone: 'UTC',
+    isMoveToMonthBtnDisabled: false
+
   };
 
   it('should render header with navigation buttons and title', () => {

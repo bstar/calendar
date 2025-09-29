@@ -449,7 +449,6 @@
   isolation: isolate !important;
 }
 
-/* Tooltip styles - use !important to ensure they can't be overridden */
 /* Namespaced tooltip styles to prevent conflicts with global Bootstrap .tooltip */
 .cla-calendar-tooltip {
   position: fixed !important;

@@ -4,8 +4,11 @@ import {
   format,
   parseISO,
   isSameDay,
+  startOfMonth,
 } from '../../utils/DateUtils';
+import { startOfDay, endOfDay } from 'date-fns';
 import { DateRange } from './selection/DateRangeSelectionManager';
+import { getNavigationRestrictionDate } from '../CLACalendarComponents/restrictions/utils';
 import { DEFAULT_CONTAINER_STYLES, CalendarSettings } from '../CLACalendar.config';
 import { RestrictionConfig } from './restrictions/types';
 import { Layer } from '../CLACalendar.config';
@@ -185,113 +188,116 @@ export const DateInput: React.FC<DateInputProps> = ({
     }
   };
 
-  const validateAndUpdate = () => {
-    if (inputValue === previousInputRef.current) {
-      return;
+const validateAndUpdate = () => {
+  if (inputValue === previousInputRef.current) return;
+  previousInputRef.current = inputValue;
+
+  const trimmed = inputValue.trim();
+  if (!trimmed) {
+    onChange(null);
+    setError(null);
+    setShowError(false);
+    if (value) {
+      setShowIndicator('error');
+      setTimeout(() => setShowIndicator(null), 3000);
+    }
+    return;
+  }
+
+  const parseUserDateString = (s: string): Date | null => {
+    const mdy = /^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/;
+    const dot = /^(\d{1,2})\.(\d{1,2})\.(\d{2}|\d{4})$/;
+    const iso = /^(\d{4})-(\d{2})-(\d{2})$/;
+    let yyyy, mm, dd;
+
+    if (mdy.test(s)) {
+      [, mm, dd, yyyy] = s.match(mdy)!;
+      yyyy = yyyy.length === 2 ? `20${yyyy}` : yyyy;
+    } else if (dot.test(s)) {
+      [, mm, dd, yyyy] = s.match(dot)!;
+      yyyy = yyyy.length === 2 ? `20${yyyy}` : yyyy;
+    } else if (iso.test(s)) {
+      return parseISO(s);
+    } else {
+      const native = new Date(s);
+      if (!isNaN(native.getTime())) return native;
+      return null;
     }
 
-    previousInputRef.current = inputValue;
+    return parseISO(`${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`);
+  };
 
-    // Handle empty input
-    if (!inputValue.trim()) {
-      onChange(null);
-      setError(null);
-      setShowError(false);
-      if (value) {
-        setShowIndicator('error');
-        setTimeout(() => setShowIndicator(null), 3000);
-      }
-      return;
-    }
-
-    // Try to parse the input value (UTC-safe)
-    try {
-      const parseUserDateString = (s: string): Date | null => {
-        const trimmed = s.trim();
-        // Accept MM/DD/YYYY
-        const mdy = /^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/;
-        // Accept dot notation: M.D.YY or M.D.YYYY
-        const dot = /^(\d{1,2})\.(\d{1,2})\.(\d{2}|\d{4})$/;
-        const iso = /^(\d{4})-(\d{2})-(\d{2})$/;
-        let yyyy: string, mm: string, dd: string;
-        if (mdy.test(trimmed)) {
-          const [, m, d, y] = trimmed.match(mdy)!;
-          yyyy = y.length === 2 ? `20${y}` : y;
-          mm = String(parseInt(m, 10)).padStart(2, '0');
-          dd = String(parseInt(d, 10)).padStart(2, '0');
-          return parseISO(`${yyyy}-${mm}-${dd}`); // UTC-aware
-        }
-        if (dot.test(trimmed)) {
-          const [, m, d, y] = trimmed.match(dot)!;
-          yyyy = y.length === 2 ? `20${y}` : y;
-          mm = String(parseInt(m, 10)).padStart(2, '0');
-          dd = String(parseInt(d, 10)).padStart(2, '0');
-          return parseISO(`${yyyy}-${mm}-${dd}`);
-        }
-        if (iso.test(trimmed)) {
-          return parseISO(trimmed); // UTC-aware
-        }
-        // Fallback: month name formats (e.g., Jul 20, 2025)
-        const native = new Date(trimmed);
-        if (!isNaN(native.getTime())) {
-          const y = native.getFullYear();
-          const m = String(native.getMonth() + 1).padStart(2, '0');
-          const d = String(native.getDate()).padStart(2, '0');
-          return parseISO(`${y}-${m}-${d}`);
-        }
-        return null;
-      };
-
-      const date = parseUserDateString(inputValue);
-      if (date && !isNaN(date.getTime())) {
-        // Range validation
-        if (field === 'start' && selectedRange?.end) {
-          const endDate = parseISO(selectedRange.end);
-          if (date > endDate) {
-            showValidationError({
-              message: 'Start date must be before end date',
-              type: 'error',
-              field: 'range'
-            });
-            return;
-          }
-        } else if (field === 'end' && selectedRange?.start) {
-          const startDate = parseISO(selectedRange.start);
-          if (date < startDate) {
-            showValidationError({
-              message: 'End date must be after start date',
-              type: 'error',
-              field: 'range'
-            });
-            return;
-          }
-        }
-
-        // Only show success for valid new values
-        const isNewValue = !value || !isSameDay(date, value);
-        if (isNewValue) {
-          setShowIndicator('success');
-          setTimeout(() => setShowIndicator(null), 3000);
-        }
-
-        onChange(date);
-        setError(null);
-        setShowError(false);
-      } else {
-        showValidationError({
-          message: 'Please use format: MM/DD/YYYY',
-          type: 'error',
-          field: 'format'
-        });
-      }
-    } catch {
+  try {
+    const date = parseUserDateString(inputValue);
+    if (!date || isNaN(date.getTime())) {
       showValidationError({
         message: 'Please use format: MM/DD/YYYY',
         type: 'error',
         field: 'format'
       });
+      return;
     }
-  };
+
+  const { before, after } = getNavigationRestrictionDate(settings);
+
+    if (before?.date || after?.date) {
+      const isBeforeRestricted = before?.date && date < startOfDay(before?.date);
+      const isAfterRestricted = after?.date && date > endOfDay(after?.date);
+
+      if (isBeforeRestricted || isAfterRestricted) {
+        showValidationError({
+          message: isBeforeRestricted ? before?.message : after?.message,
+          type: 'error',
+          field: 'range'
+        });
+        return;
+      }
+    }
+
+    if (field === 'start' && selectedRange?.end) {
+      const endDate = parseISO(selectedRange.end);
+      if (date > endDate) {
+        showValidationError({
+          message: 'Start date must be before end date',
+          type: 'error',
+          field: 'range'
+        });
+        return;
+      }
+    }
+
+    if (field === 'end' && selectedRange?.start) {
+      const startDate = parseISO(selectedRange.start);
+      if (date < startDate) {
+        showValidationError({
+          message: 'End date must be after start date',
+          type: 'error',
+          field: 'range'
+        });
+        return;
+      }
+    }
+
+    const isNewValue = !value || !isSameDay(date, value);
+    if (isNewValue) {
+      setShowIndicator('success');
+      setTimeout(() => setShowIndicator(null), 3000);
+    }
+
+    onChange(date);
+    setError(null);
+    setShowError(false);
+  } catch {
+    showValidationError({
+      message: 'Please use format: MM/DD/YYYY',
+      type: 'error',
+      field: 'format'
+    });
+  }
+};
+
+
+
 
   const showValidationError = (error: ValidationError) => {
     setError(error);
@@ -340,11 +346,6 @@ export const DateInput: React.FC<DateInputProps> = ({
           backgroundColor: settings?.backgroundColors?.input || '#fff'
         }}
       />
-      {showIndicator && (
-        <div className={`date-input-indicator date-input-indicator-${showIndicator}`}>
-          {showIndicator === 'success' ? '✓' : '×'}
-        </div>
-      )}
       <div
         id={`${field}-error`}
         className={`date-input-error ${((error && showError) || externalError) ? 'show' : ''}`}
@@ -364,6 +365,9 @@ export interface CalendarHeaderProps {
   moveToMonth: (direction: 'prev' | 'next') => void;
   timezone?: string;
   settings?: CalendarSettings;
+  isMoveToMonthBackwardBtnDisabled: boolean;
+  isMoveToMonthForwardBtnDisabled: boolean
+
 }
 
 /**
@@ -371,6 +375,8 @@ export interface CalendarHeaderProps {
  * @param months - Array of month dates to display
  * @param visibleMonths - Number of months visible at once
  * @param moveToMonth - Function to navigate between months
+ * @param isMoveToMonthBackwardBtnDisabled - Boolean flag to enable and disable Backward month navigation
+ * @param isMoveToMonthForwardBtnDisabled - Boolean flag to enable and disable Forward month navigation
  * @param timezone - Optional timezone for display
  * @returns Calendar header with navigation buttons
  */
@@ -379,7 +385,9 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   visibleMonths,
   moveToMonth,
   timezone = 'UTC',
-  settings
+  settings,
+  isMoveToMonthBackwardBtnDisabled = false,
+  isMoveToMonthForwardBtnDisabled = false
 }) => {
   // Format timezone for display
   const formatTimezone = (tz: string) => {
@@ -400,6 +408,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
         className="cla-button-nav"
         onClick={() => moveToMonth('prev')}
         aria-label="Previous month"
+        disabled={isMoveToMonthBackwardBtnDisabled}
       >
         <ChevronLeft size={16} />
       </button>
@@ -420,6 +429,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
         className="cla-button-nav"
         onClick={() => moveToMonth('next')}
         aria-label="Next month"
+        disabled={isMoveToMonthForwardBtnDisabled}
       >
         <ChevronRight size={16} />
       </button>
@@ -847,7 +857,7 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, show, children }) => 
 
   return (
     <>
-      <div ref={targetRef} className="cla-calendar-tooltip-container">
+    <div ref={targetRef} className="cla-calendar-tooltip-container">
         {children}
       </div>
       {show && portalContainer && ReactDOM.createPortal(

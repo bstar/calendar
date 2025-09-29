@@ -11,3 +11,26 @@ export function isValidDateString(value: unknown): value is string {
 export function hasValidDateStrings(range: { startDate?: unknown; endDate?: unknown }): range is { startDate: string; endDate: string } {
   return isValidDateString(range.startDate) && isValidDateString(range.endDate);
 }
+export const getNavigationRestrictionDate = (settings) => {
+  const beforeRestriction = settings?.navigationRestrictions?.restrictions?.find(
+    r => r?.direction === 'before' && r?.date
+  );
+
+  const afterRestriction = settings?.navigationRestrictions?.restrictions?.find(
+    r => r?.direction === 'after' && r?.date
+  );
+
+  return {
+    before: beforeRestriction?.date ? {
+      date: new Date(beforeRestriction?.date),
+      message: beforeRestriction?.message || ''
+    } : { date: null, message: '' },
+
+    after: afterRestriction?.date ? {
+      date: new Date(afterRestriction?.date),
+      message: afterRestriction?.message || ''
+    } : { date: null, message: '' }
+  };
+};
+
+

@@ -68,7 +68,7 @@
   display: block !important;
 }
 
-/* Tooltip container and styles */
+/* Tooltip container and styles (namespaced to prevent global conflicts) */
 .cla-calendar-tooltip {
   position: fixed !important;
   background-color: #1a1a1a !important;
@@ -154,4 +154,3 @@
 
     /* Special case for range mode on small screens */
   }
-}

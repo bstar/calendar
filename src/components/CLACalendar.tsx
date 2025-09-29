@@ -57,8 +57,7 @@ import {
   getActiveLayers,
   findLayerByName
 } from "./CLACalendar.config";
-import { LayerRenderer } from './CLACalendarComponents/layers/LayerRenderer';
-import { RestrictionManager } from './CLACalendarComponents/restrictions/RestrictionManager';
+import { getNavigationRestrictionDate } from './CLACalendarComponents/restrictions/utils';
 import { Notification } from './CLACalendarComponents/Notification';
 import {
   CalendarHeader,
@@ -312,6 +311,15 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
   const calendarIdRef = useRef<string>(`calendar-${++calendarCounter}`);
   const coordinatorRef = useRef<ReturnType<typeof registerCalendar> | null>(null);
   const [externalInputRef, setExternalInputRef] = useState<HTMLInputElement | null>(null);
+  const [isMoveToMonthForwardBtnDisabled, setIsMoveToMonthForwardBtnDisabled] = useState(false);
+  const [isMoveToMonthBackwardBtnDisabled, setIsMoveToMonthBackwardBtnDisabled] = useState(false);
+
+  // Track the last applied defaultRange so we can rehydrate on reopen if parent changed it while closed
+  const lastAppliedDefaultRangeRef = useRef<string | null>(settings.defaultRange?.start && settings.defaultRange?.end
+    ? `${settings.defaultRange.start}|${settings.defaultRange.end}`
+    : null);
+  // Track previous open state to detect reopen transitions
+  const prevIsOpenRef = useRef<boolean>(isOpen);
 
   // These states will only be initialized when calendar is first opened
   const [currentMonth, setCurrentMonth] = useState<Date | null>(() => {
@@ -693,6 +701,45 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     }
   }, [isOpen, everInitialized, settings.defaultRange, settings.dateFormatter]);
 
+  // Re-apply (hydrate) defaultRange when calendar is reopened if parent changed it while closed.
+  // This internalizes the previously external "reset key" workaround.
+  useEffect(() => {
+    // Detect open transition
+    const justOpened = isOpen && !prevIsOpenRef.current;
+    if (justOpened) {
+      const dr = settings.defaultRange;
+      if (dr?.start && dr?.end) {
+        const key = `${dr.start}|${dr.end}`;
+        // Only apply if different from what we already applied (or if selection is empty)
+        const selectionEmpty = !selectedRange.start && !selectedRange.end;
+        if (key !== lastAppliedDefaultRangeRef.current || selectionEmpty) {
+          // Update selected & display ranges
+            setSelectedRange({ start: dr.start, end: dr.end, anchorDate: dr.start });
+            setDisplayRange({ start: dr.start, end: dr.end, anchorDate: dr.start });
+
+            // Also update date input context formatting
+            const formatDateString = (dateString: string) => {
+              try {
+                const date = parseISO(dateString);
+                return settings.dateFormatter
+                  ? settings.dateFormatter(date)
+                  : format(date, "MM/dd/yyyy", 'UTC');
+              } catch (e) {
+                return null;
+              }
+            };
+            setDateInputContext({
+              startDate: formatDateString(dr.start),
+              endDate: formatDateString(dr.end),
+              currentField: null
+            });
+            lastAppliedDefaultRangeRef.current = key;
+        }
+      }
+    }
+    prevIsOpenRef.current = isOpen;
+  }, [isOpen, settings.defaultRange, settings.dateFormatter, selectedRange.start, selectedRange.end]);
+
   // Add a useEffect to update activeLayer when initialActiveLayer changes
   useEffect(() => {
     if (settings.initialActiveLayer) {
@@ -998,7 +1045,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     if (Object.keys(_validationErrors).length > 0) {
       // Build a concise message for the user
       const humanField = (field: string) => field === 'start' ? 'Start date' : field === 'end' ? 'End date' : 'Date';
-      const msg = Object.entries(_validationErrors)
+      const msg = (Object.entries(_validationErrors) as [string, CalendarValidationError][]) 
         .map(([field, err]) => `${humanField(field)}: ${err.message}`)
         .join('  ');
       // Surface error under inputs via existing per-field validation messaging
@@ -1102,7 +1149,7 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
     if (!updatedRange.start && !updatedRange.end) {
       const msg = settings.selectionMode === 'single'
         ? 'Please select a date before submitting.'
-        : 'Please select a start date (and optionally an end date) before submitting.';
+        : 'Please select a start date.';
       // Show guidance inline under Start input
       setValidationErrors(prev => ({
         ...prev,
@@ -1230,56 +1277,83 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
 
   // Update the moveToMonth function - only needed when initialized
   const moveToMonth = useCallback((direction: 'prev' | 'next') => {
-    if (!everInitialized || !currentMonth) return;
 
-    // First move the month - this happens regardless of selection state
-    setCurrentMonth(prev => {
-      return direction === 'next'
-        ? addMonths(prev, 1)
-        : addMonths(prev, -1);
-    });
+      if (!everInitialized || !currentMonth) return;
 
-    // Then handle selection logic only if we're in an out-of-bounds selection
-    if (isSelecting && outOfBoundsDirection && selectionManager) {
-      const start = selectedRange.start ? parseISO(selectedRange.start) : null;
-      if (!start) return;
+    const { before, after } = getNavigationRestrictionDate(settings);
+    const nextMonth = direction === 'next'
+      ? addMonths(currentMonth, 1)
+      : addMonths(currentMonth, -1);
+              // Reset button state
+    // Enable both navigation buttons by default
+    setIsMoveToMonthBackwardBtnDisabled(false);
+    setIsMoveToMonthForwardBtnDisabled(false);
 
-      // Calculate the month we just moved to
-      const nextMonth = direction === 'next'
-        ? addMonths(months[months.length - 1], 1)
-        : addMonths(months[0], -1);
+    // Determine restriction conditions
+    const isPrevRestricted = direction === 'prev' && before?.date && nextMonth < startOfMonth(before?.date);
+    const isNextRestricted = direction === 'next' && after?.date && nextMonth > startOfMonth(after?.date);
 
-      const firstDayOfMonth = startOfMonth(nextMonth);
-      const lastDayOfMonth = endOfMonth(nextMonth);
-
-      // Determine the potential new end of the selection
-      const potentialEnd = direction === 'next' ? lastDayOfMonth : firstDayOfMonth;
-
-      // Use the selection manager to handle the update, which now properly checks boundaries
-      const updateResult = selectionManager.updateSelection(
-        selectedRange,
-        potentialEnd
-      );
-
-      // Update the selection range with the result
-      setSelectedRange(updateResult.range);
-
-      // If there's a message or the update wasn't successful, we hit a restriction
-      if (updateResult.message || !updateResult.success) {
-        // End the selection and show message
-        setIsSelecting(false);
-        setOutOfBoundsDirection(null);
-
-        // Only show notification during out-of-bounds scrolling
-        if (settings.showSelectionAlert && outOfBoundsDirection) {
-          setNotification(updateResult.message);
-        }
-
-        document.removeEventListener("mousemove", handleDocumentMouseMove);
-        document.removeEventListener("mouseup", handleMouseUp);
+    // Apply restrictions if needed
+    if (isPrevRestricted || isNextRestricted) {
+      if (isPrevRestricted) {
+        setIsMoveToMonthBackwardBtnDisabled(true);
+      } else {
+        setIsMoveToMonthForwardBtnDisabled(true);
       }
+      console.warn('Navigation blocked due to restriction boundary');
+      return;
     }
-  }, [everInitialized, months, selectionManager, settings.showSelectionAlert, isSelecting, outOfBoundsDirection, selectedRange, handleDocumentMouseMove, handleMouseUp, currentMonth]);
+
+      // First move the month
+      setCurrentMonth(() => nextMonth);
+
+      // Then handle selection logic only if we're in an out-of-bounds selection
+      if (isSelecting && outOfBoundsDirection && selectionManager) {
+        const start = selectedRange.start ? parseISO(selectedRange.start) : null;
+        if (!start) return;
+      // Calculate the month we just moved to
+        const nextMonthForSelection = direction === 'next'
+          ? addMonths(months[months.length - 1], 1)
+          : addMonths(months[0], -1);
+
+        const firstDayOfMonth = startOfMonth(nextMonthForSelection);
+        const lastDayOfMonth = endOfMonth(nextMonthForSelection);
+        const potentialEnd = direction === 'next' ? lastDayOfMonth : firstDayOfMonth;
+
+        const updateResult = selectionManager.updateSelection(
+          selectedRange,
+          potentialEnd
+        );
+
+        setSelectedRange(updateResult.range);
+
+        if (updateResult.message || !updateResult.success) {
+          setIsSelecting(false);
+          setOutOfBoundsDirection(null);
+
+          if (settings.showSelectionAlert && outOfBoundsDirection) {
+            setNotification(updateResult.message);
+          }
+
+          document.removeEventListener("mousemove", handleDocumentMouseMove);
+          document.removeEventListener("mouseup", handleMouseUp);
+        }
+      }
+    },
+    [
+      everInitialized,
+      months,
+      selectionManager,
+      settings.showSelectionAlert,
+      isSelecting,
+      outOfBoundsDirection,
+      selectedRange,
+      handleDocumentMouseMove,
+      handleMouseUp,
+      currentMonth
+    ]
+  );
+
 
   // Update moveToMonthRef when moveToMonth changes
   useEffect(() => {
@@ -1397,6 +1471,8 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
               moveToMonth={moveToMonth}
               timezone={settings.timezone}
               settings={settings}
+              isMoveToMonthBackwardBtnDisabled={isMoveToMonthBackwardBtnDisabled}
+              isMoveToMonthForwardBtnDisabled={isMoveToMonthForwardBtnDisabled}
             />
           </>
         )}
