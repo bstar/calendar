@@ -1123,9 +1123,8 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
           if (updatedRange.start && updatedRange.end) {
             const startDate = parseISO(updatedRange.start);
             const endDate = parseISO(updatedRange.end);
-            // Use anchor from current selection when available
-            const anchor = selectedRange.anchorDate ? parseISO(selectedRange.anchorDate) : startDate;
-            const rangeCheck = runtimeSelectionManager.canSelectRange(startDate, endDate, anchor);
+            // Anchor to the current start to strictly enforce boundary restrictions
+            const rangeCheck = runtimeSelectionManager.canSelectRange(startDate, endDate, startDate);
             if (!rangeCheck.allowed) {
               // Attribute the message to end by default (user likely needs to adjust end)
               setValidationErrors(prev => ({

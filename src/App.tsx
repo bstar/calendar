@@ -28,6 +28,7 @@ import './App.css';
 import './components/CLACalendarComponents/defensive-styles.css';
 
 import CLACalendar from './components/CLACalendar';
+import { format } from './utils/DateUtils';
 import { useEffect as _useEffect, useState as _useState } from 'react';
 
 const App: React.FC = () => {
@@ -109,6 +110,8 @@ const App: React.FC = () => {
                   <option value="multiple">Multiple Months</option>
                   <option value="custom">Custom Theme</option>
                   <option value="popup">Popup Mode</option>
+                  <option value="typed-end-restrictions">Typed End Restrictions</option>
+                  <option value="display-separator-to">Display Separator: "to"</option>
                   <option value="popup-positions">Popup Positioning Tests</option>
                   <option value="dynamic-positioning">Dynamic Positioning Demo</option>
                   <option value="null-safe">Null-Safe Configuration</option>
@@ -489,6 +492,54 @@ const App: React.FC = () => {
                         The calendar should appear directly below the input field, aligned to the left edge.
                       </small>
                     </div>
+                  </div>
+                )}
+
+                {/* Demo: Restriction enforcement on typed end + immediate submit */}
+                {currentDemo === 'typed-end-restrictions' && (
+                  <div>
+                    <h4>Typed End + Immediate Submit (Restrictions Enforced)</h4>
+                    <p className="cla-cal-text-muted">Type an end date outside the allowed boundary and click Submit. It should block and focus End.</p>
+                    <CLACalendar
+                      settings={{
+                        displayMode: 'embedded',
+                        selectionMode: 'range',
+                        visibleMonths: 2,
+                        showFooter: true,
+                        showSubmitButton: true,
+                        timezone: 'UTC',
+                        // Restrict to year 2025 only
+                        restrictionConfigFactory: () => ({
+                          restrictions: [
+                            { type: 'boundary', enabled: true, date: '2025-01-01', direction: 'before', inclusive: false, message: 'Please select dates in 2025 or later' },
+                            { type: 'boundary', enabled: true, date: '2025-12-31', direction: 'after', inclusive: true, message: 'Please select dates in 2025 or earlier' },
+                          ],
+                        }),
+                        defaultRange: { start: '2025-09-10', end: '2025-09-10' },
+                        dateRangeSeparator: ' - ',
+                      }}
+                      onSubmit={handleDateSubmit}
+                    />
+                  </div>
+                )}
+
+                {/* Demo: External input separator as " to " for display */}
+                {currentDemo === 'display-separator-to' && (
+                  <div>
+                    <h4>External Input Display using "to"</h4>
+                    <p className="cla-cal-text-muted">Sets dateRangeSeparator to " to " for visual display only.</p>
+                    <CLACalendar
+                      settings={{
+                        displayMode: 'popup',
+                        selectionMode: 'range',
+                        visibleMonths: 2,
+                        position: 'bottom-left',
+                        dateRangeSeparator: ' to ',
+                        // Example dateFormatter to show custom display format
+                        dateFormatter: (date) => format(date, 'MMM dd, yyyy', 'UTC'),
+                      }}
+                      onSubmit={handleDateSubmit}
+                    />
                   </div>
                 )}
 

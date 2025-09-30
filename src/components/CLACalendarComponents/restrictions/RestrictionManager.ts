@@ -71,18 +71,19 @@ export class RestrictionManager {
     if (!isValid(boundaryDate)) return null;
 
     if (restriction.direction === 'before') {
-      if (start < boundaryDate) {
+      // Enforce minimum: entire selection must be on/after boundaryDate
+      if (start < boundaryDate || end < boundaryDate) {
         return restriction.message || 'Selection before boundary date is not allowed';
       }
     } else {
-      // Create end of day in UTC to match parseISO's UTC behavior
+      // Enforce maximum: entire selection must be on/before boundary end-of-day (UTC)
       const boundaryEndOfDay = new Date(Date.UTC(
         boundaryDate.getUTCFullYear(),
         boundaryDate.getUTCMonth(),
         boundaryDate.getUTCDate(),
         23, 59, 59, 999
       ));
-      if (start > boundaryEndOfDay) {
+      if (start > boundaryEndOfDay || end > boundaryEndOfDay) {
         return restriction.message || 'Selection after boundary date is not allowed';
       }
     }

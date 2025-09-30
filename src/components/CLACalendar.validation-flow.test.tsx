@@ -3,6 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import CLACalendar from './CLACalendar';
 import { createCalendarSettings } from './CLACalendar.config';
+import { format } from '../utils/DateUtils';
 import '@testing-library/jest-dom';
 
 const boundaryRestrictions = {
@@ -200,6 +201,85 @@ describe('CLACalendar validation and submit flow', () => {
     // Portal should be gone
     await waitFor(() => {
       expect(document.querySelector('.cla-calendar-portal')).not.toBeInTheDocument();
+    });
+  });
+
+  it('blocks typed end outside restriction on immediate submit (embedded)', async () => {
+    const onSubmit = vi.fn();
+    const { container } = render(
+      <CLACalendar
+        settings={createCalendarSettings({
+          displayMode: 'embedded',
+          selectionMode: 'range',
+          visibleMonths: 2,
+          showSubmitButton: true,
+          showFooter: true,
+          defaultRange: { start: '2025-09-10', end: '2025-09-10' },
+          restrictionConfigFactory: () => boundaryRestrictions,
+          timezone: 'UTC',
+          dateRangeSeparator: ' - ',
+        })}
+        onSubmit={onSubmit}
+      />
+    );
+
+    const inputs = container.querySelectorAll('input.date-input') as NodeListOf<HTMLInputElement>;
+    const startInput = inputs[0];
+    const endInput = inputs[1];
+
+    // Valid start in 2025
+    fireEvent.change(startInput, { target: { value: '09/10/2025' } });
+    // End outside boundary (2026)
+    fireEvent.change(endInput, { target: { value: '01/05/2026' } });
+
+    const submitButton = screen.getByText('Submit');
+    fireEvent.mouseDown(submitButton);
+    fireEvent.click(submitButton);
+
+    // The inputs validate on blur/Enter. Since we intentionally submitted without blurring,
+    // assert no submit happened, then trigger blur on End to surface the inline error state.
+    expect(onSubmit).not.toHaveBeenCalled();
+    fireEvent.blur(endInput);
+    // Still no submission and calendar remains open
+    expect(onSubmit).not.toHaveBeenCalled();
+    const wrapper = container.querySelector('.cla-calendar-wrapper');
+    expect(wrapper?.getAttribute('data-open')).toBe('true');
+  });
+
+  it('uses " to " separator for external input display when configured', async () => {
+    const onSubmit = vi.fn();
+    const { container } = render(
+      <CLACalendar
+        settings={createCalendarSettings({
+          displayMode: 'popup',
+          selectionMode: 'range',
+          visibleMonths: 2,
+          dateRangeSeparator: ' to ',
+          dateFormatter: (date) => format(date, 'MMM dd, yyyy', 'UTC'),
+          defaultRange: { start: '2025-09-10', end: '2025-09-12' },
+        })}
+        onSubmit={onSubmit}
+      />
+    );
+
+    // Open popup
+    const triggerInput = container.querySelector('.cla-input-custom') as HTMLInputElement | null;
+    if (triggerInput) {
+      fireEvent.click(triggerInput);
+    }
+
+    // Submit the default range
+    const submitButton = screen.queryByText('Submit');
+    if (submitButton) {
+      fireEvent.mouseDown(submitButton);
+      fireEvent.click(submitButton);
+    }
+
+    // After submit, external input should display with " to "
+    await waitFor(() => {
+      const external = container.querySelector('.cla-input-custom') as HTMLInputElement | null;
+      expect(external?.value).toMatch(/ to /);
+      expect(external?.value).toMatch(/Sep 10, 2025 to Sep 12, 2025/i);
     });
   });
 });

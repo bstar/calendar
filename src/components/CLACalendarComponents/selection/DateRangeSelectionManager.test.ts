@@ -221,10 +221,8 @@ describe('DateRangeSelectionManager', () => {
       const endDate = new Date('2025-07-01T12:00:00.000Z');
       const result = manager.canSelectRange(startDate, endDate);
       
-      // TODO: Boundary restriction logic may not be working as expected
-      // Currently allows ranges that extend beyond boundary
-      expect(result.allowed).toBe(true);
-      // expect(result.message).toBeTruthy();
+      expect(result.allowed).toBe(false);
+      expect(result.message).toBeTruthy();
     });
   });
 
