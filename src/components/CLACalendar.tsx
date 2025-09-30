@@ -1131,6 +1131,13 @@ export const CLACalendar: React.FC<CLACalendarProps> = ({
                 ...prev,
                 end: { message: rangeCheck.message || 'Selection violates restrictions', type: 'error', field: 'restriction' }
               }));
+              // Revert the uncommitted end date visually to avoid displaying an invalid value
+              try {
+                setSelectedRange(prev => ({
+                  ...prev,
+                  end: prev.start || null,
+                }));
+              } catch {}
               setIsOpen(true);
               try {
                 const container = containerRef.current;

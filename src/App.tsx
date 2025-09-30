@@ -21,7 +21,7 @@
  * @module App
  */
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import './cla-base.css';
 import './docStyles.css';
 import './App.css';
@@ -74,6 +74,28 @@ const App: React.FC = () => {
     setSelectedRange({ start, end });
   };
 
+  // Small helper component for popup + external input, starting blank
+  const BlankExternalDemo: React.FC<{ onSubmit: (s: string | null, e: string | null) => void }> = ({ onSubmit }) => {
+    const externalRef = useRef<HTMLInputElement | null>(null);
+    return (
+      <div>
+        <input ref={externalRef} placeholder="Select date" className="cla-form-control" style={{ width: 220 }} />
+        <div style={{ marginTop: 8 }}>
+          <CLACalendar
+            settings={{
+              displayMode: 'popup',
+              selectionMode: 'range',
+              externalInput: externalRef,
+              showFooter: true,
+              showSubmitButton: true,
+            }}
+            onSubmit={onSubmit}
+          />
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="cla-cal-wrapper">
       <div className="cla-cal-container-fluid cla-cal-py-4">
@@ -112,6 +134,7 @@ const App: React.FC = () => {
                   <option value="popup">Popup Mode</option>
                   <option value="typed-end-restrictions">Typed End Restrictions</option>
                   <option value="display-separator-to">Display Separator: "to"</option>
+                  <option value="blank-input">Blank Input Handling</option>
                   <option value="popup-positions">Popup Positioning Tests</option>
                   <option value="dynamic-positioning">Dynamic Positioning Demo</option>
                   <option value="null-safe">Null-Safe Configuration</option>
@@ -540,6 +563,53 @@ const App: React.FC = () => {
                       }}
                       onSubmit={handleDateSubmit}
                     />
+                  </div>
+                )}
+
+                {/* Demo: Blank input handling */}
+                {currentDemo === 'blank-input' && (
+                  <div>
+                    <h4>Blank Input Handling</h4>
+                    <p className="cla-cal-text-muted">Open with no default selection. Leave fields blank or clear them, then press Submit.</p>
+                    <div style={{ display: 'flex', gap: 24 }}>
+                      {/* Embedded version */}
+                      <div>
+                        <h5>Embedded</h5>
+                        <CLACalendar
+                          settings={{
+                            displayMode: 'embedded',
+                            selectionMode: 'range',
+                            visibleMonths: 2,
+                            showFooter: true,
+                            showSubmitButton: true,
+                            // Restrict selecting Jan 3, 2027
+                            restrictionConfig: {
+                              restrictions: [
+                                {
+                                  type: 'daterange',
+                                  enabled: true,
+                                  ranges: [
+                                    { startDate: '2027-01-03', endDate: '2027-01-03', message: 'Jan 3, 2027 is not selectable' }
+                                  ]
+                                }
+                              ]
+                            },
+                            // Navigation: cap the maximum last visible month at January 2026
+                            navigationRestrictions: {
+                              restrictions: [
+                                { direction: 'after', date: '2026-01-01', message: 'Navigation limited to January 2026 or earlier' }
+                              ]
+                            }
+                          }}
+                          onSubmit={handleDateSubmit}
+                        />
+                      </div>
+                      {/* Popup with external input */}
+                      <div>
+                        <h5>Popup with External Input</h5>
+                        <BlankExternalDemo onSubmit={handleDateSubmit} />
+                      </div>
+                    </div>
                   </div>
                 )}
 
