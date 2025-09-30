@@ -647,7 +647,7 @@ describe('CLACalendar External Input', () => {
       const externalInput = screen.getByTestId('external-input') as HTMLInputElement;
 
       // Pre-fill external input with invalid range (end before start)
-      externalInput.value = '02/01/2026 - 12/31/2025';
+      externalInput.value = '02/01/2026 to 12/31/2025';
 
       // Open calendar
       fireEvent.click(externalInput);

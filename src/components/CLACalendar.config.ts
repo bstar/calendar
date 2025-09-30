@@ -274,7 +274,7 @@ export interface CalendarSettings {
   startWeekOnSunday?: boolean;
   dateFormatter?: (date: Date) => string; // Custom date formatter for visual display
   submissionFormatter?: (date: Date) => string; // Custom formatter for onSubmit callback data
-  dateRangeSeparator?: string; // Custom separator for date ranges (default is " - ")
+  dateRangeSeparator?: string; // Custom separator for date ranges (default is " to ")
   defaultRange?: { start: string; end: string }; // Default date range to initialize with
   
   // Layer Settings - now optional with smart defaults
@@ -452,7 +452,7 @@ const CORE_DEFAULTS = {
   suppressTooltipsOnSelection: false,
   showSelectionAlert: false,
   startWeekOnSunday: false,
-  dateRangeSeparator: " - ",
+  dateRangeSeparator: " to ",
   layers: DEFAULT_LAYERS,
   showLayersNavigation: false, // Changed to false for simpler default
   defaultLayer: '',
